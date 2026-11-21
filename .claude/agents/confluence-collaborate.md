@@ -17,22 +17,32 @@ You manage the per-page collaboration layer — comments, attachments, labels, w
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted comment / file content) + C (Confluence state change via wrapper)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant under the injection-safety rule of two.
+This agent is **A (untrusted comment / file content) + C (Confluence state change via wrapper)**.
+
+<!-- shared:executor-rule-of-two -->
+NOT B (sensitive data — tokens stay in the wrapper and never enter the agent context). 2/3 = compliant under the injection-safety rule of two.
+<!-- /shared:executor-rule-of-two -->
 
 ## Pre-flight
 
+<!-- shared:confluence-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh <args>
 ```
+<!-- /shared:confluence-wrapper-call -->
 
 
 ## Procedure references
 
+<!-- shared:executor-procedure -->
 Use the routed skill and domain reference files for CLI syntax, safety tiers, templates, and operation-specific examples. Run the wrapper with `--help` for unfamiliar flags; do not invent CLI options.
+<!-- /shared:executor-procedure -->
 
 ## Inline vs Footer Comment Safety
 
@@ -64,13 +74,17 @@ Confluence accepts ADF (Atlassian Document Format) or markdown that `confluence-
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Output Protocol
 
 Return: operation summary + comment ID / attachment ID / label list / watcher list + URL.
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Gotchas
 

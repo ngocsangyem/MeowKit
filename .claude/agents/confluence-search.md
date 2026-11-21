@@ -17,24 +17,36 @@ You are the Confluence search agent. Run CQL queries, validate CQL, build querie
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted CQL + page content) + C (filter CRUD via wrapper)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant under the injection-safety rule of two. Read-only search ops are 1/3; saved-filter writes lift to 2/3.
+This agent is **A (untrusted CQL + page content) + C (filter CRUD via wrapper)**.
+
+<!-- shared:executor-rule-of-two -->
+NOT B (sensitive data — tokens stay in the wrapper and never enter the agent context). 2/3 = compliant under the injection-safety rule of two.
+<!-- /shared:executor-rule-of-two -->
+
+Read-only search ops are 1/3; saved-filter writes lift to 2/3.
 
 ## Pre-flight
 
 SessionStart hook validated env. All invocations go through:
 
+<!-- shared:confluence-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh <args>
 ```
+<!-- /shared:confluence-wrapper-call -->
 
 
 ## Procedure references
 
+<!-- shared:executor-procedure -->
 Use the routed skill and domain reference files for CLI syntax, safety tiers, templates, and operation-specific examples. Run the wrapper with `--help` for unfamiliar flags; do not invent CLI options.
+<!-- /shared:executor-procedure -->
 
 ## CQL Sanitization (MANDATORY for any user-derived term)
 
@@ -69,13 +81,17 @@ See `.claude/skills/confluence-search/references/cql-patterns.md` for canonical 
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Output Protocol
 
 Return: result count + projected page list (id + title + space + last-modified). For export, return: file path + record count.
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Gotchas
 

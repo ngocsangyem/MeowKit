@@ -8,14 +8,16 @@
 //! content.
 //!
 //! Beside the workflow-drift check because the failure is the same: prose that
-//! disagrees with its source. The default run reports drift as advisory, since
-//! the kit already carries copies that have diverged.
+//! disagrees with its source. A family may name `sections` to compare only the
+//! marked blocks of each member (see `shared_sections`) instead of the whole
+//! file, for agents that share boilerplate but differ elsewhere.
 use std::fs;
 use std::path::{Component, Path};
 
 use serde_json::Value;
 
 use super::result::{CheckResult, Section, Status};
+use super::shared_sections::{extract_section, section_drift};
 
 pub const MANIFEST_REL_PATH: &str = "shared-families.json";
 
@@ -39,8 +41,28 @@ fn fail(name: &str, detail: impl Into<String>) -> CheckResult {
     CheckResult::new(name, Status::Fail, detail, Section::Workflow)
 }
 
-/// One family: the members whose content differs from the canonical file, or
-/// that are missing.
+/// Why `actual` does not match `expected`: the whole file when the family names
+/// no sections, otherwise each named section in turn.
+fn drift_reasons(expected: &[u8], actual: &[u8], sections: &[String]) -> Vec<String> {
+    if sections.is_empty() {
+        return if expected == actual {
+            Vec::new()
+        } else {
+            vec!["differs".to_string()]
+        };
+    }
+    let (want, got) = (
+        String::from_utf8_lossy(expected),
+        String::from_utf8_lossy(actual),
+    );
+    sections
+        .iter()
+        .filter_map(|name| section_drift(&want, &got, name))
+        .collect()
+}
+
+/// One family: the members whose content (or named sections) differ from the
+/// canonical file, or that are missing.
 fn check_family(claude_dir: &Path, family: &Value, severity: Status) -> CheckResult {
     let name = family
         .get("name")
@@ -68,11 +90,31 @@ fn check_family(claude_dir: &Path, family: &Value, severity: Status) -> CheckRes
         return fail(&row, format!("canonical file `{canonical}` cannot be read"));
     };
 
+    let sections = string_list(family.get("sections")).unwrap_or_default();
+    let canonical_text = String::from_utf8_lossy(&expected);
+    if let Some(name) = sections
+        .iter()
+        .find(|s| extract_section(&canonical_text, s).is_none())
+    {
+        return fail(
+            &row,
+            format!("canonical file `{canonical}` has no `{name}` section"),
+        );
+    }
+
     let mut drifted = Vec::new();
     for member in members.iter().filter(|m| m.as_str() != canonical) {
         match fs::read(claude_dir.join(member)) {
-            Ok(bytes) if bytes == expected => {}
-            Ok(_) => drifted.push(format!("{member} differs from {canonical}")),
+            Ok(bytes) => {
+                let reasons = drift_reasons(&expected, &bytes, &sections);
+                if !reasons.is_empty() {
+                    drifted.push(if sections.is_empty() {
+                        format!("{member} differs from {canonical}")
+                    } else {
+                        format!("{member}: {}", reasons.join("; "))
+                    });
+                }
+            }
             Err(_) => drifted.push(format!("{member} is missing")),
         }
     }

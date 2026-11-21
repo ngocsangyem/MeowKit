@@ -56,7 +56,7 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 
 ## Workflow
 
-1. **Initialize** — Run preamble, detect base branch, parse parameters (URL, tier, mode, scope, auth), select mode (diff-aware / full / quick / regression), verify clean working tree, find browse binary. See `references/preamble.md`, `references/setup.md`, `references/modes.md`
+1. **Initialize** — Run preamble, detect base branch, parse parameters (URL, tier, mode, scope, auth), select mode (diff-aware / full / quick / regression), verify clean working tree, find browse binary. See `references/preamble.md`, `references/shared-protocols.md`, `references/setup.md`, `references/modes.md`
 
 2. **Orient** — Launch browser, navigate to target URL (or diff-aware entry point), authenticate if needed (login, cookies, 2FA, CAPTCHA), screenshot all key pages, map links and console errors, detect framework. See `references/workflow-phases.md`
 
@@ -64,11 +64,12 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 
 4. **Compute health score + triage** — Score all findings using health score rubric, sort by severity, filter by tier (Quick: critical/high only; Standard: + medium; Exhaustive: + cosmetic). Write top 3 issues. See `references/health-score.md`, `references/workflow-phases.md`
 
-5. **Fix + retest + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
+5. **Fix + retest + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/shared-protocols.md`
 
 ## References
 
-- `references/preamble.md` — Preamble, user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer
+- `references/preamble.md` — Session setup, upgrade check, lake intro, telemetry prompt
+- `references/shared-protocols.md` — User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer
 - `references/setup.md` — Base branch detection, parameters, clean tree check, browse binary, test framework bootstrap, output directories, test plan context
 - `references/modes.md` — Diff-aware, Full, Quick, Regression mode details
 - `references/workflow-phases.md` — Phases 1-11 with full implementation details (authenticate, orient, explore, document, wrap up, triage, fix loop, final QA, report, TODOS)

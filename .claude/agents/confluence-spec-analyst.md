@@ -21,7 +21,9 @@ You read full Confluence spec context and produce a **structured Spec Research R
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
@@ -31,9 +33,11 @@ This agent is **A (untrusted page content) + C (bounded local Spec Research Repo
 
 All invocations through:
 
+<!-- shared:confluence-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh <args>
 ```
+<!-- /shared:confluence-wrapper-call -->
 
 Detect `mk:multimodal` skill presence at `.claude/skills/multimodal/`. If absent → image findings section is replaced with `[NO_MULTIMODAL]` flag (does not block analysis).
 
@@ -165,7 +169,9 @@ After successful run, return to the user:
 3. One-line headline (e.g. `"Spec is mostly complete — 3 gaps in the SLA section need clarification"`)
 4. Suggested next action (e.g. "Run `mk:planning-engine plan --tickets ... --spec <report-path>` once tickets are scoped")
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Failure Handling
 
@@ -182,7 +188,9 @@ Multimodal available but key missing|`[MULTIMODAL_AVAILABLE_BUT_FAILED: missing-
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Gotchas
 

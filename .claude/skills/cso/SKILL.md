@@ -55,7 +55,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 
 ## Workflow
 
-1. **Initialize** — run preamble, parse arguments (mode, scope, diff). See [preamble.md](references/preamble.md), [arguments-and-modes.md](references/arguments-and-modes.md)
+1. **Initialize** — run preamble, parse arguments (mode, scope, diff). See [preamble.md](references/preamble.md), [preamble-cso.md](references/preamble-cso.md), [arguments-and-modes.md](references/arguments-and-modes.md)
 2. **Reconnaissance** — architecture + attack surface + secrets + dependencies + CI/CD + infra + webhooks + LLM + skills. See phases 0-8 references.
 3. **Assessment** — OWASP Top 10 + STRIDE threat model + data classification + false positive filtering. See [phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md), [phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)
 4. **Report** — generate findings with exploit scenarios, trend tracking, remediation roadmap. Save JSON. See [phase-13-14-report-save.md](references/phase-13-14-report-save.md), [shared-protocols.md](references/shared-protocols.md)
@@ -65,6 +65,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 | File                                                                                                       | Contents                                                                                                                                                   |
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [references/preamble.md](references/preamble.md)                                                           | Startup script, upgrade check, lake intro, telemetry prompt                                                                                                |
+| [references/preamble-cso.md](references/preamble-cso.md)                                                   | Memory read step, loaded with the preamble                                                                                                                 |
 | [references/shared-protocols.md](references/shared-protocols.md)                                           | User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer |
 | [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `/mk:cso` flags, mode resolution logic, Grep tool usage note                                                                                         |
 | [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census                                                                                             |

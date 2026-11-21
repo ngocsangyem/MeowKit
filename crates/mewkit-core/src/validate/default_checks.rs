@@ -117,9 +117,9 @@ pub fn build_default_checks(
         // (prompting an upgrade) rather than failing an un-synced install. The
         // scoped flags stay strict, which is what the CI steps use.
         results.extend(check_workflow_drift(project_root, Status::Warn));
-        // Advisory for the same reason: copies that already diverged are a
-        // work list, and the scoped checks stay the strict ones.
-        results.extend(check_shared_families(meowkit_dir, Status::Warn));
+        // A copy that drifted from its canonical gives two skills different
+        // rules for the same step, so drift fails the run.
+        results.extend(check_shared_families(meowkit_dir, Status::Fail));
         results.extend(check_operation_conformance(meowkit_dir));
         results.push(check_generic_core_tokens(meowkit_dir));
         // Declared doc counts against the real inventory: surfacing it here

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "description": "Files copied into several skills that must stay identical to one canonical copy. `mewkit validate` compares each member to its canonical file. Paths are relative to .claude/.",
+  "description": "Files, or marked sections of files, copied into several skills or agents that must stay identical to one canonical copy. `mewkit validate` compares each member to its canonical file. A family with `sections` compares only the text between `<!-- shared:NAME -->` and `<!-- /shared:NAME -->` marker lines. Paths are relative to .claude/.",
   "families": [
     {
       "name": "shared-protocols",
@@ -8,7 +8,9 @@
       "members": [
         "skills/cso/references/shared-protocols.md",
         "skills/office-hours/references/shared-protocols.md",
-        "skills/plan-ceo-review/references/shared-protocols.md"
+        "skills/plan-ceo-review/references/shared-protocols.md",
+        "skills/qa/references/shared-protocols.md",
+        "skills/review/references/shared-protocols.md"
       ]
     },
     {
@@ -23,6 +25,104 @@
         "skills/qa/references/preamble.md",
         "skills/retro/references/preamble.md",
         "skills/ship/references/preamble.md"
+      ]
+    },
+    {
+      "name": "executor-core",
+      "canonical": "agents/jira-issue.md",
+      "sections": [
+        "executor-context",
+        "executor-memory",
+        "executor-status"
+      ],
+      "members": [
+        "agents/confluence-bulk.md",
+        "agents/confluence-collaborate.md",
+        "agents/confluence-page.md",
+        "agents/confluence-search.md",
+        "agents/confluence-spec-analyst.md",
+        "agents/jira-admin.md",
+        "agents/jira-agile.md",
+        "agents/jira-analyst.md",
+        "agents/jira-bulk.md",
+        "agents/jira-collaborate.md",
+        "agents/jira-dev.md",
+        "agents/jira-estimator.md",
+        "agents/jira-evaluator.md",
+        "agents/jira-fields.md",
+        "agents/jira-issue.md",
+        "agents/jira-jsm.md",
+        "agents/jira-lifecycle.md",
+        "agents/jira-ops.md",
+        "agents/jira-relationships.md",
+        "agents/jira-search.md",
+        "agents/jira-time.md"
+      ]
+    },
+    {
+      "name": "executor-wrapper",
+      "canonical": "agents/jira-issue.md",
+      "sections": [
+        "executor-procedure",
+        "executor-rule-of-two"
+      ],
+      "members": [
+        "agents/confluence-bulk.md",
+        "agents/confluence-collaborate.md",
+        "agents/confluence-page.md",
+        "agents/confluence-search.md",
+        "agents/jira-admin.md",
+        "agents/jira-agile.md",
+        "agents/jira-bulk.md",
+        "agents/jira-collaborate.md",
+        "agents/jira-dev.md",
+        "agents/jira-fields.md",
+        "agents/jira-issue.md",
+        "agents/jira-jsm.md",
+        "agents/jira-lifecycle.md",
+        "agents/jira-ops.md",
+        "agents/jira-relationships.md",
+        "agents/jira-search.md",
+        "agents/jira-time.md"
+      ]
+    },
+    {
+      "name": "jira-wrapper-call",
+      "canonical": "agents/jira-issue.md",
+      "sections": [
+        "jira-wrapper-call"
+      ],
+      "members": [
+        "agents/jira-admin.md",
+        "agents/jira-agile.md",
+        "agents/jira-analyst.md",
+        "agents/jira-bulk.md",
+        "agents/jira-collaborate.md",
+        "agents/jira-dev.md",
+        "agents/jira-estimator.md",
+        "agents/jira-evaluator.md",
+        "agents/jira-fields.md",
+        "agents/jira-issue.md",
+        "agents/jira-jsm.md",
+        "agents/jira-lifecycle.md",
+        "agents/jira-ops.md",
+        "agents/jira-relationships.md",
+        "agents/jira-search.md",
+        "agents/jira-time.md"
+      ]
+    },
+    {
+      "name": "confluence-wrapper-call",
+      "canonical": "agents/confluence-page.md",
+      "sections": [
+        "confluence-wrapper-call"
+      ],
+      "members": [
+        "agents/confluence-bulk.md",
+        "agents/confluence-collaborate.md",
+        "agents/confluence-page.md",
+        "agents/confluence-search.md",
+        "agents/confluence-spec-analyst.md"
       ]
     }
   ]

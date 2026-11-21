@@ -124,7 +124,7 @@ Report exactly one classification and one short evidence line in the final summa
 
 **Publish (explicit)** — After an explicit request, decide versioning, changelog, and issue actions with the user; never auto-select a version bump or create external records.
 
-**Post-ship** — Verify CI passes. Document rollback steps in PR body. See `references/preamble.md`
+**Post-ship** — Verify CI passes. Document rollback steps in PR body. See `references/preamble.md`, `references/preamble-ship.md`
 
 ## Output Format
 
@@ -161,7 +161,8 @@ After pipeline completes, output this summary:
 
 ## References
 
-- `references/preamble.md` — Session init, user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Plan Status Footer
+- `references/preamble.md` — Session init, upgrade check, lake intro, telemetry prompt
+- `references/preamble-ship.md` — User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Plan Status Footer
 - `references/pre-flight.md` — Base branch detection (Step 0), pre-flight checks (Step 1), Review Readiness Dashboard
 - `references/distribution-pipeline.md` — Distribution pipeline check (Step 1.5)
 - `references/merge-and-test-bootstrap.md` — Merge base branch (Step 2), test framework bootstrap (Step 2.5)

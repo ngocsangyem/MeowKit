@@ -83,3 +83,63 @@ fn an_absent_manifest_is_not_applicable_and_bad_json_fails() {
     assert_eq!(statuses(dir.path()), vec![Status::Na]);
     assert_eq!(statuses(kit("{", &[]).path()), vec![Status::Fail]);
 }
+
+const SECTIONED: &str = r#"{"families":[{"name":"agents","canonical":"agents/a.md",
+  "sections":["core"],"members":["agents/a.md","agents/b.md"]}]}"#;
+
+fn agent(intro: &str, core: &str) -> String {
+    format!("{intro}\n<!-- shared:core -->\n{core}\n<!-- /shared:core -->\n")
+}
+
+#[test]
+fn a_sectioned_family_ignores_text_outside_the_markers() {
+    let dir = kit(
+        SECTIONED,
+        &[
+            ("agents/a.md", &agent("one", "same")),
+            ("agents/b.md", &agent("another", "same")),
+        ],
+    );
+    assert_eq!(statuses(dir.path()), vec![Status::Pass]);
+}
+
+#[test]
+fn a_sectioned_family_reports_a_changed_or_unmarked_member() {
+    let changed = kit(
+        SECTIONED,
+        &[
+            ("agents/a.md", &agent("one", "same")),
+            ("agents/b.md", &agent("one", "other")),
+        ],
+    );
+    let rows = check_shared_families(&changed.path().join(".claude"), Status::Fail);
+    assert_eq!(rows[0].status, Status::Fail);
+    assert!(
+        rows[0]
+            .detail
+            .contains("agents/b.md: `core` section differs")
+    );
+
+    let unmarked = kit(
+        SECTIONED,
+        &[
+            ("agents/a.md", &agent("one", "same")),
+            ("agents/b.md", "same"),
+        ],
+    );
+    let rows = check_shared_families(&unmarked.path().join(".claude"), Status::Warn);
+    assert!(
+        rows[0]
+            .detail
+            .contains("agents/b.md: has no `core` section")
+    );
+}
+
+#[test]
+fn a_canonical_without_the_section_fails_whatever_the_severity() {
+    let dir = kit(
+        SECTIONED,
+        &[("agents/a.md", "no markers"), ("agents/b.md", "no markers")],
+    );
+    assert_eq!(statuses(dir.path()), vec![Status::Fail]);
+}

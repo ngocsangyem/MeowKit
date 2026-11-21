@@ -20,7 +20,9 @@ You read full ticket context and produce **structured analysis** that the user c
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
@@ -30,9 +32,11 @@ This agent is **A (untrusted ticket content) + C (bounded local analysis report 
 
 All `jira-as` invocations through:
 
+<!-- shared:jira-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 ```
+<!-- /shared:jira-wrapper-call -->
 
 ## Live vs Mock Check
 
@@ -165,7 +169,9 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships li
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<media findings summary>"
 ```
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Report Persistence
 
@@ -179,7 +185,9 @@ This makes the output durable across sessions and consumable by downstream skill
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Gotchas
 
