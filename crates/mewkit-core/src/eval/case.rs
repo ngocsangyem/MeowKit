@@ -37,8 +37,14 @@ pub enum Assertion {
         skill: String,
     },
     /// A file exists in the run's workspace after the run, relative to it.
+    /// A path segment may use `*` (`tasks/plans/*/plan.md`).
     FileExists {
         path: String,
+    },
+    /// Some file matching `path` (as for `fileExists`) matches `pattern`.
+    FileContains {
+        path: String,
+        pattern: String,
     },
     OutputMatches {
         pattern: String,
@@ -187,6 +193,10 @@ fn check_assertion(a: &Assertion) -> Result<(), String> {
         Assertion::FileExists { path } => RelPath::new(path)
             .map(|_| ())
             .map_err(|e| format!("fileExists: {e}")),
+        Assertion::FileContains { path, pattern } => {
+            RelPath::new(path).map_err(|e| format!("fileContains: {e}"))?;
+            compile(pattern).map(|_| ())
+        }
         Assertion::OutputMatches { pattern } | Assertion::OutputNotMatches { pattern } => {
             compile(pattern).map(|_| ())
         }

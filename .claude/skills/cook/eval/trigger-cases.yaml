@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: cook-trigger-1
+    skill: cook
+    kind: trigger
+    prompt: "Implement the CSV export feature described in tasks/plans/260101-export/plan.md end to end."
+    expectTrigger: true
+  - id: cook-trigger-2
+    skill: cook
+    kind: trigger
+    prompt: "Build the rate-limit middleware from the agreed plan, then verify and review it."
+    expectTrigger: true
+  - id: cook-near-miss-1
+    skill: cook
+    kind: trigger
+    prompt: "Explain what a Rust lifetime annotation means."
+    expectTrigger: false
+  - id: cook-near-miss-2
+    skill: cook
+    kind: trigger
+    prompt: "Write a short commit message for a typo fix in the README."
+    expectTrigger: false

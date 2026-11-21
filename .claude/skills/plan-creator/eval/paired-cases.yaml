@@ -1,0 +1,37 @@
+# Paired cases: the same task with the skill on and off, graded by assertions.
+cases:
+  - id: plan-creator-writes-plan
+    skill: plan-creator
+    kind: paired
+    prompt: "Plan adding a multiply and a power function with tests. Write the plan; do not implement."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileExists, path: "tasks/plans/*/plan.md" }
+      - { type: fileContains, path: "tasks/plans/*/phase-*.md", pattern: "(?i)multiply" }
+  - id: plan-creator-no-code
+    skill: plan-creator
+    kind: paired
+    prompt: "Write an implementation plan for a divide-by-zero guard. Planning only."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileExists, path: "tasks/plans/*/plan.md" }
+      - { type: fileContains, path: "src/calc.js", pattern: "return a / b;" }
+  - id: plan-creator-acceptance
+    skill: plan-creator
+    kind: paired
+    prompt: "Plan a CLI wrapper for calc with acceptance criteria per phase."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "tasks/plans/*/*.md", pattern: "(?i)acceptance|success criteria" }
+  - id: plan-creator-held-out
+    skill: plan-creator
+    kind: paired
+    prompt: "Before we build anything, plan rounding support for divide."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    heldOut: true
+    assertions:
+      - { type: fileExists, path: "tasks/plans/*/plan.md" }

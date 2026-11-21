@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: planning-engine-trigger-1
+    skill: planning-engine
+    kind: trigger
+    prompt: "Score the complexity and dependencies of ticket PROJ-88 against this codebase."
+    expectTrigger: true
+  - id: planning-engine-trigger-2
+    skill: planning-engine
+    kind: trigger
+    prompt: "Estimate how risky PROJ-90 is given the modules it touches."
+    expectTrigger: true
+  - id: planning-engine-near-miss-1
+    skill: planning-engine
+    kind: trigger
+    prompt: "Write a phased implementation plan for SSO."
+    expectTrigger: false
+  - id: planning-engine-near-miss-2
+    skill: planning-engine
+    kind: trigger
+    prompt: "Size these three user stories with Fibonacci points."
+    expectTrigger: false

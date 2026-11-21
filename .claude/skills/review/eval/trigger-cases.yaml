@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: review-trigger-1
+    skill: review
+    kind: trigger
+    prompt: "Review the diff on this branch adversarially before I merge it."
+    expectTrigger: true
+  - id: review-trigger-2
+    skill: review
+    kind: trigger
+    prompt: "Do a multi-pass code review of the last commit."
+    expectTrigger: true
+  - id: review-near-miss-1
+    skill: review
+    kind: trigger
+    prompt: "Open the app in a browser and click through the signup flow to see if it works."
+    expectTrigger: false
+  - id: review-near-miss-2
+    skill: review
+    kind: trigger
+    prompt: "Write unit tests for src/date-utils.js."
+    expectTrigger: false

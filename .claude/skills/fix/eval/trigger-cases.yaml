@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: fix-trigger-1
+    skill: fix
+    kind: trigger
+    prompt: "The test suite fails with TypeError: cannot read property 'id' of undefined in user.service. Fix it."
+    expectTrigger: true
+  - id: fix-trigger-2
+    skill: fix
+    kind: trigger
+    prompt: "CI lint is failing on main; find the cause and fix it."
+    expectTrigger: true
+  - id: fix-near-miss-1
+    skill: fix
+    kind: trigger
+    prompt: "Why does our login sometimes hang? Diagnose it and write a report, don't change code."
+    expectTrigger: false
+  - id: fix-near-miss-2
+    skill: fix
+    kind: trigger
+    prompt: "Rename the variable `tmp` to `buffer` in src/io.js."
+    expectTrigger: false

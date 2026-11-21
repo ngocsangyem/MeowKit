@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: scout-trigger-1
+    skill: scout
+    kind: trigger
+    prompt: "Where in this repo is the session timeout enforced? Map the relevant files."
+    expectTrigger: true
+  - id: scout-trigger-2
+    skill: scout
+    kind: trigger
+    prompt: "Sweep the codebase and give me a file map of everything touching payments."
+    expectTrigger: true
+  - id: scout-near-miss-1
+    skill: scout
+    kind: trigger
+    prompt: "Research which OAuth library is best for Node in 2026."
+    expectTrigger: false
+  - id: scout-near-miss-2
+    skill: scout
+    kind: trigger
+    prompt: "Fix the null check in src/auth.ts line 45."
+    expectTrigger: false

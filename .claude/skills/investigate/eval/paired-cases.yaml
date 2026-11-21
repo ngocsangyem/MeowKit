@@ -1,0 +1,38 @@
+# Paired cases: the same task with the skill on and off, graded by assertions.
+cases:
+  - id: investigate-report-not-edit
+    skill: investigate
+    kind: paired
+    prompt: "Why does the subtract test fail? Diagnose it; do not change source code."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "function subtract\\(a, b\\) \\{\\n  return a \\+ b;" }
+      - { type: outputMatches, pattern: "(?i)subtract" }
+  - id: investigate-writes-report
+    skill: investigate
+    kind: paired
+    prompt: "Investigate the failing subtract test and write a diagnostic report."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "tasks/reports/*", pattern: "(?i)subtract" }
+      - { type: fileContains, path: "src/calc.js", pattern: "return a \\+ b;\\n\\}\\n\\nfunction divide" }
+  - id: investigate-names-cause
+    skill: investigate
+    kind: paired
+    prompt: "subtract gives wrong answers. What is the root cause? Report only."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: outputMatches, pattern: "(?i)(a \\+ b|adds|addition|plus)" }
+  - id: investigate-held-out
+    skill: investigate
+    kind: paired
+    prompt: "Our calc tests are red. Find out why without editing anything."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    heldOut: true
+    assertions:
+      - { type: outputMatches, pattern: "(?i)subtract" }
+      - { type: fileContains, path: "src/calc.js", pattern: "return a \\+ b;\\n\\}\\n\\nfunction divide" }

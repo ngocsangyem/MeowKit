@@ -1,0 +1,37 @@
+# Paired cases: the same task with the skill on and off, graded by assertions.
+cases:
+  - id: cook-executes-plan
+    skill: cook
+    kind: paired
+    prompt: "Execute the plan at tasks/plans/261122-divide-guard/plan.md."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "RangeError" }
+      - { type: fileContains, path: "test/calc.test.js", pattern: "(?i)divide" }
+  - id: cook-ticks-phase
+    skill: cook
+    kind: paired
+    prompt: "Implement tasks/plans/261122-divide-guard/plan.md and keep the plan's status current."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-*.md", pattern: "- \\[x\\]" }
+  - id: cook-verifies
+    skill: cook
+    kind: paired
+    prompt: "Cook the divide-guard plan in tasks/plans and confirm the tests pass."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "RangeError" }
+      - { type: toolBefore, first: "Edit", then: "Bash" }
+  - id: cook-held-out
+    skill: cook
+    kind: paired
+    prompt: "Build what tasks/plans/261122-divide-guard/plan.md describes."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    heldOut: true
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "RangeError" }

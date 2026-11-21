@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: agent-browser-trigger-1
+    skill: agent-browser
+    kind: trigger
+    prompt: "Open https://example.com in a browser, fill the search box with 'cats' and take a screenshot."
+    expectTrigger: true
+  - id: agent-browser-trigger-2
+    skill: agent-browser
+    kind: trigger
+    prompt: "Automate clicking through the login form in the browser and capture the result."
+    expectTrigger: true
+  - id: agent-browser-near-miss-1
+    skill: agent-browser
+    kind: trigger
+    prompt: "Use my real Chrome profile with my logins to check my Gmail."
+    expectTrigger: false
+  - id: agent-browser-near-miss-2
+    skill: agent-browser
+    kind: trigger
+    prompt: "Fetch the docs for the Playwright `locator` API."
+    expectTrigger: false

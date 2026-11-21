@@ -132,3 +132,19 @@ fn compare_prints_deltas_and_refuses_different_case_sets() {
     assert_eq!(o.status.code(), Some(1));
     assert!(text(&o).contains("case sets differ"), "{}", text(&o));
 }
+
+/// The kit's own baseline suite loads and keeps the shape the plan's run
+/// budget was computed from; every fixture it names exists.
+#[test]
+fn the_kits_baseline_suite_loads() {
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let o = mewkit(&repo, &["eval", "run", "--suite", "baseline", "--dry-run"]);
+    let out = text(&o);
+    assert!(o.status.success(), "{out}");
+    assert!(out.contains("108 cases, 396 runs"), "{out}");
+    let skills = repo.join(".claude/skills");
+    for skill in ["cook", "fix", "investigate", "plan-creator"] {
+        let fx = skills.join(skill).join("eval/fixtures");
+        assert!(fx.is_dir(), "{skill} has no fixtures");
+    }
+}

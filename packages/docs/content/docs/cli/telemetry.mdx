@@ -73,6 +73,7 @@ mewkit eval compare <base.json> <new.json> [--json]
 - A run that times out, is rate-limited or ends without a result is retried twice and then recorded as an error, kept out of every rate. A report is incomplete when errors pass 5% of runs, when a case ran other than planned, or when a case was skipped.
 - `compare` refuses incomplete reports and reports that differ in runtime, model, case set or case list, and exits 1.
 - Cases live in `<skill>/eval/*.yaml` under `.claude/skills`. `--case-root` reads another folder and needs `--trust-cases`, because its cases run model turns.
+- The `baseline` suite (trigger cases for the 20 most-referenced skills, paired cases for `cook`, `plan-creator`, `fix` and `investigate`, and parachute briefs with controls) lives in the MeowKit repository; an install does not carry `eval/` folders. Paired assertions are `skillLoaded`, `skillNotLoaded`, `fileExists`, `fileContains`, `outputMatches`, `outputNotMatches`, `toolBefore` and `modelGraded`; a `fileExists` or `fileContains` path may use `*` within a segment (`tasks/plans/*/plan.md`).
 
 ## capabilities
 

@@ -1,0 +1,38 @@
+# Paired cases: the same task with the skill on and off, graded by assertions.
+cases:
+  - id: fix-subtract-bug
+    skill: fix
+    kind: paired
+    prompt: "npm test fails on the subtract test. Fix the bug."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "a\\s*-\\s*b" }
+      - { type: outputMatches, pattern: "(?i)root cause|caused by|because" }
+  - id: fix-keeps-tests
+    skill: fix
+    kind: paired
+    prompt: "The subtract test is red. Make it pass without weakening the test."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "test/calc.test.js", pattern: "subtract\\(5, 3\\), 2" }
+      - { type: fileContains, path: "src/calc.js", pattern: "a\\s*-\\s*b" }
+  - id: fix-scope
+    skill: fix
+    kind: paired
+    prompt: "Fix the failing subtract test. Touch only what the fix needs."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "return a / b" }
+      - { type: fileContains, path: "src/calc.js", pattern: "a\\s*-\\s*b" }
+  - id: fix-held-out
+    skill: fix
+    kind: paired
+    prompt: "subtract(5, 3) returns 8. Find why and fix it."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    heldOut: true
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: "a\\s*-\\s*b" }

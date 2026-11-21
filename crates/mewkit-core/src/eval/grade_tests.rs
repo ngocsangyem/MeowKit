@@ -19,9 +19,21 @@ fn tool(s: &str) -> Event {
     Event::Tool(s.into())
 }
 
-fn no_files(_: &RelPath) -> bool {
-    false
+/// An in-memory workspace: exact paths only, which is all these tests need.
+struct Files(Vec<(&'static str, &'static str)>);
+
+impl Workspace for Files {
+    fn read_matching(&self, pattern: &RelPath) -> Vec<String> {
+        self.0
+            .iter()
+            .filter(|(p, _)| *p == pattern.as_str())
+            .map(|(_, c)| (*c).to_owned())
+            .collect()
+    }
 }
+
+#[allow(non_upper_case_globals)]
+const no_files: Files = Files(Vec::new());
 
 fn case(kind: CaseKind) -> EvalCase {
     EvalCase {
@@ -106,7 +118,7 @@ fn each_assertion_has_a_pass_and_a_fail() {
         vec![load("cook"), tool("Write"), tool("Bash")],
         "all tests pass",
     );
-    let has_flag = |p: &RelPath| p.as_str() == "src/flag.rs";
+    let has_flag = Files(vec![("src/flag.rs", "pub fn flag() -> bool { true }")]);
     let cases = [
         (
             Assertion::SkillLoaded {
@@ -130,6 +142,16 @@ fn each_assertion_has_a_pass_and_a_fail() {
             },
             Assertion::FileExists {
                 path: "src/other.rs".into(),
+            },
+        ),
+        (
+            Assertion::FileContains {
+                path: "src/flag.rs".into(),
+                pattern: r"fn flag\(\)".into(),
+            },
+            Assertion::FileContains {
+                path: "src/flag.rs".into(),
+                pattern: "false".into(),
             },
         ),
         (

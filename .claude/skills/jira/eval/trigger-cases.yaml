@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: jira-trigger-1
+    skill: jira
+    kind: trigger
+    prompt: "Do something with ticket PROJ-142 in Jira, I'm not sure which operation yet."
+    expectTrigger: true
+  - id: jira-trigger-2
+    skill: jira
+    kind: trigger
+    prompt: "Help me with our Jira project: find, update or comment on issues as needed."
+    expectTrigger: true
+  - id: jira-near-miss-1
+    skill: jira
+    kind: trigger
+    prompt: "Summarise the open GitHub issues labelled bug in this repo."
+    expectTrigger: false
+  - id: jira-near-miss-2
+    skill: jira
+    kind: trigger
+    prompt: "What is the difference between a Kanban board and a Scrum board, in general?"
+    expectTrigger: false

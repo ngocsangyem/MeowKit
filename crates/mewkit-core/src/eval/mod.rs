@@ -20,7 +20,7 @@ pub mod transcript;
 
 pub use case::{Assertion, CaseError, CaseKind, EvalCase};
 pub use compare::{CompareError, Comparison, Delta, compare};
-pub use grade::{Verdict, grade_run, trigger_hit};
+pub use grade::{Verdict, Workspace, grade_run, trigger_hit};
 pub use load::{CaseSet, LoadError, LoadedCase, load_cases};
 pub use report::{
     Arm, CaseResult, GateRow, Probe, ProbeOutcome, REPORT_SCHEMA_VERSION, Report, RunOutcome,

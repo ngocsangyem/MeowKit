@@ -10,11 +10,10 @@ use std::process::Command;
 use std::time::Duration;
 
 use mewkit_core::eval::runner::{self, MAX_ATTEMPTS, RunSpec, backoff};
-use mewkit_core::eval::sandbox::{child_env, copy_tree, remove_skill};
+use mewkit_core::eval::sandbox::{DirWorkspace, child_env, copy_tree, remove_skill};
 use mewkit_core::eval::{
     Arm, LoadedCase, RunOutcome, RunResult, Runtime, Verdict, grade_run, normalize_skill, parse,
 };
-use mewkit_core::fsx::RelPath;
 use mewkit_core::trace_analysis::redact_friction_note;
 use tempfile::TempDir;
 
@@ -114,11 +113,8 @@ fn attempt(
     {
         return Err(format!("`{skill}` is still listed in the off arm"));
     }
-    let exists = |p: &RelPath| p.under(&project).exists();
-    Ok((
-        grade_run(&lc.case, &transcript, &exists),
-        transcript.cost_usd,
-    ))
+    let ws = DirWorkspace(project);
+    Ok((grade_run(&lc.case, &transcript, &ws), transcript.cost_usd))
 }
 
 /// Run with retries; an attempt that keeps erroring is an `error` result.
