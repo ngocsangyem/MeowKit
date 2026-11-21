@@ -3,6 +3,7 @@
   "comment": "One entry per observer. `matcher` is present only for tool-scoped events, because the others have nothing to match on. `toggleKey` is the key that switches the entry off in the project config, and it is the handler file's base name so the registry entry IS the config key — nothing to translate and nothing to drift. One key covers every registration of the same handler. The write guards are deliberately absent: they are registered directly and must never run through a fail-open dispatcher.",
   "handlers": [
     { "event": "PreToolUse", "matcher": "Bash", "handler": "./handlers/pre-task-check.cjs", "toggleKey": "pre-task-check" },
+    { "event": "PreToolUse", "matcher": "Task|Agent", "handler": "./handlers/delegation-brief-check.cjs", "toggleKey": "delegation-brief-check" },
 
     { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/build-verify.cjs", "toggleKey": "build-verify" },
     { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/loop-detection.cjs", "toggleKey": "loop-detection" },

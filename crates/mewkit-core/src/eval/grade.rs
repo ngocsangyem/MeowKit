@@ -44,9 +44,15 @@ fn loaded_anywhere(skill: &str, t: &Transcript) -> bool {
         .any(|e| matches!(e, Event::SkillLoad(s) if *s == want))
 }
 
+/// Claude Code renamed its subagent tool from `Task` to `Agent`; either spelling
+/// in a case names it.
+fn same_tool(called: &str, wanted: &str) -> bool {
+    called == wanted || (matches!(called, "Task" | "Agent") && matches!(wanted, "Task" | "Agent"))
+}
+
 fn tool_index(name: &str, t: &Transcript) -> Option<usize> {
     t.events.iter().position(|e| match e {
-        Event::Tool(n) => n == name,
+        Event::Tool { name: n, .. } => n == name,
         Event::SkillLoad(_) => name == "Skill",
     })
 }
@@ -80,6 +86,11 @@ pub fn grade_assertion(a: &Assertion, t: &Transcript, ws: &dyn Workspace) -> Ver
         Assertion::ToolBefore { first, then } => verdict(
             matches!((tool_index(first, t), tool_index(then, t)), (Some(a), Some(b)) if a < b),
         ),
+        Assertion::ToolInputMatches { tool, pattern } => verdict(compile(pattern).is_ok_and(|re| {
+            t.events.iter().any(|e| {
+                matches!(e, Event::Tool { name, input } if same_tool(name, tool) && re.is_match(input))
+            })
+        })),
         Assertion::ModelGraded { .. } => Verdict::NeedsJudge,
     }
 }

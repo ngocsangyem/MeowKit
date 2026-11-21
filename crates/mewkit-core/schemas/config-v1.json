@@ -99,6 +99,9 @@
 				"jira-env-loader": {
 					"type": "boolean"
 				},
+				"delegation-brief-check": {
+					"type": "boolean"
+				},
 				"learning-observer": {
 					"type": "boolean"
 				},

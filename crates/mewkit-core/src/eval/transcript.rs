@@ -25,8 +25,10 @@ pub enum Runtime {
 pub enum Event {
     /// A skill was loaded; the name is normalised by [`normalize_skill`].
     SkillLoad(String),
-    /// Any other tool call, by tool name (`shell` for a Codex command).
-    Tool(String),
+    /// Any other tool call: the tool name (`shell` for a Codex command) and its
+    /// input as a JSON string (the command text for a Codex command, empty when
+    /// the runtime reports none).
+    Tool { name: String, input: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -112,7 +114,10 @@ fn claude_line(v: &Value, t: &mut Transcript) -> Result<bool, TranscriptError> {
                 let skill = block.pointer("/input/skill").and_then(Value::as_str);
                 t.events.push(match (name, skill) {
                     ("Skill", Some(s)) => Event::SkillLoad(normalize_skill(s)),
-                    _ => Event::Tool(name.to_owned()),
+                    _ => Event::Tool {
+                        name: name.to_owned(),
+                        input: block.get("input").map(Value::to_string).unwrap_or_default(),
+                    },
                 });
             }
         }
@@ -152,22 +157,29 @@ fn codex_line(v: &Value, t: &mut Transcript) -> Result<bool, TranscriptError> {
                         .get("exit_code")
                         .and_then(Value::as_i64)
                         .is_some_and(|c| c != 0);
+                    let command = str_at(item, "command");
                     let loads: Vec<Event> = if failed {
                         Vec::new()
                     } else {
                         CODEX_SKILL_READ
-                            .captures_iter(str_at(item, "command"))
+                            .captures_iter(command)
                             .map(|c| Event::SkillLoad(normalize_skill(&c[1])))
                             .collect()
                     };
                     if loads.is_empty() {
-                        t.events.push(Event::Tool("shell".into()));
+                        t.events.push(Event::Tool {
+                            name: "shell".into(),
+                            input: command.to_owned(),
+                        });
                     } else {
                         t.events.extend(loads);
                     }
                 }
                 "reasoning" | "" => {}
-                other => t.events.push(Event::Tool(other.to_owned())),
+                other => t.events.push(Event::Tool {
+                    name: other.to_owned(),
+                    input: String::new(),
+                }),
             }
         }
         "turn.completed" => {

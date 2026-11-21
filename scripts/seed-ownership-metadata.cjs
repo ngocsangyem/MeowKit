@@ -75,6 +75,7 @@ const HOOK_GOVERNANCE = {
   "precompact-probe":      { criticality: "medium",   responsibility: "observability" },
   "posttoolfailure-probe": { criticality: "medium",   responsibility: "failure-attribution" },
   "loop-detection":        { criticality: "medium",   responsibility: "failure-attribution" },
+  "delegation-brief-check":{ criticality: "medium",   responsibility: "context-selection" },
   "learning-observer":     { criticality: "medium",   responsibility: "project-memory" },
   "capability-bootstrap":  { criticality: "medium",   responsibility: "context-selection" },
   "project-context-loader":{ criticality: "medium",   responsibility: "context-selection" },

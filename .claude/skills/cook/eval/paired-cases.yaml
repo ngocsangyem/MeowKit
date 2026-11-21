@@ -5,10 +5,11 @@ cases:
     kind: paired
     prompt: "Execute the plan at tasks/plans/261122-divide-guard/plan.md."
     fixture: fixtures/calc-with-plan
-    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash]
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
     assertions:
       - { type: fileContains, path: "src/calc.js", pattern: "RangeError" }
       - { type: fileContains, path: "test/calc.test.js", pattern: "(?i)divide" }
+      - { type: toolInputMatches, tool: Agent, pattern: "(?s)Goal:.*Return:" }
   - id: cook-ticks-phase
     skill: cook
     kind: paired

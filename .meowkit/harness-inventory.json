@@ -224,6 +224,13 @@
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "verification"
+    },
+    "hooks/handlers/delegation-brief-check.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
     }
   }
 }

@@ -8,7 +8,7 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Responsibility | Coverage | Tagged | Active | Examples |
 | -------------- | -------- | -----: | -----: | -------- |
 | Task specification | ✅ covered | 2 | 2 | core-behaviors, meowkit-core |
-| Context selection | ✅ covered | 5 | 5 | capability-bootstrap, model-detector, orientation-ritual |
+| Context selection | ✅ covered | 6 | 6 | capability-bootstrap, delegation-brief-check, model-detector |
 | Tool access | ✅ covered | 1 | 1 | jira-env-loader |
 | Project memory | ✅ covered | 1 | 1 | learning-observer |
 | Task state | ✅ covered | 3 | 3 | agent-conduct, auto-checkpoint, checkpoint-writer |

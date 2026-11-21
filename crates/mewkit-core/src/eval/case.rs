@@ -57,6 +57,12 @@ pub enum Assertion {
         first: String,
         then: String,
     },
+    /// Some call to `tool` has an input, as JSON text, that matches `pattern`.
+    /// `Task` and `Agent` name the same tool across Claude Code versions.
+    ToolInputMatches {
+        tool: String,
+        pattern: String,
+    },
     /// Needs a pinned judge model; the runner grades it, not this crate.
     ModelGraded {
         rubric: String,
@@ -197,9 +203,9 @@ fn check_assertion(a: &Assertion) -> Result<(), String> {
             RelPath::new(path).map_err(|e| format!("fileContains: {e}"))?;
             compile(pattern).map(|_| ())
         }
-        Assertion::OutputMatches { pattern } | Assertion::OutputNotMatches { pattern } => {
-            compile(pattern).map(|_| ())
-        }
+        Assertion::OutputMatches { pattern }
+        | Assertion::OutputNotMatches { pattern }
+        | Assertion::ToolInputMatches { pattern, .. } => compile(pattern).map(|_| ()),
         Assertion::ModelGraded { rubric } if rubric.trim().is_empty() => {
             Err("modelGraded needs a rubric".into())
         }
