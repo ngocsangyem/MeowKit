@@ -1,4 +1,14 @@
-<!-- Per-skill additions to references/preamble.md; load both files. -->
+<!-- Per-skill additions to the shared preamble; SKILL.md loads both. -->
+
+## Contents
+
+- User Question Format
+- Completeness Principle — Boil the Lake
+- Repo Ownership Mode — See Something, Say Something
+- Search Before Building
+- Completion Status Protocol
+- Plan Status Footer
+- REVIEW REPORT
 
 ## User Question Format
 
