@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "description": "Files copied into several skills that must stay identical to one canonical copy. `mewkit validate` compares each member to its canonical file. Paths are relative to .claude/.",
+  "families": [
+    {
+      "name": "shared-protocols",
+      "canonical": "skills/investigate/references/shared-protocols.md",
+      "members": [
+        "skills/cso/references/shared-protocols.md",
+        "skills/office-hours/references/shared-protocols.md",
+        "skills/plan-ceo-review/references/shared-protocols.md"
+      ]
+    },
+    {
+      "name": "preamble",
+      "canonical": "skills/review/references/preamble.md",
+      "members": [
+        "skills/cso/references/preamble.md",
+        "skills/document-release/references/preamble.md",
+        "skills/investigate/references/preamble.md",
+        "skills/office-hours/references/preamble.md",
+        "skills/plan-ceo-review/references/preamble.md",
+        "skills/qa/references/preamble.md",
+        "skills/retro/references/preamble.md",
+        "skills/ship/references/preamble.md"
+      ]
+    }
+  ]
+}

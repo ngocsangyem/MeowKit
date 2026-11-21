@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 use super::docs_refs_tokens::{extract_tokens, is_allowed, parse_allowlist, resolve_contract_path};
 
 /// Subdirectories under `.claude/` that ship in the release archive.
-const SCAN_DIRS: [&str; 9] = [
+pub(super) const SCAN_DIRS: [&str; 9] = [
     "agents",
     "skills",
     "commands",
@@ -28,7 +28,8 @@ const SCAN_DIRS: [&str; 9] = [
 ];
 
 /// Files allowed to mention banned paths, because they DEFINE the bans.
-const FILE_WHITELIST: [&str; 1] = ["skills/skill-creator/references/skill-authoring-rules.md"];
+pub(super) const FILE_WHITELIST: [&str; 1] =
+    ["skills/skill-creator/references/skill-authoring-rules.md"];
 
 /// Skill dirs whose Grep-of-a-user-project semantics need an opt-out.
 const SKILL_DIR_WHITELIST: [&str; 1] = ["skills/docs-finder"];
@@ -66,7 +67,7 @@ pub struct DocsRefResult {
     pub not_applicable: bool,
 }
 
-fn walk_scanned(dir: &Path, out: &mut Vec<PathBuf>) {
+pub(super) fn walk_scanned(dir: &Path, out: &mut Vec<PathBuf>) {
     for entry in super::dir_order::sorted_entries(dir) {
         let name = entry.file_name().to_string_lossy().into_owned();
         let path = entry.path();
