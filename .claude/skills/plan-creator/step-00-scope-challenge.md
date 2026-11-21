@@ -29,34 +29,34 @@ Ask these 3 questions (internally, don't need to ask user):
 
 ### 0d. Complexity Classification
 
-| Signal | Trivial | Simple | Complex |
+| Signal | TRIVIAL | STANDARD | COMPLEX |
 |--------|---------|--------|---------|
 | File count | ≤ 2 | ≤ 5 | > 5 |
 | Estimated hours | ≤ 1h | ≤ 4h | > 4h |
 | Arch decisions | None | None | Yes |
-| Domain (scale-routing) | low | low/medium | high |
+| Domain (scale-routing `level`, mapped per `.claude/skills/agent-detector/references/model-selection-rules.md`) | low | medium | high |
 | New abstractions | 0 | ≤ 1 | > 1 |
 
-**Classify as the HIGHEST matching level** (any one signal at complex → complex).
+**Classify as the HIGHEST matching level** (any one signal at COMPLEX → COMPLEX).
 
 ### 0e. Mode Selection
 
 | Complexity | Planning Mode | What Happens |
 |------------|--------------|-------------|
-| trivial | EXIT | Print: "Task is trivial. Use `/mk:fix`." → STOP |
-| simple | fast | Skip research + codebase analysis. Go to step-03. |
-| complex | hard | Full pipeline: research → analysis → plan + phases → red team → validation |
-| complex + 5+ dirs OR refactor+complex | deep | Hard pipeline + per-phase scouting after step-03 drafts phase files |
+| TRIVIAL | EXIT | Print: "Task is trivial. Use `/mk:fix`." → STOP |
+| STANDARD | fast | Skip research + codebase analysis. Go to step-03. |
+| COMPLEX | hard | Full pipeline: research → analysis → plan + phases → red team → validation |
+| COMPLEX + 5+ dirs OR refactor+COMPLEX | deep | Hard pipeline + per-phase scouting after step-03 drafts phase files |
 
 **Override:** User can force mode via `--fast`, `--hard`, or `--deep` flag regardless of complexity.
 
-**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` by asking the user. User can accept or stay with `--hard`.
+**Auto-detect `--deep`:** If complexity = COMPLEX AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` by asking the user. User can accept or stay with `--hard`.
 
 ### 0f. User Scope Input (Hard Mode Only)
 
 **Note:** `--parallel` and `--two` flags set `planning_mode` to `parallel`/`two` respectively and internally behave as `--hard` (full research pipeline). Skip mode selection when either flag is explicitly provided.
 
-**Skip if:** `planning_mode = fast` or trivial.
+**Skip if:** `planning_mode = fast` or TRIVIAL.
 
 Present scope mode choice by asking the user. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
 
@@ -76,7 +76,7 @@ Present scope mode choice by asking the user. Header: "Scope Mode". Question: "H
 
 ### 0g. Mode Suggestion Logic (Hard Mode Only)
 
-**Skip if:** `planning_mode = fast`, trivial, or user already provided `--parallel`/`--two` explicitly.
+**Skip if:** `planning_mode = fast`, TRIVIAL, or user already provided `--parallel`/`--two` explicitly.
 
 After scope assessment, scan the task description for structural signals:
 
@@ -122,7 +122,7 @@ Before committing to plan creation, classify the request:
 ### 0h. Product-Level Intent Detection
 
 **Skip if:** user already passed `--fast`, `--parallel`, `--two`, or `--hard` explicitly,
-or `task_complexity = trivial`.
+or `task_complexity = TRIVIAL`.
 
 **Skip if:** user already passed `--product-level` explicitly — set `planning_mode = product-level` and proceed.
 
@@ -157,7 +157,7 @@ Present by asking the user. Header: "Plan Mode". Question: "This looks like a gr
 - Task description contains a file path (e.g., `src/auth.ts`)
 - Task description names an existing module/class (e.g., `UserService`)
 - Task description starts with `fix`, `refactor`, `update`, `migrate`, `bump`
-- `task_complexity = trivial` (use `/mk:fix` instead)
+- `task_complexity = TRIVIAL` (use `/mk:fix` instead)
 
 **Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
 
@@ -193,8 +193,8 @@ Default: `tdd_mode = false`.
 
 ## Output
 
-- `task_complexity` — trivial, simple, or complex
-- `planning_mode` — fast, hard, deep, parallel, two, **product-level**, or **spike** (trivial = exit, no mode)
+- `task_complexity` — TRIVIAL, STANDARD, or COMPLEX
+- `planning_mode` — fast, hard, deep, parallel, two, **product-level**, or **spike** (TRIVIAL = exit, no mode)
 - `workflow_model` — feature, bugfix, refactor, or security
 - `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default; spike skips scope question)
 - `tdd_mode` — true or false (composable flag, independent of planning_mode)
@@ -207,7 +207,7 @@ Default: `tdd_mode = false`.
 checkpoint HERE — scope has stopped moving and research has not started. Follow
 `references/advice-checkpoints.md`. Without the flag, skip this paragraph entirely.
 
-If trivial → STOP (recommend /mk:fix).
+If TRIVIAL → STOP (recommend /mk:fix).
 Otherwise, FIRST read and follow `step-00-5-intake-packet.md` (conditional — activates only when ≥2 external artifact paths are in the invocation; 0–1 sources skip cleanly). It then routes by mode:
 If fast → skip to `step-03-draft-plan.md`.
 If **spike** → skip step-01 and step-02; go directly to `step-03-draft-plan.md` using `assets/spike-plan-template.md` (gated by `agile-feedback-cycle.md` 2 when Agile context active).

@@ -28,19 +28,7 @@ delegate a subagent (agent="[type]", prompt="[task description]", description="[
 
 ## Standard Delegation Skeleton
 
-Every template below SHOULD expand into this 9-field skeleton at runtime (per `references/orchestration-rules.md` Delegation Prompt Template). The compact `Agent()` examples are runtime shorthand; omitting fields produces under-specified prompts.
-
-```
-Task: <specific task>
-Work context: <project path>
-Plan: <plan path or "none">
-Reports: <reports path or "none">
-Plans: <plans path or "none">
-Files to modify: <glob patterns>
-Files to read for context: <specific paths>
-Acceptance criteria: <binary pass/fail checks>
-Constraints: <what must NOT change>
-```
+Every template below SHOULD expand into the full field set of the Delegation Prompt Template in `references/orchestration-rules.md` at runtime. The compact `Agent()` examples are runtime shorthand; omitting fields produces under-specified prompts.
 
 Each per-phase section below adds a one-line **Scope** annotation defining what to pass and explicitly what NOT to pass (isolation boundary, per `references/orchestration-rules.md` "Isolation Boundaries"). Adds ~10–15 tokens per template, paid only when this file is loaded (JIT).
 

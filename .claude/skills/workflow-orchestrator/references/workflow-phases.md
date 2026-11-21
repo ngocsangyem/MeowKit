@@ -4,9 +4,9 @@
 
 # 7-Phase Workflow Detail
 
-## Collaborative Planning (Deep Tasks Only)
+## Collaborative Planning (COMPLEX Tasks Only)
 
-For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
+For **COMPLEX** tasks, Phase 1 uses multi-perspective deliberation:
 
 - 3 agents (Builder, Breaker, User) analyze independently
 - Cross-review and debate proposals

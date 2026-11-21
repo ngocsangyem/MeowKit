@@ -62,6 +62,8 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 | medium | standard | Write it, agree it | Standard phases |
 | high | high-assurance | Write it, agree it | Full phases + security |
 
+The tier each `level` maps to is defined once in `.claude/skills/agent-detector/references/model-selection-rules.md` (Task Complexity Tiers). Do not restate it here.
+
 ## Provider Boundary
 
 This skill emits only task complexity, risk, workflow intensity, and scaffolding density. It does not select a model or name a provider. The active harness resolves any provider-specific model policy after this routing result is produced.

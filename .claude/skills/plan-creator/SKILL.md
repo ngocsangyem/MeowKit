@@ -137,7 +137,7 @@ Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 **Agile DoR advisory (Phase 1 entry, conditional):** if the parsed plan frontmatter contains a non-empty `jira_tickets:` list AND `agile-story-gates.md` is loaded (Agile context active per `mk:agent-detector` Step 0b), run 1 of `agile-story-gates.md` for each ticket BEFORE generating phase files. Render the advisory checklist; never block — let the user decide. Skip silently when `jira_tickets:` is absent or the rule is not loaded.
 
 ```
-Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard/deep)
+Step 0: Scope Challenge → TRIVIAL (exit) | STANDARD (fast) | COMPLEX (hard/deep)
 Step 0.5: Intake Packet (conditional: ≥2 external artifacts) → consolidate upstream artifacts, else clean skip
 Step 1: Research (hard/deep/parallel/two only) → 2-3 researchers, max 5 calls each
 Step 2: Codebase Analysis (hard/deep/parallel/two only) → scout + docs (deep: bounded scope map)

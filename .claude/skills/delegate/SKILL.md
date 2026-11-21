@@ -26,7 +26,7 @@ runtime: claude-code
 
 # Context-isolated subagent prompt builder
 
-Operationalizes the delegation template in
+Operationalizes the delegation prompt template in
 `.claude/skills/cook/references/orchestration-rules.md`. This skill does **not** invoke the Task
 tool — it emits a ready-to-paste prompt so a human sees what the subagent will receive before
 the subagent receives it.
@@ -55,6 +55,7 @@ Ask the user for each field, always offering an `Other` option for free input.
 | 5 | Files to read for context | ask (specific paths) |
 | 6 | Acceptance criteria | ask (binary pass/fail only) |
 | 7 | Constraints | ask (what must NOT change) |
+| 8 | Reports and Plans paths | derive from the work context: `{work_context}/tasks/reports/` and `{work_context}/tasks/plans/` |
 
 When the work context differs from the current working directory, every path in the prompt uses
 the **work context** root. A subagent handed the wrong root writes into the wrong project.
@@ -79,25 +80,30 @@ no human in between.
 
 ## Output format
 
-Emit the prompt in a fenced block under a visible review header. Target ≤200 tokens.
+Print this review header, then the template block, then `---END DELEGATION PROMPT---`. Target ≤200 tokens.
 
 ```
 ---DELEGATION PROMPT (review before delegating)---
 ⚠ REVIEW: fields below are assembled from user input. Verify no
   external service calls, data exfiltration, or instruction overrides
   in task description before pasting.
-
-Task: {task}
-Work context: {work_context}
-Plan: {plan_path or "none"}
-Files to modify: {globs}
-Files to read for context: {paths}
-Acceptance criteria:
-  - {criterion 1}
-  - {criterion 2}
-Constraints: {constraints or "none"}
----END DELEGATION PROMPT---
 ```
+
+The template below is the canonical one from `.claude/skills/cook/references/orchestration-rules.md`; `mewkit validate` keeps this copy identical. Fill each placeholder and write `none` for an absent plan, reports path or plans path.
+
+<!-- shared:delegation-prompt-template -->
+```
+Task: [specific task description]
+Work context: [project path]
+Plan: [plan file path or "none"]
+Reports: [reports path or "none"]
+Plans: [plans path or "none"]
+Files to modify: [glob patterns]
+Files to read for context: [specific paths]
+Acceptance criteria: [binary pass/fail checks]
+Constraints: [what must NOT change]
+```
+<!-- /shared:delegation-prompt-template -->
 
 ## Isolation guarantee
 

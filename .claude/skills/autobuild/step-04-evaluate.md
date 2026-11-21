@@ -60,6 +60,12 @@ Agent(
     Status: return DONE | DONE_WITH_CONCERNS | BLOCKED with verdict path
 
     Work context: $(pwd)
+    Plan: $plan_dir/plan.md
+    Reports: tasks/reviews/
+    Plans: none
+    Files to modify: the verdict file and its evidence directory only
+    Acceptance criteria: a verdict file with a non-empty evidence directory
+    Constraints: Do NOT modify source files
   "
 )
 ```

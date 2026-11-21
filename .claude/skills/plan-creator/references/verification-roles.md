@@ -50,6 +50,11 @@ Phase file: {absolute-path}
 Tier: {Light|Standard|Full}
 Claim budget: {N} claims per phase
 Work context: {project-root}
+Plan: none
+Reports: none
+Plans: none
+Files to modify: none (read-only)
+Constraints: read-only; do not edit any file
 
 Read the phase file. Extract claims relevant to your role:
 - Fact Checker: file paths, symbol names, endpoints, config keys

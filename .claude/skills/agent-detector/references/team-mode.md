@@ -6,14 +6,14 @@ On Claude Code, team mode spawns multiple instances as **teammates** (persistent
 
 ## Complexity Check (CRITICAL -- Token Savings)
 
-**Team mode is ONLY for Deep complexity + multi-domain tasks.** All other tasks use single-agent or subagent mode to save tokens.
+**Team mode is ONLY for COMPLEX tasks + multi-domain tasks.** All other tasks use single-agent or subagent mode to save tokens.
 
 ```toon
 team_decision[5]{condition,mode,reason}:
-  Complexity=Quick,single agent,Trivial task - no team overhead
-  Complexity=Standard,subagent,Standard tasks never need teams - save tokens
-  Complexity=Deep + 1 domain,subagent,Deep but single-focus - one agent sufficient
-  Complexity=Deep + 2+ domains (>=50 each),team (if enabled),Only case for parallel teammates
+  Complexity=TRIVIAL,single agent,Trivial task - no team overhead
+  Complexity=STANDARD,subagent,Standard tasks never need teams - save tokens
+  Complexity=COMPLEX + 1 domain,subagent,COMPLEX but single-focus - one agent sufficient
+  Complexity=COMPLEX + 2+ domains (>=50 each),team (if enabled),Only case for parallel teammates
   Agent Teams disabled,subagent,Feature not enabled - always subagent
 ```
 
@@ -21,7 +21,7 @@ team_decision[5]{condition,mode,reason}:
 
 **Checks (ALL must pass):**
 1. `isAgentTeamsEnabled()` returns true
-2. Complexity = Deep
+2. Complexity = COMPLEX
 3. 2+ domains score >=50 each
 4. Task requires cross-domain collaboration (not just multiple files)
 
@@ -34,7 +34,7 @@ When team mode is selected, output:
 - **Agent:** architect (LEAD)
 - **Mode:** team
 - **Model:** opus
-- **Complexity:** Deep
+- **Complexity:** COMPLEX
 - **Team Composition:**
   - architect (lead) - system design, API endpoints
   - frontend (primary) - frontend components

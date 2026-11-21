@@ -16,9 +16,7 @@ WHY: Fallback prevents regression for unrecognized task types.
 
 ## Rule 3: High Complexity Forces COMPLEX Tier
 
-When CSV returns `level=high`, the model tier MUST be COMPLEX (best available) regardless of other signals.
-
-WHY: High-complexity domains carry risk where weaker-model savings are not worth the failure cost.
+When CSV returns `level=high`, the tier is COMPLEX: see `references/model-selection-rules.md` (Task Complexity Tiers, Rule 4).
 
 ## Rule 4: One-Shot Workflow Skips the Plan
 

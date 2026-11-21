@@ -6,7 +6,7 @@
 - [Example 1: Explicit Technology Mention](#example-1-explicit-technology-mention)
 - [Example 2: Context-Based Detection (No Tech Mention)](#example-2-context-based-detection-no-tech-mention)
 - [Example 3: Architecture Task (Uses COMPLEX Tier)](#example-3-architecture-task-uses-complex-tier)
-- [Example 4: Quick Fix (Uses TRIVIAL Tier)](#example-4-quick-fix-uses-trivial-tier)
+- [Example 4: Trivial Fix (Uses TRIVIAL Tier)](#example-4-trivial-fix-uses-trivial-tier)
 - [Example 5: Backend Repo, Frontend Task (Task-Based Override)](#example-5-backend-repo-frontend-task-task-based-override)
 - [Example 6: Frontend Repo, Database Task (Task-Based Override)](#example-6-frontend-repo-database-task-task-based-override)
 - [Example 7: Backend Repo, PDF Generation (Task-Based Override)](#example-7-backend-repo-pdf-generation-task-based-override)
@@ -23,7 +23,7 @@ Layer 4 (Files): *.phone.tsx present → +20
 Detection Result:
   Agent: developer (PRIMARY, 80 pts)
   Tier: STANDARD
-  Complexity: Standard
+  Complexity: STANDARD
   Secondary: tester (30)
 ```
 
@@ -39,7 +39,7 @@ Layer 4 (Files): AuthController.php recent → +20
 Detection Result:
   Agent: developer (PRIMARY, 95 pts)
   Tier: STANDARD
-  Complexity: Standard
+  Complexity: STANDARD
   Skill: mk:fix
   Secondary: tester (35)
 ```
@@ -50,26 +50,26 @@ Detection Result:
 User: "Design the authentication system architecture"
 
 Layer 2 (Intent): "design", "architecture" → Architecture intent
-Complexity: Deep (architecture keyword)
+Complexity: COMPLEX (architecture keyword)
 
 Detection Result:
   Agent: architect (PRIMARY)
   Tier: COMPLEX (architecture task)
-  Complexity: Deep
+  Complexity: COMPLEX
   Secondary: security (55)
 ```
 
-## Example 4: Quick Fix (Uses TRIVIAL Tier)
+## Example 4: Trivial Fix (Uses TRIVIAL Tier)
 
 ```
 User: "Fix typo in README.md line 42"
 
-Complexity: Quick (single file, explicit location)
+Complexity: TRIVIAL (single file, explicit location)
 
 Detection Result:
   Agent: orchestrator (handles directly — too simple for delegation)
   Tier: TRIVIAL
-  Complexity: Quick
+  Complexity: TRIVIAL
 ```
 
 ## Example 5: Backend Repo, Frontend Task (Task-Based Override)
@@ -87,7 +87,7 @@ Task Content Analysis:
 Detection Result:
   Agent: developer (PRIMARY, 125 pts) — leads template fix
   Tier: STANDARD
-  Complexity: Standard
+  Complexity: STANDARD
 ```
 
 ## Example 6: Frontend Repo, Database Task (Task-Based Override)
@@ -105,7 +105,7 @@ Task Content Analysis:
 Detection Result:
   Agent: developer (PRIMARY, 90 pts) — database optimization
   Tier: STANDARD
-  Complexity: Standard
+  Complexity: STANDARD
 ```
 
 ## Example 7: Backend Repo, PDF Generation (Task-Based Override)
@@ -123,5 +123,5 @@ Task Content Analysis:
 Detection Result:
   Agent: developer (PRIMARY, 120 pts) — HTML/CSS for PDF
   Tier: STANDARD
-  Complexity: Standard
+  Complexity: STANDARD
 ```

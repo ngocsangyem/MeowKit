@@ -124,6 +124,17 @@
         "agents/confluence-search.md",
         "agents/confluence-spec-analyst.md"
       ]
+    },
+    {
+      "name": "delegation-prompt-template",
+      "canonical": "skills/cook/references/orchestration-rules.md",
+      "sections": [
+        "delegation-prompt-template"
+      ],
+      "members": [
+        "skills/cook/references/orchestration-rules.md",
+        "skills/delegate/SKILL.md"
+      ]
     }
   ]
 }

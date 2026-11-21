@@ -58,6 +58,9 @@ Before spawning any subagent, verify you have included:
 
 ### Delegation Prompt Template
 
+This is the one canonical template; other files point here.
+
+<!-- shared:delegation-prompt-template -->
 ```
 Task: [specific task description]
 Work context: [project path]
@@ -69,6 +72,7 @@ Files to read for context: [specific paths]
 Acceptance criteria: [binary pass/fail checks]
 Constraints: [what must NOT change]
 ```
+<!-- /shared:delegation-prompt-template -->
 
 ### Anti-Patterns
 
@@ -81,7 +85,7 @@ Constraints: [what must NOT change]
 
 ### Use `mk:delegate` to Build the Prompt
 
-For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It asks for the 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste it into the Agent tool. Compatible with all inner harnesses via `--silent` mode.
+For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It collects the template fields (Reports and Plans derive from the work context), runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste it into the Agent tool. Compatible with all inner harnesses via `--silent` mode.
 
 Distinct from `mk:team-config` — that one sets up parallel agents in isolated worktrees (Conductor pattern). Use `mk:delegate` to build ONE clean prompt; use `mk:team-config` to coordinate MANY agents on non-overlapping files.
 

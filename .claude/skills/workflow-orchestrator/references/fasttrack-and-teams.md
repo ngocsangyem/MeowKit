@@ -26,7 +26,7 @@ Overview, Requirements, Technical Design, API/Interfaces, Data Model, Acceptance
 
 ## Agent Teams Mode (Experimental)
 
-**Condition:** ONLY for Deep complexity with 2+ domains scoring >=50. Quick/Standard use single-agent.
+**Condition:** ONLY for COMPLEX tasks with 2+ domains scoring >=50. TRIVIAL/STANDARD use single-agent.
 
 ### Phase Team Composition
 

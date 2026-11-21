@@ -44,7 +44,7 @@ cache_check[4]{condition,action}:
   "workflowId": "FEAT-123",
   "agent": "architect",
   "model": "sonnet",
-  "complexity": "Standard",
+  "complexity": "STANDARD",
   "secondary": ["tester"],
   "teamMode": false,
   "detectedAt": "2026-03-24T10:00:00Z"

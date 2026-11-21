@@ -25,7 +25,7 @@ Planning is a practice here. No hook blocks an edit or a commit when a plan is m
 | Standard: a feature under about 5 files, a bug fix, an API endpoint | `--fast`: no research, `plan.md` only |
 | Complex: auth, payments, data model, or any risk flag raised at Phase 0 | `--hard`: two researchers, `plan.md` plus phase files, a red-team pass and a validation interview |
 
-Plan-creator also picks a mode from the scope itself in its first step (trivial exits, simple runs fast, complex runs hard), and the flag overrides that choice. The `mk:agent-detector` risk flags work the same way. AUTH, AUTHZ, AUDIT_SEC and EXT_SYSTEM force the COMPLEX tier. DATA_MODEL and PUBLIC_CONTRACT force `mk:plan-creator --hard`. See [Step 9](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) for Phase 0.
+Plan-creator also picks a mode from the scope itself in its first step (TRIVIAL exits, STANDARD runs fast, COMPLEX runs hard), and the flag overrides that choice. The `mk:agent-detector` risk flags work the same way. AUTH, AUTHZ, AUDIT_SEC and EXT_SYSTEM force the COMPLEX tier. DATA_MODEL and PUBLIC_CONTRACT force `mk:plan-creator --hard`. See [Step 9](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) for Phase 0.
 
 ## Prompt
 
