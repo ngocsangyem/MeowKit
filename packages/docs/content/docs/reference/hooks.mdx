@@ -35,7 +35,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 
 | Observer | Event (matcher) | What it does |
 | --- | --- | --- |
-| `pre-task-check` | PreToolUse (Bash) | Reports prompt-injection patterns found in a command to the model as context. Advisory |
+| `pre-task-check` | PreToolUse (Bash) | Reports blocking-class prompt-injection patterns found in a command to the model as context. Advisory; a long command or a path outside the project is not reported |
 | `delegation-brief-check` | PreToolUse (Task\|Agent) | Notes to the model when a subagent brief has no `Goal:` or `Return:` label, and records one `delegation_brief_check` trace event with two booleans. Never blocks and never repeats the brief |
 | `build-verify` | PostToolUse (Edit\|Write) | Runs the compile or lint check for the file's language; results are cached by file content hash |
 | `loop-detection` | PostToolUse (Edit\|Write) | Counts edits per file and reminds the model at 4 edits, asks it to re-plan at 8, and repeats every 4 after. Never blocks |
