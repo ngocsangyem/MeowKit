@@ -11,6 +11,7 @@ pub mod baseline;
 pub mod budget;
 pub mod capability;
 pub mod config;
+pub mod eval;
 pub mod exec;
 pub mod fsx;
 pub mod journal;
