@@ -3,7 +3,8 @@
 // What each runtime lists is the name plus the description text it reads:
 //   - Claude Code reads `description` and `when_to_use` as separate fields and truncates the
 //     pair at 1,536 characters per entry (code.claude.com/docs/en/skills).
-//   - Every other runtime has no `when_to_use` field: the adapters project `description` alone,
+//   - Every other runtime has no `when_to_use` field. The adapters append it to `description` as
+//     "<description> Use when: <when_to_use>" (crates/mewkit-adapters, projection/frontmatter.rs),
 //     so the listing is name plus that text.
 // Budgets are documented only for Claude Code (1% of the window) and Codex (2%); the other
 // runtimes publish none, so they carry a ceiling that ratchets the current size and no budget.
@@ -28,12 +29,12 @@ const bytes = (value) => (typeof value === "string" ? Buffer.byteLength(value, "
 /** The text a runtime lists after the name, for one skill's frontmatter values. */
 function listedText(runtime, values) {
 	const description = typeof values.description === "string" ? values.description : "";
+	const whenToUse = typeof values.when_to_use === "string" ? values.when_to_use : "";
 	if (runtime === "claude-code") {
-		const whenToUse = typeof values.when_to_use === "string" ? values.when_to_use : "";
 		const pair = whenToUse ? `${description} ${whenToUse}` : description;
 		return [...pair].slice(0, CLAUDE_ENTRY_CAP_CHARS).join("");
 	}
-	return description;
+	return whenToUse ? `${description} Use when: ${whenToUse}` : description;
 }
 
 /** Bytes of the listing a runtime builds from skill items (each item carries `values`). */

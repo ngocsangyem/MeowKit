@@ -35,11 +35,11 @@ const LIMIT_ALWAYS_LISTED_BYTES = 70000;
 // window, far below these figures: the report prints that gap rather than gating on it.
 const LISTING_CEILINGS = {
 	"claude-code": 16100,
-	codex: 11300,
-	cursor: 11300,
-	grok: 11300,
-	pi: 11300,
-	omp: 11300,
+	codex: 17300,
+	cursor: 17300,
+	grok: 17300,
+	pi: 17300,
+	omp: 17300,
 };
 const LIMIT_SKILL_FILES_TOTAL_BYTES = 769000;
 const LIMIT_LARGEST_SKILL_FILE_BYTES = 27200;

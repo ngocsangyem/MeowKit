@@ -113,13 +113,13 @@ describe("always-on budget ceilings", () => {
 	});
 
 	it("fails on a runtime's skill-listing ceiling while the always-listed total is still under", () => {
-		// 60 skills of 300 B: ~18 kB listed per runtime, over the 16100 and 11300 ceilings, and
+		// 60 skills of 300 B: ~18 kB listed per runtime, over the 16100 and 17300 ceilings, and
 		// the whole tree is far under 70000.
 		const root = buildTree({ rulesBytes: 1000, skills: 60, skillDescriptionBytes: 300 });
 		const { status, out } = run(root);
 		expect(status).toBe(1);
 		expect(out).toMatch(/claude-code skill listing is \d+ bytes over its 16100-byte ceiling/);
-		expect(out).toMatch(/codex skill listing is \d+ bytes over its 11300-byte ceiling/);
+		expect(out).toMatch(/codex skill listing is \d+ bytes over its 17300-byte ceiling/);
 		expect(out).not.toMatch(/bytes over the 70000-byte budget/);
 	});
 
