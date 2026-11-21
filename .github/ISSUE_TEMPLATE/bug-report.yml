@@ -1,35 +1,67 @@
 name: Bug Report
-description: Report a bug in MeowKit
+description: Report a bug in the MeowKit kit or the mewkit CLI
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug! Please fill out the sections below so we can reproduce and fix it.
+        Thanks for reporting a bug. Fill in the sections below so it can be reproduced.
+        Security problem? Do not open a public issue; contact the maintainer privately.
 
   - type: input
-    id: version
+    id: binary-version
     attributes:
-      label: MeowKit Version
-      description: "Run `npx mewkit --version` or check `.claude/metadata.json`"
-      placeholder: "1.0.0"
+      label: mewkit version
+      description: "Output of `mewkit --version`"
+      placeholder: "mewkit 0.1.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: kit-version
+    attributes:
+      label: Kit version
+      description: "Output of `mewkit versions` in the project"
+      render: shell
     validations:
       required: true
 
   - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Which runtime were you using? Pick all that are installed in the project.
+      multiple: true
+      options:
+        - Claude Code
+        - Codex
+        - Cursor
+        - Grok
+        - Pi
+        - OMP
+        - Not runtime-specific (CLI only)
+    validations:
+      required: true
+
+  - type: input
+    id: runtime-version
+    attributes:
+      label: Runtime version
+      placeholder: "Claude Code 2.x"
+
+  - type: dropdown
     id: area
     attributes:
-      label: Affected Area
+      label: Affected area
       options:
+        - "CLI: init / upgrade / uninstall"
+        - "CLI: doctor / validate / other command"
+        - "CLI: install.sh / install.ps1 / self-update"
         - Skill (mk:*)
         - Agent
-        - Rule enforcement
-        - Hook
-        - CLI (create-meowkit)
-        - CLI (mewkit)
-        - Gate (Gate 1 or Gate 2)
-        - Mode
+        - Rule
+        - Hook (ship check, credential guard, other)
         - Documentation
         - Other
     validations:
@@ -39,8 +71,7 @@ body:
     id: description
     attributes:
       label: What happened?
-      description: Clear description of the bug.
-      placeholder: "When I run /mk:review, the Blind Hunter step fails with..."
+      placeholder: "After `mewkit upgrade`, files the new kit dropped were still in .claude/..."
     validations:
       required: true
 
@@ -48,7 +79,6 @@ body:
     id: expected
     attributes:
       label: What did you expect?
-      placeholder: "The review should complete with a PASS/WARN/FAIL verdict."
     validations:
       required: true
 
@@ -56,7 +86,7 @@ body:
     id: reproduce
     attributes:
       label: Steps to reproduce
-      description: Minimal steps to trigger the bug.
+      description: The smallest set of commands that shows the bug.
       value: |
         1.
         2.
@@ -67,30 +97,25 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Error output / logs
-      description: Paste relevant error messages or Claude Code output.
+      label: Output
+      description: "Command output, and `mewkit doctor` output if relevant. Remove secrets first."
       render: shell
 
   - type: dropdown
     id: os
     attributes:
-      label: Operating System
+      label: Operating system
       options:
         - macOS
         - Linux
-        - Windows (WSL)
         - Windows
+        - Windows (WSL)
     validations:
       required: true
 
   - type: input
     id: node
     attributes:
-      label: Node.js Version
-      placeholder: "20.x"
-
-  - type: input
-    id: claude-code
-    attributes:
-      label: Claude Code Version
-      placeholder: "2.x"
+      label: Node.js version
+      description: "Hooks run on Node.js 24+. Output of `node --version`"
+      placeholder: "v24.x"

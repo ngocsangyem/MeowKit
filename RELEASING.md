@@ -90,7 +90,34 @@ not build or tag the binary. That is the separate `mewkit-v` tag (see
 
 **Before running the script:** complete step 2 (CHANGELOG) by hand, plus steps 1a, 1b and 1e when they apply.
 
-**After the script:** run step 11 (end-to-end test). If the binary changed, run step 10 too.
+**After the script:** run step 11 (end-to-end test).
+
+### Order when both streams change
+
+Release the binary first, then the kit. The kit gate installs the candidate kit with the newest
+published binary, and a kit that needs new binary behavior must find it published.
+
+1. One PR bumps both versions (step 3) and turns the changelog's `## Unreleased` into the
+   `## <kit version> (<date>)` section. Merge it.
+2. Tag the merge commit `mewkit-v<binary version>` and push the tag (step 10). Wait for
+   `rust-release.yml` to publish.
+3. Merge the installer pin PR (step 10).
+4. Run the script against the published binary:
+
+   ```bash
+   B=$(mktemp -d) && cd "$B"
+   gh release download mewkit-v<binary version> -R ngocsangyem/MeowKit -p checksums.txt -p 'mewkit-<binary version>-<your target>.tar.gz'
+   grep '<your target>' checksums.txt | shasum -a 256 -c     # must print OK
+   tar -xzf mewkit-*.tar.gz && cd -
+   MEWKIT_NEXT_BIN="$B/mewkit-<binary version>-<your target>/mewkit" ./scripts/release.sh <kit version> "<title>"
+   ```
+
+   Without `MEWKIT_NEXT_BIN` the gate uses `mk` from your `PATH`, which may be an older binary.
+
+**The script pushes to `main` directly.** It is the one sanctioned direct push. Run it on a clean,
+up-to-date `main`: if someone merges while it runs, `git push origin main` is rejected. Then
+`git pull --ff-only` and run the script again; it reuses the local tag. A change merged in between
+re-runs the whole gate, so fix whatever it reports first.
 
 ## Manual Release (Step-by-Step)
 
@@ -142,15 +169,26 @@ npm run build -w packages/docs
 
 Must complete with no errors. Chunk size warnings are normal.
 
-#### 1d. Update the Codex and Cursor overlays (when `.claude/` content changes)
+#### 1d. Update the runtime overlays (when `.claude/` content changes)
 
-`mewkit init --target codex|cursor` projects the `.claude/` skills and agents into each runtime's
-layout at install time. A new or changed skill or agent reaches both runtimes with no second edit.
-Only the items in the table below need a hand edit, per runtime.
+`mewkit init --target codex|cursor|grok|pi|omp` projects the `.claude/` skills and agents into each
+runtime's layout at install time. A new or changed skill or agent reaches every runtime with no
+second edit. Only the items in the table below need a hand edit, per runtime.
+
+The overlays in `kit/overlays/`:
+
+| Overlay | Used by |
+| --- | --- |
+| `codex/` | Codex: `.codex/` hooks, config and command policy |
+| `cursor/` | Cursor: `.cursor/` hooks and rules, MCP profiles |
+| `grok/` | Grok: `.grok/` hook file and helpers |
+| `agents/` | The `.agents/skills/` root Codex, Pi and OMP read: its skill-pack catalog |
+| `pi/`, `omp/` | Pi's extension and OMP's hook module only |
+| `shared/AGENTS.md` | The always-on block every runtime that reads `AGENTS.md` merges |
 
 | Change | Edit |
 | --- | --- |
-| New skill | Add `mk-<name>` to a pack in `kit/overlays/codex/catalog/skill-packs.json` **and** `kit/overlays/cursor/catalog/skill-packs.json`. A skill in no pack installs only when no pack list is given. Keep `core` under `budgetChars`. |
+| New skill | Add `mk-<name>` to a pack in **every** `kit/overlays/*/catalog/skill-packs.json` (codex, cursor, grok, agents). A skill in no pack installs only when no pack list is given; `mewkit validate --packs` fails on it. Keep `core` under `budgetChars`. |
 | Hook or hook helper | Write the file under `kit/overlays/<runtime>/files/` (Codex: `.codex/hooks.json`, `.codex/hooks/**`; Cursor: `.cursor/hooks.json`, `.cursor/hooks/**`). Shared hook libraries are copies of `.claude/hooks/lib/` made by `node scripts/sync-hook-core.cjs`; run it after editing them. |
 | Cursor rule | `kit/overlays/cursor/files/.cursor/rules/<name>.mdc`, holding only what the shared `AGENTS.md` block does not say. Codex has no rule files: `.claude/rules/*` reach it as sections of `AGENTS.md`. |
 | Always-on text | `kit/overlays/shared/AGENTS.md`: one text, merged as the `meowkit` block of the project's `AGENTS.md` by every runtime that reads that file (Codex, Cursor). Name no runtime folder in it. Claude Code keeps `.claude/rules/`. What only Cursor needs in every session goes in `kit/overlays/cursor/files/.cursor/rules/runtime-invariants.mdc`. |
@@ -164,12 +202,13 @@ but a line that only makes sense on Claude Code must be reworded in the `.claude
 overlay `[[replace]]` only for text that belongs to one runtime.
 
 **Skill naming.** Skills are `.claude/skills/<name>/` with `name: mk:<name>`. Projection installs them
-as `mk-<name>` for both runtimes (`skill_prefix` in `crates/mewkit-adapters/src/projection/target.rs`).
+as `mk-<name>` on every other runtime (`skill_prefix` in `crates/mewkit-adapters/src/projection/target.rs`).
 Do not write `mk-` names into `.claude/` by hand.
 
-**The skills directories differ ON PURPOSE.** Codex reads `.agents/skills/`, Cursor reads
-`.cursor/skills/`. Each is the only skills root its runtime reads (`skills_root` in
-`crates/mewkit-adapters/src/projection/target.rs`). Do NOT "unify" them.
+**The skills directories differ ON PURPOSE.** Codex, Pi and OMP read `.agents/skills/`, Cursor reads
+`.cursor/skills/`, Grok reads `.grok/skills/` (`skills_root` in
+`crates/mewkit-adapters/src/projection/target.rs`). Do NOT "unify" them. Where each combination of
+runtimes writes: `crates/mewkit-adapters/runtime-surface-table.md`.
 
 **What projection produces** (reference only; these files are generated, do not author them by hand):
 
@@ -509,18 +548,44 @@ gh release view v<version> --json url -q '.url'
 ### 10. Release the binary (only when step 3 bumped the binary version)
 
 Skip this step if `git diff` in step 3 printed nothing. The binary keeps its version and nothing is
-tagged. Otherwise follow [Binary release stream](#binary-release-stream): merge the version bump, tag
-`mewkit-v<version>`, push the tag, then review and merge the pin PR the workflow opens.
+tagged. Otherwise follow [Binary release stream](#binary-release-stream). Do it before the kit
+release when both changed ([order](#order-when-both-streams-change)).
+
+```bash
+git switch main && git pull --ff-only
+git tag -a mewkit-v<version> -m "mewkit <version>"
+git push origin mewkit-v<version>
+gh run watch "$(gh run list --workflow rust-release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
+```
+
+The last job, "Open the installer pin pull request", fails while the repository setting "Allow
+GitHub Actions to create and approve pull requests" is off. The release is already published and the
+branch `release/installer-pins-mewkit-v<version>` is already pushed; open the PR by hand after the
+review below:
+
+```bash
+git fetch origin release/installer-pins-mewkit-v<version>
+gh release download mewkit-v<version> -p checksums.txt -D "$(mktemp -d)"   # compare each digest with the diff
+git diff main FETCH_HEAD                                                     # every URL under releases/download/mewkit-v<version>/
+git switch --detach FETCH_HEAD && node scripts/release/render-installers.mjs --check; git switch main
+gh pr create --base main --head release/installer-pins-mewkit-v<version> --title "build(release): pin installers to mewkit <version>"
+```
+
+Until the pin PR merges, `install.sh` and `install.ps1` still install the previous binary.
 
 ### 11. Test end-to-end
 
-In an empty directory, with the binary installed from the release (`install.sh` / `install.ps1`):
+After the pin PR and the kit release, in a scratch `HOME` so your own install is untouched:
 
 ```bash
-S=$(mktemp -d) && cd "$S"
+S=$(mktemp -d) && export HOME="$S/home" && mkdir -p "$HOME" && cd "$S"
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+mewkit --version                       # the binary just released
+mkdir proj && cd proj && git init -q
 mewkit init --target claude-code --yes
-mewkit versions     # kit version must be the one just released
-mewkit doctor
+mewkit versions                        # kit version must be the one just released
+mewkit doctor && mewkit validate
 ```
 
 ## Release Checklist
@@ -545,15 +610,16 @@ Copy this checklist for each release:
 ### Build and overlays
 
 - [ ] Step 4 commands pass (cargo fmt, clippy, test, `npm test`, lint, hook tests, `npm run release:check`)
-- [ ] Codex AND Cursor overlays updated where step 1d needs a hand edit; new skills in both `kit/overlays/*/catalog/skill-packs.json` files
+- [ ] Runtime overlays updated where step 1d needs a hand edit; new skills in every `kit/overlays/*/catalog/skill-packs.json` file
 - [ ] Step 1d verify commands pass (installed-tree checks, `sync-hook-core.cjs --check`, `mewkit validate --packs`, `bless_docs_manifest`); multi-provider smoke passes in both orders
 
 ### Release
 
 - [ ] `prepare-release-assets.cjs` and `verify-release-assets.cjs` ran; `dist/meowkit-release.zip` has the expected size
 - [ ] Committed, tagged `v<version>`, pushed; GitHub Release has `meowkit-release.zip` and `checksums.txt` only, with `mewkit init` install notes
-- [ ] Binary changed: `mewkit-v<version>` tag pushed, release published, pin PR merged (step 10)
-- [ ] `mewkit init` in an empty directory scaffolds the new version (step 11)
+- [ ] Binary changed: `mewkit-v<version>` tag pushed and release published BEFORE the kit release; pin PR reviewed and merged (step 10)
+- [ ] Kit gate ran against the published binary (`MEWKIT_NEXT_BIN`)
+- [ ] Fresh `install.sh` + `mewkit init` in a scratch `HOME` gives the new binary and kit (step 11)
 ```
 
 ## Release Streams and Trust Model
@@ -659,18 +725,29 @@ For binary changes, use the SemVer table in step 3.
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + `dist/meowkit-release.zip` + `dist/checksums.txt`   |
 | `scripts/verify-release-assets.cjs`     | Check `dist/` before upload: contract in the zip, checksum, no signed-artifact asset |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
-| `scripts/kit-ship-set.cjs`              | The files a kit ships: `.claude/`, plus `kit/overlays/{codex,cursor}/` (`overlay.toml`, `files/`, catalogs) |
+| `scripts/kit-ship-set.cjs`              | The files a kit ships: `.claude/`, `kit/overlays/{codex,cursor,grok,agents}/` (`overlay.toml`, `files/`, catalogs), `kit/overlays/{pi,omp}/files`, `kit/overlays/shared/AGENTS.md` |
 | `scripts/sync-hook-core.cjs`            | Copies the shared hook libraries from `.claude/hooks/lib/` into the overlays; `--check` exits 1 on drift |
 | `scripts/sync-versions.cjs`             | Check or stamp the kit version into the derived surfaces, incl. `.claude/kit-contract.json`; records the binary version read from `Cargo.toml` |
 | `scripts/lib/cli-version.cjs`           | Reads the binary version from `[workspace.package]` in the root `Cargo.toml`    |
 | `scripts/release/build-binary-manifest.mjs` | Binary stream: `binary-manifest.json` + `checksums.txt` from the six archives (run by `rust-release.yml`) |
 | `scripts/release/render-installers.mjs` | Binary stream: render `install.sh` / `install.ps1` from their templates and `installer-pins.json`; `--check` fails on drift |
-| `scripts/release/check-kit-against-binary.sh` | Kit gate: `init --dry-run` of a staged kit for the three runtimes with a given binary |
+| `scripts/release/check-kit-against-binary.sh` | Kit gate: `init --dry-run` of a staged kit for claude-code, codex and cursor with a given binary |
 
 ## Release History
 
+Binary releases (`mewkit-v*`, never `latest`):
+
+| Version | Date       | Notes                                                        |
+| ------- | ---------- | ------------------------------------------------------------ |
+| 0.1.1   | 2026-11-21 | Upgrade removes retired files without a cache or install record; `init` notes a newer binary |
+| 0.1.0   | 2026-11-20 | First native binary                                          |
+
+Kit releases (`v*`):
+
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v3.0.1  | 2026-11-21 | Upgrade Fixes                                    |
+| v3.0.0  | 2026-11-20 | Native Binary & Six Runtimes                     |
 | v2.15.0 | 2026-07-27 | Strategic Supervision & the Portable Backend Surface |
 | v2.14.8 | 2026-07-26 | Runtime-Neutral State & the Documentation Rebuild |
 | v2.14.7 | 2026-07-25 | Per-Agent Model Routing & Explore Agent          |
@@ -790,14 +867,44 @@ The same steps apply to a `mewkit-v<version>` tag.
 gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobber
 ```
 
-### A Codex or Cursor install is missing a skill or rule after editing `.claude/`
+### The binary workflow fails at "Open the installer pin pull request"
+
+**Cause:** "Allow GitHub Actions to create and approve pull requests" is off in the repository
+settings. The release itself is published and the pin branch is pushed.
+
+**Fix:** Review the pin branch and open the PR by hand (step 10). To stop it recurring, turn the
+setting on or add the `RELEASE_PR_TOKEN` secret.
+
+### `release.sh` stops at `git push origin main` ("fetch first")
+
+**Cause:** `main` moved while the script ran. Nothing was published: the tag is local only.
+
+**Fix:** `git pull --ff-only`, then run the script again. It reuses the local tag when that tag's
+commit is still an ancestor of `main`.
+
+### The readiness gate reports "generated artifacts drifted" for `README.md`
+
+**Cause:** The skill, agent, rule and hook counts in `README.md` are generated from the tree, and a
+hand edit changed them.
+
+**Fix:** `MEWKIT_BLESS=1 cargo test -p mewkit-core --locked --test bless_inventory_counts`, review the
+diff and commit it. The same failure makes `validate --portable` report hard failures.
+
+### The readiness gate cannot find a binary
+
+**Cause:** No `mk` on `PATH` and no `MEWKIT_NEXT_BIN`.
+
+**Fix:** Set `MEWKIT_NEXT_BIN` to a checksum-verified binary from the newest `mewkit-v*` release
+([order](#order-when-both-streams-change)).
+
+### An install is missing a skill or rule after editing `.claude/`
 
 **Cause:** A skill that is in no pack in `kit/overlays/<runtime>/catalog/skill-packs.json` is skipped by a pack-limited install. A Cursor rule exists only in `.claude/rules/` and was never written as a `.mdc` in the Cursor overlay. A hook edit in `.claude/hooks/` does not reach the overlay until it is copied.
 
-**Fix:** Add the skill as `mk-<name>` to a pack in both `kit/overlays/codex/catalog/skill-packs.json` and `kit/overlays/cursor/catalog/skill-packs.json`. Write a Cursor rule under `kit/overlays/cursor/files/.cursor/rules/`. Run `node scripts/sync-hook-core.cjs` for hook libraries. Then run the verify commands and the multi-provider smoke in step 1d.
+**Fix:** Add the skill as `mk-<name>` to a pack in every `kit/overlays/*/catalog/skill-packs.json`. Write a Cursor rule under `kit/overlays/cursor/files/.cursor/rules/`. Run `node scripts/sync-hook-core.cjs` for hook libraries. Then run the verify commands and the multi-provider smoke in step 1d.
 
 ### Cursor installed no skills at all in a multi-provider project
 
-**Cause:** Skills were written into a directory another runtime owns. Codex owns `.agents/skills/` and Cursor owns `.cursor/skills/` (`skills_root` in `crates/mewkit-adapters/src/projection/target.rs`).
+**Cause:** Skills were written into a directory another runtime owns. Codex, Pi and OMP read `.agents/skills/`, Cursor reads `.cursor/skills/` and Grok reads `.grok/skills/` (`skills_root` in `crates/mewkit-adapters/src/projection/target.rs`).
 
 **Fix:** Keep the trees separate. Both are documented load paths for their runtime; do not "unify" them. Re-run the multi-provider smoke in step 1d, in both install orders.

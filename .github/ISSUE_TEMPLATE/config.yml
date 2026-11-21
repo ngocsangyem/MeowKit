@@ -3,6 +3,6 @@ contact_links:
   - name: Documentation
     url: https://docs.meowkit.dev
     about: Check the docs before opening an issue
-  - name: Discussions
-    url: https://github.com/ngocsangyem/MeowKit/discussions
-    about: Ask questions and share ideas
+  - name: Contributing guide
+    url: https://github.com/ngocsangyem/MeowKit/blob/main/CONTRIBUTING.md
+    about: How to make a change and get it through CI

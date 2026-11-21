@@ -17,7 +17,7 @@ body:
         - New agent
         - New rule
         - New hook
-        - New mode
+        - Runtime support (Codex, Cursor, Grok, Pi, OMP)
         - CLI improvement
         - Documentation
         - Other
