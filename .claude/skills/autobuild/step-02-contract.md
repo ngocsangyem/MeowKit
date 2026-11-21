@@ -53,6 +53,8 @@ Agent(
     Re-read the draft against assets/contract-template.md to confirm every section
     and every AC form is present.
 
+    Goal: a sprint contract the generator and evaluator can both sign
+    Return: the contract path
     Work context: $(pwd)
     Plan: $plan_dir/plan.md
     Reports: none
@@ -77,6 +79,8 @@ Agent(
     If clean, write 'Round 1 (reviewer): accepted'.
     Hard cap: 2 rounds. Round 3 escalates to the user.
 
+    Goal: a contract whose criteria can each be tested
+    Return: Round 1 (reviewer) entries in the Negotiation Log
     Work context: $(pwd)
     Plan: $plan_dir/plan.md
     Reports: none

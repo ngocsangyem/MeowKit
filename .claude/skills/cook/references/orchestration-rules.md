@@ -54,7 +54,10 @@ Before spawning any subagent, verify you have included:
 - [ ] **Plans path** — `tasks/plans/` under work context (or "none")
 - [ ] **File ownership** — glob patterns for files this subagent may modify
 - [ ] **Acceptance criteria** — how to verify the subagent's work is complete
-- [ ] **Constraints** — what the subagent must NOT change or touch
+- [ ] **Goal** — the outcome the task serves, so the subagent can tell when the approach no longer fits it
+- [ ] **Fixed constraints** — what must NOT change, only items the user set or you verified
+- [ ] **Current approach** — marked as open to challenge with `file:line` evidence; an example that pre-solves a cause is labelled "already diagnosed"
+- [ ] **Return** — the shape of the answer you will read
 
 ### Delegation Prompt Template
 
@@ -63,6 +66,7 @@ This is the one canonical template; other files point here.
 <!-- shared:delegation-prompt-template -->
 ```
 Task: [specific task description]
+Goal: [the outcome this task serves, in one sentence]
 Work context: [project path]
 Plan: [plan file path or "none"]
 Reports: [reports path or "none"]
@@ -70,7 +74,9 @@ Plans: [plans path or "none"]
 Files to modify: [glob patterns]
 Files to read for context: [specific paths]
 Acceptance criteria: [binary pass/fail checks]
-Constraints: [what must NOT change]
+Fixed constraints: [what must NOT change; user-set or verified]
+Current approach: [how the lead expects to do it; open to challenge with file:line evidence]
+Return: [the shape of the answer: file path, verdict, or list]
 ```
 <!-- /shared:delegation-prompt-template -->
 
@@ -79,7 +85,7 @@ Constraints: [what must NOT change]
 | Bad                                   | Good                                                           |
 | ------------------------------------- | -------------------------------------------------------------- |
 | "Continue from where we left off"     | "Implement X feature per spec in phase-02.md"                  |
-| "Fix the issues we discussed"         | "Fix null check in auth.ts:45, root cause: missing validation" |
+| "Fix the issues we discussed"         | "Fix null check in auth.ts:45 (already diagnosed: missing validation; challenge it with file:line evidence)" |
 | "Look at the codebase and figure out" | "Read src/api/routes.ts and add POST /users endpoint"          |
 | Passing 50+ lines of conversation     | 5-line task summary with file paths                            |
 

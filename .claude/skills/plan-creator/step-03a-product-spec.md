@@ -107,6 +107,8 @@ If the task involves a frontend (web, mobile, or visual UI):
    Task: Generate a product-level design language for a new green-field build.
      Sanitized task summary: "{sanitized one-sentence summary}"
 
+   Goal: a design language the build can follow
+   Return: the Design Language section written into the plan
    Work context: {absolute path to project root}
    Plan: {absolute path to {plan_dir}/plan.md}
    Reports: none

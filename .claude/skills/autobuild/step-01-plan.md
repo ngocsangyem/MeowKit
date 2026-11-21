@@ -33,6 +33,8 @@ Agent(
     - Save to tasks/plans/{date}-{slug}/plan.md
     - Return the absolute plan path
 
+    Goal: a product spec the build steps can follow
+    Return: the absolute plan path
     Work context: $(pwd)
     Plan: none
     Reports: tasks/reports/

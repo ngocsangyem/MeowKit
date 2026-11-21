@@ -64,6 +64,8 @@ Agent(
 
     Status: return DONE | DONE_WITH_CONCERNS | BLOCKED with handoff path
 
+    Goal: the contract's scope built and committed
+    Return: the handoff path and a status
     Work context: $(pwd)
     Reports: tasks/reports/
     Plans: none

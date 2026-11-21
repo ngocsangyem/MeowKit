@@ -121,6 +121,8 @@ Agent(
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
     Read tasks/handoff/{slug}-sprint-1.md for the build summary.
 
+    Goal: the approved build shipped
+    Return: the PR or release reference and a status
     Work context: $(pwd)
     Plan: $plan_dir/plan.md
     Reports: tasks/reports/

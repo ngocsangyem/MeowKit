@@ -59,6 +59,8 @@ Agent(
 
     Status: return DONE | DONE_WITH_CONCERNS | BLOCKED with verdict path
 
+    Goal: a verdict on the build backed by evidence from the running artifact
+    Return: the verdict path and PASS, WARN or FAIL
     Work context: $(pwd)
     Plan: $plan_dir/plan.md
     Reports: tasks/reviews/
