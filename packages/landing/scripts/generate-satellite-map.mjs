@@ -3,7 +3,8 @@
  * generate-satellite-map.mjs — deterministic extraction of the meowkit
  * satellite map. Re-runnable with zero LLM involvement:
  *   node scripts/generate-satellite-map.mjs
- * Reads plugin/ (read-only), writes public/data/satellite-map.json.
+ * Reads the kit source (.claude/ and .meowkit/, read-only), writes
+ * public/data/satellite-map.json.
  * Contract version: 1. Asserts every shape/cap rule; exits non-zero on violation.
  */
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
@@ -11,11 +12,12 @@ import { join, dirname, resolve, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const PLUGIN = join(ROOT, 'plugin')
+const KIT = join(ROOT, '.claude')
+const META = join(ROOT, '.meowkit')
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'data', 'satellite-map.json')
 
 // The only LLM-authored copy in this file (allowed by the data contract).
-const TAGLINE = 'How meowkit skills, agents, commands, and hooks orbit each other'
+const TAGLINE = 'How meowkit skills, agents, and hooks orbit each other'
 
 // ─── helpers ────────────────────────────────────────────────────────────
 const read = (p) => readFileSync(p, 'utf8')
@@ -56,9 +58,9 @@ const label24 = (prefix, id) => {
 // ─── 1 · inventory ──────────────────────────────────────────────────────
 const nodes = new Map() // key → node record (key is kind-prefixed, id is map-level)
 
-for (const dir of readdirSync(join(PLUGIN, 'skills'), { withFileTypes: true })) {
+for (const dir of readdirSync(join(KIT, 'skills'), { withFileTypes: true })) {
   if (!dir.isDirectory()) continue
-  const p = join(PLUGIN, 'skills', dir.name, 'SKILL.md')
+  const p = join(KIT, 'skills', dir.name, 'SKILL.md')
   if (!existsSync(p)) continue
   const text = read(p)
   const body = text.split('---').slice(2).join('---').trim()
@@ -70,9 +72,10 @@ for (const dir of readdirSync(join(PLUGIN, 'skills'), { withFileTypes: true })) 
     owner: fmValue(text, 'owner'), criticality: fmValue(text, 'criticality'), text,
   })
 }
-for (const f of readdirSync(join(PLUGIN, 'agents'))) {
-  if (!f.endsWith('.md')) continue
-  const p = join(PLUGIN, 'agents', f)
+for (const f of readdirSync(join(KIT, 'agents'))) {
+  // AGENTS_INDEX.md and SKILLS_INDEX.md are catalogues, not agents
+  if (!f.endsWith('.md') || f.endsWith('_INDEX.md')) continue
+  const p = join(KIT, 'agents', f)
   const text = read(p)
   const name = basename(f, '.md')
   nodes.set(`agent:${name}`, {
@@ -82,8 +85,10 @@ for (const f of readdirSync(join(PLUGIN, 'agents'))) {
   })
 }
 const skillIds = new Set([...nodes.values()].filter((n) => n.kind === 'skill').map((n) => n.id))
-for (const f of readdirSync(join(PLUGIN, 'commands', 'mk'))) {
-  const p = join(PLUGIN, 'commands', 'mk', f)
+// The kit ships no slash commands today; read them only if the directory returns.
+const COMMANDS = join(KIT, 'commands', 'mk')
+for (const f of existsSync(COMMANDS) ? readdirSync(COMMANDS) : []) {
+  const p = join(COMMANDS, f)
   const text = read(p)
   const name = basename(f, '.md')
   // command names collide with same-named skills at the map level → suffix the id
@@ -94,9 +99,11 @@ for (const f of readdirSync(join(PLUGIN, 'commands', 'mk'))) {
     owner: fmValue(text, 'owner'), criticality: fmValue(text, 'criticality'), text,
   })
 }
-for (const f of readdirSync(join(PLUGIN, 'hooks', 'handlers'))) {
-  if (!f.endsWith('.cjs')) continue
-  const p = join(PLUGIN, 'hooks', 'handlers', f)
+// Hook scripts: the entry points in hooks/ plus the handlers dispatch runs.
+const hookFiles = ['hooks', join('hooks', 'handlers')].flatMap((d) =>
+  readdirSync(join(KIT, d)).filter((f) => f.endsWith('.cjs')).map((f) => join(KIT, d, f)))
+for (const p of hookFiles) {
+  const f = basename(p)
   const text = read(p)
   const name = basename(f, '.cjs')
   const comment = text.split('\n').find((l) => /^\s*(\/\/|\/?\*+)/.test(l) && /[a-zA-Z]{4,}/.test(l)) || name
@@ -108,14 +115,14 @@ for (const f of readdirSync(join(PLUGIN, 'hooks', 'handlers'))) {
 }
 
 // ─── metadata enrichment: pack membership (via owner) + criticality ─────
-const packManifest = JSON.parse(read(join(PLUGIN, 'pack-manifest.json')))
+const packManifest = JSON.parse(read(join(META, 'pack-manifest.json')))
 const ownerToPack = new Map()
 for (const [packName, pack] of Object.entries(packManifest.packs || {}))
   for (const owner of pack.owners || [])
     if (!ownerToPack.has(owner)) ownerToPack.set(owner, packName)
-const inventory = JSON.parse(read(join(PLUGIN, 'harness-inventory.json'))).artifacts || {}
+const inventory = JSON.parse(read(join(META, 'harness-inventory.json'))).artifacts || {}
 for (const n of nodes.values()) {
-  const inv = inventory[n.sourceRef.replace(/^plugin\//, '')]
+  const inv = inventory[n.sourceRef.replace(/^\.claude\//, '')]
   if (inv?.criticality) n.criticality = inv.criticality
   n.group = ownerToPack.get(n.owner) || ''
 }

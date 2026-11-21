@@ -3,17 +3,17 @@
 type Step = { kind: 'phase' | 'gate'; label: string; detail?: string };
 
 const steps: Step[] = [
-  { kind: 'phase', label: 'plan' },
-  { kind: 'gate', label: 'GATE 1', detail: 'human approval' },
+  { kind: 'phase', label: 'plan', detail: 'agreed with you' },
   { kind: 'phase', label: 'build · simplify · verify' },
-  { kind: 'gate', label: 'GATE 2', detail: 'review verdict' },
+  { kind: 'phase', label: 'review', detail: 'adversarial reviewers' },
+  { kind: 'gate', label: 'SHIP CHECK', detail: 'lint · tests · types' },
   { kind: 'phase', label: 'ship' },
 ];
 
 export function HeroPipeline() {
   return (
     <div
-      aria-label="MeowKit workflow: plan, Gate 1 human approval, build, Gate 2 review verdict, ship"
+      aria-label="MeowKit workflow: plan agreed with you, build, review, ship check (lint, related tests, type-check), ship"
       // Flat card on a hairline: depth in this identity comes from the surface step
       // between ground and card, not from a shadow.
       className="w-full max-w-[300px] rounded-lg border border-fd-border bg-fd-card p-4 pb-5"
@@ -23,7 +23,7 @@ export function HeroPipeline() {
         <span className="text-xs font-medium tracking-wider text-fd-muted-foreground">
           workflow
         </span>
-        <span className="text-[11px] text-fd-primary">2 hard gates</span>
+        <span className="text-[11px] text-fd-primary">1 enforced check</span>
       </div>
       <ol className="relative m-0 list-none p-0">
         {/* vertical connector */}
