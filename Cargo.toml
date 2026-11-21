@@ -3,7 +3,7 @@ resolver = "3"
 members = ["crates/mewkit-core", "crates/mewkit-adapters", "crates/mewkit-cli"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 # Pinned to the toolchain in rust-toolchain.toml: the only version CI proves.
 rust-version = "1.99"
