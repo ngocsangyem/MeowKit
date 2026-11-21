@@ -29,7 +29,7 @@ Plans describe the happy path. Your job is to find every way the system breaks w
 - **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
 - **Flaw:** {what failure mode is unaddressed}
 - **Failure scenario:** {concrete description: trigger → propagation → impact}
-- **Evidence:** {quote from plan showing missing error handling / recovery}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim; a finding without one is dropped}
 - **Suggested fix:** {brief recommendation — e.g., add transaction, add retry, add circuit breaker}
 - **Category:** reliability
 ```

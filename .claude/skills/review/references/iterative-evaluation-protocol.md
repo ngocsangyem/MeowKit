@@ -29,7 +29,7 @@ Output: full findings list with severity ratings. Do NOT issue a verdict yet.
 Developer receives Pass 1 findings and makes changes. Reviewer re-reviews:
 - All items flagged in Pass 1 (verify each was addressed or explicitly accepted)
 - Any code adjacent to the changes made in response to Pass 1 (new code can introduce new bugs)
-- The forced-finding protocol runs again on the new diff
+- The challenger policy applies again to the new diff
 
 Output: delta findings (new issues introduced, prior issues resolved). Do NOT issue a verdict yet.
 

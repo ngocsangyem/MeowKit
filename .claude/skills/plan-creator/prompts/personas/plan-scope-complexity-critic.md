@@ -29,7 +29,7 @@ The best plan is the smallest plan that achieves the goal. Every extra phase, ab
 - **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
 - **Flaw:** {what is unnecessary or over-scoped}
 - **Failure scenario:** {how this excess adds risk, delay, or cost}
-- **Evidence:** {quote from plan or acceptance criteria comparison}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim; a finding without one is dropped}
 - **Suggested fix:** {simpler alternative}
 - **Category:** scope
 ```

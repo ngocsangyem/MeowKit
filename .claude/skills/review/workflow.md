@@ -20,7 +20,7 @@ Scope-aware parallel review with adversarial persona passes, forced-finding, and
 1. `step-01-gather-context.md` — Load diff, plan, acceptance criteria. **Assess review scope** (minimal/full) and domain complexity.
 2. `step-02-parallel-review.md` — **Phase A:** Dispatch reviewers based on scope. Minimal=Blind Hunter only. Full=all 3 reviewers.
 3. `step-02b-persona-passes.md` — **Phase B** (full scope only): Dispatch adversarial persona subagents informed by Phase A findings. Skip if scope=minimal.
-4. `step-03-triage.md` — **Forced-finding check** (zero findings = re-analyze once). Then categorize as current-change or incidental. Dedup Phase A + Phase B.
+4. `step-03-triage.md` — **Challenger policy** (a finding needs `file:line`; unsupported findings are dropped; no finding is a valid result). Then categorize as current-change or incidental. Dedup Phase A + Phase B.
 5. `step-03b-whole-plan-sweep.md` — **Whole-Plan Consistency Sweep**. Re-read plan.md + phase-*.md, detect cross-file drift after edits, emit `sweep_failures` (non-blocking). Skipped if no active plan.
 6. `step-04-verdict.md` — Synthesize verdict + **artifact verification** (full scope: 4-level checks for stubs, orphans, data flow). Append `sweep_failures` if any. Present the verdict to the user.
 

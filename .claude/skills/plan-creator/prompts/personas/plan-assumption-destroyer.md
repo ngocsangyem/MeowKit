@@ -29,7 +29,7 @@ Plans are built on assumptions. Most are invisible. Make them visible and test w
 - **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
 - **Flaw:** {what is assumed without evidence}
 - **Failure scenario:** {concrete description of how this breaks at implementation time}
-- **Evidence:** {quote from plan or note of what is missing}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim; a finding without one is dropped}
 - **Suggested fix:** {brief recommendation}
 - **Category:** assumption
 ```

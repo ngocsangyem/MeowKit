@@ -123,7 +123,7 @@ Execute via `workflow.md`. Each step is a separate file loaded JIT:
 1. **step-01-gather-context** — Load diff, plan, ACs. **Scope check** classifies diff as `minimal` or `full`. Domain complexity check via `mk:scale-routing`.
 2. **step-02-parallel-review (Phase A)** — Dispatch reviewers based on scope. Minimal = Blind Hunter only. Full = all 3 reviewers in parallel.
 3. **step-02b-persona-passes (Phase B)** — Full scope only. Dispatch adversarial persona subagents informed by Phase A findings. 2-at-a-time batching.
-4. **step-03-triage** — **Forced-finding check** (zero → re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
+4. **step-03-triage** — **Challenger policy** (a finding needs `file:line`; unsupported findings are dropped; no finding is a valid result). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
 5. **step-04-verdict** — 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) + **artifact verification** (4-level). Present the verdict to the user.
 
 For high-stakes code (payments, auth, security) or `--iterative` flag, load `references/iterative-evaluation-protocol.md` for the 3-pass structured review process.

@@ -131,7 +131,7 @@ Separate subagents receive diff + Phase A findings summary. Go deeper, not wider
 - Assumption Destroyer + Scope Complexity Critic (scope=full, domain=high only)
 
 **Scope check:** step-01 classifies diff as minimal (Blind Hunter only) or full (all reviewers + personas).
-**Forced-Finding:** Zero findings → re-analyze once. Prevents rubber-stamp approvals.
+**Challenger policy:** a finding needs `file:line`; unsupported findings are dropped; no finding is a valid result, so there is no forced re-analysis.
 **Artifact Verification:** 4-level checks (exists, substantive, wired, data flowing) in verdict step.
 
 Workflow: `.claude/skills/review/workflow.md` → step-01 → step-02 (Phase A) → step-02b (Phase B) → step-03 (triage) → step-04 (verdict).

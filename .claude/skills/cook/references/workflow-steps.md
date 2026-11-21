@@ -131,6 +131,8 @@ Implement code until all tests pass. TDD: implement ONLY enough to make tests pa
 
 **Rule loads for this phase.** Before spawning any subagent, `Read` `references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
 
+**Premise check (standard path only).** Skip it in `quick` / `--fast` runs and when the plan carries no open `[ASSUMPTION]` item. Otherwise, before the first edit, delegate ONE read-only `researcher` run (`mk:delegate` brief, `Files to modify: none`) that checks each open `[ASSUMPTION]` against the code. It returns, per item, `holds` or `false` with `file:line`. An item it cannot check is reported as unchecked, not guessed. A finding without `file:line` is dropped, and no finding is a valid result. A `false` assumption goes back to the plan before any build; do not build past it.
+
 **Pre-check (TDD mode only):** TDD mode is ON when
 
 - the `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
