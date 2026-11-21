@@ -39,6 +39,9 @@ export default defineConfig({
 			// Sibling session checkouts: separate revisions, not this tree's suites.
 			".claude/worktrees/**",
 			"kit/overlays/**",
+			// Eval fixtures are sample projects the eval runner copies; their tests
+			// belong to those projects and run under `node --test`, not here.
+			".claude/skills/*/eval/fixtures/**",
 		],
 	},
 });

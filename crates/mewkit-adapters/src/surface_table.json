@@ -382,14 +382,14 @@
             {
               "root": ".agents/skills",
               "write": true,
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/skills.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/skills.md"
             },
             {
               "root": ".pi/skills",
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md"
             }
           ],
-          "note": "The kit writes `.agents/skills` only, so Pi shares one copy with Codex and OMP and `.pi/skills` stays empty (maintainer, 2026-11-19). A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md)."
+          "note": "The kit writes `.agents/skills` only, so Pi shares one copy with Codex and OMP and `.pi/skills` stays empty (maintainer, 2026-11-19). A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/security.md)."
         },
         "always-on": {
           "own": true,
@@ -397,11 +397,11 @@
             {
               "root": "AGENTS.md",
               "write": true,
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md"
             },
             {
               "root": "CLAUDE.md",
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md"
             }
           ],
           "note": "Parent directories are walked. `AGENTS.md` against `CLAUDE.md` in one directory is not ranked in the docs."
@@ -411,7 +411,7 @@
             {
               "root": ".pi/extensions",
               "write": true,
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/extensions.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/extensions.md"
             }
           ],
           "note": "No hook file: an extension blocks a call from `pi.on(\"tool_call\")`."
@@ -421,7 +421,7 @@
             {
               "root": ".pi/mcp.json",
               "write": true,
-              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/mcp.md"
+              "source": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/mcp.md"
             }
           ]
         }

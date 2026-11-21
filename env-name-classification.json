@@ -387,7 +387,7 @@
       "name": "MEOWKIT_MODEL_HINT",
       "class": "runtime-handoff",
       "key": "",
-      "reader": "crates/mewkit-core/src/trace.rs, hooks/handlers/model-detector.cjs"
+      "reader": "crates/mewkit-core/src/trace.rs, hooks/lib/resolve-model.cjs"
     },
     {
       "name": "MEOWKIT_MUSIC_PROVIDER_CHAIN",

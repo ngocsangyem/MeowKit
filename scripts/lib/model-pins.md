@@ -41,7 +41,9 @@ On Codex, Enterprise and Edu admins must enable `gpt-6-luna` before it can run.
 | `claude-opus-5` | claude-code | listed | [Claude Code model config] | 2026-11-15 | Version prefix; the page pins with full ids such as `claude-opus-5-5` |
 | `claude-opus-5-5` | claude-code | listed | [Claude Code model config] | 2026-11-15 | Full id given as the pinning example |
 | `gpt-6-astra` | codex | recommended | [Codex models] | 2026-11-15 | Most capable |
-| `gpt-6.1-sol` | codex | recommended | [Codex models] | 2026-11-15 | Default in the sample `config.toml` |
+| `gpt-6.1-sol` | codex | listed | [Codex models] | 2026-11-22 | Named as a replacement "when available"; no longer the sample default |
+| `gpt-6.2-astra` | codex | listed | [Codex models] | 2026-11-22 | "Now available in ChatGPT Work and Codex" |
+| `gpt-6.2-sol` | codex | listed | [Codex models] | 2026-11-22 | Default in the sample `config.toml` |
 | `gpt-6.1-terra` | codex | recommended | [Codex models] | 2026-11-15 | Needs Codex CLI 0.159.0 or later |
 | `gpt-6-luna` | codex | recommended | [Codex models] | 2026-11-15 | Named replacement for `gpt-5.4-mini`; Enterprise/Edu admins enable it first |
 | `gpt-5.5` | codex | retired | [Codex models] | 2026-11-15 | Retired with ChatGPT sign-in 2026-10-14; API-key sessions unaffected |
