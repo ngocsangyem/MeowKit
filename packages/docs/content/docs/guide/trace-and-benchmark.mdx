@@ -21,7 +21,7 @@ hooks append records  →  .meowkit/telemetry/trace-log.jsonl
 {
   "schema_version": "1.0",
   "ts": "2026-04-08T14:30:00Z",
-  "event": "build_verify_result",
+  "event": "session_end",
   "run_id": "260408-1430-myapp",
   "harness_version": "3.0.0",
   "model": "claude-sonnet-4-5",
@@ -30,13 +30,15 @@ hooks append records  →  .meowkit/telemetry/trace-log.jsonl
 }
 ```
 
-Hooks and harness steps write records through `append-trace.cjs`. Event types written today include:
+Hooks and harness steps write records through `append-trace.cjs`. Event types written today:
 
 | Event | Writer | When |
 |---|---|---|
-| `build_verify_result` | `build-verify.cjs` | A compile or lint failure after a file write |
-| `loop_warning` | `loop-detection.cjs` | A file reaches the edit-count thresholds (4 and 8) |
+| `file_edited` | `learning-observer.cjs` | A file is edited, with its edit count in the session |
 | `session_end` | `post-session.cjs` | A session closes |
+| `dead_weight_audit_needed` | `post-session.cjs` | The session's model differs from the previous session's |
+| `task_transition` | `mewkit task` | A durable task changes status |
+| `friction` | `mewkit trace --friction` | A friction note is recorded |
 | `orient_run` | `mewkit orient` | An orientation run, unless `--no-record` is passed |
 | `benchmark_result` | `mk:benchmark` | A canary suite run |
 

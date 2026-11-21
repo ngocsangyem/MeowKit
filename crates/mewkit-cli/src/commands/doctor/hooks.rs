@@ -38,7 +38,7 @@ pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Ch
                 Status::Ok,
                 "Grok runs project hooks only after /hooks-trust or a start with --trust; whether this project is trusted is not read here",
             )),
-            // https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md
+            // https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/security.md
             Runtime::Pi => out.push(Check::new(
                 "pi trust",
                 Status::Ok,

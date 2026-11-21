@@ -88,7 +88,7 @@ Set these in your shell profile or per session with `export`.
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `MEOWKIT_TDD` | off | Strict test-first mode. Truthy values: `1`, `true`, `yes`, `on`, `enable`, `enabled` (any case). Falsy values: `0`, `false`, `no`, `off`, `disable`, `disabled`. An unrecognized value is ignored with a warning. It outranks `tdd` in the config and the `--tdd` prompt flag |
-| `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when SessionStart input has no `model` field. Needed only when `model-detector` reports "not detected" |
+| `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when SessionStart input has no `model` field. Read after the SessionStart `model` field and before `CLAUDE_MODEL`, `CLAUDE_MODEL_ID` and `ANTHROPIC_MODEL`. A Claude model name behind a non-Anthropic `ANTHROPIC_BASE_URL` is not trusted: the tier is unknown and density is FULL |
 | `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` makes `learning-observer`, `post-session` and `pre-task-check` do nothing. `standard` and `strict` behave the same. The legacy alias `MEOW_HOOK_PROFILE` still works, and the new name wins when both are set |
 | `MEOWKIT_AUTOBUILD_MODE` | none | Density override for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. Also settable as `autobuild.mode` |
 | `MEOWKIT_RUN_ID` | none | A per-run id set by `mk:autobuild` and read by the trace log |

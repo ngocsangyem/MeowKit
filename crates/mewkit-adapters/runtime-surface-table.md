@@ -103,14 +103,14 @@ Checked: docs on the default branch read 2026-11-18 and 2026-11-19, package 1.5.
 
 | Kind | Root | Kit writes | Unsure | Switch | Source |
 |---|---|---|---|---|---|
-| skills | `.agents/skills` | yes |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/skills.md |
-| skills | `.pi/skills` |  |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md |
-| always-on | `AGENTS.md` | yes |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md |
-| always-on | `CLAUDE.md` |  |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md |
-| hooks | `.pi/extensions` | yes |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/extensions.md |
-| mcp | `.pi/mcp.json` | yes |  |  | https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/mcp.md |
+| skills | `.agents/skills` | yes |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/skills.md |
+| skills | `.pi/skills` |  |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md |
+| always-on | `AGENTS.md` | yes |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md |
+| always-on | `CLAUDE.md` |  |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/configuration.md |
+| hooks | `.pi/extensions` | yes |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/extensions.md |
+| mcp | `.pi/mcp.json` | yes |  |  | https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/mcp.md |
 
-- skills: The kit writes `.agents/skills` only, so Pi shares one copy with Codex and OMP and `.pi/skills` stays empty (maintainer, 2026-11-19). A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md).
+- skills: The kit writes `.agents/skills` only, so Pi shares one copy with Codex and OMP and `.pi/skills` stays empty (maintainer, 2026-11-19). A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/security.md).
 - always-on: Parent directories are walked. `AGENTS.md` against `CLAUDE.md` in one directory is not ranked in the docs.
 - hooks: No hook file: an extension blocks a call from `pi.on("tool_call")`.
 
