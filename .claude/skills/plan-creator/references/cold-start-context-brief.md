@@ -10,7 +10,7 @@ Self-contained phase files eliminate this problem entirely. Each file carries ex
 
 ## Phase File Template
 
-Every phase file MUST include all 7 sections. No section may reference another file for its content.
+Every phase file follows `phase-template.md` (frontmatter plus 12 sections). The 7 sections below are the cold-start minimum those sections must carry inline. No section may reference another file for its content.
 
 ```markdown
 ## Goal

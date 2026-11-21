@@ -6,7 +6,7 @@ When to activate each skill and agent during fix workflows.
 
 | Skill/Agent | Reason |
 |-------------|--------|
-| `mk:investigate` | Core to all fix workflows — find root cause first |
+| `mk:investigate` | Standard and deep fix workflows — find root cause first. Quick mode skips it and validates the supplied cause directly |
 
 ## Conditional Activation
 

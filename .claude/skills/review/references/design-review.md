@@ -12,7 +12,7 @@ source <(.claude/hooks/lib/workflow-diff-scope <base> 2>/dev/null)
 
 1. **Check for DESIGN.md.** If `DESIGN.md` or `design-system.md` exists in the repo root, read it. All design findings are calibrated against it — patterns blessed in DESIGN.md are not flagged. If not found, use universal design principles.
 
-2. **Load design rubrics from the rubric library** (NOT the deleted `design-checklist.md`). The legacy `design-checklist.md` was removed in a prior cleanup; the design judgment surface now lives in `.claude/skills/rubric/rubrics/design-quality.md` and `.claude/skills/rubric/rubrics/originality.md`. Load both via:
+2. **Load design rubrics from the rubric library** (`design-checklist.md` is the source-pattern scan `mk:ship` reads; it does not replace the rubrics). The design judgment surface lives in `.claude/skills/rubric/rubrics/design-quality.md` and `.claude/skills/rubric/rubrics/originality.md`. Load both via:
 
    ```bash
    .claude/skills/rubric/scripts/load-rubric.sh design-quality

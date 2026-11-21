@@ -16,7 +16,7 @@
 
 - **Red-team personas too aggressive on small plans**: 4 personas on a 2-phase plan floods findings with noise → Dynamic scaling: 1-3 phases = 2 personas only, 4-5 = 3, 6+ = 4
 
-- **Security-sensitive plans need /mk:cso before Security persona ships**: Plan red-team currently uses Assumption Destroyer + Scope Critic only. For auth/payments/PII plans, run `/mk:cso` separately until Security Adversary persona is A/B tested and shipped
+- **Security-sensitive plans need /mk:cso before Security persona ships**: Plans of 1–3 phases get only Assumption Destroyer + Scope Complexity Critic; Security Adversary joins at 4+ phases (see `step-05-red-team.md`). For auth/payments/PII plans of any size, also run `/mk:cso`
 
 - **Two-approach mode doubles research cost**: Both approaches share the same research reports from step-01 → No additional researcher spawning needed; approach files synthesize existing research differently
 

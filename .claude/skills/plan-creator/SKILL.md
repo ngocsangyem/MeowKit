@@ -79,7 +79,7 @@ Activate when:
 - Phase 3 needs a plan to build from
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
-- Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps, not standalone subcommands, and must never be routed away.
+- Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps of that flow and must never be routed away; the `red-team {path}` and `validate {path}` aliases below run them standalone on an existing plan.
 - Compatibility aliases: `/mk:plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk:plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
 Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.

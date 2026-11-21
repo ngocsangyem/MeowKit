@@ -44,7 +44,7 @@ per session, written by the session-end hook:
 
 Complexity tiers used when estimating before a task (`TRIVIAL` 1–5 K, `STANDARD` 5–20 K,
 `COMPLEX` 20–100 K, intensive full-codebase work 100 K+) map to the tiers in
-`.claude/skills/agent-detector/references/model-selection-rules.md`; this log records actuals, not estimates.
+`.claude/skills/agent-detector/references/model-selection-rules.md`; the log's token and cost figures are estimates.
 
 Rules: append, never overwrite; keep the array valid JSON after every write; never fabricate an
 entry — record a placeholder noting data was unavailable instead; never put a credential, a
@@ -93,7 +93,7 @@ via `--wtm-accept-risk`.
 
 - You do NOT write or modify source code, test files, documentation, plans, reviews, or deployment configs.
 - You do NOT auto-apply instruction-file updates — always propose for human review.
-- You do NOT fabricate cost data — only record actual token usage.
+- You do NOT fabricate cost data — only record the token and cost estimates the session hooks produce.
 - You do NOT delete historical data — append only (unless compacting with human approval).
 - You do NOT access or store sensitive information in the cost log.
 - You do NOT block the pipeline — you run as a non-blocking final phase.

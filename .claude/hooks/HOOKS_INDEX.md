@@ -11,7 +11,7 @@ registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` s
 the hook paths for one.
 
 The kit ships 26 node hooks: the 4 entrypoints directly under `hooks/`, which the host
-registers or an agent invokes, and the 21 observers under `hooks/handlers/`, which
+registers or an agent invokes, and the 22 observers under `hooks/handlers/`, which
 `dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
 neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 
@@ -48,8 +48,8 @@ transcript.
 **CLI modules** are invoked with arguments by an agent or another module, not by an
 event, so they appear in no registry.
 
-`toggleKey` is declared for every observer and is read from project configuration
-later; nothing is switchable yet.
+`toggleKey` is declared for every observer. Setting `hooks.<toggleKey>: false` in the project
+config removes that observer from every event it is registered on (`lib/handler-registry.cjs`).
 
 ## Registered entrypoints
 
@@ -72,29 +72,29 @@ later; nothing is switchable yet.
 
 | Handler | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
-| `pre-task-check.cjs` | PreToolUse | Bash | preTaskCheck | — | Reports prompt-injection patterns in a command to the model as additionalContext (advisory) |
-| `build-verify.cjs` | PostToolUse | Edit\|Write | buildVerify | — | Runs the project build after an edit |
-| `loop-detection.cjs` | PostToolUse | Edit\|Write | loopDetection | — | Reminds the model, as additionalContext, at 4 and 8 edits to one file, then every 4 |
-| `budget-tracker.cjs` | PostToolUse | Edit\|Write | budgetTracker | — | Accumulates token and cost estimates; notices are user-only |
-| `auto-checkpoint.cjs` | PostToolUse | Edit\|Write | autoCheckpoint | — | Writes a checkpoint after an edit |
-| `learning-observer.cjs` | PostToolUse | Edit\|Write | learningObserver | — | Per-file edit ledger and the canonical edit record |
-| `post-write.cjs` | PostToolUse | Edit\|Write | postWrite | — | Security scan of a file that has already been written; fails the tool result on a blocked pattern |
-| `budget-tracker.cjs` | PostToolUse | Bash | budgetTracker | — | Accumulates token and cost estimates; notices are user-only |
-| `review-evidence-tag.cjs` | PostToolUse | Bash | reviewEvidenceTag | — | Tags review evidence from a command |
-| `verification-evidence.cjs` | PostToolUse, SessionStart | Bash | verificationEvidence | — | Records the session's starting tree and the tree at each passing verification command, for the opt-in completion check |
-| `checkpoint-writer.cjs` | Stop | — | checkpointWriter | — | Writes the end-of-session checkpoint |
-| `post-session.cjs` | Stop | — | postSession | — | Records cost and trace data when a session ends |
-| `control-probe.cjs` | Stop | — | controlProbe | — | A known-good fire, used as a control signal |
-| `pre-completion-check.cjs` | Stop | — | preCompletionCheck | — | Opt-in: continues a turn whose edits are unverified, at most twice |
-| `model-detector.cjs` | SessionStart | — | modelDetector | — | Records the active model at session start |
-| `orientation-ritual.cjs` | SessionStart | — | orientationRitual | — | Emits the orientation prompt at session start |
-| `project-context-loader.cjs` | SessionStart | — | projectContextLoader | — | Injects the project's own context and resets per-session state |
-| `jira-env-loader.cjs` | SessionStart | — | jiraEnvLoader | — | Reports whether the issue-tracker credentials are present. The only reader of the project dotenv |
-| `capability-bootstrap.cjs` | SessionStart | — | capabilityBootstrap | — | Emits the capability-resolution guidance |
-| `safety-sentinel-inject.cjs` | UserPromptSubmit | — | safetySentinelInject | — | Emits the cached-skip marker when this session already verified the baseline |
-| `tdd-flag-detector.cjs` | UserPromptSubmit | — | tddFlagDetector | — | Turns the test-first sentinel on or off from the prompt |
-| `precompact-probe.cjs` | PreCompact | — | precompactProbe | — | Re-arms the safety baseline before context is compacted |
-| `posttoolfailure-probe.cjs` | PostToolUseFailure | — | posttoolfailureProbe | — | Records that the tool-failure event fires |
+| `pre-task-check.cjs` | PreToolUse | Bash | pre-task-check | — | Reports prompt-injection patterns in a command to the model as additionalContext (advisory) |
+| `build-verify.cjs` | PostToolUse | Edit\|Write | build-verify | — | Runs the project build after an edit |
+| `loop-detection.cjs` | PostToolUse | Edit\|Write | loop-detection | — | Reminds the model, as additionalContext, at 4 and 8 edits to one file, then every 4 |
+| `budget-tracker.cjs` | PostToolUse | Edit\|Write | budget-tracker | — | Accumulates token and cost estimates; notices are user-only |
+| `auto-checkpoint.cjs` | PostToolUse | Edit\|Write | auto-checkpoint | — | Writes a checkpoint after an edit |
+| `learning-observer.cjs` | PostToolUse | Edit\|Write | learning-observer | — | Per-file edit ledger and the canonical edit record |
+| `post-write.cjs` | PostToolUse | Edit\|Write | post-write | — | Security scan of a file that has already been written; fails the tool result on a blocked pattern |
+| `budget-tracker.cjs` | PostToolUse | Bash | budget-tracker | — | Accumulates token and cost estimates; notices are user-only |
+| `review-evidence-tag.cjs` | PostToolUse | Bash | review-evidence-tag | — | Tags review evidence from a command |
+| `verification-evidence.cjs` | PostToolUse, SessionStart | Bash | verification-evidence | — | Records the session's starting tree and the tree at each passing verification command, for the opt-in completion check |
+| `checkpoint-writer.cjs` | Stop | — | checkpoint-writer | — | Writes the end-of-session checkpoint |
+| `post-session.cjs` | Stop | — | post-session | — | Records cost and trace data when a session ends |
+| `control-probe.cjs` | Stop | — | control-probe | — | A known-good fire, used as a control signal |
+| `pre-completion-check.cjs` | Stop | — | pre-completion-check | — | Opt-in: continues a turn whose edits are unverified, at most twice |
+| `model-detector.cjs` | SessionStart | — | model-detector | — | Records the active model at session start |
+| `orientation-ritual.cjs` | SessionStart | — | orientation-ritual | — | Emits the orientation prompt at session start |
+| `project-context-loader.cjs` | SessionStart | — | project-context-loader | — | Injects the project's own context and resets per-session state |
+| `jira-env-loader.cjs` | SessionStart | — | jira-env-loader | — | Reports whether the issue-tracker credentials are present. The only reader of the project dotenv |
+| `capability-bootstrap.cjs` | SessionStart | — | capability-bootstrap | — | Emits the capability-resolution guidance |
+| `safety-sentinel-inject.cjs` | UserPromptSubmit | — | safety-sentinel-inject | — | Emits the cached-skip marker when this session already verified the baseline |
+| `tdd-flag-detector.cjs` | UserPromptSubmit | — | tdd-flag-detector | — | Turns the test-first sentinel on or off from the prompt |
+| `precompact-probe.cjs` | PreCompact | — | precompact-probe | — | Re-arms the safety baseline before context is compacted |
+| `posttoolfailure-probe.cjs` | PostToolUseFailure | — | posttoolfailure-probe | — | Records that the tool-failure event fires |
 
 ## CLI modules (argv-invoked, in no registry)
 
