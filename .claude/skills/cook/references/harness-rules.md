@@ -47,7 +47,7 @@ The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:sca
 
 ## Rule 6: Budget Thresholds — Warn at $30, Approve at $100, Hard Block at User Cap
 
-The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces three thresholds:
+The harness budget tracker (`.claude/skills/autobuild/scripts/budget-tracker.sh`) enforces three thresholds:
 
 - **$30 warn** — print warning, continue
 - **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
@@ -75,7 +75,7 @@ The evaluator (autobuild Step 4 — evaluator stage) MUST drive the running buil
 
 ## Rule 9: Skeptic Persona Reloaded Per Criterion
 
-The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-persona.md`) before grading each criterion. Leniency drift accumulates over a session.
+The evaluator MUST re-anchor its skeptic persona (`.claude/skills/evaluate/prompts/skeptic-persona.md`) before grading each criterion. Leniency drift accumulates over a session.
 
 **WHY:** Persona re-anchoring prevents leniency drift during long grading sessions.
 

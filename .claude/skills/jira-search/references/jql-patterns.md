@@ -46,6 +46,6 @@ comment ~ "SEARCH_TERM" AND updated >= -30d ORDER BY updated DESC
 
 - `currentUser()` resolves to the authenticated user (configured via `MEOW_JIRA_EMAIL` in `.meowkit/.env`; the wrapper exports it to `JIRA_EMAIL` per call)
 - `openSprints()` returns the currently active sprint(s)
-- Custom field IDs: use `references/field-discovery.md` to find the right ID
+- Custom field IDs: use `mk:jira-fields` (`.claude/skills/jira-fields/references/field-discovery.md`) to find the right ID
 - Chain conditions with `AND`, `OR`, use parentheses for grouping
 - For advanced patterns, see [Jira JQL documentation](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)

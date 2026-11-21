@@ -102,9 +102,9 @@ pub fn build_default_checks(
     results.push(check_config(meowkit_dir));
     results.extend(check_hooks_executable(meowkit_dir));
     results.extend(check_docs_refs_contract(meowkit_dir));
-    // Advisory: the kit carries dead skill paths and unknown commands that
-    // predate this check, so they surface as a work list, not a build break.
-    results.extend(check_skill_link_rows(meowkit_dir, Status::Warn));
+    // A dead skill path or unknown command misleads whoever follows it, so
+    // these rows fail the run.
+    results.extend(check_skill_link_rows(meowkit_dir, Status::Fail));
     // Namespace purity is cheap and consumer-relevant: a leaked double-prefix
     // misbehaves in a consumer install too.
     results.extend(check_plugin_namespace(meowkit_dir));

@@ -30,11 +30,11 @@ Taxonomy for confluence-as ops, condensed to project conventions:
 - **Tier 1 (read-only)** — `page get`, `search`, `hierarchy *`, `version list`, `space list/get`, `comment list`, `attachment list/download`, `label list`, `watch list`. No confirmation; execute immediately.
 - **Tier 2 (single-item modify, reversible)** — `page create`, `comment add`, `label add`, `attachment upload`, `watch add`. Agent reports the change in response.
 - **Tier 3 (single-item destroy, version-history exists)** — `page update`, `page copy`, `page move`, `version restore`, `comment update`, `label remove`, `watch remove`. Agent confirms intent before exec; for `update`, show diff (current → proposed).
-- **Tier 4 (HIGH BLAST or irreversible)** — `page delete`, `comment delete`, `attachment delete`, `bulk *` (label add/remove, move, delete). Mandatory 3-step dry-run ceremony per `mk:confluence-bulk/references/dry-run-protocol.md`.
+- **Tier 4 (HIGH BLAST or irreversible)** — `page delete`, `comment delete`, `attachment delete`, `bulk *` (label add/remove, move, delete). Mandatory 3-step dry-run ceremony per `.claude/skills/confluence-bulk/references/dry-run-protocol.md`.
 
 ## Dry-Run Protocol (Tier 4 ops)
 
-(Full enforcement details in `mk:confluence-bulk/references/dry-run-protocol.md`. Summary:)
+(Full enforcement details in `.claude/skills/confluence-bulk/references/dry-run-protocol.md`. Summary:)
 
 1. Always run with `--dry-run` first. Skipping is a hard violation.
 2. Agent presents `would_*` summary + impacted-count + first 5 affected page titles to the user.

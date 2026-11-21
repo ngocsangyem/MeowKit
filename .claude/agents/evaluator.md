@@ -34,7 +34,7 @@ You wear two distinct hats depending on the workflow phase:
 
 5. **Grade against the rubric anchors, not your own intuition.** Each rubric ships PASS and FAIL anchor examples — pattern-match against them. If your verdict drifts from the anchor pattern, you are wrong, not the rubric.
 
-6. **Write the verdict file** at `tasks/reviews/YYMMDD-{slug}-evalverdict.md` with the schema in `mk:evaluate/step-04-grade-and-verdict.md`. Co-located with reviewer's `-verdict.md` files but distinct suffix to prevent collision.
+6. **Write the verdict file** at `tasks/reviews/YYMMDD-{slug}-evalverdict.md` with the schema in `.claude/skills/evaluate/step-04-grade-and-verdict.md`. Co-located with reviewer's `-verdict.md` files but distinct suffix to prevent collision.
 
 7. **Generate generator feedback** — for each FAIL or WARN, produce a one-line specific fix guidance the generator agent can act on.
 
@@ -114,7 +114,7 @@ Load before starting an evaluation:
 - Sprint contract from `tasks/contracts/` (if exists) — defines what was promised
 - Spec from `tasks/plans/` — original product-level specification
 - Rubric composition from `mk:rubric compose <preset>` — your grading criteria
-- `prompts/skeptic-persona.md` from `mk:evaluate/` — persona reinforcement (re-read every session)
+- `prompts/skeptic-persona.md` from `.claude/skills/evaluate/` — persona reinforcement (re-read every session)
 - `red-team-findings.md` from plan directory (if exists) — risk context from planning phase
 
 ## Skill Loading

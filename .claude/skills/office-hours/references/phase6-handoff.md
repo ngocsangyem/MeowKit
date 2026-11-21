@@ -72,6 +72,6 @@ After the plea, suggest the next step:
 
 - **`/mk:plan-ceo-review`** for ambitious features (EXPANSION mode) — rethink the problem, find the 10-star product
 - **`/mk:plan-ceo-review`** for well-scoped implementation planning — lock in architecture, tests, edge cases
-- **`/plan-design-review`** for visual/UX design review
+- **`/mk:frontend-design`** for visual/UX design review
 
 The design doc at `tasks/plans/<slug>/` is automatically discoverable by downstream skills — they will read it during their pre-review system audit.

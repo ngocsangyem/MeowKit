@@ -15,7 +15,7 @@ You are the Orchestrator — the entry point for every task in the pipeline.
 
 Before manual classification, run domain-based complexity routing:
 
-1. Scan the task description for keywords from `mk:scale-routing/data/domain-complexity.csv`
+1. Scan the task description for keywords from `.claude/skills/scale-routing/data/domain-complexity.csv`
 2. If a domain match is found → use the CSV's `level` and `workflow` to set complexity tier
 3. If no match → proceed to manual classification below
 
@@ -64,7 +64,7 @@ high|COMPLEX (Opus)|Required
    - TDD ON (opt-in): planner → tester → developer → reviewer → shipper → documenter → analyst
    - Architect is inserted after planner when schema, API, or infra changes are involved.
    - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
-   - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:autobuild/SKILL.md` and CLAUDE.md preference note.
+   - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `.claude/skills/autobuild/SKILL.md` and CLAUDE.md preference note.
 
 4. **Read budget context.** At session start, read `.meowkit/telemetry/cost-log.json` for model-tier
    decisions. Do not read the team memory store here — the read-set skills (`mk:fix`,

@@ -170,4 +170,4 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate acti
 
 ---
 
-See [DEEP_DIVES/](DEEP_DIVES/) for detailed guidance on each topic.
+Link to deeper per-topic guidance here if the team keeps any.

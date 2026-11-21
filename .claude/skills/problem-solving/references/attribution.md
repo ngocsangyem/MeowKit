@@ -61,7 +61,7 @@ Full audit of all 39 cc-thinking-skills conducted 2026-04-19. Report:
 - `thinking-triz` — if contradiction-resolution moments aren't served by Collision-Zone + Inversion
 - `thinking-theory-of-constraints` — if bottleneck-framing adds precision beyond general performance work
 
-The 3 diagnostic cc-thinking skills (`thinking-five-whys-plus`, `thinking-scientific-method`, `thinking-kepner-tregoe`) were moved to `mk:sequential-thinking/references/` instead — they fit the evidence-based diagnosis axis, not the strategic-unsticking axis of this skill.
+The 3 diagnostic cc-thinking skills (`thinking-five-whys-plus`, `thinking-scientific-method`, `thinking-kepner-tregoe`) were moved to `.claude/skills/sequential-thinking/references/` instead — they fit the evidence-based diagnosis axis, not the strategic-unsticking axis of this skill.
 
 ## License
 

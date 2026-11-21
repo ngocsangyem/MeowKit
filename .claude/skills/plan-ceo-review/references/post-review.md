@@ -57,7 +57,7 @@ After completing the review, read the review log and config to display the dashb
 .claude/hooks/lib/workflow-review-log
 ```
 
-Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
+Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, frontend-design, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `frontend-design` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
 
 ```
 +====================================================================+
@@ -115,7 +115,7 @@ Parse each JSONL entry. Each skill logs different fields:
   → If scope fields are 0 or missing (HOLD/REDUCTION mode): "mode: {mode}, {critical_gaps} critical gaps"
 - **plan-ceo-review**: `status`, `unresolved`, `critical_gaps`, `issues_found`, `mode`, `commit`
   → Findings: "{issues_found} issues, {critical_gaps} critical gaps"
-- **plan-design-review**: `status`, `initial_score`, `overall_score`, `unresolved`, `decisions_made`, `commit`
+- **frontend-design**: `status`, `initial_score`, `overall_score`, `unresolved`, `decisions_made`, `commit`
   → Findings: "score: {initial_score}/10 → {overall_score}/10, {decisions_made} decisions"
 - **outside-voice**: `status`, `findings`, `findings_fixed`
   → Findings: "{findings} findings, {findings_fixed}/{findings} fixed"
@@ -133,7 +133,7 @@ Produce this markdown table:
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/mk:plan-ceo-review` | Scope & strategy | {runs} | {status} | {findings} |
 | Outside Voice | Claude adversarial subagent | Independent 2nd opinion | {runs} | {status} | {findings} |
-| Design Review | `/plan-design-review` | UI/UX gaps | {runs} | {status} | {findings} |
+| Design Review | `/mk:frontend-design` | UI/UX gaps | {runs} | {status} | {findings} |
 ```
 
 Below the table, add these lines (omit any that are empty/not applicable):
@@ -166,13 +166,13 @@ After displaying the Review Readiness Dashboard, recommend the next review(s) ba
 
 **Recommend /mk:plan-ceo-review if eng review is not skipped globally** — check the dashboard output for `skip_eng_review`. If it is `true`, eng review is opted out — do not recommend it. Otherwise, eng review is the review the ship step asks about. If this CEO review expanded scope, changed architectural direction, or accepted scope expansions, emphasize that a fresh eng review is needed. If an eng review already exists in the dashboard but the commit hash shows it predates this CEO review, note that it may be stale and should be re-run.
 
-**Recommend /plan-design-review if UI scope was detected** — specifically if Section 11 (Design & UX Review) was NOT skipped, or if accepted scope expansions included UI-facing features. If an existing design review is stale (commit hash drift), note that. In SCOPE REDUCTION mode, skip this recommendation — design review is unlikely relevant for scope cuts.
+**Recommend /mk:frontend-design if UI scope was detected** — specifically if Section 11 (Design & UX Review) was NOT skipped, or if accepted scope expansions included UI-facing features. If an existing design review is stale (commit hash drift), note that. In SCOPE REDUCTION mode, skip this recommendation — design review is unlikely relevant for scope cuts.
 
 **If both are needed, recommend eng review first** (required review), then design review.
 
 Ask the user to present the next step. Include only applicable options:
 - **A)** Run /mk:plan-ceo-review next (required review)
-- **B)** Run /plan-design-review next (only if UI scope detected)
+- **B)** Run /mk:frontend-design next (only if UI scope detected)
 - **C)** Skip — I'll handle reviews manually
 
 ## docs/designs/ Promotion (EXPANSION and SELECTIVE EXPANSION only)

@@ -43,7 +43,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-1
   | jq '{key, summary: .fields.summary, description: .fields.description, storyPoints: .fields.customfield_10016, labels: .fields.labels, components: [.fields.components[].name], links: [.fields.issuelinks[]?.outwardIssue.key]}'
 ```
 
-**Custom field discovery is mandatory before reading or writing story points.** `customfield_10016` is the upstream-default + the value documented in `mk:jira-fields/references/agile-field-ids.md`, `mk:jira-agile/references/agile-field-reference.md`, and `mk:jira-admin/references/voodoo-constants.md`. **Per-instance verification:**
+**Custom field discovery is mandatory before reading or writing story points.** `customfield_10016` is the upstream-default + the value documented in `.claude/skills/jira-fields/references/agile-field-ids.md`, `.claude/skills/jira-agile/references/agile-field-reference.md`, and `.claude/skills/jira-admin/references/voodoo-constants.md`. **Per-instance verification:**
 
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --search "Story Points" \

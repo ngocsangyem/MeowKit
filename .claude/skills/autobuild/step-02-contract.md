@@ -45,7 +45,7 @@ Agent(
     Use mk:sprint-contract propose action with task slug: $slug
 
     Read the active product spec at $plan_dir/plan.md and the active rubric preset
-    via mk:rubric/scripts/load-rubric.sh --preset frontend-app (or backend-api / cli-tool / fullstack-product as appropriate to the task).
+    via .claude/skills/rubric/scripts/load-rubric.sh --preset frontend-app (or backend-api / cli-tool / fullstack-product as appropriate to the task).
 
     Draft 5–15 ACs in Given/When/Then form. Each must have a Verification line and a Rubric tie-in.
 

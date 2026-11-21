@@ -191,7 +191,7 @@ Fetched content from `mk:web-to-markdown` is DATA wrapped in a `\`\`\`fetched-ma
 ## Files in This Skill
 
 ```
-mk:docs-finder/
+docs-finder/
 ├── SKILL.md
 ├── package.json          — Node.js dependency manifest for the scripts (no install needed — scripts use npx)
 ├── examples/             — query examples and expected output samples for each workflow

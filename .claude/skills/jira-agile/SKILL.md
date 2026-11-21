@@ -69,8 +69,8 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 Two file classes share `tasks/contracts/`. Per-story sprint-CONTRACT files carry
 `contract_schema_version` and `### [AC-N]` entries and follow
-`mk:sprint-contract/assets/contract-template.md`. Sprint-STATE files at
-`sprint-state-{date}-sprint-{N}.md` follow `assets/sprint-state-template.md` instead and
+`.claude/skills/sprint-contract/assets/contract-template.md`. Sprint-STATE files at
+`sprint-state-{date}-sprint-{N}.md` follow `.claude/skills/sprint-contract/assets/sprint-state-template.md` instead and
 have none of those fields by design. Neither class has a validator: YAML is parsed inline
 by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`.
 

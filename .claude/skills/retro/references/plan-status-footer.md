@@ -23,9 +23,9 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/mk:plan-ceo-review` | Scope & strategy | 0 | — | — |
-| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+| Design Review | `/mk:frontend-design` | UI/UX gaps | 0 | — | — |
 
-**VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET — run `/mk:plan-ceo-review` or the individual reviews above.
 ```
 
 **Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one

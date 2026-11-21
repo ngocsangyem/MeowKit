@@ -154,7 +154,7 @@ When triggered, add ONE line — to Section 3 (analyze modes) or as a CONSTRAINT
 note in the rewrite:
 
 > Context risk detected (`<which trigger>`). Consider `mk:context-engineering`
-> (intent → one `references/pattern-index.md` section, e.g. retrieval /
+> (intent → one section of its `pattern-index.md` reference, e.g. retrieval /
 > delegation / less-noise) to pick a minimal read-set before executing.
 
 The enhancer NAMES the intent; it does not load the pattern or read the codebase

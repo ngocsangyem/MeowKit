@@ -79,7 +79,7 @@ WHY: Mid-task downgrades lose reasoning context and create phase inconsistency.
 
 When `mk:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
 
-WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `references/scale-adaptive-rules.md` and `mk:scale-routing/data/domain-complexity.csv`.
+WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `references/scale-adaptive-rules.md` and `.claude/skills/scale-routing/data/domain-complexity.csv`.
 
 ### Rule 5: Harness Density Follows Tier
 
