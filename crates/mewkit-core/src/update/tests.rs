@@ -130,18 +130,6 @@ fn a_valid_update_replaces_the_binary_and_keeps_the_old_one() {
     assert_eq!(std::fs::read(&old).unwrap(), b"new binary");
 }
 
-#[test]
-fn an_archive_from_before_the_rename_still_updates() {
-    let legacy = format!("mewkit-next{}", std::env::consts::EXE_SUFFIX);
-    let archive = tar_gz(&legacy, b"new binary");
-    let http = server("1.1.0", &archive, None);
-    let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
-    let dir = tempfile::tempdir().unwrap();
-    let exe = exe_in(dir.path());
-    apply(&http, &offer, &exe).unwrap();
-    assert_eq!(std::fs::read(&exe).unwrap(), b"new binary");
-}
-
 #[cfg(unix)]
 #[test]
 fn updating_through_the_mk_link_replaces_the_real_binary() {

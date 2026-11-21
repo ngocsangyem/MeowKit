@@ -58,12 +58,11 @@ else
 fi
 
 # The kit must install with the mewkit binary users already have. The binary is
-# $MEWKIT_NEXT_BIN (named before the rename), else `mk` on PATH, else a pre-rename
-# `mewkit-next`. A bare `mewkit` is not looked up: on a machine that still has the npm
+# $MEWKIT_NEXT_BIN, else `mk` on PATH. A bare `mewkit` is not looked up: on a machine that still has the npm
 # CLI it is that CLI's shim. With none, the gate is skipped only while `gh` can prove
 # no binary release exists; otherwise it fails.
 step "Candidate kit against the published mewkit binary"
-NEXT_BIN="${MEWKIT_NEXT_BIN:-$(command -v mk 2>/dev/null || command -v mewkit-next 2>/dev/null || true)}"
+NEXT_BIN="${MEWKIT_NEXT_BIN:-$(command -v mk 2>/dev/null || true)}"
 if [ -z "$NEXT_BIN" ]; then
   if ! TAGS="$(gh release list --limit 100 --json tagName -q '.[].tagName' 2>/dev/null)"; then
     bad "no mewkit binary (mk), and gh cannot list releases to show none is published: install it (install.sh) or set MEWKIT_NEXT_BIN"
@@ -73,7 +72,7 @@ if [ -z "$NEXT_BIN" ]; then
     ok "skipped — no mewkit binary release is published yet"
   fi
 # `mk` is a short name another tool may own; only a `mewkit X` banner is the binary.
-elif ! "$NEXT_BIN" --version 2>/dev/null | grep -Eq '^mewkit(-next)? '; then
+elif ! "$NEXT_BIN" --version 2>/dev/null | grep -q '^mewkit '; then
   bad "$NEXT_BIN is not a mewkit binary (its --version is not \`mewkit X\`): set MEWKIT_NEXT_BIN"
 else
   GATE_TMP="$(mktemp -d)"

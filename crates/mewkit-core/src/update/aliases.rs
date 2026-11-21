@@ -1,27 +1,32 @@
-//! The binary's other names beside it: `mk` (the short name) and `mewkit-next` (the
-//! pre-rename name, kept for one release). The installer places them; after a
-//! self-update they must run the new binary too, or `mk` would silently stay old.
+//! The binary's other name beside it: `mk`. The installer places it; after a
+//! self-update it must run the new binary too, or `mk` would silently stay old.
 //!
-//! On Unix each name is a symlink to the binary, so a symlink already resolving to it
-//! is left alone, and an older mewkit copy is swapped for a symlink. On Windows each
-//! name is a copy and is replaced with the new bytes. A name that does not exist is
-//! only created when the running file is itself `mewkit-next`: that install predates
-//! the rename and should land on the new names.
+//! On Unix the name is a symlink to the binary, so a symlink already resolving to it
+//! is left alone, and an older mewkit copy is swapped for a symlink. On Windows it is a
+//! copy and is replaced with the new bytes. A missing name is not created.
 //!
 //! An existing name is only replaced when it is a mewkit binary (`--version` prints
 //! `mewkit …`): a `mk` from another tool, the npm CLI's `mewkit` shim or a directory
 //! is left as it is and reported.
+//!
+//! Installers for 0.1.0 and 0.1.1 also placed `mewkit-next`. A self-update removes it
+//! when it is a mewkit binary, so a stale Windows copy does not stay behind.
 use std::io;
 use std::path::Path;
 
 /// Every name the binary is installed under.
-const NAMES: [&str; 3] = ["mewkit", "mk", "mewkit-next"];
+const NAMES: [&str; 2] = ["mewkit", "mk"];
+
+/// A name earlier installers placed and no longer do.
+const RETIRED: &str = "mewkit-next";
 
 /// What happened to the names beside the binary.
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Refreshed {
     /// Names placed or refreshed, as file names.
     pub placed: Vec<String>,
+    /// Retired names removed, as file names.
+    pub removed: Vec<String>,
     /// One line per name left unplaced; the binary itself is already updated.
     pub problems: Vec<String>,
 }
@@ -39,7 +44,6 @@ pub fn refresh(exe: &Path) -> Refreshed {
         return out;
     };
     let suffix = std::env::consts::EXE_SUFFIX;
-    let legacy = own.to_str() == Some(&*format!("mewkit-next{suffix}"));
     for name in NAMES {
         let file = format!("{name}{suffix}");
         if own.to_str() == Some(file.as_str()) {
@@ -47,9 +51,6 @@ pub fn refresh(exe: &Path) -> Refreshed {
         }
         let path = dir.join(&file);
         let Ok(meta) = path.symlink_metadata() else {
-            if legacy {
-                record(&mut out, &file, &path, place(exe, &path));
-            }
             continue;
         };
         if path.canonicalize().is_ok_and(|real| real == exe) {
@@ -64,7 +65,27 @@ pub fn refresh(exe: &Path) -> Refreshed {
         }
         record(&mut out, &file, &path, place(exe, &path));
     }
+    remove_retired(&mut out, exe, dir, suffix);
     out
+}
+
+/// Remove `mewkit-next` beside the binary when it runs this binary or another mewkit.
+fn remove_retired(out: &mut Refreshed, exe: &Path, dir: &Path, suffix: &str) {
+    let file = format!("{RETIRED}{suffix}");
+    let path = dir.join(&file);
+    let Ok(meta) = path.symlink_metadata() else {
+        return;
+    };
+    let ours = path.canonicalize().is_ok_and(|real| real == exe);
+    if meta.is_dir() || !(ours || is_mewkit(&path)) {
+        return;
+    }
+    match std::fs::remove_file(&path) {
+        Ok(()) => out.removed.push(file),
+        Err(e) => out
+            .problems
+            .push(format!("could not remove {}: {e}", path.display())),
+    }
 }
 
 fn record(out: &mut Refreshed, file: &str, path: &Path, result: io::Result<()>) {
@@ -76,8 +97,8 @@ fn record(out: &mut Refreshed, file: &str, path: &Path, result: io::Result<()>) 
     }
 }
 
-/// Whether `path` runs a mewkit binary: its version banner is `mewkit X` (or the
-/// pre-rename `mewkit-next X`). The npm CLI prints a bare version, so its shim fails.
+/// Whether `path` runs a mewkit binary: its version banner is `mewkit X`. The npm CLI
+/// prints a bare version, so its shim fails.
 fn is_mewkit(path: &Path) -> bool {
     std::process::Command::new(path)
         .arg("--version")
@@ -85,9 +106,7 @@ fn is_mewkit(path: &Path) -> bool {
         .stderr(std::process::Stdio::null())
         .output()
         .is_ok_and(|o| {
-            let banner = String::from_utf8_lossy(&o.stdout);
-            o.status.success()
-                && (banner.starts_with("mewkit ") || banner.starts_with("mewkit-next "))
+            o.status.success() && String::from_utf8_lossy(&o.stdout).starts_with("mewkit ")
         })
 }
 

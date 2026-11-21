@@ -127,11 +127,10 @@ fn the_pinned_archive_installs() {
     let out = install(&env, rendered.path(), &dest, &[]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert_eq!(std::fs::read(installed(&dest)).unwrap(), BODY);
-    // `mk` and the pre-rename `mewkit-next` run the same binary: a link on Unix, a copy
-    // on Windows. Reading through either yields the installed bytes.
-    for alias in ["mk", "mewkit-next"] {
-        assert_eq!(std::fs::read(named(&dest, alias)).unwrap(), BODY, "{alias}");
-    }
+    // `mk` runs the same binary: a link on Unix, a copy on Windows. Reading through it
+    // yields the installed bytes. The retired `mewkit-next` is not placed.
+    assert_eq!(std::fs::read(named(&dest, "mk")).unwrap(), BODY);
+    assert!(!named(&dest, "mewkit-next").exists());
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -164,7 +163,24 @@ fn an_mk_owned_by_another_tool_is_left_alone() {
         "{}",
         text(&out)
     );
-    assert_eq!(std::fs::read(named(&dest, "mewkit-next")).unwrap(), BODY);
+}
+
+/// A reinstall over 0.1.0 or 0.1.1 removes the `mewkit-next` link those installers placed.
+#[cfg(unix)]
+#[test]
+fn a_leftover_mewkit_next_link_is_removed() {
+    let env = TempHome::new();
+    let (_server, rendered) = setup(None);
+    let dest = env.home().join("bin");
+    std::fs::create_dir_all(&dest).unwrap();
+    std::os::unix::fs::symlink("mewkit", dest.join("mewkit-next")).unwrap();
+    let out = install(&env, rendered.path(), &dest, &[]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(
+        dest.join("mewkit-next").symlink_metadata().is_err(),
+        "{}",
+        text(&out)
+    );
 }
 
 #[test]

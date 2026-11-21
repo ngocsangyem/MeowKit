@@ -8,9 +8,9 @@ license.workspace = true
 repository.workspace = true
 publish.workspace = true
 
-# One binary. `mk` and the pre-rename `mewkit-next` are links (copies on Windows) the
-# installer and self-update place beside it, not further `[[bin]]` targets: each target
-# would compile and ship another full copy.
+# One binary. `mk` is a link (a copy on Windows) the installer and self-update place
+# beside it, not a further `[[bin]]` target: each target would compile and ship another
+# full copy.
 [[bin]]
 name = "mewkit"
 path = "src/main.rs"

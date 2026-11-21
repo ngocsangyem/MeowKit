@@ -6,9 +6,9 @@ use super::{Check, Status};
 
 pub fn checks() -> Vec<Check> {
     let mut out = vec![node()];
-    // `mk` and `mewkit-next` are the names the installer links to this binary. A `mewkit`
-    // that resolves elsewhere may be the npm CLI's shim, which this report makes visible.
-    for name in ["mewkit", "mk", "mewkit-next"] {
+    // `mk` is the name the installer links to this binary. A `mewkit` that resolves
+    // elsewhere may be the npm CLI's shim, which this report makes visible.
+    for name in ["mewkit", "mk"] {
         out.push(match which(name) {
             Some(path) => Check::new(
                 format!("{name} on PATH"),

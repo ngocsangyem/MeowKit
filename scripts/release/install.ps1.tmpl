@@ -132,11 +132,10 @@ function Install-MewkitNext {
 			}
 			Fail "cannot place $dest ($why); nothing new was installed and any previous mewkit is back in place"
 		}
-		# `mk` is the short name; `mewkit-next` is the pre-rename name, kept one release so
-		# existing scripts still run. Windows has no reliable unprivileged symlink, so each
-		# is a copy; `mewkit self-update` refreshes the copies it finds beside it.
+		# `mk` is the short name. Windows has no reliable unprivileged symlink, so it is a
+		# copy; `mewkit self-update` refreshes the copy it finds beside it.
 		Say "installed $dest ($($pin.Version), $channel)"
-		foreach ($alias in @('mk.exe', 'mewkit-next.exe')) {
+		foreach ($alias in @('mk.exe')) {
 			$aliasPath = Join-Path $installDir $alias
 			try {
 				if (Test-Path -LiteralPath $aliasPath) {
@@ -145,7 +144,7 @@ function Install-MewkitNext {
 					if (Test-Path -LiteralPath $aliasPath -PathType Leaf) {
 						$banner = (& $aliasPath --version 2>$null | Select-Object -First 1)
 					}
-					if ("$banner" -notmatch '^mewkit(-next)? ') {
+					if ("$banner" -notmatch '^mewkit ') {
 						Say "$aliasPath exists and is not mewkit; left as it is (run mewkit.exe directly)"
 						continue
 					}
@@ -156,6 +155,20 @@ function Install-MewkitNext {
 				Say "placed $aliasPath"
 			} catch {
 				Say "could not place $aliasPath ($($_.Exception.Message)); run mewkit.exe directly"
+			}
+		}
+
+		# Installers for 0.1.0 and 0.1.1 also placed `mewkit-next.exe`; remove it when it is mewkit.
+		$retired = Join-Path $installDir 'mewkit-next.exe'
+		if (Test-Path -LiteralPath $retired -PathType Leaf) {
+			$banner = (& $retired --version 2>$null | Select-Object -First 1)
+			if ("$banner" -match '^mewkit ') {
+				try {
+					Remove-Item -LiteralPath $retired -Force
+					Say "removed $retired (the name is retired; run mewkit or mk)"
+				} catch {
+					Say "could not remove $retired ($($_.Exception.Message)); delete it yourself"
+				}
 			}
 		}
 

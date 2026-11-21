@@ -648,9 +648,9 @@ Three things ship. Only two are released.
 nothing. **Run it once before the first tag**: it is the only proof that the arm64 runners build every
 target.
 
-**Installers.** `install.sh` and `install.ps1` place `mewkit` and `mk` (the same binary). For one
-release they also place `mewkit-next` with a rename notice, then that name is dropped. An existing
-`mk` that is not MeowKit is left alone and reported.
+**Installers.** `install.sh` and `install.ps1` place `mewkit` and `mk` (the same binary). An existing
+`mk` that is not MeowKit is left alone and reported. The 0.1.0 and 0.1.1 installers also placed
+`mewkit-next`; later installers and `mewkit self-update` remove it when it is a mewkit binary.
 
 **`releases/latest` keeps pointing at a kit.** Binary releases are never `latest`, so
 `https://github.com/ngocsangyem/MeowKit/releases/latest` keeps resolving to the newest stable kit.
@@ -681,7 +681,7 @@ to move to. Deleting a release does not withdraw it from users who have it.
 
 **Kit releases check the binary.** `scripts/release-check.sh` installs the candidate kit with the
 newest published binary (`init --dry-run` for claude-code, codex and cursor). It looks for `mk` on
-PATH, then a pre-rename `mewkit-next`; set `MEWKIT_NEXT_BIN` to point at another binary. A kit whose
+PATH; set `MEWKIT_NEXT_BIN` to point at another binary. A kit whose
 `kitContract` or `requires.mewkitMin` is beyond that binary fails the release. Install the binary
 first (`install.sh`) or set `MEWKIT_NEXT_BIN`; until a binary release exists the step is skipped, and
 only when `gh` can confirm that.
