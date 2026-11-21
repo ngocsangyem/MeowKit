@@ -1,0 +1,15 @@
+# The Vercel project meowkit-landing builds packages/landing (its Root Directory)
+# and is deployed from the repository root, so the build can read the workspace
+# pnpm-lock.yaml. Upload only what that build needs.
+/*
+!/.nvmrc
+!/package.json
+!/pnpm-lock.yaml
+!/pnpm-workspace.yaml
+!/packages
+/packages/*
+!/packages/landing
+/packages/landing/node_modules
+/packages/landing/.nuxt
+/packages/landing/.output
+/packages/landing/.vercel
