@@ -5,7 +5,7 @@
   "files": {
     ".claude/agents/AGENTS_INDEX.md": "# Agents\n\n[1]{agent_file\n\ndeveloper\n\n<!-- GENERATED:agent-views START -->\n**Agent registry views (generated):** 1 core/support direct-only; 0 domain hub-only; 0 intelligence direct-only; 0 intelligence direct-and-harness; 0 internal harness.\n<!-- GENERATED:agent-views END -->\n",
     ".claude/agents/SKILLS_INDEX.md": "# Skills\n\n**Total**|**1**\n\nmk:cook\n",
-    ".claude/agents/developer.md": "---\nname: developer\ndescription: Use for implementation. Does not review its own work.\nmodel: inherit\ntools: Read, Write\nowner: lifecycle\ncriticality: high\nstatus: active\nruntime: claude-code\nresponsibility: task-specification\n---\n\n## Exclusive Ownership\n\nOwns `src/*`.\n",
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Use for implementation. Does not review its own work.\nmodel: inherit\ntools: Read, Write\nowner: lifecycle\ncriticality: high\nstatus: active\nruntime: claude-code\nresponsibility: task-specification\n---\n\n## Exclusive Ownership\n\nOwns `src/*`.\n\nEnd with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).\n",
     ".claude/hooks/HOOKS_INDEX.md": "# Hooks\n\n1 node hook\n\npre-ship\n",
     ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
     ".claude/rules/agent-conduct.md": "# agent-conduct.md\n\nProse that carries enforcement.\n",

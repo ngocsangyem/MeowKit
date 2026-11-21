@@ -13,3 +13,5 @@ responsibility: task-specification
 ## Exclusive Ownership
 
 Owns `src/*`.
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
