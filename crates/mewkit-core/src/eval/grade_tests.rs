@@ -6,6 +6,8 @@ fn t(events: Vec<Event>, final_text: &str) -> Transcript {
         events,
         final_text: final_text.into(),
         listed_skills: None,
+        cost_usd: None,
+        tokens: None,
     }
 }
 
@@ -28,6 +30,7 @@ fn case(kind: CaseKind) -> EvalCase {
         kind,
         prompt: "p".into(),
         runs: 1,
+        suite: "baseline".into(),
         fixture: None,
         tools: vec![],
         held_out: false,

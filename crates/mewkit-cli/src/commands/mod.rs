@@ -4,6 +4,7 @@ pub mod backups;
 pub mod budget;
 pub mod capabilities;
 pub mod doctor;
+pub mod eval;
 pub mod init;
 pub mod note;
 pub mod orient;

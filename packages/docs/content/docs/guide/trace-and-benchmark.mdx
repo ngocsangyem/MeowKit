@@ -68,6 +68,17 @@ Record friction when you correct the agent by hand. A note about a skill is best
 
 A pattern needs 3 or more occurrences to become a suggestion, so one bad run does not drive a change. The skill is skipped when there are fewer than 3 records, or when the last analysis ran within 24 hours with no new records. Output goes to `plans/{date}-trace-analysis/`: `findings.md`, `suggestions-draft.md`, `suggestions.md` (approved only), `rejected.md` and `analysis.md`.
 
+## Measuring a change with evals
+
+`mewkit eval` measures whether a skill or rule change helps. Record a report before the change and one after, on the same pinned model, then compare them:
+
+```bash
+mewkit eval run --suite baseline --model <pinned-model> --max-cost-usd 5 --max-runs 40 --kit-archive meowkit-release.zip
+mewkit eval compare .meowkit/telemetry/eval/<before>.json .meowkit/telemetry/eval/<after>.json
+```
+
+A difference counts only when it is larger than the report's margin: the measured run-to-run spread, and never less than 10 percentage points. Flags and the sandbox are described on the [Cost and Telemetry](/cli/telemetry) page.
+
 ## Benchmark canary suite
 
 `/mk:benchmark` is a maintainer-only procedure. The published kit does not carry the skill or its specs, so it runs from the source repository, not from an installed project.

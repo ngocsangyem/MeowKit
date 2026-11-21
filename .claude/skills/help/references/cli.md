@@ -479,6 +479,63 @@ Options:
   -h, --help                             Print help
 ```
 
+## mewkit eval
+
+```text
+Measure the kit: run eval cases in sandboxes, compare two reports
+
+Usage: mewkit eval <COMMAND>
+
+Commands:
+  run      Run a case suite in disposable sandboxes and write a report
+  compare  Compare two reports of the same suite; refuses reports that differ in what they measured
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+```
+
+### mewkit eval run
+
+```text
+Run a case suite in disposable sandboxes and write a report
+
+Usage: mewkit eval run [OPTIONS]
+
+Options:
+      --suite <SUITE>                Suite to run: the cases whose `suite` field names it [default: baseline]
+      --runtime <RUNTIME>            Runtime to drive: `claude-code` or `codex` [default: claude-code]
+      --model <MODEL>                Pinned model version, recorded in the report (required unless --dry-run)
+      --max-cost-usd <MAX_COST_USD>  Stop before total spend across concurrent eval runs here passes this many USD (required unless --dry-run)
+      --max-runs <MAX_RUNS>          Stop after this many runs (required unless --dry-run)
+      --case-root <CASE_ROOT>        Folder holding `<skill>/eval/*.yaml` cases; defaults to this project's `.claude/skills`
+      --trust-cases                  Accept a case root outside this project's `.claude/skills` (its cases run model turns)
+      --case <CASES>                 Only these case ids (repeatable)
+      --kit-archive <KIT_ARCHIVE>    Kit archive installed into every sandbox (required unless --dry-run); a release `meowkit-release.zip`, or one built from a checkout
+      --kit-sha256 <KIT_SHA256>      The expected SHA-256 of --kit-archive, in hex
+      --timeout-secs <TIMEOUT_SECS>  Seconds before one run is stopped and counted as an error [default: 600]
+      --max-turns <MAX_TURNS>        Turn limit passed to the runtime for each run [default: 12]
+      --fail-under <FAIL_UNDER>      Exit 1 when the trigger, paired-on or mismatch-report rate is below this fraction
+      --dry-run                      List the cases and runs that would happen, and run nothing
+  -h, --help                         Print help
+```
+
+### mewkit eval compare
+
+```text
+Compare two reports of the same suite; refuses reports that differ in what they measured
+
+Usage: mewkit eval compare [OPTIONS] <BASE> <NEW>
+
+Arguments:
+  <BASE>  The earlier report (JSON)
+  <NEW>   The later report (JSON)
+
+Options:
+      --json  Print JSON instead of text
+  -h, --help  Print help
+```
+
 ## mewkit budget
 
 ```text

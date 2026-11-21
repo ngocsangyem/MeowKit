@@ -29,12 +29,16 @@ pub enum Event {
     Tool(String),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Transcript {
     pub events: Vec<Event>,
     pub final_text: String,
     /// Skills the runtime listed at start, when it reports them (Claude Code).
     pub listed_skills: Option<Vec<String>>,
+    /// What the run cost, when the runtime reports it (Claude Code).
+    pub cost_usd: Option<f64>,
+    /// Input plus output tokens, when the runtime reports them (Codex).
+    pub tokens: Option<u64>,
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
@@ -114,6 +118,7 @@ fn claude_line(v: &Value, t: &mut Transcript) -> Result<bool, TranscriptError> {
         }
         "result" => {
             t.final_text = str_at(v, "result").to_owned();
+            t.cost_usd = v.get("total_cost_usd").and_then(Value::as_f64);
             // `error_max_turns` and friends are failures to finish, even when
             // `is_error` is false.
             let subtype = str_at(v, "subtype");
@@ -165,7 +170,14 @@ fn codex_line(v: &Value, t: &mut Transcript) -> Result<bool, TranscriptError> {
                 other => t.events.push(Event::Tool(other.to_owned())),
             }
         }
-        "turn.completed" => return Ok(true),
+        "turn.completed" => {
+            let used = |k: &str| v.pointer(&format!("/usage/{k}")).and_then(Value::as_u64);
+            t.tokens = match (used("input_tokens"), used("output_tokens")) {
+                (None, None) => None,
+                (i, o) => Some(i.unwrap_or(0) + o.unwrap_or(0)),
+            };
+            return Ok(true);
+        }
         "turn.failed" | "error" => {
             let msg = v
                 .pointer("/error/message")
