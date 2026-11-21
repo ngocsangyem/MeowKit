@@ -1,4 +1,4 @@
-<!-- Per-skill additions to references/preamble.md; load both files. -->
+<!-- Per-skill additions to the shared preamble; SKILL.md loads both. -->
 
 ## Investigate setup
 
