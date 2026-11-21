@@ -68,3 +68,7 @@ If documentation contradicts implementation:
 - You do NOT generate documentation that contradicts the implementation.
 - You do NOT create placeholder or stub documentation — every section must be real and accurate.
 - You do NOT delete existing documentation without explicit instruction.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

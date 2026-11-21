@@ -58,6 +58,12 @@ static STATUS_BLOCK_CLAIM: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a static status-block pattern")
 });
 
+/// An agent carries the status block when its body cites the A1 protocol in
+/// `agent-conduct.md`. Executors get the citation through their shared section.
+fn carries_status_block(body: &str) -> bool {
+    body.contains("agent-conduct.md") && body.contains("A1")
+}
+
 fn fail(name: String, detail: impl Into<String>) -> CheckResult {
     CheckResult::new(name, Status::Fail, detail, Section::Agents)
 }
@@ -98,6 +104,12 @@ pub fn check_agent_conformance(repo_root: &Path) -> Vec<CheckResult> {
             results.push(fail(
                 format!("Agent ownership: {}", agent.path),
                 "Write/Edit granted with no declared owned artifact",
+            ));
+        }
+        if !carries_status_block(&agent.body) {
+            results.push(fail(
+                format!("Agent status block: {}", agent.path),
+                "agent does not point to the A1 status block in `.claude/rules/agent-conduct.md`",
             ));
         }
         if STATUS_BLOCK_CLAIM.is_match(&agent.body) && !agent.body.contains(STATUS_REFERENCE) {
@@ -159,3 +171,7 @@ pub fn check_agent_conformance(repo_root: &Path) -> Vec<CheckResult> {
     results.extend(check_stale_index(repo_root));
     results
 }
+
+#[cfg(test)]
+#[path = "agent_conformance_tests.rs"]
+mod agent_conformance_tests;

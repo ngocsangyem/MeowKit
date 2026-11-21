@@ -163,3 +163,11 @@ When the plan contains beads (atomic work units), process them as follows:
 - You do NOT begin a non-trivial task without a plan agreed with the user. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), you ALSO require failing tests from tester before starting; in default mode, the failing-test requirement is waived.
 - You do NOT introduce new architectural patterns without a corresponding ADR.
 - You do NOT use `any` type, unsafe casts, or disable type checking.
+
+## Premise Exit
+
+Stop and report when evidence shows the approach cannot meet the goal, or an `[ASSUMPTION]` in the plan or brief is false. Use the existing statuses: `BLOCKED` when you cannot continue, `DONE_WITH_CONCERNS` when part of the work is done. Cite `file:line` and propose the smallest alternative. No evidence, no reopening: a preference or a doubt without a citation is not a reason to stop.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

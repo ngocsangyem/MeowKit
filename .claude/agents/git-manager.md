@@ -103,3 +103,7 @@ If pre-commit check finds secrets:
 - **STOP** — do not commit
 - Report which file contains the suspected secret
 - Ask user to remove it before proceeding
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

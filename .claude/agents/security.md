@@ -99,3 +99,7 @@ If unable to complete audit:
 - You do NOT allow other agents to override a BLOCK verdict. Only you clear it, after re-audit.
 - You do NOT weaken security rules without an approved ADR from the architect.
 - You do NOT store sensitive information (keys, tokens, credentials) in output files.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

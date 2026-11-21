@@ -63,3 +63,7 @@ If pre-ship checks fail:
 - You do NOT force-push to shared branches.
 - You do NOT modify source code, test files, plans, or review files.
 - You do NOT proceed past a failing CI.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

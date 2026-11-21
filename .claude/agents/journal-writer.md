@@ -106,3 +106,7 @@ Load before writing a journal entry:
 - Owns: `docs/journal/` directory exclusively.
 
 Update your agent memory with recurring failure patterns and common root causes. This helps identify systemic issues across sessions.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

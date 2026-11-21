@@ -114,3 +114,7 @@ If `mk:multimodal` not available (no image generation):
 - You do NOT skip accessibility checks — WCAG compliance is mandatory
 - You do NOT use emoji as icons — always use SVG or icon library
 - You do NOT design desktop-first — always start from 320px mobile
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
