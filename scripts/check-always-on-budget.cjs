@@ -13,17 +13,36 @@
 // `name` + `description` (agents) — never a line or regex match. The file set comes from
 // `kit-ship-set.cjs`, not a glob of `.claude`, so budget and published kit cannot disagree.
 //
+// It also reports each runtime's skill-listing size (scripts/lib/skill-listing-budget.cjs) and
+// SKILL.md sizes, and fails on their ceilings below.
+//
 // Usage: node scripts/check-always-on-budget.cjs [project-root]
 //   exit 0  both comparisons pass
-//   exit 1  either comparison is breached (the breached limit and the overage are printed)
+//   exit 1  a comparison or a per-runtime listing / SKILL.md ceiling is breached (the breached limit and the overage are printed)
 //   exit 2  the rules directory, the ship set or a measured file is missing or unreadable
 
 const fs = require("node:fs");
 const path = require("node:path");
 const { excludeMatcher, shipSetExclusions, shipSetFiles } = require("./kit-ship-set.cjs");
+const listing = require("./lib/skill-listing-budget.cjs");
 
 const LIMIT_RULES_BYTES = 18191;
 const LIMIT_ALWAYS_LISTED_BYTES = 70000;
+
+// Per-runtime skill-listing ceilings (bytes of name plus listed description text) and SKILL.md
+// ceilings. Each sits just above what the tree measures, so a regression fails while today
+// passes; none is a vendor budget. Claude Code and Codex document 1% and 2% of the context
+// window, far below these figures: the report prints that gap rather than gating on it.
+const LISTING_CEILINGS = {
+	"claude-code": 16100,
+	codex: 11300,
+	cursor: 11300,
+	grok: 11300,
+	pi: 11300,
+	omp: 11300,
+};
+const LIMIT_SKILL_FILES_TOTAL_BYTES = 769000;
+const LIMIT_LARGEST_SKILL_FILE_BYTES = 27200;
 
 // Reference only, never a gate: the per-item figures the budget was sized from. Printed so a
 // maintainer who has to find bytes knows what shape was assumed, and so a block that is far over
@@ -98,7 +117,7 @@ function measureMetadata(root) {
 		const id = String(fm.name ?? rel);
 		const label = isIntegration(id) ? `${kind} (integration)` : kind;
 		const bytes = fields.reduce((total, field) => total + perField[field], 0);
-		items.push({ kind, label, id, rel, perField, bytes });
+		items.push({ kind, label, id, rel, perField, bytes, values: fm });
 	}
 	return items;
 }
@@ -173,7 +192,11 @@ function main(argv) {
 		`\nmeasured: rules ${rulesTotal} B (limit ${LIMIT_RULES_BYTES}), always-listed ${alwaysListed} B (limit ${LIMIT_ALWAYS_LISTED_BYTES})`,
 	);
 
-	let failed = false;
+	let failed = listing.reportAndCheck(root, skills, {
+		listing: LISTING_CEILINGS,
+		skillFilesTotal: LIMIT_SKILL_FILES_TOTAL_BYTES,
+		largestSkillFile: LIMIT_LARGEST_SKILL_FILE_BYTES,
+	});
 	if (rulesTotal > LIMIT_RULES_BYTES) {
 		reportBreach("always-on rules", rulesTotal, LIMIT_RULES_BYTES);
 		failed = true;
@@ -197,4 +220,4 @@ if (require.main === module) {
 	process.exit(main(process.argv));
 }
 
-module.exports = { main, LIMIT_RULES_BYTES, LIMIT_ALWAYS_LISTED_BYTES, measureMetadata };
+module.exports = { main, LIMIT_RULES_BYTES, LIMIT_ALWAYS_LISTED_BYTES, LISTING_CEILINGS, measureMetadata };

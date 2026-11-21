@@ -172,15 +172,34 @@ fn head(file: &Path) -> Option<String> {
 /// oversized block counts as unread rather than as free, because the row's
 /// number would otherwise understate the cost.
 pub fn listing_cost(file: &Path) -> Option<usize> {
+    let f = skill_fields(file)?;
+    Some(f.name.chars().count() + f.description.chars().count())
+}
+
+/// The frontmatter fields a host may list for one skill; an absent or
+/// non-text field is empty. Same capped, link-refusing read as
+/// [`listing_cost`].
+pub struct SkillFields {
+    pub name: String,
+    pub description: String,
+    pub when_to_use: String,
+}
+
+pub fn skill_fields(file: &Path) -> Option<SkillFields> {
     let text = head(file)?;
     let (block, _) = mewkit_core::yaml_doc::split_frontmatter(&text)?;
     let data = mewkit_core::yaml_doc::parse_value(block).ok()?;
     let field = |key: &str| {
         data.get(key)
             .and_then(serde_json::Value::as_str)
-            .map_or(0, |v| v.chars().count())
+            .unwrap_or_default()
+            .to_owned()
     };
-    Some(field("name") + field("description"))
+    Some(SkillFields {
+        name: field("name"),
+        description: field("description"),
+        when_to_use: field("when_to_use"),
+    })
 }
 
 /// Up to [`MAX_LISTED`] names, then how many are left.
