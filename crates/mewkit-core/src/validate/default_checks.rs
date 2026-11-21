@@ -7,6 +7,7 @@ use std::path::Path;
 
 use super::agent_conformance::check_agent_conformance;
 use super::capability_rows::{check_capabilities_section, check_capability_view_drift};
+use super::docs_refs_link_rows::check_skill_link_rows;
 use super::docs_refs_rows::check_docs_refs_contract;
 use super::hooks::check_hooks_executable;
 use super::namespace::check_plugin_namespace;
@@ -16,6 +17,7 @@ use super::packs::check_packs;
 use super::portability::check_portability;
 use super::result::{CheckResult, Section, Status};
 use super::routing_breadth::check_routing_table_breadth;
+use super::shared_families::check_shared_families;
 use super::stale_index::check_stale_index;
 use super::structure::{always_on_rule_paths, check_config, check_dir_exists, check_file_exists};
 use super::substrate::check_substrate;
@@ -100,6 +102,9 @@ pub fn build_default_checks(
     results.push(check_config(meowkit_dir));
     results.extend(check_hooks_executable(meowkit_dir));
     results.extend(check_docs_refs_contract(meowkit_dir));
+    // Advisory: the kit carries dead skill paths and unknown commands that
+    // predate this check, so they surface as a work list, not a build break.
+    results.extend(check_skill_link_rows(meowkit_dir, Status::Warn));
     // Namespace purity is cheap and consumer-relevant: a leaked double-prefix
     // misbehaves in a consumer install too.
     results.extend(check_plugin_namespace(meowkit_dir));
@@ -112,6 +117,9 @@ pub fn build_default_checks(
         // (prompting an upgrade) rather than failing an un-synced install. The
         // scoped flags stay strict, which is what the CI steps use.
         results.extend(check_workflow_drift(project_root, Status::Warn));
+        // Advisory for the same reason: copies that already diverged are a
+        // work list, and the scoped checks stay the strict ones.
+        results.extend(check_shared_families(meowkit_dir, Status::Warn));
         results.extend(check_operation_conformance(meowkit_dir));
         results.push(check_generic_core_tokens(meowkit_dir));
         // Declared doc counts against the real inventory: surfacing it here
