@@ -91,3 +91,6 @@ tmp/
 
 # Rust build output
 target/
+
+# Vercel CLI project link (meowkit-landing deploys from the repo root)
+.vercel
