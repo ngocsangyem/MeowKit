@@ -91,27 +91,12 @@ Skip when:
 
 ## Arguments
 
-| Flag              | Mode                     | Research                | Phase Files                                                                                   | Validation                                                                   |
-| ----------------- | ------------------------ | ----------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| (default)         | Auto-detect from scope   | Follows mode            | Follows mode                                                                                  | Follows mode                                                                 |
-| `--fast`          | Fast                     | Skip                    | plan.md only                                                                                  | Semantic checks only                                                         |
-| `--hard`          | Hard                     | 2 researchers           | plan.md + phases                                                                              | Full interview                                                               |
-| `--deep`          | Deep                     | 2-3 researchers         | plan.md + phases + bounded phase map: file inventory, test gaps, interfaces, dependencies     | Full interview                                                               |
-| `--parallel`      | Parallel                 | 2 researchers           | plan.md + phases + ownership matrix                                                           | Full interview                                                               |
-| `--two`           | Two approaches           | 2 researchers           | 2 approach files + trade-off matrix                                                           | After selection                                                              |
-| `--product-level` | Product spec             | 2 researchers (broader) | plan.md only (user stories + features + design language; NO phase files)                      | Semantic + check-product-spec.sh (no red-team, no validation interview — v1) |
-| `--spike`         | Time-boxed investigation | Skip                    | spike plan from `assets/spike-plan-template.md` (investigate + findings phases; NO test/ship) | Semantic only                                                                |
-
-**`--spike` constraints (Agile context only — gated by `agile-feedback-cycle.md` 2 when loaded):**
-
-- Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); reject with "spike requires --timebox" if absent
-- Sets plan frontmatter `spike: true`, `timebox:`, and `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
-- INCOMPATIBLE with `--product-level` and `mk:autobuild` FULL density (autobuild gate breaks). Reject combination "spike incompatible with autobuild FULL — use --fast or mk:cook"
-- Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
+Modes: (default) auto-detect from scope | `--fast` | `--hard` | `--deep` | `--parallel` | `--two` | `--product-level` | `--spike --timebox <duration>`. What each mode changes (research, phase files, validation) and the `--spike` constraints (timebox required, frontmatter, incompatible combinations, story-point cap): `references/modes-and-flags.md` — load it when a mode flag is present or step-00 picks a mode.
 
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
+- `--advice` — opt-in strategic supervision; see `--advice` below.
 
 ## Requirements Capture Contract
 
@@ -198,66 +183,15 @@ Without the flag there are zero calls and no state is written.
 Checkpoints: `references/advice-checkpoints.md`. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the
 flag is present).
 
-## References
-
-| File                                               | Purpose                                                                                                                                                                                                              |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow.md`                                      | Step sequence, variable table, flow diagram (hard mode)                                                                                                                                                              |
-| `workflow-fast.md`                                 | Compact step sequence for `--fast` mode (00→03→04→07→08)                                                                                                                                                             |
-| `step-03a-product-spec.md`                         | Product-level spec drafter: user stories, features, design language. Replaces step-03 when `planning_mode = product-level`.                                                                                          |
-| `assets/product-spec-template.md`                  | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope)                                                                                                                              |
-| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:autobuild` FULL.                |
-| `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                                                                |
-| `step-00-5-intake-packet.md`                       | Conditional intake packet builder: consolidates ≥2 pre-existing external artifacts before research/drafting                                                                                                          |
-| `references/plan-intake-packet.md`                 | Plan Intake Packet contract: purpose, activation, 6-block schema, quality rules, boundaries                                                                                                                          |
-| `references/design-evidence-consumption.md`        | Consuming a design evidence packet (e.g. Figma): do/don't, adjudication precedence, decision-ledger, flow→validation-matrix, `blocked_on:` phase blocking. Never re-analyzes the design source.                        |
-| `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
-| `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
-| `step-07-gate.md`                                  | Self-check and the question that presents the plan to the user                                                                                                                                                                     |
-| `step-09-post-plan-handoff.md`                     | Deterministic post-plan handoff: mode-pruned user question (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
-| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (checks W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
-| `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
-| `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |
-| `references/verification-roles.md`                 | Verification Roles for step-04 sub-step 4d (Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier) with tier selection by phase count. Subagents are READ-ONLY; orchestrator writes the `## Verification Log`. |
-| `prompts/personas/plan-assumption-destroyer.md`    | Plan-specific assumption skeptic persona                                                                                                                                                                             |
-| `prompts/personas/plan-scope-complexity-critic.md` | Plan-specific YAGNI/scope minimalist persona                                                                                                                                                                         |
-| `prompts/personas/plan-security-adversary.md`      | Plan-specific security adversary (auth bypass, injection, data exposure). Used at 4+ phases.                                                                                                                         |
-| `prompts/personas/plan-failure-mode-analyst.md`    | Plan-specific failure mode analyst (race conditions, cascading failures, recovery). Used at 6+ phases.                                                                                                               |
-| `references/phase-template.md`                     | 12-section phase file template                                                                                                                                                                                       |
-| `references/ops-metrics-design.md`                 | If task involves metrics/KPIs/dashboards, load for metric philosophy, templates, and domain fallbacks                                                                                                                |
-| `references/cold-start-context-brief.md`           | When writing phase files, follow this template for self-contained, cold-start-safe phase files                                                                                                                       |
-| `references/plan-mutation-protocol.md`             | When modifying an existing plan (split/insert/skip/reorder/abandon), follow this protocol                                                                                                                            |
-| `references/worked-example-stripe-billing.md`      | For plan detail level reference, see this complete worked example (the 7-phase model)                                                                                                                                |
-| `references/scope-challenge.md`                    | Scope modes (HOLD/EXPANSION/REDUCTION)                                                                                                                                                                               |
-| `references/research-phase.md`                     | Researcher spawning protocol                                                                                                                                                                                         |
-| `references/plan-organization.md`                  | Directory structure, naming, size rules                                                                                                                                                                              |
-| `references/output-standards.md`                   | YAML frontmatter, required sections                                                                                                                                                                                  |
-| `references/validation-questions.md`               | Critical question categories for interview                                                                                                                                                                           |
-| `references/plan-presentation.md`                  | the question that presents the plan + Context Reminder                                                                                                                                                                             |
-| `references/task-management.md`                    | Hydration, cross-session resume, sync-back                                                                                                                                                                           |
-| `references/solution-evaluation.md`                | Trade-off scoring criteria                                                                                                                                                                                           |
-| `references/gotchas.md`                            | Full gotchas list                                                                                                                                                                                                    |
-| `references/solution-design-checklist.md`          | Trade-off analysis checklist for Architecture/Risk/Security sections (5 dimensions)                                                                                                                                  |
-| `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                                                              |
-| `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                                                                      |
-| `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                                                             |
-| `scripts/check-product-spec.sh`                    | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a and step-04 for `--product-level` mode.                                                   |
-| `references/workflow-models/feature-model.md`      | Workflow template for feature tasks (loaded JIT by step-00)                                                                                                                                                          |
-| `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
-| `references/workflow-models/refactor-model.md`     | Workflow template for refactor tasks (loaded JIT by step-00)                                                                                                                                                         |
-| `references/workflow-models/security-model.md`     | Workflow template for security tasks (loaded JIT by step-00)                                                                                                                                                         |
-
-| `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
-
-## Known Exceptions
-
-- `references/anthropic-example-plan.md` — filename retained as the source-provenance attribution for the few-shot calibration example. The file content is the appendix of a published harness-design article (Prithvi Rajasekaran, Labs); renaming would obscure the research origin. Future brand-prose audits skip this filename per this documented exception.
-
 ## Related Rules
 
 - `.claude/rules/meowkit-core.md` — planning as a practice: write the plan and agree it with the user before Phase 3
 - `.claude/skills/cook/references/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
 - `.claude/skills/cook/references/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
+
+## File Index
+
+Every step file, template, persona prompt, script and reference this skill ships, with its purpose, plus the documented filename exception for the few-shot calibration example: `references/file-index.md` — load it when you need a file no step names, such as the metrics design guide, the plan mutation protocol, the ADR guide or a worked example.
 
 ## Start
 
