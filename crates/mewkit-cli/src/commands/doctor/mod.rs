@@ -28,6 +28,7 @@ mod integrity;
 mod overlap;
 mod overlap_survey;
 mod provenance;
+mod skill_listing;
 mod toolchain;
 mod weakened;
 
@@ -139,6 +140,7 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
     checks.extend(installs::checks(&place, other.as_ref(), &targets));
     checks.extend(coexistence::checks(&scopes, &targets));
     checks.extend(overlap::checks(&scopes, &targets));
+    checks.extend(skill_listing::checks(&scopes, &targets));
     checks.push(weakened::check(&scopes));
     checks.push(integrity::check(&scopes, &targets));
     let root = extras::project_root();

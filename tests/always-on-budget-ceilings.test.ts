@@ -23,6 +23,8 @@ interface TreeOptions {
 	rulesBytes: number;
 	skills: number;
 	skillDescriptionBytes: number;
+	/** Extra body bytes on the first skill, for the SKILL.md size ceilings. */
+	firstSkillBodyBytes?: number;
 }
 
 /** A tree with the shape the check reads: a rules dir, a pack manifest and some shipped skills. */
@@ -44,7 +46,7 @@ function buildTree(options: TreeOptions): string {
 				"when_to_use: when probing",
 				"---",
 				"",
-				"body",
+				"body".padEnd(i === 0 ? (options.firstSkillBodyBytes ?? 4) : 4, "b"),
 				"",
 			].join("\n"),
 		);
@@ -108,5 +110,38 @@ describe("always-on budget ceilings", () => {
 		const listed = [...out.matchAll(/^\s+(\d+)\t(?:skill|agent)/gm)].map((m) => Number(m[1]));
 		expect(listed.length).toBeGreaterThan(1);
 		expect([...listed].sort((a, b) => b - a)).toEqual(listed);
+	});
+
+	it("fails on a runtime's skill-listing ceiling while the always-listed total is still under", () => {
+		// 60 skills of 300 B: ~18 kB listed per runtime, over the 16100 and 11300 ceilings, and
+		// the whole tree is far under 70000.
+		const root = buildTree({ rulesBytes: 1000, skills: 60, skillDescriptionBytes: 300 });
+		const { status, out } = run(root);
+		expect(status).toBe(1);
+		expect(out).toMatch(/claude-code skill listing is \d+ bytes over its 16100-byte ceiling/);
+		expect(out).toMatch(/codex skill listing is \d+ bytes over its 11300-byte ceiling/);
+		expect(out).not.toMatch(/bytes over the 70000-byte budget/);
+	});
+
+	it("reports each runtime's listing with an estimated token count and where no budget is documented", () => {
+		const root = buildTree({ rulesBytes: 1000, skills: 3, skillDescriptionBytes: 100 });
+		const { status, out } = run(root);
+		expect(status).toBe(0);
+		for (const runtime of ["claude-code", "codex", "cursor", "grok", "pi", "omp"]) {
+			expect(out).toMatch(new RegExp(`^\\s+${runtime}\\s+\\d+ B\\s+~\\d+ tokens \\(est\\.\\)`, "m"));
+		}
+		expect(out).toContain("200K: budget ~2000 tokens; 1M: budget ~10000 tokens");
+		expect(out).toContain("200K: budget unknown; 1M: budget unknown");
+	});
+
+	it("reports SKILL.md sizes and fails when one file passes the largest-file ceiling", () => {
+		const small = run(buildTree({ rulesBytes: 1000, skills: 2, skillDescriptionBytes: 50 }));
+		expect(small.status).toBe(0);
+		expect(small.out).toMatch(/SKILL\.md size: 2 files, \d+ B, ~\d+ tokens \(est\., chars\/4\)/);
+		expect(small.out).toContain("largest SKILL.md files");
+
+		const big = run(buildTree({ rulesBytes: 1000, skills: 2, skillDescriptionBytes: 50, firstSkillBodyBytes: 30000 }));
+		expect(big.status).toBe(1);
+		expect(big.out).toMatch(/probe-0\/SKILL\.md is \d+ bytes over the 27200-byte ceiling/);
 	});
 });
