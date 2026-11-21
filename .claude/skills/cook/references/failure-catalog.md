@@ -14,6 +14,7 @@ For post-build operational gotchas (parallel deadlocks, stale plans, model tier,
 | "This refactor is small enough to include" | Refactors mixed with features make both harder to review and debug. Separate them. |
 | "I already know how to do this" | Knowing is not planning. Write it down. Undisciplined action wastes tokens. |
 | "Let me just start coding" | Fastest path = plan then implement then done. Not: implement then debug then rewrite. |
+| "Tests can come after" | In TDD mode (`--tdd`), no — failing tests define the spec. In default mode, yes — tests after is permitted. Choose your mode explicitly. |
 
 ## Red Flags
 
