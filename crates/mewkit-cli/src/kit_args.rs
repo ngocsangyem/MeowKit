@@ -61,6 +61,12 @@ impl KitArgs {
         })
     }
 
+    /// Whether this command may download a kit it was not handed: false when
+    /// it was told to stay offline or given its kit as a local file.
+    pub fn may_fetch(&self) -> bool {
+        !self.offline && self.kit_dir.is_none() && self.kit_archive.is_none()
+    }
+
     /// The kit these flags name, verified and unpacked into `place`'s cache.
     pub fn resolve(&self, place: &Place) -> Result<Kit, Failure> {
         let cache = place.cache_dir();
@@ -74,6 +80,20 @@ impl KitArgs {
     }
 }
 
+/// The cached kit `version`, with no network request.
+fn cached(place: &Place, version: &str, allow_unverified: bool) -> Option<Kit> {
+    let cache = place.cache_dir();
+    let req = KitRequest {
+        source: Source::Offline {
+            version: Some(version.to_owned()),
+        },
+        allow_unverified,
+        cache_dir: &cache,
+        binary_version: mewkit_core::VERSION,
+    };
+    kit::resolve(&req, &UreqHttp::default()).ok()
+}
+
 /// The kit an existing install was made from, from the cache only: what
 /// upgrade and uninstall need to corroborate a removal. `None` when it is
 /// not cached (or came from a local directory, which is never cached).
@@ -81,12 +101,56 @@ pub fn installed_kit(place: &Place, index: &OwnershipIndex) -> Option<Kit> {
     if index.origin == Origin::LocalDir {
         return None;
     }
+    cached(
+        place,
+        &index.kit_version,
+        index.origin == Origin::Unverified,
+    )
+}
+
+/// As [`installed_kit`], downloading the release when the cache has lost it.
+///
+/// The cache is machine-local and outside git, so a clone, another machine or
+/// a cleaned project has an install record and no copy of the kit behind it.
+/// Without that copy nothing the new kit dropped can be told from a file of
+/// the user's, and every retired file would stay. An install made from a
+/// published release names that release, so it is downloaded again and
+/// checked as any other. An install from a local archive or directory names
+/// no release, and `may_fetch` is false for a command told to stay offline.
+pub fn installed_kit_or_fetch(
+    place: &Place,
+    index: &OwnershipIndex,
+    may_fetch: bool,
+) -> Option<Kit> {
+    if index.origin == Origin::LocalDir {
+        return None;
+    }
+    let published = matches!(index.origin, Origin::Release | Origin::Unverified);
+    release(
+        place,
+        &index.kit_version,
+        index.origin == Origin::Unverified,
+        may_fetch && published,
+    )
+}
+
+/// The kit release `version`: from the cache, else downloaded when `may_fetch`.
+pub fn release(
+    place: &Place,
+    version: &str,
+    allow_unverified: bool,
+    may_fetch: bool,
+) -> Option<Kit> {
+    if let Some(kit) = cached(place, version, allow_unverified) {
+        return Some(kit);
+    }
+    if !may_fetch {
+        return None;
+    }
     let cache = place.cache_dir();
     let req = KitRequest {
-        source: Source::Offline {
-            version: Some(index.kit_version.clone()),
-        },
-        allow_unverified: index.origin == Origin::Unverified,
+        source: Source::Tag(format!("v{}", version.trim_start_matches('v'))),
+        allow_unverified,
         cache_dir: &cache,
         binary_version: mewkit_core::VERSION,
     };

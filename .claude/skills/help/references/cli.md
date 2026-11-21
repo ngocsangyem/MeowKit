@@ -26,6 +26,7 @@ Options:
       --allow-cloud-mcp       Cursor: second opt-in for applying an MCP profile to a project that has a git remote (Cursor Cloud Agents run no local MCP hooks)
       --allow-kit-source      Run even in the MeowKit source repo (whose `.claude/` is the kit's authored source, and which an install would overwrite)
       --dry-run               Show what would change and change nothing installed (a downloaded kit is still kept in the cache)
+      --adopt-from <TAG>      The kit release the files here came from (e.g. v3.0.0), when a project has the kit's files and no install record. Files that still match that release are taken as the kit's; the rest stay yours
   -y, --yes                   Answer every question with its default and do not ask any
       --global                Act on your home directory instead of this project
       --json                  Print one JSON document instead of text

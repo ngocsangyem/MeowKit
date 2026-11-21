@@ -13,6 +13,15 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
+## Unreleased
+
+### Bug Fixes
+
+- `upgrade` and `uninstall` download the installed kit release again when the cache no longer has it. Before, a clone or a project with a cleaned `.meowkit/cache` kept every file the new kit had dropped, because nothing proved the kit had written them.
+- `init` in a project that has the kit's files and no install record rebuilds the record from the release those files came from, then removes what the new kit dropped and keeps the files you changed. Before, it wrote the new kit beside the old one. `--adopt-from <tag>` names the release when the files do not.
+- `init` refuses to install over 20 or more kit paths that hold other contents when it cannot tell which release they came from. `--force` replaces them, each one backed up first.
+- The kit's `.meowkit/.gitignore` no longer ignores `.meowkit/state/ownership/*.json`. Commit those files so a clone carries the install record.
+
 ## 3.0.0 (2026-11-20)
 
 Version 3 replaces the npm CLI with one native binary, installs the kit on six runtimes from a single authored tree, and removes the approval gates. Read the Removals and Migration Notes before you upgrade a 2.x project.

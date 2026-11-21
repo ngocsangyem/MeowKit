@@ -27,7 +27,7 @@ The project config lives in `.meowkit/` with the project's other MeowKit state. 
 
 Resolution order for a key is: environment override (only `MEOWKIT_TDD`), then project config, then user config (`~/.meowkit/config.yaml`), then the default.
 
-Commit this file and `.meowkit/memory/*.md`, since the team memory store is reviewed in the PR diff. The other `.meowkit/` subdirectories (`telemetry/`, `state/`, `cache/`) are machine-written and stay out of git.
+Commit this file and `.meowkit/memory/*.md`, since the team memory store is reviewed in the PR diff. Commit `.meowkit/state/ownership/*.json` as well: it records which files the kit installed, and a clone without it cannot tell the kit's files from yours. The rest of `.meowkit/` (`telemetry/`, the other files in `state/`, `cache/`) is machine-written and stays out of git.
 
 ```yaml
 # .meowkit/config.yaml

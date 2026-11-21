@@ -6,6 +6,7 @@
 use clap::Args;
 use mewkit_adapters::contract::written_hashes;
 use mewkit_core::exec::ExecOptions;
+use mewkit_core::ownership::Origin;
 
 use super::upgrade_query::{self, Query};
 use super::{
@@ -13,7 +14,7 @@ use super::{
     run_jobs, stamp, unconfirmed_force,
 };
 use crate::failure::{Failure, PENDING};
-use crate::kit_args::{KitArgs, installed_kit};
+use crate::kit_args::{KitArgs, installed_kit_or_fetch};
 use crate::output;
 use crate::place::Place;
 
@@ -110,7 +111,7 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
         let packs = index.packs.clone();
         // An old kit that no longer plans cleanly is treated as missing: its
         // files are kept rather than the upgrade refused.
-        let old = installed_kit(&place, &index)
+        let old = installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
             .and_then(|k| hashes_of(&place, e, &k, &packs).ok())
             .unwrap_or_default();
         let mut plan = prepare(&place, e, &kit, &packs)?;
@@ -119,8 +120,14 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
             plan.notices.insert(
                 0,
                 format!(
-                    "kit {} is not available, so files the new kit dropped are kept",
-                    index.kit_version
+                    "kit {} is not in the cache and was not downloaded, so files the new kit \
+                     dropped are kept{}",
+                    index.kit_version,
+                    if matches!(index.origin, Origin::Release | Origin::Unverified) {
+                        "; run the upgrade again online to remove them"
+                    } else {
+                        ""
+                    }
                 ),
             );
         }
@@ -181,8 +188,9 @@ fn unmanaged_hint(place: &Place) -> String {
     }
     if !bare.is_empty() {
         out += &format!(
-            "; {0} has no install record: `mewkit init --target {0}` installs the kit \
-             there and keeps every file that differs from it",
+            "; {0} has no install record: `mewkit init --target {0}` rebuilds it from the kit \
+             release the files came from (add `--adopt-from <tag>` when they do not name one), \
+             then moves to the newest kit",
             bare.join(",")
         );
     }
