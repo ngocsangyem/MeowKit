@@ -49,6 +49,8 @@ Role: {role-name}
 Phase file: {absolute-path}
 Tier: {Light|Standard|Full}
 Claim budget: {N} claims per phase
+Goal: claims in the phase file checked against the repo
+Return: verified, failed and unverifiable claims, each with file:line
 Work context: {project-root}
 Plan: none
 Reports: none

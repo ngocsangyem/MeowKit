@@ -49,13 +49,16 @@ Ask the user for each field, always offering an `Other` option for free input.
 | # | Field | Source |
 | --- | --- | --- |
 | 1 | Task | argument, or ask |
-| 2 | Work context | auto-detect the git root of the files being changed; the user may override |
-| 3 | Plan reference | auto-detect from the active-plan pointer; the user may override |
-| 4 | Files to modify | ask (glob patterns) |
-| 5 | Files to read for context | ask (specific paths) |
-| 6 | Acceptance criteria | ask (binary pass/fail only) |
-| 7 | Constraints | ask (what must NOT change) |
-| 8 | Reports and Plans paths | derive from the work context: `{work_context}/tasks/reports/` and `{work_context}/tasks/plans/` |
+| 2 | Goal | ask (one sentence: the outcome the task serves) |
+| 3 | Work context | auto-detect the git root of the files being changed; the user may override |
+| 4 | Plan reference | auto-detect from the active-plan pointer; the user may override |
+| 5 | Files to modify | ask (glob patterns) |
+| 6 | Files to read for context | ask (specific paths) |
+| 7 | Acceptance criteria | ask (binary pass/fail only) |
+| 8 | Fixed constraints | ask (what must NOT change; only what the user set or you verified) |
+| 9 | Current approach | ask (the expected way; the subagent may challenge it with `file:line` evidence). A cause already worked out is labelled "already diagnosed", never stated as fact |
+| 10 | Return | ask (the shape of the answer: file path, verdict, list) |
+| 11 | Reports and Plans paths | derive from the work context: `{work_context}/tasks/reports/` and `{work_context}/tasks/plans/` |
 
 When the work context differs from the current working directory, every path in the prompt uses
 the **work context** root. A subagent handed the wrong root writes into the wrong project.
@@ -94,6 +97,7 @@ The template below is the canonical one from `.claude/skills/cook/references/orc
 <!-- shared:delegation-prompt-template -->
 ```
 Task: [specific task description]
+Goal: [the outcome this task serves, in one sentence]
 Work context: [project path]
 Plan: [plan file path or "none"]
 Reports: [reports path or "none"]
@@ -101,7 +105,9 @@ Plans: [plans path or "none"]
 Files to modify: [glob patterns]
 Files to read for context: [specific paths]
 Acceptance criteria: [binary pass/fail checks]
-Constraints: [what must NOT change]
+Fixed constraints: [what must NOT change; user-set or verified]
+Current approach: [how the lead expects to do it; open to challenge with file:line evidence]
+Return: [the shape of the answer: file path, verdict, or list]
 ```
 <!-- /shared:delegation-prompt-template -->
 
