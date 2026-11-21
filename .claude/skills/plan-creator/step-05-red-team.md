@@ -49,6 +49,8 @@ Find architectural flaws, unstated assumptions, scope issues, or risks in this P
 Use the output format defined in your persona prompt.
 Max 10 findings. Quality over quantity.
 
+Challenger policy: a finding needs a quote from the plan, or `file:line` for a claim about the repo. A finding without one is dropped. Finding nothing is a valid result: say so and stop; do not invent a finding to fill the list.
+
 After the findings list, emit ONE `**Cross-persona blind spot:**` line per the "Cross-Persona Blind Spot" section in your persona prompt. Use `None observed.` if you cannot identify one — do NOT fabricate.
 ```
 
@@ -56,7 +58,7 @@ After the findings list, emit ONE `**Cross-persona blind spot:**` line per the "
 
 After all subagents complete:
 
-1. Merge all findings into a single list
+1. Merge all findings into a single list, first dropping any finding whose Evidence is neither a plan quote nor `file:line`. If none remain, record `Findings: none` and continue; zero findings is a valid result
 2. Deduplicate: merge findings with the same `location` + `core_flaw` (keep highest severity)
 3. Sort by severity: Critical → High → Medium
 4. Cap at 15 findings total
@@ -68,7 +70,7 @@ Each finding must have these 7 fields:
 - **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
 - **Flaw:** {what's wrong}
 - **Failure scenario:** {concrete description of how this breaks}
-- **Evidence:** {quote from plan or note of missing element}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim}
 - **Suggested fix:** {brief recommendation}
 - **Category:** {assumption | scope | risk | architecture | timeline | cross-cutting}
 ```
@@ -160,7 +162,7 @@ Write the **full detailed findings** to a separate file: `{plan_dir}/red-team-fi
 - **Location:** {Phase X, section "name"}
 - **Flaw:** {full description}
 - **Failure scenario:** {detailed scenario}
-- **Evidence:** {quote from plan or missing element}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim}
 - **Suggested fix:** {recommendation}
 - **Category:** {assumption | scope | security | reliability | architecture | cross-cutting}
 - **Disposition:** {Accept | Reject} — {rationale}

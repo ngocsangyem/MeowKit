@@ -30,7 +30,7 @@ Security flaws baked into the plan survive into implementation. Catching auth ga
 - **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
 - **Flaw:** {what security property is violated}
 - **Failure scenario:** {concrete attack scenario — who does what to exploit this}
-- **Evidence:** {quote from plan or note of what security measure is missing}
+- **Evidence:** {quote from the plan, or `file:line` for a repo claim; a finding without one is dropped}
 - **Suggested fix:** {brief recommendation — reference security-rules.md if applicable}
 - **Category:** security
 ```

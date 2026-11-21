@@ -29,20 +29,13 @@ mewkit review coverage --session <session-id> --json
 
 Skip this coverage check for branch-diff / `--pending` / commit reviews (no session).
 
-## Zero-Finding Check (Forced-Finding Protocol)
+## Challenger Policy
 
-Before categorizing, check total findings count from all reviewers (Phase A + Phase B if applicable).
+A finding needs `file:line` (or a quote from the plan, for a plan review). Before categorizing, drop every finding from Phase A and Phase B that has neither.
 
-**If total findings = 0:**
+**If no finding survives:** the review is clean. Say so in the verdict, and do not re-run a reviewer to find something: a pass forced to produce findings produces unsupported ones. No finding is a valid result.
 
-1. **Re-analyze** — Re-run the highest-signal reviewer with an augmented prompt:
-   - For code reviews: re-run **Edge Case Hunter** (or Blind Hunter if scope=minimal)
-   - For plan reviews: re-run **Criteria Auditor**
-   - Augmented prompt: *"Previous analysis found zero issues. Re-analyze with higher scrutiny. Look specifically for: boundary conditions, implicit assumptions, missing error handling, security surface, unvalidated inputs, resource leaks."*
-2. **Cap at 1 re-analysis** — never re-analyze more than once. No infinite loops.
-3. **If still 0:** Accept as genuinely clean. Add note to verdict: `"Zero-finding review (double-checked)"`.
-
-**If total findings > 0:** Proceed to categorization below.
+**If findings remain:** proceed to categorization below.
 
 ## Categories
 
