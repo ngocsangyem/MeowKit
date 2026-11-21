@@ -2,11 +2,17 @@
 //! authored frontmatter carries kit bookkeeping (owner, phase, keywords);
 //! a projected skill keeps the name, the description and what the skill
 //! needs installed, plus any key the runtime's overlay adds.
+//!
+//! No projected runtime has a `when_to_use` field, so it is appended to the
+//! description, the one text those runtimes route on.
 use std::collections::BTreeSet;
 
 use super::{Skill, Target, project_skill_body, project_text};
 use crate::contract::EmitError;
 use crate::cursor::frontmatter::fields;
+
+/// Characters a runtime's skill description may hold (the Agent Skills limit).
+pub const DESCRIPTION_LIMIT: usize = 1024;
 
 /// Authored list-valued keys every target keeps.
 const KEPT_LISTS: &[&str] = &["requires_runtime"];
@@ -80,7 +86,20 @@ pub fn skill_file(
     let mut out = String::from("---\n");
     let name = format!("{}{}", target.skill_prefix, skill.name);
     out.push_str(&format!("name: {}\n", quoted(&name)));
-    let description = project_text(description, skills, target);
+    let mut description = project_text(description, skills, target);
+    if let Some(when) = get("when_to_use") {
+        if is_block_scalar(when) {
+            return Err(bad("has a block-scalar when_to_use; write it on one line"));
+        }
+        let when = project_text(when, skills, target);
+        description = format!("{description} Use when: {when}");
+    }
+    let length = description.chars().count();
+    if length > DESCRIPTION_LIMIT {
+        return Err(bad(&format!(
+            "description plus when_to_use is {length} characters; a runtime keeps at most {DESCRIPTION_LIMIT}"
+        )));
+    }
     out.push_str(&format!("description: {}\n", quoted(&description)));
     for key in KEPT_LISTS {
         if let Some(value) = get(key) {
@@ -119,6 +138,31 @@ mod tests {
             "---\nname: \"mk-cook\"\ndescription: \"Builds one feature. NOT for mk-autobuild.\"\n\
              requires_runtime: [\"python>=3.9\"]\ndisable-model-invocation: true\n---\n\n# mk-cook\n"
         );
+    }
+
+    #[test]
+    fn when_to_use_is_appended_to_the_description_and_never_dropped() {
+        let src = "---\nname: mk:cook\ndescription: \"Builds one feature.\"\n\
+                   when_to_use: \"One scoped feature or approved plan.\"\n---\n\n# mk:cook\n";
+        let out = skill_file(src, &cook(), &BTreeSet::new(), &CODEX, &[], Ok).unwrap();
+        assert!(
+            out.contains(
+                "description: \"Builds one feature. Use when: One scoped feature or approved plan.\"\n"
+            ),
+            "{out}"
+        );
+        assert!(!out.contains("when_to_use:"), "no field the runtime lacks");
+    }
+
+    #[test]
+    fn a_combined_description_over_the_limit_is_an_error_naming_the_skill() {
+        let long = "w".repeat(DESCRIPTION_LIMIT);
+        let src =
+            format!("---\nname: mk:cook\ndescription: \"Builds.\"\nwhen_to_use: \"{long}\"\n---\n");
+        let err = skill_file(&src, &cook(), &BTreeSet::new(), &CODEX, &[], Ok).unwrap_err();
+        let text = err.to_string();
+        assert!(text.contains("skill cook"), "{text}");
+        assert!(text.contains("1024"), "{text}");
     }
 
     #[test]
