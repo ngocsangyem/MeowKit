@@ -1,7 +1,7 @@
 ---
 name: mk:arch
 description: "Manages ADRs in docs/architecture/adr/. NOT for mk:improve-codebase-architecture."
-argument-hint: new [title] | list | review [number] | impact [change description]
+argument-hint: new [title] | list | review [ADR file stem] | impact [change description]
 source: local
 trust_level: kit-authored
 injection_risk: low
@@ -30,7 +30,7 @@ runtime: claude-code
 Architecture as a first-class concern. Owns the ADR lifecycle under `docs/architecture/adr/`
 and the impact analysis of a proposed change against the decisions already taken.
 
-The `architect` agent authors the decision content; this skill owns the lifecycle — numbering,
+The `architect` agent authors the decision content; this skill owns the lifecycle — naming,
 file layout, status transitions and the impact read. `docs/architecture/` is the architect
 agent's directory, so ADR bodies are written by that agent, never by another one.
 
@@ -39,41 +39,41 @@ agent's directory, so ADR bodies are written by that agent, never by another one
 ```
 mk:arch new [title]
 mk:arch list
-mk:arch review [number]
+mk:arch review [ADR file stem]
 mk:arch impact [change description]
 ```
 
 ## new [title]
 
-1. Scan `docs/architecture/adr/` and assign the next sequential ADR number.
+1. Scan `docs/architecture/adr/` for an existing ADR on the same decision.
 2. Gather context before writing anything: what decision is being made, what constrains it,
    what options exist. If any of the three is unknown, ask — an ADR with an invented context
    records a decision nobody took.
 3. Delegate the body to the `architect` agent, with the sections: Title, Status (Proposed),
    Context, Decision, Consequences, Alternatives Considered.
-4. Write `docs/architecture/adr/YYMMDD-title.md`.
+4. Write `docs/architecture/adr/YYMMDD-decision.md`.
 5. Print the path and a one-paragraph summary, then ask for review. A Proposed ADR is not an
    approved one.
 
 ## list
 
 1. Scan `docs/architecture/adr/`.
-2. Print one row per ADR — number, title, status — with superseding links resolved:
+2. Print one row per ADR — file stem, title, status — with superseding links resolved:
 
    ```
-   # | Title                          | Status
-   1 | Use PostgreSQL for persistence | Accepted
-   2 | Event-driven architecture      | Proposed
-   3 | Monorepo structure             | Superseded by #5
+   ADR                      | Title                          | Status
+   260105-postgres-storage  | Use PostgreSQL for persistence | Accepted
+   260112-event-driven      | Event-driven architecture      | Proposed
+   260120-monorepo-layout   | Monorepo structure             | Superseded by 260301-polyrepo
    ```
 
-## review [number]
+## review [ADR file stem]
 
 1. Read the ADR.
 2. Evaluate three things explicitly: is the decision still valid, has the context changed, are
    there alternatives that did not exist when it was taken.
 3. Update the status when the answer demands it — Proposed → Accepted, Accepted → Deprecated,
-   Accepted → Superseded by #N. A status left alone is also a result; say so.
+   Accepted → Superseded by YYMMDD-decision. A status left alone is also a result; say so.
 4. Append dated review notes. Never rewrite the original Context or Decision text: an ADR
    records what was decided when it was decided, and editing that history makes it describe a
    system it never approved.
@@ -92,7 +92,7 @@ mk:arch impact [change description]
 
 | Mode | Output |
 | --- | --- |
-| `new` | `docs/architecture/adr/YYMMDD-title.md` plus a printed summary awaiting review |
+| `new` | `docs/architecture/adr/YYMMDD-decision.md` plus a printed summary awaiting review |
 | `list` | table of every ADR with status |
 | `review` | the updated ADR with dated review notes |
 | `impact` | printed assessment: components, ADRs, risk, recommendation |

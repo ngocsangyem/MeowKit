@@ -52,7 +52,7 @@ The **researcher** agent queries official documentation, repositories and commun
 /mk:arch new "Use tRPC for internal API"
 ```
 
-`mk:arch` assigns the next number, gathers the context, constraints and options (it asks if any are missing) and has the **architect** agent write the body: Status, Context, Decision, Consequences and Alternatives Considered. The file is `docs/architecture/adr/YYMMDD-title.md`, with status Proposed until you review it. Other `mk:arch` commands are `list`, `review [number]` and `impact [change description]`, which checks a proposed change against the decisions already taken.
+`mk:arch` checks for an existing ADR on the same decision, gathers the context, constraints and options (it asks if any are missing) and has the **architect** agent write the body: Status, Context, Decision, Consequences and Alternatives Considered. The file is `docs/architecture/adr/YYMMDD-decision.md`, with status Proposed until you review it. Other `mk:arch` commands are `list`, `review [ADR file stem]` and `impact [change description]`, which checks a proposed change against the decisions already taken.
 
 ```markdown
 # 0005 - Use tRPC for internal API

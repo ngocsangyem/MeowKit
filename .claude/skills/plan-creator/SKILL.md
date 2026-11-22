@@ -73,7 +73,7 @@ Public surface: classify → inspect → capture missing decisions → draft →
 Activate when:
 
 - User runs `/mk:plan-creator [task]` or `/mk:cook [task]`
-- Non-trivial task (> 2 files OR > 1h OR architectural decisions)
+- Non-trivial task (> 2 files OR > 30 min OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Phase 3 needs a plan to build from

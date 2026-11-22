@@ -166,7 +166,7 @@ One object per candidate in the `candidates` array. Plain data — no markup.
 - `recommendation` ∈ `Strong` | `Worth exploring` | `Speculative`.
 - `dependency_category` ∈ `in-process` | `local-substitutable` | `ports-and-adapters` | `mock` — definitions and per-category test/patch shape in [references/deep-module-design.md](references/deep-module-design.md).
 - `before`/`after` are **structural descriptors** for `mk:preview` to draw — never pre-rendered diagrams.
-- `adr_conflict`: `null`, or `{ "adr": "ADR-0007", "why_reopen": "<one line>" }`.
+- `adr_conflict`: `null`, or `{ "adr": "260105-postgres-storage", "why_reopen": "<one line>" }`.
 
 ## State tracking (long-horizon resilience)
 
