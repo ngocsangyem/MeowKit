@@ -41,7 +41,9 @@ fn child_env_keeps_only_the_allowlist_and_points_home_inside() {
         ]
     );
     assert!(env.contains(&("HOME".into(), "/sandbox/home".into())));
-    assert!(env.contains(&("CLAUDE_CONFIG_DIR".into(), "/sandbox/home/.claude".into())));
+    // Joined the way the sandbox joins it, so the separator matches on Windows.
+    let config = home.join(".claude").display().to_string();
+    assert!(env.contains(&("CLAUDE_CONFIG_DIR".into(), config)));
     assert!(has_auth(&env, Runtime::ClaudeCode));
 }
 
