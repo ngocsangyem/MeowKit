@@ -98,8 +98,8 @@ pub fn run(place: &Place, name: &str, yes: bool) -> Result<u8, Failure> {
     let backup = apply(&store.layout, &store.paths, &writes, &[], &backed_refs)?;
     // Index again so the record carries the placed tree's digest.
     let store = open(place)?;
-    let (indexed, _) = store.index(&next)?;
-    store.save(&indexed)?;
+    let (indexed, survey) = store.index(&next)?;
+    store.save(&indexed, &survey)?;
     println!("approved and placed the overlay of {name}");
     if let Some(dir) = backup {
         println!("backup: {}", dir.display());

@@ -1,11 +1,13 @@
-//! The skill store on the command line: `skill status`, `overlay` and
-//! `fork`, and what every lifecycle command does with the store around the
-//! run that changes a ledger.
+//! The skill store on the command line: `skill status`, `overlay`, `fork`
+//! and `rollback`, and what every lifecycle command does with the store
+//! around the run that changes a ledger.
 mod diff;
 mod fork;
+mod kept_trees;
 pub mod lifecycle;
 mod overlay;
 mod overlay_approve;
+mod rollback;
 mod status;
 
 use std::collections::BTreeMap;
@@ -21,7 +23,7 @@ use crate::failure::{Failure, USAGE};
 use crate::place::Place;
 
 /// The verbs this module answers, after `env`.
-pub const VERBS: [&str; 3] = ["status", "overlay", "fork"];
+pub const VERBS: [&str; 4] = ["status", "overlay", "fork", "rollback"];
 
 pub fn run(sub: &str, args: &SkillArgs) -> Result<u8, Failure> {
     let place = Place::new(args.global)?;
@@ -29,6 +31,7 @@ pub fn run(sub: &str, args: &SkillArgs) -> Result<u8, Failure> {
         "status" => status::run(&place, args.json),
         "overlay" => overlay::run(&place, args),
         "fork" => fork::run(&place, args.skill.as_deref(), args.new_name.as_deref()),
+        "rollback" => rollback::run(&place, args.skill.as_deref(), args.to.as_deref()),
         _ => Ok(USAGE),
     }
 }
@@ -125,30 +128,32 @@ impl Store {
         out
     }
 
-    /// The write (or removal, for an empty store) that records `next`;
-    /// nothing when the bytes on disk already say it.
-    pub fn sidecar_change(&self, next: &Sidecar) -> (Vec<Write>, Vec<RelPath>) {
+    /// The writes and removals that record `next` (indexed as `survey`): the
+    /// sidecar unless the bytes on disk already say it (removed when empty),
+    /// and the kept trees.
+    pub fn changes(
+        &self,
+        next: &Sidecar,
+        survey: &Survey,
+    ) -> Result<(Vec<Write>, Vec<RelPath>), Failure> {
+        let (mut writes, mut removes) = kept_trees::changes(self, next, survey)?;
         let file = self.layout.resolve(&self.paths.sidecar);
         let on_disk = std::fs::read(&file).ok();
         if next.records.is_empty() {
-            let removes = on_disk.map(|_| self.paths.sidecar.clone());
-            return (Vec::new(), removes.into_iter().collect());
+            removes.extend(on_disk.map(|_| self.paths.sidecar.clone()));
+        } else if on_disk.as_deref() != Some(next.to_json().as_slice()) {
+            writes.push(Write {
+                path: self.paths.sidecar.clone(),
+                bytes: next.to_json(),
+                mode: None,
+            });
         }
-        let bytes = next.to_json();
-        if on_disk.as_deref() == Some(bytes.as_slice()) {
-            return (Vec::new(), Vec::new());
-        }
-        let write = Write {
-            path: self.paths.sidecar.clone(),
-            bytes,
-            mode: None,
-        };
-        (vec![write], Vec::new())
+        Ok((writes, removes))
     }
 
-    /// Record `next` as the sidecar.
-    pub fn save(&self, next: &Sidecar) -> Result<(), Failure> {
-        let (writes, removes) = self.sidecar_change(next);
+    /// Record `next`, indexed as `survey`.
+    pub fn save(&self, next: &Sidecar, survey: &Survey) -> Result<(), Failure> {
+        let (writes, removes) = self.changes(next, survey)?;
         skill_store::apply(&self.layout, &self.paths, &writes, &removes, &[])?;
         Ok(())
     }

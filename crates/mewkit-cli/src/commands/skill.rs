@@ -25,7 +25,7 @@ use crate::failure::{FAILED, Failure, OK, USAGE};
 
 #[derive(Args, Debug)]
 pub struct SkillArgs {
-    /// `env`, `status`, `overlay` or `fork`.
+    /// `env`, `status`, `overlay`, `fork` or `rollback`.
     pub subcommand: Option<String>,
     /// The skill to act on.
     pub skill: Option<String>,
@@ -44,6 +44,10 @@ pub struct SkillArgs {
     /// Confirm `overlay --approve` in a session with no terminal.
     #[arg(long)]
     pub yes: bool,
+    /// `rollback`: the recorded digest to restore (a unique prefix of at
+    /// least 7 hex digits; default: the most recent earlier one).
+    #[arg(long, value_name = "DIGEST")]
+    pub to: Option<String>,
     /// Act on your home directory instead of this project (skill store verbs).
     #[arg(long)]
     pub global: bool,

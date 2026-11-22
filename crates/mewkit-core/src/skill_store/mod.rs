@@ -22,6 +22,7 @@ mod overlay;
 mod persist;
 mod record;
 mod rows;
+mod trees;
 
 pub use digest::{TreeFile, read_tree, tree_digest};
 pub use index::{Observed, Survey, build};
@@ -32,6 +33,7 @@ pub use overlay::{
 pub use persist::{Write, apply};
 pub use record::{OverlayFile, SCHEMA_VERSION, Sidecar, SkillRecord, State, StoreError};
 pub use rows::{Ledgers, Rows, ledger_rows, mark_unverified, no_rows_hash, skill_key_of};
+pub use trees::{RestoredFile, capture, load as load_tree, tree_file};
 
 use crate::fsx::RelPath;
 

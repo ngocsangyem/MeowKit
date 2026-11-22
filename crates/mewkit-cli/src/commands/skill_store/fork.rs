@@ -75,8 +75,8 @@ pub fn run(place: &Place, name: Option<&str>, new_name: Option<&str>) -> Result<
     }
     apply(&store.layout, &store.paths, &writes, &[], &[])?;
     let store = open(place)?;
-    let (indexed, _) = store.index(&next)?;
-    store.save(&indexed)?;
+    let (indexed, survey) = store.index(&next)?;
+    store.save(&indexed, &survey)?;
     for (from, to) in &made {
         println!("forked {from} to {to}");
     }

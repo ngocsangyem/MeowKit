@@ -10,7 +10,7 @@ use crate::place::Place;
 pub fn run(place: &Place, json_out: bool) -> Result<u8, Failure> {
     let store = open(place)?;
     let (next, survey) = store.index(&store.checked())?;
-    store.save(&next)?;
+    store.save(&next, &survey)?;
     let pending = store.overlays.pending(&store.approvals);
     let rows: Vec<(&String, &SkillRecord, Vec<String>)> = next
         .records
