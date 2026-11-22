@@ -23,11 +23,30 @@ const MAX_BYTES = 50 * 1024 * 1024;
 const SCHEMA_VERSION = '1.0';
 const DEFAULT_HARNESS_VERSION = '3.0.0';
 
+/**
+ * What a record says about how a skill fared. A closed set written as a fixed
+ * token, never free text; the Rust writer carries the same tokens. Strong
+ * signals state an outcome, weak ones are common and often harmless.
+ */
+const STRONG_SIGNALS = ['denied_tool_call', 'user_interruption', 'task_failure', 'explicit_report', 'ship_check_result'];
+const WEAK_SIGNALS = ['tool_error', 'retry', 'advisory_hook'];
+const SIGNALS = [...STRONG_SIGNALS, ...WEAK_SIGNALS];
+
 const sanitizeId = (value) => String(value || '').replace(/[^a-zA-Z0-9._-]/g, '');
 
 /** The harness sets the run identity; otherwise it comes from the session-start marker. */
 function resolveRunId(root, env) {
   if (env.MEOWKIT_RUN_ID) return env.MEOWKIT_RUN_ID;
+  try {
+    return sanitizeId(fs.readFileSync(sessionStateFile('last-session-id', root), 'utf8').replace(/\s/g, ''));
+  } catch {
+    return '';
+  }
+}
+
+/** The host session: the hook's variable, else the session-start marker, else empty. */
+function resolveSessionId(root, env) {
+  if (env.HOOK_SESSION_ID) return sanitizeId(env.HOOK_SESSION_ID);
   try {
     return sanitizeId(fs.readFileSync(sessionStateFile('last-session-id', root), 'utf8').replace(/\s/g, ''));
   } catch {
@@ -76,8 +95,8 @@ function rotate(logFile, dir, now) {
   }
 }
 
-function buildRecord({ event, payload, model, runId, env, now }) {
-  return {
+function buildRecord({ event, payload, model, runId, env, now, skill = '', sessionId = '', signal = '' }) {
+  const record = {
     schema_version: SCHEMA_VERSION,
     ts: now.toISOString().replace(/\.\d{3}Z$/, 'Z'),
     event: event || 'unknown',
@@ -85,8 +104,14 @@ function buildRecord({ event, payload, model, runId, env, now }) {
     harness_version: env.MEOWKIT_HARNESS_VERSION || DEFAULT_HARNESS_VERSION,
     model,
     density: env.MEOWKIT_AUTOBUILD_MODE || '',
-    data: parsePayload(payload),
   };
+  // Optional keys are left out when unknown. A skill is recorded only when the
+  // caller names it; an unknown signal token is dropped rather than stored.
+  if (skill) record.skill = skill;
+  if (sessionId) record.session_id = sessionId;
+  if (SIGNALS.includes(signal)) record.signal = signal;
+  record.data = parsePayload(payload);
+  return record;
 }
 
 /**
@@ -94,7 +119,7 @@ function buildRecord({ event, payload, model, runId, env, now }) {
  * caller treats as "dropped": blocking a hook chain on telemetry is never the
  * right trade.
  */
-function appendTrace({ root = process.cwd(), event = 'unknown', payload = '', env = process.env, now = new Date() } = {}) {
+function appendTrace({ root = process.cwd(), event = 'unknown', payload = '', env = process.env, now = new Date(), skill = '', signal = '' } = {}) {
   const dir = telemetryDir(root);
   const logFile = path.join(dir, 'trace-log.jsonl');
   const lockFile = path.join(dir, '.trace-log.lock');
@@ -113,6 +138,9 @@ function appendTrace({ root = process.cwd(), event = 'unknown', payload = '', en
     // so a reader can tell "not detected" from a model actually named that.
     model: resolved === UNKNOWN ? '' : resolved,
     runId: resolveRunId(root, env),
+    sessionId: resolveSessionId(root, env),
+    skill: scrubSecrets(skill),
+    signal,
     env,
     now,
   });
@@ -123,4 +151,4 @@ function appendTrace({ root = process.cwd(), event = 'unknown', payload = '', en
   });
 }
 
-module.exports = { appendTrace, buildRecord, parsePayload, MAX_BYTES };
+module.exports = { appendTrace, buildRecord, parsePayload, MAX_BYTES, STRONG_SIGNALS, WEAK_SIGNALS };

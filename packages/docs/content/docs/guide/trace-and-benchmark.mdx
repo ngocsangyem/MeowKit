@@ -44,6 +44,8 @@ Hooks and harness steps write records through `append-trace.cjs`. Event types wr
 | `orient_run` | `mewkit orient` | An orientation run, unless `--no-record` is passed |
 | `benchmark_result` | `mk:benchmark` | A canary suite run |
 
+Three optional keys may sit before `data`, and each is left out when unknown. `session_id` is the host session (`HOOK_SESSION_ID`, else the session marker). `skill` is written only when the writer names the skill for certain, such as `mewkit trace --friction --skill <name>`; it is never inferred. `signal` is one token from a closed set. Strong signals are `denied_tool_call`, `user_interruption`, `task_failure`, `explicit_report` and `ship_check_result`; weak ones are `tool_error`, `retry` and `advisory_hook`. Today `ship_check` records carry `ship_check_result`, and a friction note recorded with `--skill` carries `explicit_report`. A record without a `skill` key never counts toward a skill's signals. Readers ignore keys they do not know, so older binaries read these records unchanged.
+
 Writes happen under a file lock, and a record is dropped rather than blocking a hook. Payloads pass through `lib/secret-scrub.cjs` before they are written, so keys, tokens and credential strings are stripped. Records are never edited after they are appended.
 
 When the file passes 50 MB, the next append rotates it to `trace-log.{YYMMDD-HHMMSS}.jsonl.gz` and starts a fresh log.
@@ -55,7 +57,7 @@ When the file passes 50 MB, the next append rotates it to `trace-log.{YYMMDD-HHM
 | `mewkit trace score [--id RUN]` | Trace-quality tier per run lane |
 | `mewkit trace audit` | Entropy, and counts of orphaned, stale, unverified-run and repeated-friction records |
 | `mewkit trace propose [--commit]` | Groups repeated friction (2 or more) and drift into advisory backlog items. Without `--commit` it only prints them |
-| `mewkit trace --friction "<note>" [--responsibility R] [--id RUN]` | Records a friction note |
+| `mewkit trace --friction "<note>" [--responsibility R] [--id RUN] [--skill NAME]` | Records a friction note |
 
 Record friction when you correct the agent by hand. A note about a skill is best encoded in that skill's Gotchas section.
 
