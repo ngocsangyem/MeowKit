@@ -161,6 +161,10 @@ async function main() {
   }
 
   const doc = Object.assign({}, ...hostJson);
+  // Two handlers may each have a line for the user (a completion notice, a plan-state line);
+  // a plain merge would keep only the last one.
+  const notices = hostJson.map((d) => d.systemMessage).filter((m) => typeof m === 'string' && m);
+  if (notices.length > 1) doc.systemMessage = notices.join('\n');
   let forModel = [modelReadsStdout ? plain.trim() : '', context].filter(Boolean).join('\n\n');
   if (forModel.length > CONTEXT_LIMIT) forModel = `${forModel.slice(0, CONTEXT_LIMIT - 20)}\n[truncated]`;
   if (forModel) doc.hookSpecificOutput = { ...doc.hookSpecificOutput, hookEventName: event, additionalContext: forModel };

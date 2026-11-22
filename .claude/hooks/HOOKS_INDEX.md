@@ -10,8 +10,8 @@ shell to start and the kit runs on a host that has none. There is no exception: 
 registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` sweeps
 the hook paths for one.
 
-The kit ships 27 node hooks: the 4 entrypoints directly under `hooks/`, which the host
-registers or an agent invokes, and the 23 observers under `hooks/handlers/`, which
+The kit ships 28 node hooks: the 4 entrypoints directly under `hooks/`, which the host
+registers or an agent invokes, and the 24 observers under `hooks/handlers/`, which
 `dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
 neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 
@@ -57,9 +57,9 @@ config removes that observer from every event it is registered on (`lib/handler-
 |---|---|---|---|---|---|
 | `dispatch.cjs` | SessionStart | — | — | 15s | Runs the observers registered for one event, fail-open |
 | `privacy-block.cjs` | PreToolUse | Edit\|Write | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
-| `privacy-block.cjs` | PreToolUse | Read | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
+| `privacy-block.cjs` | PreToolUse | Read\|Grep\|Glob | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, obviously unsafe fetch targets, and reads, searches and listings of archived plans (`tasks/plans/archive/`, `tasks/plans/ceo-plans/archive/`) |
 | `pre-ship.cjs` | PreToolUse | Bash | — | 300s | Ship check: team-memory lint, then lint on the changed files, the tests related to them and a type-check |
-| `privacy-block.cjs` | PreToolUse | Bash | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
+| `privacy-block.cjs` | PreToolUse | Bash | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, obviously unsafe fetch targets, and read, list or search commands aimed at archived plans (moves and writes into the archive pass) |
 | `dispatch.cjs` | PreToolUse | Bash | — | 10s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | PreToolUse | Task\|Agent | — | 10s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | PostToolUse | Edit\|Write | — | 40s | Runs the observers registered for one event, fail-open |
@@ -88,6 +88,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 | `post-session.cjs` | Stop | — | post-session | — | Records cost and trace data when a session ends; writes the "verified" marker only for rule and phase-zero files that are present, non-empty and unchanged since session start |
 | `control-probe.cjs` | Stop | — | control-probe | — | A known-good fire, used as a control signal |
 | `pre-completion-check.cjs` | Stop | — | pre-completion-check | — | Opt-in: continues a turn whose edits are unverified, at most twice |
+| `plan-state-sync.cjs` | Stop | — | plan-state-sync | — | Always on: syncs changed plans' derived state (phase status, Overview line, plan.md table and status, `.plan-state.json`) to their checkboxes; one line to the user when it changed something or a plan is ready to archive; never blocks |
 | `model-detector.cjs` | SessionStart | — | model-detector | — | Records the active model at session start |
 | `orientation-ritual.cjs` | SessionStart | — | orientation-ritual | — | Emits the orientation prompt at session start |
 | `project-context-loader.cjs` | SessionStart | — | project-context-loader | — | Injects the project's own context, resets per-session state and records the rule-file digests the marker is checked against |

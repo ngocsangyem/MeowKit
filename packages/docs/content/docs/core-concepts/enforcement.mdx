@@ -37,6 +37,8 @@ An Enforced cell means a registered hook refuses the action. Advisory means an i
 | Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent | Absent |
+| Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Advisory at ship check | Advisory at ship check | Advisory at ship check | Advisory at ship check |
+| Archived-plan reads | Enforced on Read, Grep, Glob and Bash | Enforced on Bash only | Enforced on file reads, search tools and shell | Enforced on every tool | Enforced on every tool call | Enforced on every tool call | Unverified on every tool (from documentation) |
 
 Cells that say Absent mean the host's own permissions are the only control. On Claude Code the `careful` and `freeze` skills block destructive commands only while the skill is active.
 
@@ -87,7 +89,7 @@ The hook names below are the Claude Code registrations.
 
 | Hook | Event | What it blocks |
 |------|-------|---------------|
-| `privacy-block.cjs` | PreToolUse (Read, Edit\|Write, Bash) | Reads of credential files; fetches aimed at private or metadata hosts |
+| `privacy-block.cjs` | PreToolUse (Read\|Grep\|Glob, Edit\|Write, Bash) | Reads of credential files; fetches aimed at private or metadata hosts; reads of archived plans under `tasks/plans/archive/` |
 | `pre-ship.cjs` | PreToolUse (Bash) | A commit, push, merge or PR whose lint, related tests or type-check fail |
 
 These hooks intercept the tool call before it runs.

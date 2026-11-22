@@ -21,7 +21,7 @@ use super::archive_writes::{
 };
 use super::{Output, resolve_against};
 
-static PHASE_FILE: LazyLock<Regex> =
+pub(super) static PHASE_FILE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^phase-.*\.md$").expect("static phase filename pattern"));
 
 struct Report {
@@ -36,7 +36,7 @@ struct Report {
 
 /// Resolve a plan directory from a dir path or a `plan.md` path. The result is
 /// symlink-resolved, so the containment check below compares like with like.
-fn resolve_plan_dir(project_root: &Path, target: &str) -> Result<PathBuf, String> {
+pub(super) fn resolve_plan_dir(project_root: &Path, target: &str) -> Result<PathBuf, String> {
     let resolved = resolve_against(project_root, target);
     if !resolved.exists() {
         return Err(format!("not found: {target}"));

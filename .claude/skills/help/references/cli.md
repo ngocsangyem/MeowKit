@@ -180,13 +180,14 @@ Options:
 ## mewkit plan
 
 ```text
-Inspect or archive a plan under tasks/plans/
+Inspect, sync or archive a plan under tasks/plans/
 
 Usage: mewkit plan <COMMAND>
 
 Commands:
   status   Progress across plan.md + its phase files (read-only)
   check    Required-section report for one phase file (read-only)
+  sync     Rewrite derived statuses from the checkboxes; never a checkbox (mutating)
   archive  Mark statuses completed + move to tasks/plans/archive/ (mutating)
   help     Print this message or the help of the given subcommand(s)
 
@@ -223,6 +224,22 @@ Options:
       --json        Print the report as JSON
       --structural  Validate plan.md + every sibling phase file against the full template
   -h, --help        Print help
+```
+
+### mewkit plan sync
+
+```text
+Rewrite derived statuses from the checkboxes; never a checkbox (mutating)
+
+Usage: mewkit plan sync [OPTIONS] [TARGET]
+
+Arguments:
+  [TARGET]  The plan directory, or a plan.md inside it
+
+Options:
+      --check  Write nothing; print the drift and exit 1 when there is any
+      --json   Print the changes as JSON
+  -h, --help   Print help
 ```
 
 ### mewkit plan archive

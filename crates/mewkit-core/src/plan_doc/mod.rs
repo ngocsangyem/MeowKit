@@ -4,20 +4,25 @@
 //! plan — a different noun entirely. This module is about the planning
 //! DOCUMENT under `tasks/plans/YYMMDD-name/`.
 //!
-//! Three subcommands, two of them read-only:
+//! Four subcommands, two of them read-only:
 //!
 //! | subcommand | effect |
 //! |---|---|
 //! | `status`  | progress across `plan.md` + its phase files |
 //! | `check`   | required sections for one phase, or `--structural` for the whole plan |
+//! | `sync`    | rewrite the DERIVED status fields from the checkboxes |
 //! | `archive` | complete every status and move the plan under `tasks/plans/archive/` |
 //!
-//! `status` and `check` are read-only BY CONSTRUCTION: [`parser`],
-//! [`frontmatter_scan`], [`phase_structure`], [`phase_frontmatter`],
-//! [`structure_check`] and [`render`] import no write API.
-//! The moment a CLI can edit a plan, the plan has two authors and the
-//! checkboxes stop meaning what the human meant by them. The one mutating
-//! subcommand lives in [`archive`], named so a reader can see which is which.
+//! `status` and `check` are read-only: [`parser`], [`frontmatter_scan`],
+//! [`phase_structure`], [`phase_frontmatter`], [`structure_check`] and
+//! [`render`] import no write API, and the one thing `status` asks of [`sync`]
+//! — whether the plan has drifted — runs it with writing switched off.
+//!
+//! The checkboxes are the plan's single author. [`sync`] writes only values
+//! derived from them (phase and plan statuses, the Phases table, the
+//! `.plan-state.json` checkpoint) and never a checkbox, so a human's tick still
+//! means what they meant by it. [`archive`] is the other mutating subcommand,
+//! named so a reader can see which is which.
 //!
 //! Every entry point returns an [`Output`] rather than printing: the CLI owns
 //! the streams, and a renderer that returns text is testable without a TTY.
@@ -29,6 +34,9 @@ mod phase_frontmatter;
 mod phase_structure;
 mod render;
 mod structure_check;
+mod sync;
+mod sync_fields;
+mod sync_plan_state;
 
 use std::path::{Path, PathBuf};
 
@@ -43,6 +51,7 @@ pub use phase_structure::check_phase_file;
 /// The structural check `validate` also runs. It is public for that caller:
 /// one implementation of the plan structure rules, not two.
 pub use structure_check::{PlanStructureReport, check_plan_structure, render_plan_structure};
+pub use sync::{SyncChange, SyncReport, plan_sync};
 
 /// What a `plan` subcommand produced: the two streams and the exit code.
 ///
@@ -100,7 +109,17 @@ pub fn plan_status(project_root: &Path, target: Option<&str>, json: bool) -> Out
             0,
             serde_json::to_string_pretty(&summary).unwrap_or_default(),
         ),
-        Ok(summary) => Output::code(0, render::render_status(&summary)),
+        Ok(summary) => {
+            let mut out = Output::code(0, render::render_status(&summary));
+            // The JSON summary is a byte-parity contract, so the hint is
+            // human-output only.
+            if sync::has_drift(&resolved) {
+                out.push(format!(
+                    "  state is behind the checkboxes: run `mewkit plan sync {target}`"
+                ));
+            }
+            out
+        }
     }
 }
 

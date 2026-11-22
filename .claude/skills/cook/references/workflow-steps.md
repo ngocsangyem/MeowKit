@@ -317,10 +317,10 @@ Three mandatory subagents in parallel:
    Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
    ```
-delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path]: tick the completed todos, then run `mewkit plan sync [plan-dir]` (if the binary lacks `plan sync`, apply the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md by hand). Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
-   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
+   If `mewkit plan sync` prints `plan complete` (every non-abandoned phase todo checked), archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
 
 2. **Docs update:**
 
@@ -336,12 +336,12 @@ On a long multi-phase or auto-mode run, the external-memory write after each com
 
 After each completed plan phase — and BEFORE the auto-mode "loop to Phase 2 for next phase" transition below — you MUST update the two durable, recomputable surfaces:
 
-1. **Phase-file checkboxes** — flip that phase's `[ ]` → `[x]` items via the Sync-Back Algorithm in `.claude/skills/plan-creator/references/task-management.md` (same status enum: `pending | in_progress | completed`).
-2. **plan.md** — update the Phases-table status column and the Agent State block for that phase.
+1. **Phase-file checkboxes** — flip that phase's `[ ]` → `[x]` items, then run `mewkit plan sync {plan-dir}`: it rewrites the phase status, its `**Status:**` line, the plan.md Phases-table cell and status, and `.plan-state.json` from the checkboxes (status enum: `pending | in_progress | completed`). If the binary lacks `plan sync`, apply the Sync-Back Algorithm in `.claude/skills/plan-creator/references/task-management.md` by hand.
+2. **plan.md** — update the Agent State block for that phase.
 
-Do NOT hand-write `.plan-state.json` mid-run. It is a DERIVED cache: written once at hydration and regenerated from the checkboxes at the final sync-back (this Phase 6, last pass through the loop). A mid-run JSON edit drifts from the checkbox source of truth, which is the authority.
+Do NOT hand-write `.plan-state.json` mid-run. It is a DERIVED cache, written at hydration and rewritten only by `mewkit plan sync` from the checkboxes. A hand edit drifts from the checkbox source of truth, which is the authority.
 
-Idempotent: re-running this checkpoint on an unchanged phase produces zero diff (Sync-Back Algorithm invariant). For a single-phase plan, this checkpoint and the final sync-back coincide.
+Idempotent: re-running this checkpoint on an unchanged phase produces zero diff (`plan sync` reports `already in sync`). For a single-phase plan, this checkpoint and the final sync-back coincide.
 
 **Auto mode:** After an explicit close request, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.

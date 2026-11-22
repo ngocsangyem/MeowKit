@@ -310,6 +310,12 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/handlers/plan-state-sync.cjs",
+      "sha256": "ec2ea6fd2d5e29abc31784234922d3dc3051848ff6ff6bc0d33f95f71c659d60",
+      "size": 798,
+      "exec": true
+    },
+    {
       "path": ".claude/hooks/handlers/post-session.cjs",
       "sha256": "b6859478d5f4cf2f16db8e14c14cdda3289374234abee6a1a0db328cb8e75d1b",
       "size": 6596,
@@ -423,6 +429,11 @@
       "path": ".claude/hooks/lib/core/hook-payload.cjs",
       "sha256": "6fe4af50785b60745aa0b0a9eb3ae27453000fa9287fd400f7374fc8ff95d81a",
       "size": 2249
+    },
+    {
+      "path": ".claude/hooks/lib/core/plan-state-sync.cjs",
+      "sha256": "d2d2ab8418cc471188b119892c125aa1c8ee357fe128095213bad8f972268b66",
+      "size": 12959
     },
     {
       "path": ".claude/hooks/lib/core/pre-ship.cjs",
@@ -11550,8 +11561,8 @@
     },
     {
       "path": ".meowkit/config.yaml",
-      "sha256": "a97af5f09614d49f32478b70e888652e5fc6c4271217f5c865d3fb725cff6344",
-      "size": 2155
+      "sha256": "44612b105e682af636564e7aeacf2dc98b8e7c1682b64ae6a890a4e3bf674383",
+      "size": 2181
     },
     {
       "path": ".meowkit/gitignore.meowkit",

@@ -7,11 +7,16 @@
 //   - the opt-in completion check (shared rule, lib/core/completion-check.cjs): files changed
 //     since the session's last passing verification command, at most twice per session;
 //   - a turn that ended in an error, while loop_count is below 3.
+//
+// Before either, and whatever the opt-in check says, changed plans' derived state is brought up
+// to date with their checkboxes (lib/core/plan-state-sync.cjs). `stop` output has no
+// user-visible message field, so its one line goes to stderr; it never starts another turn.
 "use strict";
 const path = require("node:path");
 const { readStdinPayload, projectRoot, emit } = require("./lib/cursor-hook-runtime.cjs");
 const { appendTelemetry } = require("./lib/telemetry-writer.cjs");
 const check = require("./lib/core/completion-check.cjs");
+const planState = require("./lib/core/plan-state-sync.cjs");
 
 const payload = readStdinPayload();
 const root = projectRoot();
@@ -19,6 +24,14 @@ appendTelemetry(root, "stop-events.jsonl", payload ?? {});
 
 const status = payload && typeof payload.status === "string" ? payload.status : null;
 const loopCount = payload && typeof payload.loop_count === "number" ? payload.loop_count : 0;
+
+// First, because emit() ends the process; its own failure never changes a follow-up.
+try {
+	const line = planState.summaryLine(planState.syncChangedPlans(root, { write: true }));
+	if (line) process.stderr.write(`${line}\n`);
+} catch (err) {
+	process.stderr.write(`plan state sync skipped: ${err && err.message ? err.message : String(err)}\n`);
+}
 
 if (status !== "aborted") {
 	try {

@@ -218,9 +218,9 @@ Resume orientation from durable task state; reads records only
 
 ### `mewkit plan`
 
-Inspect or archive a plan under tasks/plans/
+Inspect, sync or archive a plan under tasks/plans/
 
-Subcommands: `status`, `check`, `archive`.
+Subcommands: `status`, `check`, `sync`, `archive`.
 
 ### `mewkit plan status`
 
@@ -238,6 +238,15 @@ Required-section report for one phase file (read-only)
 |---|---|
 | `--json` | Print the report as JSON |
 | `--structural` | Validate plan.md + every sibling phase file against the full template |
+
+### `mewkit plan sync`
+
+Rewrite derived statuses from the checkboxes; never a checkbox (mutating)
+
+| Flag | What it does |
+|---|---|
+| `--check` | Write nothing; print the drift and exit 1 when there is any |
+| `--json` | Print the changes as JSON |
 
 ### `mewkit plan archive`
 

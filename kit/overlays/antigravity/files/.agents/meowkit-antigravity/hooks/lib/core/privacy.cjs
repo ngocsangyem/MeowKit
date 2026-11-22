@@ -1,8 +1,8 @@
 'use strict';
 // privacy.cjs — the privacy decision, shared by every runtime's read and shell guards.
 //
-// Refuses access to credential-bearing files and web-fetch artifacts, and fetches aimed at
-// loopback, private or metadata hosts. No stdin, stdout or exit code. Result:
+// Refuses access to credential-bearing files and web-fetch artifacts, fetches aimed at
+// loopback, private or metadata hosts, and reads of archived plans. No stdin, stdout or exit code. Result:
 // `{ exit, stdout, stderr }`, where exit 2 is a block and the first stderr line is the marker.
 // The only I/O is resolving a named path that exists, to see through a symlink.
 //
@@ -138,13 +138,108 @@ function checkCommand(command) {
   return null;
 }
 
-/** @param {{ paths: string[], command?: string }} input */
-function decidePrivacy({ paths, command = '' }) {
-  for (const filePath of paths.filter(Boolean)) {
+/**
+ * Archived plans. A finished plan describes intent the shipped code has since settled; read
+ * back into context it competes with the code as a source of truth, so reads are refused
+ * (the user can still approve one). Moving a plan in and writing there stay allowed.
+ */
+const ARCHIVE_PATH = /(?:^|\/)tasks\/plans\/(?:ceo-plans\/)?archive(?:\/|$)/;
+
+/** True for a path inside an archived-plan directory, by its name or the file it resolves to. */
+function isArchivedPlanPath(filePath) {
+  if (!filePath) return false;
+  if (ARCHIVE_PATH.test(normalise(filePath))) return true;
+  try {
+    return ARCHIVE_PATH.test(normalise(fs.realpathSync(filePath)));
+  } catch {
+    return false;
+  }
+}
+
+/** Tool names that put content into a file rather than read one; archive paths stay writable. */
+const WRITE_TOOL = /edit|write|replace|create|patch|update|insert|move|rename|mkdir|delete|remove|notebook/i;
+
+/** Shell commands that print, list or search what they name. */
+const READ_VERBS = new Set(['cat', 'head', 'tail', 'less', 'more', 'grep', 'egrep', 'fgrep', 'rg', 'ag', 'ls', 'find', 'sed', 'awk', 'gawk', 'bat', 'tree', 'nl', 'strings', 'xxd', 'od']);
+const WRAPPERS = new Set(['sudo', 'command', 'env', 'nice', 'time', 'exec', 'nohup']);
+
+/** Quote-aware split of a shell command into segments of words, cut at `|`, `;`, `&`, `(`, `)` and newlines. */
+function shellSegments(command) {
+  const segments = [[]];
+  let word = null;
+  let quote = '';
+  const end = () => { if (word !== null) segments[segments.length - 1].push(word); word = null; };
+  for (let i = 0; i < command.length; i += 1) {
+    const ch = command[i];
+    if (quote) { if (ch === quote) quote = ''; else word = (word || '') + ch; continue; }
+    if (ch === '"' || ch === "'") { quote = ch; word = word || ''; continue; }
+    if (ch === '\\' && i + 1 < command.length) { word = (word || '') + command[i += 1]; continue; }
+    if (/[|;&()\n`]/.test(ch)) { end(); if (segments[segments.length - 1].length) segments.push([]); continue; }
+    if (ch === '<' || ch === '>') { end(); segments[segments.length - 1].push(ch); continue; }
+    if (/\s/.test(ch)) { end(); continue; }
+    word = (word || '') + ch;
+  }
+  end();
+  return segments.filter((s) => s.length);
+}
+
+/**
+ * The archive path a shell command reads, or null. Only a read, list or search command (or an
+ * input redirect) counts, so `mv`, `cp`, `mkdir`, `git mv` and `mewkit plan archive` aimed at
+ * the archive pass, and a search rooted outside it (`grep -r . x`) passes too.
+ */
+function archiveReadInCommand(command) {
+  for (const words of shellSegments(command)) {
+    for (let i = 0; i < words.length - 1; i += 1) if (words[i] === '<' && isArchivedPlanPath(words[i + 1])) return words[i + 1];
+    let at = 0;
+    while (at < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[at]) || WRAPPERS.has(words[at]))) at += 1;
+    const verb = (words[at] || '').replace(/^.*\//, '');
+    if (!READ_VERBS.has(verb)) continue;
+    // An output redirect target is written, not read (`cat > archive/x/notes.md`).
+    const args = [];
+    for (let i = at + 1; i < words.length; i += 1) {
+      if (words[i] === '>') { while (words[i + 1] === '>') i += 1; i += 1; continue; }
+      if (words[i] !== '<') args.push(words[i]);
+    }
+    if (verb === 'sed' && args.some((a) => /^-[a-zA-Z]*i|^--in-place/.test(a))) continue;
+    let positional = args.filter((a) => !a.startsWith('-'));
+    // A search's first positional word is its pattern unless -e/-f gave one.
+    if (/^(?:e|f)?grep$|^rg$|^ag$/.test(verb) && !args.some((a) => /^-(?:e|f|-regexp|-file)/.test(a))) positional = positional.slice(1);
+    // Option values are left out: `--exclude-dir=archive` names the archive to skip it.
+    const hit = positional.find(isArchivedPlanPath);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+const archiveBlock = (filePath) => block([
+  `'${filePath}' is an archived plan. Archived plans are kept out of context; the shipped code is the source of truth.`,
+  ASK_FIRST,
+]);
+
+/**
+ * The block for an archived-plan read, or null. A shell call is judged by its command (the
+ * path-like words a runtime adds to `paths` would otherwise refuse a `mv` into the archive);
+ * any other call is a read unless its tool name says it writes.
+ */
+function checkArchive({ paths, command, toolName }) {
+  if (command) {
+    const hit = archiveReadInCommand(command);
+    return hit ? archiveBlock(hit) : null;
+  }
+  if (toolName && WRITE_TOOL.test(toolName)) return null;
+  const hit = paths.find(isArchivedPlanPath);
+  return hit ? archiveBlock(hit) : null;
+}
+
+/** @param {{ paths: string[], command?: string, toolName?: string }} input */
+function decidePrivacy({ paths, command = '', toolName = '' }) {
+  const named = paths.filter(Boolean);
+  for (const filePath of named) {
     const blocked = checkPath(filePath);
     if (blocked) return blocked;
   }
-  return checkCommand(command) || ALLOW;
+  return checkCommand(command) || checkArchive({ paths: named, command, toolName }) || ALLOW;
 }
 
-module.exports = { decidePrivacy, isSensitive };
+module.exports = { decidePrivacy, isSensitive, isArchivedPlanPath, archiveReadInCommand };

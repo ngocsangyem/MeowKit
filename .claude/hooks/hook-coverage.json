@@ -7,9 +7,9 @@
       "codex": {
         "status": "ported",
         "where": ".codex/hooks/privacy-block.cjs (PreToolUse Bash)",
-        "note": "Codex has no file-read hook; the decision runs on the shell command and the paths it names."
+        "note": "Codex has no file-read hook; the decision runs on the shell command and the paths it names. The archived-plan read gate runs on the command: a read, list or search command naming a path under tasks/plans/archive/."
       },
-      "cursor": { "status": "ported", "where": ".cursor/hooks/privacy-read-gate.cjs (beforeReadFile)" },
+      "cursor": { "status": "ported", "where": ".cursor/hooks/privacy-read-gate.cjs (beforeReadFile)", "note": "The archived-plan read gate also runs in shell-gate.cjs (beforeShellExecution) and in tool-gate.cjs for search and list tools, where the kill switch downgrades it." },
       "grok": { "status": "ported", "where": ".grok/meowkit/hooks/privacy-block.cjs (PreToolUse, every tool)", "note": "A hook Grok stops at its timeout lets the call through, and so does a shell command carried under a field name the guard does not know." },
       "pi": { "status": "ported", "where": ".agents/meowkit/hooks/guard.cjs (extension .pi/extensions/meowkit.ts, tool_call)", "note": "Pi lets a call run when an extension throws, so the extension catches every failure and blocks." },
       "omp": { "status": "ported", "where": ".agents/meowkit/hooks/guard.cjs (hook module .omp/hooks/pre/meowkit.ts, tool_call)" },
@@ -46,6 +46,7 @@
     "post-session": { "codex": "not-ported", "cursor": "equivalent", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Cursor's telemetry-observers.cjs records sessionEnd; Codex has no Stop hook in the bundle." },
     "control-probe": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Claude Code host diagnostics." },
     "pre-completion-check": { "codex": "ported", "cursor": "ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Opt-in. Codex: .codex/hooks/completion-check.cjs on Stop (block continues the turn). Cursor: stop-followup.cjs returns the same reason as followup_message. Both use lib/core/completion-check.cjs." },
+    "plan-state-sync": { "codex": "ported", "cursor": "ported", "grok": "equivalent", "pi": "equivalent", "omp": "equivalent", "antigravity": "equivalent", "reason": "Always on. Codex: .codex/hooks/completion-check.cjs on Stop syncs and adds the line as systemMessage. Cursor: stop-followup.cjs syncs and writes the line to stderr (stop has no user-visible message field). Grok, Pi, OMP and Antigravity have no Stop hook: the ship check prints the same drift line read-only and the agent runs mewkit plan sync. All use lib/core/plan-state-sync.cjs." },
     "verification-evidence": { "codex": "ported", "cursor": "ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Codex: .codex/hooks/completion-check.cjs on PostToolUse Bash records a pass only when the result carries exit code 0. Cursor: completion-check.cjs on postToolUse Shell (success only)." },
     "model-detector": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Reads Claude Code model identifiers." },
     "orientation-ritual": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "antigravity": "not-ported", "reason": "Claude Code session orientation; see safety.session-context." },
