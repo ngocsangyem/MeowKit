@@ -19,11 +19,16 @@
         "core/hook-payload.cjs",
         "core/pre-ship.cjs",
         "memory-store-lint.cjs",
+        "meowkit-paths.cjs",
         "parse-stdin.cjs",
         "preship-checks.cjs",
         "project-root.cjs",
+        "resolve-model.cjs",
+        "secret-scrub.cjs",
         "ship-command.cjs",
-        "ship-run-once.cjs"
+        "ship-run-once.cjs",
+        "sidecar-lock.cjs",
+        "trace-log.cjs"
       ],
       "spawned": []
     }
@@ -35,10 +40,15 @@
     "core/privacy.cjs",
     "hook-runtime.cjs",
     "memory-store-lint.cjs",
+    "meowkit-paths.cjs",
     "preship-checks.cjs",
     "project-root.cjs",
+    "resolve-model.cjs",
+    "secret-scrub.cjs",
     "ship-command.cjs",
-    "ship-run-once.cjs"
+    "ship-run-once.cjs",
+    "sidecar-lock.cjs",
+    "trace-log.cjs"
   ],
   "bundleLibDirs": [
     "kit/overlays/codex/files/.codex/hooks/lib",

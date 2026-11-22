@@ -367,21 +367,23 @@ Arguments:
   [DIR]  The generated target directory to validate (with `--target`)
 
 Options:
-      --mode <MODE>        Maintainer override for the detected consumer profile
-      --target <PROVIDER>  Validate a generated provider target instead of a `.claude/` project
-      --portable           Include the portable provider-contract checks
-      --strict             Treat WARN as failure (exit 1)
-      --workflow           Run only the workflow.yaml drift check
-      --ownership          Run only the artifact ownership-completeness check
-      --agents             Run only the declared agent-contract conformance checks
-      --substrate          Run only the responsibility-substrate drift and untagged check
-      --packs              Run only the pack-manifest coherence and safety check
-      --rules              Run only the routing-table-breadth check
-      --capabilities       Run only the capability-manifest checks
-      --memory             Run only the committed team-memory store lint
-      --frontmatter        Run only the SKILL.md frontmatter schema and runtime-contract check
-      --docs-refs          Run only the `.claude` to `docs/*` reference allowlist check
-  -h, --help               Print help
+      --mode <MODE>                 Maintainer override for the detected consumer profile
+      --target <PROVIDER>           Validate a generated provider target instead of a `.claude/` project
+      --portable                    Include the portable provider-contract checks
+      --strict                      Treat WARN as failure (exit 1)
+      --workflow                    Run only the workflow.yaml drift check
+      --ownership                   Run only the artifact ownership-completeness check
+      --agents                      Run only the declared agent-contract conformance checks
+      --substrate                   Run only the responsibility-substrate drift and untagged check
+      --packs                       Run only the pack-manifest coherence and safety check
+      --rules                       Run only the routing-table-breadth check
+      --capabilities                Run only the capability-manifest checks
+      --memory                      Run only the committed team-memory store lint
+      --frontmatter                 Run only the SKILL.md frontmatter schema and runtime-contract check
+      --docs-refs                   Run only the `.claude` to `docs/*` reference allowlist check
+      --skill-rubric                Run only the mechanical skill-rubric scoring and write its JSON report
+      --skill-rubric-report <PATH>  Where the skill-rubric report goes (implies --skill-rubric; default .meowkit/telemetry/skill-rubric.json)
+  -h, --help                        Print help
 ```
 
 ## mewkit review

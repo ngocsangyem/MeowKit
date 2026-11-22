@@ -4,22 +4,45 @@
 // and `gh pr create|merge` trigger it (lib/ship-command.cjs), and everything else
 // passes through untouched. The decision lives in lib/core/pre-ship.cjs.
 //
-// Exit 2 is the only blocking value. Exit 1 is advisory — it would print
-// "BLOCKED" and let the ship happen anyway — so no blocking path here may use
-// it. The same asymmetry makes a crash a silent bypass, so the handlers below
-// are installed before any library is required, and are written inline rather
-// than imported so a broken library cannot take them down with it.
+// Two blocking answers, one per outcome:
+//   failed         a check ran and reported a problem: exit 2, the reason on stderr.
+//   could_not_run  no verdict (a crash, a missing tool, the deadline): the PreToolUse
+//                  `ask` decision, so the call waits for the person at the permission
+//                  prompt. That prompt is the only override; nothing in the command or
+//                  the environment is read as one.
+// The registration sets `onFailure: "block"`, so a hook the host cannot start or has
+// to stop at its timeout blocks the call as well.
+//
+// Exit 1 is advisory — it would print "BLOCKED" and let the ship happen anyway — so
+// no blocking path here may use it. The crash handlers are installed before any
+// library is required, and written inline rather than imported, so a broken library
+// cannot take them down with it.
 
 const MARKER = '@@GATE_BLOCK@@';
 
+/** Answer `ask` with the reason, so a person decides whether an unverified ship goes ahead. */
+function askHuman(lines) {
+  const reason = ['MeowKit ship check could not run, so this ship is unverified.', ...lines].join('\n');
+  process.stdout.write(`${JSON.stringify({
+    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'ask', permissionDecisionReason: reason },
+  })}\n`);
+  process.stderr.write(`${MARKER}\n${reason}\n`);
+  process.exit(0);
+}
+
 function failClosed(err) {
+  const detail = `PRE-SHIP COULD NOT RUN: the ship check crashed (${err && err.message ? err.message : String(err)}).`;
   try {
-    process.stderr.write(`${MARKER}\nPre-ship guard could not run: ${err && err.message ? err.message : String(err)}\n`);
-    process.stderr.write('A ship with no enforceable check is blocked, not waved through.\n');
+    // Best effort: the library that failed may be the one that writes the record.
+    require('./lib/core/pre-ship.cjs').recordShipCheck(process.env.CLAUDE_PROJECT_DIR || process.cwd(), { outcome: 'could_not_run', cause: 'crash' });
   } catch {
-    // Nothing left to report with; the exit code is the decision.
+    // No record; the answer below still blocks.
   }
-  process.exit(2);
+  try {
+    askHuman([detail]);
+  } catch {
+    process.exit(2);
+  }
 }
 
 process.on('uncaughtException', failClosed);
@@ -27,13 +50,15 @@ process.on('unhandledRejection', failClosed);
 
 const { readHookInput } = require('./lib/parse-stdin.cjs');
 const { enterGuardRoot, resolveShipRoot } = require('./lib/project-root.cjs');
-const { decidePreShip } = require('./lib/core/pre-ship.cjs');
+const { decidePreShip, recordShipCheck } = require('./lib/core/pre-ship.cjs');
 
 const write = (stream, lines) => { if (lines.length) stream.write(`${lines.join('\n')}\n`); };
 
 async function main() {
   const input = await readHookInput();
   if (!input.ok) {
+    // Without the command there is nothing to put in front of a person, so this blocks outright.
+    recordShipCheck(process.env.CLAUDE_PROJECT_DIR || process.cwd(), { outcome: 'could_not_run', cause: 'unreadable_input' });
     write(process.stderr, [
       MARKER,
       `Pre-ship guard received unreadable hook input (${input.reason}).`,
@@ -56,6 +81,10 @@ async function main() {
   }
 
   const result = decidePreShip({ root, command, env: process.env });
+  if (result.outcome === 'could_not_run') {
+    write(process.stderr, result.stdout);
+    askHuman(result.stderr);
+  }
   write(process.stdout, result.stdout);
   write(process.stderr, result.stderr);
   process.exit(result.exit);

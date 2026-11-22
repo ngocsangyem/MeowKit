@@ -81,7 +81,8 @@
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"
             ],
             "timeout": 300,
-            "statusMessage": "Running ship check (lint, related tests, type-check)..."
+            "statusMessage": "Running ship check (lint, related tests, type-check)...",
+            "onFailure": "block"
           },
           {
             "type": "command",

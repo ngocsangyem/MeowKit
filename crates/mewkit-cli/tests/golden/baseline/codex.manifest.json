@@ -5380,6 +5380,11 @@
       "size": 4591
     },
     {
+      "path": ".codex/hooks/lib/meowkit-paths.cjs",
+      "sha256": "e1b8102da11a7a77b49f5234c341d104258131d5ae41a0105a4390eba145bfce",
+      "size": 3404
+    },
+    {
       "path": ".codex/hooks/lib/preship-checks.cjs",
       "sha256": "cfe383d791376ec38a20cc53d8fced13aaa2183bd8d05c80e031c4be78ef7340",
       "size": 8121
@@ -5391,6 +5396,16 @@
       "exec": true
     },
     {
+      "path": ".codex/hooks/lib/resolve-model.cjs",
+      "sha256": "aadeb05390d338d5c66479f3b16aaf0b2085ff5fb1737d1b89bc2ca709302187",
+      "size": 3614
+    },
+    {
+      "path": ".codex/hooks/lib/secret-scrub.cjs",
+      "sha256": "0a15aafc621a85d71bf3b2d7649b3f23e53a6732f639c9a0474b9a60c1a437af",
+      "size": 2093
+    },
+    {
       "path": ".codex/hooks/lib/ship-command.cjs",
       "sha256": "8fd5bba89fa90259293df1b0b58c09721f12cbe9b109667ffe58518a97e000b9",
       "size": 5098
@@ -5399,6 +5414,16 @@
       "path": ".codex/hooks/lib/ship-run-once.cjs",
       "sha256": "28fc48ea0fd647150033eb7ef6b6a12abad3aa073d026990b35efa8d0cfeb5cf",
       "size": 3411
+    },
+    {
+      "path": ".codex/hooks/lib/sidecar-lock.cjs",
+      "sha256": "04d90239c3c176b1fa49b75dc8823aa84fba0a0040e22ff69000ca37200a7e58",
+      "size": 3289
+    },
+    {
+      "path": ".codex/hooks/lib/trace-log.cjs",
+      "sha256": "208ddef1cc2b16118e1716f8f320d6b0e353364ee0015380f0f626e2afaad3e3",
+      "size": 4597
     },
     {
       "path": ".codex/hooks/lib/validate-content.cjs",

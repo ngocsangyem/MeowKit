@@ -16,6 +16,7 @@ These rules govern how new and existing `mk:*` skills are authored, audited, and
 - [Rule 8: Preserve Contracted Workflow Choices](#rule-8-preserve-contracted-workflow-choices)
 - [Rule 9: Enforce Brand Prose Incrementally](#rule-9-enforce-brand-prose-incrementally)
 - [Rule 10: Reach the Skill's Own Files Without `.claude/`](#rule-10-reach-the-skills-own-files-without-claude)
+- [Rule 11: Score Each Skill on the Mechanical Rubric](#rule-11-score-each-skill-on-the-mechanical-rubric)
 - [Applies to](#applies-to)
 
 ## Rule 1: Every Skill MUST Include a Gotchas Section
@@ -259,10 +260,30 @@ the kit's `kit-capabilities.json`. A line describing
 another project's layout may carry `portable-ignore`. The kit's release check and CI
 enforce this.
 
+## Rule 11: Score Each Skill on the Mechanical Rubric
+
+`mewkit validate --skill-rubric` scores every skill on six criteria and writes one row per
+skill to `.meowkit/telemetry/skill-rubric.json`. A skill passes a criterion when:
+
+- **Description:** it says what the skill does, when to use it (`when_to_use` or a "when"
+  clause) and when not to ("NOT for mk:other"); at most 1,024 characters, and at most 1,536
+  with `when_to_use`.
+- **Entry:** `SKILL.md` is at most 5,000 estimated tokens (characters / 4).
+- **Dead refs:** no link, slash command or docs reference in the skill points at nothing.
+- **Emphasis:** at most 10 emphatic words or capitalised bold spans per 1,000 words of the
+  `SKILL.md` body; keep emphasis for gates.
+- **Harness tools:** each tool name only one host defines has a fallback stated within 3
+  lines.
+- **Duplicates:** no paragraph of 40 or more words is copied into another skill, except
+  copies listed in `shared-families.json`.
+
+The rows warn and never fail the run. In the kit source, the published skill-audit table is
+generated from the same scores, so a new or changed skill is re-scored with it.
+
 ## Applies to
 
 - `mk:skill-creator` (must enforce Rules 1 + 3 + 4 + 5 in templates)
-- All future skill authoring (all 10 rules)
+- All future skill authoring (all 11 rules)
 - Quarterly audits and model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)
 - Every PR that touches `.claude/` (Rule 5 and Rule 10 mechanical checks in CI)
