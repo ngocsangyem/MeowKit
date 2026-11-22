@@ -27,7 +27,7 @@ mewkit init --target antigravity
 | OMP | Skills under `.agents/skills/`, agents as `.omp/agents/*.md`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md` |
 | Antigravity | Skills under `.agents/skills/`, agents as `.agents/agents/*.md`, the on-demand rule files `.agents/rules/meowkit-*.md`, and `AGENTS.md`. The privacy guard and the ship check in `.agents/hooks.json`, scripts in `.agents/meowkit-antigravity/hooks/`; both from documentation, unverified |
 
-Codex, Pi, OMP and Antigravity read the same `.agents/skills/` folder. When more than one of them is installed, they share one copy of the skills there, written in runtime-neutral text. Installed alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi OMP as `/skill:mk-x`, and Antigravity as `/mk-x`. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/crates/mewkit-adapters/runtime-surface-table.md) lists where each combination of runtimes writes.
+Codex, Pi, OMP and Antigravity read the same `.agents/skills/` folder. When more than one of them is installed, they share one copy of the skills there, written in runtime-neutral text. Installed alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, Pi and OMP as `/skill:mk-x`, and Antigravity as `/mk-x`. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/crates/mewkit-adapters/runtime-surface-table.md) lists where each combination of runtimes writes.
 
 Grok, Pi, OMP and Antigravity install into a project only; `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. `--skill-packs <packs>` limits which skills the non-Claude runtimes get. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`, and a repository with a git remote also needs `--allow-cloud-mcp`.
 
@@ -66,7 +66,7 @@ The table shows what each runtime's install writes.
 | Grok | no | yes | `AGENTS.md` | yes | no |
 | Pi | no | yes | `AGENTS.md` | yes | no |
 | OMP | yes | yes | `AGENTS.md` | yes | no |
-| Antigravity | yes | yes | `AGENTS.md` and `.agents/rules/` | no | no |
+| Antigravity | yes | yes | `AGENTS.md` and `.agents/rules/` | yes, unverified (privacy guard and ship check) | no |
 
 Notes:
 

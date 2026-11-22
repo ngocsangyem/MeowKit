@@ -12,7 +12,7 @@ const clusters = [
       {
         title: 'Credential Guard',
         detail:
-          'A hook blocks reads of .env files, keys and credential files before the agent sees them, on all six runtimes.',
+          'A hook blocks reads of .env files, keys and credential files before the agent sees them, on every runtime that carries the guard. Codex checks shell commands only.',
       },
       {
         title: 'Plan and Review',

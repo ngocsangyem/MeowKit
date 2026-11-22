@@ -20,9 +20,9 @@ mewkit init --target codex --dry-run
 
 `init` downloads the newest kit release and checks it against the release's `checksums.txt` and its `kit-contract.json`. It then writes the kit for each runtime. `--beta` allows a prerelease and `--kit-version v2.16.0` pins one release. `--offline` uses the newest kit already in the cache. `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit with no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself.
 
-`--target` takes `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp`, a comma-separated list of them, or `all`. Without `--target`, a terminal shows a picker with Claude Code preselected. With no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 and names `--target`. An unrecognized `--target` is refused by name.
+`--target` takes `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp`, `antigravity`, a comma-separated list of them, or `all`. `all` is every runtime that installs at the chosen scope: seven at project scope, and Claude Code, Codex and Cursor with `--global`. Without `--target`, a terminal shows a picker with Claude Code preselected. With no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 and names `--target`. An unrecognized `--target` is refused by name.
 
-Grok, Pi and OMP install at project scope only, so `--global` covers Claude Code, Codex and Cursor. The Grok, Pi and OMP guards follow the vendors' documentation and have not been run in a live session ([Enforcement & Security](/core-concepts/enforcement) page).
+Grok, Pi, OMP and Antigravity install at project scope only, so `--global` covers Claude Code, Codex and Cursor. The Grok, Pi, OMP and Antigravity guards follow the vendors' documentation and have not been run in a live session; `init` names the Antigravity guards as unverified ([Enforcement & Security](/core-concepts/enforcement) page).
 
 | Flag | Runtime | Effect |
 | --- | --- | --- |
@@ -128,7 +128,9 @@ With more than one runtime or toolkit installed, `doctor` also reports where the
 | --- | --- |
 | `coexistence: cross-runtime load` | An installed runtime loads the kit's skills, agents or hooks from more than one root in this project, because it also reads another installed runtime's tree. Cursor, for one, also loads `.claude/` and `.agents/skills`. The row lists each second root with the vendor setting that stops the load, where one is documented |
 | `kit copies: unrecorded` | A copy of a kit skill or agent that no install here recorded sits under a second root an installed runtime reads, for example `.pi/skills/mk-cook` beside `.agents/skills/mk-cook`. It loads beside the installed one and no upgrade or uninstall removes it. Delete what the row lists |
-| `coexistence: agent names`, `foreign hooks`, `instruction files`, `skill listing` | The same agent name at project and home scope, a hook this install does not own on an event it also uses, another always-on instruction source, or a combined skill listing large enough that a host may drop descriptions |
+| `skill listing: <runtime> (<place>)` | One row per installed runtime: the size of its skill listing (name plus the description text it lists, estimated in tokens) against that runtime's documented budget. Claude Code allows 1% of the context window and Codex 2%; Cursor, Grok, Pi and OMP document none, so the row says the budget is unknown. Over budget, it warns and names the skills that would lose their description. No usage data is read |
+| `skill store` | Warns when a skill's record no longer matches its ownership ledger (the skill is `unverified`), when an installed skill has no record, or when an overlay waits for approval on this machine. See [Customising and Upgrading Skills](/guide/customising-skills) |
+| `coexistence: agent names`, `foreign hooks`, `instruction files`, `coexistence: skill listing` | The same agent name at project and home scope, a hook this install does not own on an event it also uses, another always-on instruction source, or a combined skill listing across installed runtimes large enough that a host may drop descriptions |
 | `checks: weakened` | An observer is switched off in a config file, `MEOWKIT_HOOK_PROFILE=fast` or the Cursor kill switch is set, or a host setting stops kit hooks from running. The privacy block and the ship check cannot be switched off by config |
 | `guards: integrity` | An installed guard file no longer matches the bytes recorded at install, or a hook registration names a file that is not there |
 | `rules: always-on` | Fails when one of the six always-on rule files of a Claude Code tree, or a rule file another runtime's install recorded, is missing or holds only whitespace. Warns when the project's session marker log claims the safety baseline is verified but the rule files no longer match the digest the marker recorded, or the marker came from an older hook that recorded no digest |
@@ -171,7 +173,9 @@ With no flag it runs the full sweep. In the MeowKit authoring checkout the sweep
 
 `--portable` adds the portable provider-contract checks to the full sweep. `--strict` treats WARN as failure (exit 1). `--mode <mode>` is a maintainer override of the detected consumer profile.
 
-`--target <codex|cursor|grok|pi|omp> [dir]` validates a generated runtime install instead of a `.claude/` project. The directory defaults to the current one. It is read-only and cannot be combined with `--portable`.
+`--target <codex|cursor|grok|pi|omp|antigravity> [dir]` validates a generated runtime install instead of a `.claude/` project. The directory defaults to the current one. It is read-only and cannot be combined with `--portable`.
+
+`--skill-rubric` is separate and opt-in. It scores every skill on six mechanical criteria (a description that states what, when and when not; an entry under 5,000 estimated tokens; no dead references; emphasis density; harness-only tool names with a fallback nearby; no paragraph copied between skills) and writes a JSON report to `.meowkit/telemetry/skill-rubric.json`. `--skill-rubric-report <path>` sets another path. Rows are PASS or WARN and never FAIL, and the default run leaves them out. The scores are published on the [Skill Audit](/guide/skill-audit) page.
 
 ## versions
 

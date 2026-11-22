@@ -128,6 +128,8 @@ For Claude Code the install is:
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers; ownership/*.json is the install record, committed
 ├── envs/            One Python environment per skill, from `mewkit setup`
+├── eval/            The eval pack, only when installed with `--skill-packs eval`
+├── skill-overlays/  Your stored skill edits, git-ignored unless you re-include them
 ├── cache/           Derived caches, rebuildable
 └── mcp.json.example Optional MCP server config
 ```
@@ -141,6 +143,10 @@ You never edit `metadata.json`. It records what the install wrote and what its c
 
 An install created before these files moved keeps working: readers fall back to the old `.claude/`
 locations, and the next `upgrade` migrates each one forward.
+
+## Product name in installed files
+
+The text the kit writes into your project does not use the product name. Hook messages, rule headings and skill text describe what the step does, so a line reads "Ship check: ..." and not "MeowKit ship check: ...". The paths (`.claude/`, `.meowkit/`, `.agents/`) and the commands (`mewkit`, `mk`) keep their names. This documentation site and the product's own name in its pages keep MeowKit. A script that matched the old wording needs the new text; the 3.1.0 entry in the [changelog](/changelog) lists the changed headings.
 
 ## Verify installation
 
