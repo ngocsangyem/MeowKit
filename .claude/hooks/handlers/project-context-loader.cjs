@@ -22,6 +22,7 @@ const path = require('node:path');
 const R = require('../lib/session-context-report.cjs');
 const { configValue } = require('../lib/read-config.cjs');
 const { LEGACY_STATE_RELS, sessionStateDir, sessionStateFile } = require('../lib/meowkit-paths.cjs');
+const { markerDigests } = require('../lib/always-on-rules.cjs');
 const { isTddEnabled } = require('../lib/tdd-detect.cjs');
 
 const CONTEXT_FILE = 'docs/project-context.md';
@@ -97,6 +98,30 @@ function resetSessionState(root, sessionId) {
   return previous;
 }
 
+/** Host session identifiers are UUID-shaped; anything else could break the record. */
+const SAFE_SESSION_ID = /^[A-Za-z0-9_.-]+$/;
+
+/**
+ * Record what the rule files held when the host loaded them. The Stop handler
+ * writes the "verified" marker only while the files still match this, so a rule
+ * edited, emptied or deleted mid-session makes the next turn re-read instead of
+ * trusting a copy that is no longer on disk. Written on every session start,
+ * a resume and a compaction included, because each of those reloads the rules;
+ * the latest line for the session is the one that counts.
+ */
+function recordRuleBaseline(root, sessionId) {
+  if (process.env.MEOWKIT_SKIP_SAFETY_SENTINEL === 'off') return;
+  if (!sessionId || !SAFE_SESSION_ID.test(sessionId)) return;
+  const { rules, phaseZero } = markerDigests(root);
+  const ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+  const row = { session_id: sessionId, event: 'rules_loaded', rules_sha256: rules, phase_zero_sha256: phaseZero, ts };
+  try {
+    fs.appendFileSync(path.join(sessionStateDir(root), 'session-sentinels.jsonl'), `${JSON.stringify(row)}\n`);
+  } catch {
+    // No baseline means no marker this session: a re-read every turn, not a wrong skip.
+  }
+}
+
 /** Where an answer came from, in the words a reader can act on. */
 const SOURCE_LABEL = {
   env: 'environment override',
@@ -166,6 +191,7 @@ module.exports = function projectContextLoader(ctx, _state, env = process.env) {
   const sessionId = ctx.session_id || '';
   const previous = resetSessionState(root, sessionId);
   const newSession = Boolean(sessionId) && sessionId !== previous;
+  recordRuleBaseline(root, sessionId);
   if (newSession) out.push(...configBlock(env, root));
   // Once per session, not once per event: a resume or a compaction re-runs this
   // handler, and a hint repeated every time is one a reader learns to skip.

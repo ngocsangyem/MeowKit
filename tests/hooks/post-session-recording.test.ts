@@ -11,7 +11,41 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-import { errText, loadHandler, project } from "./lib/handler-fixtures";
+import { createRequire } from "node:module";
+
+import { errText, loadHandler, project, REPO_ROOT } from "./lib/handler-fixtures";
+
+const rulesLib = createRequire(import.meta.url)(path.join(REPO_ROOT, ".claude/hooks/lib/always-on-rules.cjs")) as {
+	ALWAYS_ON_RULES: string[];
+	PHASE_ZERO_FILES: string[];
+	markerDigests: (root: string) => { rules: string | null; phaseZero: string | null };
+};
+const digests = (root: string) => rulesLib.markerDigests(root);
+const LOG = ".meowkit/state/session-sentinels.jsonl";
+
+/** Every file the marker vouches for, each with distinct non-empty text. */
+const markerFiles = (): Record<string, string> =>
+	Object.fromEntries([...rulesLib.ALWAYS_ON_RULES, ...rulesLib.PHASE_ZERO_FILES].map((rel) => [rel, `# ${rel}\n`]));
+
+/** The line the session-start handler records, from the files as they are now. */
+function recordBaseline(root: string, sid: string) {
+	const { rules, phaseZero } = digests(root);
+	fs.mkdirSync(path.join(root, ".meowkit/state"), { recursive: true });
+	fs.appendFileSync(
+		path.join(root, LOG),
+		`${JSON.stringify({ session_id: sid, event: "rules_loaded", rules_sha256: rules, phase_zero_sha256: phaseZero })}\n`,
+	);
+}
+
+const readLog = (root: string): Record<string, unknown>[] => {
+	const file = path.join(root, LOG);
+	if (!fs.existsSync(file)) return [];
+	return fs
+		.readFileSync(file, "utf8")
+		.split("\n")
+		.filter((line) => line.trim())
+		.map((line) => JSON.parse(line));
+};
 
 describe("end-of-session recording", () => {
 	const postSession = loadHandler("post-session");
@@ -104,10 +138,52 @@ describe("end-of-session recording", () => {
 		expect(content).toBe("");
 	});
 
-	it("writes a well-formed session marker for a safe id", () => {
-		const root = project({});
+	it("writes a well-formed session marker for a safe id once the check passes", () => {
+		const root = project(markerFiles());
+		recordBaseline(root, "sess-6");
 		postSession({ root, session_id: "sess-6" }, undefined, FROZEN);
-		const line = fs.readFileSync(path.join(root, ".meowkit/state/session-sentinels.jsonl"), "utf8").trim();
-		expect(JSON.parse(line)).toMatchObject({ session_id: "sess-6", safety: true, phase_zero: true });
+		const lines = readLog(root);
+		expect(lines).toHaveLength(2);
+		const { rules, phaseZero } = digests(root);
+		expect(lines[1]).toEqual({
+			session_id: "sess-6",
+			safety: true,
+			rules_sha256: rules,
+			phase_zero: true,
+			phase_zero_sha256: phaseZero,
+			ts: "2026-03-04T05:06:07Z",
+		});
+	});
+
+	it("writes no marker when no baseline was recorded at session start", () => {
+		const root = project(markerFiles());
+		postSession({ root, session_id: "sess-7" }, undefined, FROZEN);
+		expect(readLog(root)).toEqual([]);
+	});
+
+	it("writes no marker when the rule files are missing", () => {
+		const root = project({});
+		recordBaseline(root, "sess-8");
+		postSession({ root, session_id: "sess-8" }, undefined, FROZEN);
+		expect(readLog(root).filter((row) => "safety" in row || "phase_zero" in row)).toEqual([]);
+	});
+
+	it("leaves out the set whose files changed since the session started", () => {
+		const root = project(markerFiles());
+		recordBaseline(root, "sess-9");
+		fs.writeFileSync(path.join(root, ".claude/rules/injection-rules.md"), "edited mid-session\n");
+		postSession({ root, session_id: "sess-9" }, undefined, FROZEN);
+		const written = readLog(root).at(-1);
+		expect(written).not.toHaveProperty("safety");
+		expect(written).toMatchObject({ session_id: "sess-9", phase_zero: true });
+	});
+
+	it("writes nothing when an emptied rule file and an emptied phase-zero file fail both checks", () => {
+		const root = project(markerFiles());
+		recordBaseline(root, "sess-10");
+		fs.writeFileSync(path.join(root, ".claude/rules/security-rules.md"), "   \n");
+		fs.writeFileSync(path.join(root, ".claude/skills/agent-detector/references/risk-checklist.md"), "");
+		postSession({ root, session_id: "sess-10" }, undefined, FROZEN);
+		expect(readLog(root)).toHaveLength(1);
 	});
 });
