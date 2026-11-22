@@ -47,6 +47,59 @@ function readPackage(root) {
 /** True when the failure was "this executable does not exist" rather than a check result. */
 const isMissingExecutable = (result) => Boolean(result.error && result.error.code === 'ENOENT');
 
+/**
+ * Windows cannot spawn `npm`/`npx` by bare name without a shell: they are `.cmd` shims, and
+ * Node refuses to run a `.cmd` directly. Find the shim on PATH ourselves so a missing tool still
+ * reads as ENOENT, then run it through cmd.exe. Only npm and npx come here, and their arguments
+ * are fixed words from this file, so nothing a repository controls reaches the command line.
+ */
+function findOnWindowsPath(name) {
+  // npm and npx ship as .cmd shims; a fixed list keeps PATHEXT out of the environment a guard reads.
+  const exts = ['.cmd', '.exe'];
+  for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+    for (const ext of exts) {
+      const candidate = path.join(dir, name + ext);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  }
+  return null;
+}
+
+/**
+ * A project's `node_modules/.bin/<tool>` is an extensionless sh shim next to a `.cmd` one, and
+ * neither is spawnable on Windows. The shim names the real script, so run that with this node.
+ */
+function resolveLocalBinScript(command) {
+  try {
+    const shim = fs.readFileSync(command, 'utf8');
+    const match = shim.match(/"\$basedir\/([^"]+\.[cm]?js)"/);
+    if (match) {
+      const script = path.resolve(path.dirname(command), match[1]);
+      if (fs.existsSync(script)) return script;
+    }
+  } catch {
+    // Not a readable shim: fall through to the plain spawn and let it report.
+  }
+  return null;
+}
+
+/** The spawnSync arguments for a command, adapted so Windows can start it. Identical elsewhere. */
+function spawnPlan(command, args) {
+  if (process.platform !== 'win32') return { command, args, options: {} };
+  if (command === 'npm' || command === 'npx') {
+    const shim = findOnWindowsPath(command);
+    if (!shim) return null;
+    return {
+      command: 'cmd.exe',
+      args: ['/d', '/s', '/c', `""${shim}" ${args.join(' ')}"`],
+      options: { windowsVerbatimArguments: true },
+    };
+  }
+  const script = path.isAbsolute(command) ? resolveLocalBinScript(command) : null;
+  if (script) return { command: process.execPath, args: [script, ...args], options: {} };
+  return { command, args, options: {} };
+}
+
 /** Collects output lines and the outcome tallies so the caller can render one summary. */
 function createRunner(root, out, deadline, deadlineMs) {
   const state = { run: '', failed: '', failCount: 0, notRun: '', notRunCount: 0, timedOut: false, missing: [] };
@@ -54,7 +107,9 @@ function createRunner(root, out, deadline, deadlineMs) {
   const launch = (command, args) => {
     const remaining = deadline - Date.now();
     if (remaining <= 0) return { error: { code: 'ETIMEDOUT' } };
-    return spawnSync(command, args, { cwd: root, stdio: 'ignore', shell: false, timeout: remaining });
+    const plan = spawnPlan(command, args);
+    if (!plan) return { error: { code: 'ENOENT' } };
+    return spawnSync(plan.command, plan.args, { cwd: root, stdio: 'ignore', shell: false, timeout: remaining, ...plan.options });
   };
 
   const record = (name, command, result) => {

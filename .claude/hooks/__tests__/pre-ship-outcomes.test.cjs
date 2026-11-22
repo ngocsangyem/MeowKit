@@ -65,6 +65,9 @@ function shipRecords(dir) {
 
 /** A PATH holding node and git only, so `npm` cannot be found. */
 function pathWithoutNpm() {
+  // Windows cannot symlink without privileges, and git.exe needs its sibling files, so there the
+  // PATH is git's own directory, which holds no npm.
+  if (process.platform === 'win32') return path.dirname(execFileSync('where', ['git']).toString().split(/\r?\n/)[0].trim());
   const bin = tempDir('ship-bin-');
   fs.symlinkSync(process.execPath, path.join(bin, 'node'));
   fs.symlinkSync(execFileSync('which', ['git']).toString().trim(), path.join(bin, 'git'));
@@ -73,7 +76,14 @@ function pathWithoutNpm() {
 
 /** A closed environment, so nothing the test host exports can change a decision. */
 function baseEnv(dir, extra = {}) {
-  return { HOME: dir, PATH: process.env.PATH, CLAUDE_PROJECT_DIR: dir, ...extra };
+  return { ...windowsSystemEnv(), HOME: dir, PATH: process.env.PATH, CLAUDE_PROJECT_DIR: dir, ...extra };
+}
+
+/** Windows cannot start cmd.exe or npm without these; nothing on POSIX needs them. */
+function windowsSystemEnv() {
+  if (process.platform !== 'win32') return {};
+  const keep = ["SystemRoot", "TEMP", "TMP", "USERPROFILE", "APPDATA"];
+  return Object.fromEntries(keep.filter((k) => process.env[k]).map((k) => [k, process.env[k]]));
 }
 
 function runShell(shell, dir, payload, env) {
