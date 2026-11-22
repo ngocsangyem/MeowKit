@@ -10,7 +10,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use super::config_rules::{ConfigScope, RuleError, apply_rules};
+use super::config_rules::{
+    ConfigScope, RuleError, RuleWarning, apply_rules, is_stale_hook_toggle, stale_hook_toggles,
+};
 use super::config_values::ConfigValues;
 use super::shape_check::{ShapeViolation, check_shape};
 use super::yaml_grammar::{GrammarError, parse_config_subset};
@@ -33,11 +35,14 @@ pub struct ConfigFailure {
 }
 
 /// A loaded scope. `present` separates "no file" from "a file with no keys":
-/// both apply zero keys, and only one of them is worth reporting.
+/// both apply zero keys, and only one of them is worth reporting. `warnings`
+/// names the keys that were skipped rather than applied — a toggle for a hook
+/// handler that is no longer registered.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct LoadedConfig {
     pub values: ConfigValues,
     pub present: bool,
+    pub warnings: Vec<RuleWarning>,
 }
 
 /// `<root>/.meowkit/config.yaml`.
@@ -126,11 +131,21 @@ pub fn load_config_file(
     // produces a message naming one key. Running both means a shape the rules
     // somehow let through is still refused rather than applied — the comment
     // `load-config.ts:118-120` carries, and the reason the layer is still here.
-    check_shape(&values, observer_names).map_err(|error| from_shape(error, file, scope))?;
+    // A stale hook toggle passed the rules as a warning; it is dropped before
+    // the shape check, which would otherwise refuse it as an unknown key.
+    let warnings = stale_hook_toggles(&values, observer_names, scope);
+    let mut applied = ConfigValues::new();
+    for (key, value) in values.iter() {
+        if !is_stale_hook_toggle(key, value, observer_names) {
+            applied.insert(key, value.clone());
+        }
+    }
+    check_shape(&applied, observer_names).map_err(|error| from_shape(error, file, scope))?;
 
     Ok(LoadedConfig {
-        values,
+        values: applied,
         present: true,
+        warnings,
     })
 }
 
@@ -148,6 +163,22 @@ mod tests {
         .expect("an absent file is not an error");
         assert!(!loaded.present);
         assert!(loaded.values.is_empty());
+    }
+
+    #[test]
+    fn a_removed_handlers_toggle_is_skipped_with_a_warning_and_the_rest_applies() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let file = dir.path().join("config.yaml");
+        fs::write(
+            &file,
+            "tdd: true\nhooks:\n  post-write: false\n  gone-handler: false\n",
+        )
+        .unwrap();
+        let names = vec!["post-write".to_string()];
+        let loaded = load_config_file(&file, &names, ConfigScope::ProjectConfig).expect("applies");
+        assert_eq!(loaded.values.sorted_keys(), vec!["hooks.post-write", "tdd"]);
+        assert_eq!(loaded.warnings.len(), 1);
+        assert_eq!(loaded.warnings[0].key, "hooks.gone-handler");
     }
 
     #[test]

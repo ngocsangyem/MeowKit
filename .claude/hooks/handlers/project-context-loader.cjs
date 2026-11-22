@@ -20,7 +20,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const R = require('../lib/session-context-report.cjs');
-const { configValue } = require('../lib/read-config.cjs');
+const { configValue, resolveConfig } = require('../lib/read-config.cjs');
 const { LEGACY_STATE_RELS, sessionStateDir, sessionStateFile } = require('../lib/meowkit-paths.cjs');
 const { markerDigests } = require('../lib/always-on-rules.cjs');
 const { isTddEnabled } = require('../lib/tdd-detect.cjs');
@@ -122,6 +122,22 @@ function recordRuleBaseline(root, sessionId) {
   }
 }
 
+/**
+ * A `hooks.<name>` key for a handler that is no longer registered does nothing,
+ * and the rest of its file still applies. Saying so here is the only place a
+ * session hears about it; the dispatcher stays silent so one stale key does not
+ * repeat on every event.
+ */
+function staleToggleRows(root) {
+  let warnings = [];
+  try {
+    warnings = resolveConfig({ root }).warnings || [];
+  } catch {
+    return [];
+  }
+  return warnings.map((w) => `- ⚠ ${w.message} — ${w.fix}`);
+}
+
 /** Where an answer came from, in the words a reader can act on. */
 const SOURCE_LABEL = {
   env: 'environment override',
@@ -164,6 +180,7 @@ function configBlock(env, root) {
     row('Loop detection', loop.value === false ? '**disabled**' : 'on', loop.level),
     row('Harness density', density.value === '' ? 'auto-detect' : `**${density.value}**`, density.level),
     row('Budget cap', capUsd > 0 ? `**$${capUsd}** per run` : 'none', cap.level),
+    ...staleToggleRows(root),
     '',
     '_Resolved per setting, highest level first: a supported environment override → `.meowkit/config.yaml` → `~/.meowkit/config.yaml` → the built-in default. Agent sees this block at session start only._',
   ];

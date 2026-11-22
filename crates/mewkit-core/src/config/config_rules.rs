@@ -69,7 +69,63 @@ fn looks_like_secret(text: &str) -> bool {
         .any(|word| lowered.contains(word))
 }
 
-/// `Ok(())` for an already-parsed flat map, or the first rule that fired.
+/// A `hooks.<name>` toggle that is well formed but names no registered handler,
+/// reported instead of refused. Removing or renaming a handler must not turn a
+/// config that only switched it off into a rejected file, which would also drop
+/// every other key in it; the key is skipped and this says so.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RuleWarning {
+    pub code: &'static str,
+    pub key: String,
+    pub message: String,
+    pub fix: String,
+}
+
+/// True for `hooks.<kebab-name>: <boolean>` where the name is neither
+/// registered nor protected — the shape a removed handler's toggle leaves.
+pub fn is_stale_hook_toggle(key: &str, value: &ConfigValue, observer_names: &[String]) -> bool {
+    let Some(name) = key.strip_prefix("hooks.") else {
+        return false;
+    };
+    matches!(value, ConfigValue::Bool(_))
+        && is_kebab(name)
+        && protected_hook(name).is_none()
+        && !observer_names.iter().any(|known| known == name)
+}
+
+/// `^[a-z0-9]+(-[a-z0-9]+)*$`, the registry's toggle-key shape.
+fn is_kebab(name: &str) -> bool {
+    !name.is_empty()
+        && name.split('-').all(|part| {
+            !part.is_empty()
+                && part
+                    .bytes()
+                    .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit())
+        })
+}
+
+/// One warning per stale hook toggle in `values`, in file order.
+pub fn stale_hook_toggles(
+    values: &ConfigValues,
+    observer_names: &[String],
+    scope: ConfigScope,
+) -> Vec<RuleWarning> {
+    values
+        .iter()
+        .filter(|(key, value)| is_stale_hook_toggle(key, value, observer_names))
+        .map(|(key, _)| RuleWarning {
+            code: "unknown-hook-toggle",
+            key: key.to_string(),
+            message: format!(
+                "{key} in the {scope} names no registered hook handler, so it switches nothing off"
+            ),
+            fix: format!("remove {key}; the handler it named was removed or renamed"),
+        })
+        .collect()
+}
+
+/// `Ok(())` for an already-parsed flat map, or the first rule that fired. A
+/// stale hook toggle is not a rule failure: see [`stale_hook_toggles`].
 ///
 /// The values are not transformed: a config either applies as written or does
 /// not apply at all, so there is nothing to hand back on success that the caller
@@ -131,6 +187,10 @@ pub fn apply_rules(
                 format!("{name} cannot be disabled from the {scope}: {why}"),
                 "remove the key; a safety check is not a preference".to_string(),
             );
+        }
+
+        if is_stale_hook_toggle(key, value, observer_names) {
+            continue;
         }
 
         if let Some(why) = state_only_key(key) {

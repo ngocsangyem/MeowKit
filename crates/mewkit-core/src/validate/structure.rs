@@ -105,7 +105,21 @@ pub fn check_config(meowkit_dir: &Path) -> CheckResult {
         &observer_names(root),
         ConfigScope::ProjectConfig,
     ) {
-        Ok(_) => CheckResult::new(name, Status::Pass, shown, Section::Structure),
+        Ok(loaded) if loaded.warnings.is_empty() => {
+            CheckResult::new(name, Status::Pass, shown, Section::Structure)
+        }
+        // The rest of the file applies; the row says which keys did nothing.
+        Ok(loaded) => CheckResult::new(
+            name,
+            Status::Warn,
+            loaded
+                .warnings
+                .iter()
+                .map(|w| format!("{} [{}] — {}", w.message, w.code, w.fix))
+                .collect::<Vec<_>>()
+                .join("; "),
+            Section::Structure,
+        ),
         Err(failure) => CheckResult::new(
             name,
             Status::Fail,
