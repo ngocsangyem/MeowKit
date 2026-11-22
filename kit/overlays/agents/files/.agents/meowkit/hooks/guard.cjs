@@ -73,7 +73,9 @@ if (command) {
 	const ship = decidePreShip({ root, command, env: process.env });
 	if (ship.stdout.length) process.stderr.write(`${ship.stdout.join("\n")}\n`);
 	if (ship.exit === 2) {
-		answer(true, [...ship.stderr, ...ship.stdout.filter((l) => /FAIL|DID NOT FINISH|did not run/.test(l))].join("\n"));
+		const lines = [...ship.stderr, ...ship.stdout.filter((l) => /FAIL|DID NOT FINISH|COULD NOT RUN|did not run/.test(l))];
+		if (ship.outcome === "could_not_run") lines.push("This runtime has no permission prompt for the ship check, so the ship is denied. To ship anyway, run the command in your own terminal.");
+		answer(true, lines.join("\n"));
 	}
 }
 answer(false);

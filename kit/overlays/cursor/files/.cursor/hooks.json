@@ -42,7 +42,7 @@
 				"command": "node .cursor/hooks/pre-ship.cjs",
 				"type": "command",
 				"timeout": 300,
-				"failClosed": false
+				"failClosed": true
 			}
 		],
 		"beforeMCPExecution": [

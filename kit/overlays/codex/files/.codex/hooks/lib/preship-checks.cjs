@@ -9,9 +9,14 @@
 //               output says so — lint and type-check still run
 //   type-check  project-wide, because a change can break a caller in a file it never touched
 //
-// Each check is detected before it runs, and an absent tool is a named SKIP rather than a silent
-// pass or a false failure. Tool discovery attempts the spawn and reads "no such executable"
-// instead of scanning the search path, so the probe and the launch cannot disagree.
+// Each check is detected before it runs, and an absent optional tool is a named SKIP rather than
+// a silent pass or a false failure. Tool discovery attempts the spawn and reads "no such
+// executable" instead of scanning the search path, so the probe and the launch cannot disagree.
+//
+// Two outcomes block, kept apart because they mean different things: `failed` is a check that
+// ran and reported a problem; `could_not_run` is a check that gave no verdict — a required tool
+// missing or failing to start, or a check stopped at the deadline. A failure anywhere wins over
+// could-not-run, since a known problem leaves nothing for a human to judge.
 //
 // Every spawn shares one deadline shorter than the host's hook timeout: a host that kills a
 // hook prints nothing, so a slow check is stopped here and reported as not finished.
@@ -42,9 +47,9 @@ function readPackage(root) {
 /** True when the failure was "this executable does not exist" rather than a check result. */
 const isMissingExecutable = (result) => Boolean(result.error && result.error.code === 'ENOENT');
 
-/** Collects output lines and the failure tally so the caller can render one summary. */
-function createRunner(root, out, deadline) {
-  const state = { run: '', failed: '', failCount: 0, timedOut: false };
+/** Collects output lines and the outcome tallies so the caller can render one summary. */
+function createRunner(root, out, deadline, deadlineMs) {
+  const state = { run: '', failed: '', failCount: 0, notRun: '', notRunCount: 0, timedOut: false, missing: [] };
 
   const launch = (command, args) => {
     const remaining = deadline - Date.now();
@@ -52,28 +57,42 @@ function createRunner(root, out, deadline) {
     return spawnSync(command, args, { cwd: root, stdio: 'ignore', shell: false, timeout: remaining });
   };
 
-  const record = (name, result) => {
+  const record = (name, command, result) => {
     out.push(`Running: ${name}`);
     state.run += ` ${name}`;
     if (!result.error && result.status === 0) {
       out.push(`  PASS: ${name}`);
       return;
     }
-    const timedOut = result.error && result.error.code === 'ETIMEDOUT';
-    if (timedOut) state.timedOut = true;
-    out.push(timedOut ? `  DID NOT FINISH: ${name} (ship-check deadline reached)` : `  FAIL: ${name}`);
+    // A spawn error means the check gave no verdict; a non-zero exit is the verdict.
+    if (result.error) {
+      const code = result.error.code;
+      if (code === 'ETIMEDOUT') {
+        state.timedOut = true;
+        out.push(`  DID NOT FINISH: ${name} (ship-check deadline of ${Math.round(deadlineMs / 1000)} s reached)`);
+      } else if (code === 'ENOENT') {
+        state.missing.push(path.basename(command));
+        out.push(`  COULD NOT RUN: ${name} (${path.basename(command)} not found)`);
+      } else {
+        out.push(`  COULD NOT RUN: ${name} (${code || result.error.message || 'spawn error'})`);
+      }
+      state.notRun += ` ${name}`;
+      state.notRunCount += 1;
+      return;
+    }
+    out.push(`  FAIL: ${name}`);
     state.failed += ` ${name}`;
     state.failCount += 1;
   };
 
-  /** Run and report; a missing executable counts as a failure. */
-  const runCheck = (name, command, args) => record(name, launch(command, args));
+  /** Run and report; a missing executable means the check could not run. */
+  const runCheck = (name, command, args) => record(name, command, launch(command, args));
 
   /** Run and report, unless the tool is not installed — then return false for the caller's SKIP. */
   const runIfInstalled = (name, command, args) => {
     const result = launch(command, args);
     if (isMissingExecutable(result)) return false;
-    record(name, result);
+    record(name, command, result);
     return true;
   };
 
@@ -129,7 +148,8 @@ function swiftChecks(root, scope, out, { runCheck, runIfInstalled }) {
 }
 
 /**
- * `{ exit, stdout, stderr }` for the whole block.
+ * `{ exit, stdout, stderr, outcome, cause }` for the whole block; outcome is `passed`, `failed`
+ * or `could_not_run`.
  * @param {string} root
  * @param {{ files: string[], rangeKnown: boolean }} scope
  * @param {{ deadlineMs?: number }} [opts]
@@ -138,10 +158,10 @@ function runPreShipChecks(root, scope, { deadlineMs = DEFAULT_DEADLINE_MS } = {}
   const out = ['=== Pre-Ship Checks ===', ''];
   if (scope.rangeKnown && scope.files.length === 0) {
     out.push('No changed files: nothing to lint or test.');
-    return { exit: 0, stdout: out, stderr: [] };
+    return { exit: 0, stdout: out, stderr: [], outcome: 'passed', cause: '' };
   }
   out.push(scope.rangeKnown ? `Changed files: ${scope.files.length}` : 'Changed files: unknown (lint and type-check run project-wide)', '');
-  const runner = createRunner(root, out, Date.now() + deadlineMs);
+  const runner = createRunner(root, out, Date.now() + deadlineMs, deadlineMs);
   const { state } = runner;
 
   if (exists(root, 'package.json')) nodeChecks(root, scope, out, runner);
@@ -151,11 +171,18 @@ function runPreShipChecks(root, scope, { deadlineMs = DEFAULT_DEADLINE_MS } = {}
   out.push('', '=== Summary ===', `Checks run:${state.run}`);
   if (state.failCount > 0) {
     const stderr = [`PRE-SHIP BLOCKED:${state.failed} failed`];
-    if (state.timedOut) stderr.push('A check did not finish before the ship-check deadline, so the change is unverified. Run it yourself, then retry.');
-    return { exit: 2, stdout: out, stderr };
+    if (state.notRunCount > 0) stderr.push(`Also gave no verdict:${state.notRun}`);
+    return { exit: 2, stdout: out, stderr, outcome: 'failed', cause: 'check_failed' };
+  }
+  if (state.notRunCount > 0) {
+    const cause = state.timedOut ? 'timeout' : state.missing.length ? 'missing_tool' : 'spawn_error';
+    const stderr = [`PRE-SHIP COULD NOT RUN:${state.notRun} gave no verdict, so the change is unverified.`];
+    if (state.timedOut) stderr.push(`A check did not finish within the ship-check deadline of ${Math.round(deadlineMs / 1000)} s.`);
+    if (state.missing.length) stderr.push(`Not found: ${[...new Set(state.missing)].join(', ')}.`);
+    return { exit: 2, stdout: out, stderr, outcome: 'could_not_run', cause };
   }
   out.push('PRE-SHIP PASS: All checks passed. Ready to ship.');
-  return { exit: 0, stdout: out, stderr: [] };
+  return { exit: 0, stdout: out, stderr: [], outcome: 'passed', cause: '' };
 }
 
 module.exports = { isMissingExecutable, runPreShipChecks, NO_RELATED_TESTS };
