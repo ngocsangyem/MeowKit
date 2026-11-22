@@ -131,7 +131,7 @@ describe("every child process a safety entrypoint starts is accounted for", () =
 				// node-script CLI is run by this node, so the target is node or the CLI.
 				".claude/hooks/lib/memory-store-lint.cjs spawnSync(command)",
 				// Runs the project's own lint, test and type-check commands.
-				".claude/hooks/lib/preship-checks.cjs spawnSync(command)",
+				".claude/hooks/lib/preship-checks.cjs spawnSync(plan.command)",
 				// Finds the project root when no runtime variable names it. Read-only.
 				".claude/hooks/lib/project-root.cjs spawnSync('git')",
 			].sort(),

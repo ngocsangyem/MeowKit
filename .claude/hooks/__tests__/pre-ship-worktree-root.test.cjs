@@ -16,6 +16,13 @@ const { execFileSync, spawnSync } = require('node:child_process');
 const HOOKS = path.resolve(__dirname, '..');
 const { resolveShipRoot } = require('../lib/project-root.cjs');
 
+/** Windows cannot start cmd.exe or npm without these; nothing on POSIX needs them. */
+function windowsSystemEnv() {
+  if (process.platform !== 'win32') return {};
+  const keep = ["SystemRoot", "TEMP", "TMP", "USERPROFILE", "APPDATA"];
+  return Object.fromEntries(keep.filter((k) => process.env[k]).map((k) => [k, process.env[k]]));
+}
+
 const tempDir = (prefix) => fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 const real = (p) => fs.realpathSync.native(p);
 
@@ -123,7 +130,7 @@ test('pre-ship.cjs judges the worktree a commit runs in, not the main checkout',
     input: stdin,
     encoding: 'utf8',
     cwd: worktree,
-    env: { PATH: process.env.PATH, HOME: worktree, CLAUDE_PROJECT_DIR: main },
+    env: { ...windowsSystemEnv(), PATH: process.env.PATH, HOME: worktree, CLAUDE_PROJECT_DIR: main },
   });
   assert.equal(result.status, 2, result.stderr);
   assert.match(`${result.stdout}${result.stderr}`, /lint/i);
