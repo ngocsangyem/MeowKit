@@ -63,7 +63,6 @@ For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global
 These apply across all skills:
 
 - **User question format**: See `references/ask-user-question-format.md`
-- **Completeness Principle**: See `references/completeness-principle.md`
 - **Repo Ownership Mode**: See `references/repo-ownership-mode.md`
 - **Search Before Building**: See `references/search-before-building.md`
 - **Completion Status Protocol**: See `references/completion-status-protocol.md`
@@ -77,10 +76,9 @@ See `references/tone-and-rules.md`
 
 | File                                       | Contents                                                             |
 | ------------------------------------------ | -------------------------------------------------------------------- |
-| `references/preamble.md`                   | Session initialization, upgrade checks, lake intro, telemetry prompt |
+| `references/preamble.md`                   | Branch, proactive flag and repo mode; local skill-usage log line      |
 | `references/preamble-retro.md`             | Memory write step, loaded with the preamble                          |
 | `references/ask-user-question-format.md`   | Standard ask the user structure (5 rules)                         |
-| `references/completeness-principle.md`     | Boil the Lake principle, effort estimation tables                    |
 | `references/repo-ownership-mode.md`        | Solo vs collaborative repo behavior                                  |
 | `references/search-before-building.md`     | Three layers of knowledge, eureka moments                            |
 | `references/completion-status-protocol.md` | DONE/BLOCKED/NEEDS_CONTEXT status reporting, escalation              |

@@ -73,7 +73,7 @@ Skip: Investigation itself doesn't need a plan — it produces the input for pla
 4. **Check alternatives** — test the strongest competing explanation before declaring a root cause.
 5. **Write diagnostic report** — save only to `tasks/reports/{timestamp}-investigation-{slug}.md`; include the required output contract below.
 6. **Hand off** — route confirmed defects to `mk:fix`, compile/build failures to `mk:build-fix`, and unresolved causes back to the user with explicit uncertainty.
-7. **Run shared protocols** — load `references/shared-protocols.md` for completion status + telemetry
+7. **Run shared protocols** — load `references/shared-protocols.md` for the question format and completion status
 
 ## References
 
@@ -81,10 +81,10 @@ Load **only when executing** the corresponding step — not upfront.
 
 | Reference                                                             | When to load                    | Content                                                                     |
 | --------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
-| **[preamble.md](./references/preamble.md)**                           | Step 1 — skill startup          | Session init, env detection, upgrade check                                  |
+| **[preamble.md](./references/preamble.md)**                           | Step 1 — skill startup          | Branch, proactive flag, repo mode                                           |
 | **[preamble-investigate.md](./references/preamble-investigate.md)**   | Step 1 — skill startup          | State dir, memory load, upgrade handling                                    |
 | **[debugging-methodology.md](./references/debugging-methodology.md)** | Steps 2-4 — investigation | Evidence collection and hypothesis testing |
-| **[shared-protocols.md](./references/shared-protocols.md)**           | Step 7 — completion             | User question format, completion status, telemetry      |
+| **[shared-protocols.md](./references/shared-protocols.md)**           | Step 7 — completion             | User question format, completion status, escalation     |
 
 ### Specialized Techniques (load based on bug type)
 

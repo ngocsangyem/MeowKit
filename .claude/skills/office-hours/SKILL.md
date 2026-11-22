@@ -63,9 +63,9 @@ A bare “brainstorm” request is ambiguous: ask whether the user wants product
 
 ## References
 
-- `references/preamble.md` — Preamble bash, upgrade handling, lake intro, telemetry prompt
+- `references/preamble.md` — Branch, proactive flag and repo mode; local skill-usage log line
 - `references/preamble-office-hours.md` — Browse setup check, loaded with the preamble
-- `references/shared-protocols.md` — user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry, Plan Status Footer
+- `references/shared-protocols.md` — User question format, completion status, escalation
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
 - `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling

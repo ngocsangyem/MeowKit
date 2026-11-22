@@ -1,4 +1,4 @@
-# the toolkit Skills Attribution
+# Skills Attribution
 
 Skills in this directory are sourced from open-source repositories.
 Each skill retains its original author credit in its frontmatter.
@@ -10,7 +10,7 @@ Each skill retains its original author credit in its frontmatter.
 | 1   | careful               | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/careful/SKILL.md                         | 1    |
 | 2   | ship                  | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/ship/SKILL.md                            | 1    |
 | 3   | freeze                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/freeze/SKILL.md                          | 1    |
-| 4   | review                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/review/SKILL.md. Updated 260326: +input modes, +verdict template, +phase anchoring (ck:code-review sync) | 1    |
+| 4   | review                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/review/SKILL.md                          | 1    |
 | 5   | cook                  | external author         | external toolkit                   | Proprietary | .claude/skills/cook/SKILL.md     | 1    |
 | 6   | investigate           | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/investigate/SKILL.md                     | 1    |
 | 7   | clean-code            | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/clean-code/SKILL.md               | 1    |

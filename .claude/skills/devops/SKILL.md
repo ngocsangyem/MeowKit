@@ -34,14 +34,15 @@ runtime: portable
 Infrastructure and delivery safety. It designs and prepares the change; a human performs the
 production effect.
 
+<!-- shared:backend-routing -->
 ## Ownership
 
 | Owner | Owns | Does NOT own |
 |---|---|---|
 | `mk:api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
-| `mk:backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work | Contract authorship, schema/SQL, security verdict, deploy |
-| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary | API contract, authorization verdict, infrastructure execution |
-| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment *safety design*, rollback planning, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
+| `mk:backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work, wiring the specialists together | Contract authorship, schema/SQL, security verdict, deploy |
+| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM data-access boundary | API contract, authorization verdict, infrastructure execution |
+| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback planning, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
 
 Routing rules — identical in all four skills:
 
@@ -66,6 +67,7 @@ Routing rules — identical in all four skills:
 - **An auth-sensitive change**: the owning skill states the *requirement*; the security
   workflow owns the verdict.
 - **Any production effect → `mk:ship` or a human.**
+<!-- /shared:backend-routing -->
 
 ## Secret boundary
 

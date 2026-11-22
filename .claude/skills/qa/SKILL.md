@@ -68,8 +68,8 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 
 ## References
 
-- `references/preamble.md` — Session setup, upgrade check, lake intro, telemetry prompt
-- `references/shared-protocols.md` — User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer
+- `references/preamble.md` — Branch, proactive flag and repo mode; local skill-usage log line
+- `references/shared-protocols.md` — User question format, completion status, escalation
 - `references/setup.md` — Base branch detection, parameters, clean tree check, browse binary, test framework bootstrap, output directories, test plan context
 - `references/modes.md` — Diff-aware, Full, Quick, Regression mode details
 - `references/workflow-phases.md` — Phases 1-11 with full implementation details (authenticate, orient, explore, document, wrap up, triage, fix loop, final QA, report, TODOS)

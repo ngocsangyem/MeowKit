@@ -60,8 +60,8 @@ Layer 0-1: Pre-Screen → Layer 3: Two-Lens Eval → Layer 4: Deep Sections → 
 
 - `references/pre-screen.md` — Layer 0-1: Placeholder scan (mode-aware), structural completeness, coverage mapping
 - `references/two-lens-evaluation.md` — Layer 3: Intent Alignment + Execution Credibility with PASS/FAIL anchors and verdict logic
-- `references/preamble.md` — Preamble bash script and startup logic
-- `references/shared-protocols.md` — user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry
+- `references/preamble.md` — Branch, proactive flag and repo mode; local skill-usage log line
+- `references/shared-protocols.md` — User question format, completion status, escalation
 - `references/base-branch-detection.md` — Step 0: Detect base branch
 - `references/pre-review-system-audit.md` — System audit, design doc check, handoff notes, retrospective, frontend detection, taste calibration, landscape check
 - `references/prerequisite-skill-offer.md` — Office-hours prerequisite and mid-session detection
