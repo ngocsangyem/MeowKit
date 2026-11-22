@@ -1,6 +1,6 @@
 ---
 name: mk:devops
-description: "Containers, IaC, CI/CD, rollback safety. NOT for mk:ship."
+description: "Containers, IaC, CI/CD, rollback. NOT for mk:ship."
 version: 1.0.0
 argument-hint: '[platform or infrastructure change]'
 source: local
@@ -21,7 +21,7 @@ keywords:
   - observability
   - incident-diagnosis
   - blast-radius
-when_to_use: "Changing a Dockerfile, pipeline or infra."
+when_to_use: "Dockerfile or pipeline."
 user-invocable: true
 owner: portability
 criticality: high

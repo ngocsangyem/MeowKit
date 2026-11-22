@@ -1,6 +1,6 @@
 ---
 name: mk:playwright-cli
-description: "Scripted browser control via Playwright CLI. NOT for mk:agent-browser."
+description: "Scripted browser control via Playwright. NOT for mk:agent-browser."
 allowed-tools: Bash(playwright-cli:*)
 source: microsoft/playwright
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - screenshot
   - data-extraction
   - session-persistent
-when_to_use: "A known click-and-type sequence must run on a page."
+when_to_use: "A known click sequence."
 user-invocable: true
 owner: testing
 criticality: medium

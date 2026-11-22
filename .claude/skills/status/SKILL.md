@@ -1,6 +1,6 @@
 ---
 name: mk:status
-description: "Evidence-based status of the active plan: done, blocked, changed. NOT for mk:help."
+description: "Evidence-based status of the active plan. NOT for mk:help."
 argument-hint: '[plan-dir | plan-slug]'
 source: local
 trust_level: kit-authored

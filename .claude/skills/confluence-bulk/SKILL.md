@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-bulk
-description: "Bulk Confluence ops on 10+ pages, dry-run first. NOT for mk:confluence-page."
+description: "Bulk Confluence ops on 10+ pages. NOT for mk:confluence-page."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - bulk-label
   - bulk-move
   - dry-run
-when_to_use: "A change across ten or more pages."
+when_to_use: "Change ten+ pages."
 user-invocable: true
 context: fork
 agent: confluence-bulk

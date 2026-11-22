@@ -1,6 +1,6 @@
 ---
 name: mk:jira-evaluator
-description: "mk:jira leaf: scores one ticket's complexity and inconsistencies."
+description: "mk:jira leaf: scores a ticket's complexity."
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - ticket-evaluation
   - complexity-analysis
   - ticket-quality
-when_to_use: "Ask how complex or contradictory a ticket is."
+when_to_use: "How complex is a ticket?"
 user-invocable: true
 context: fork
 agent: jira-evaluator

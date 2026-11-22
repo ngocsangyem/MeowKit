@@ -3,14 +3,14 @@
   "meta": {
     "name": "meowkit",
     "tagline": "How meowkit skills, agents, and hooks orbit each other",
-    "date": "2026-11-21"
+    "date": "2026-11-22"
   },
   "stats": {
     "skills": 127,
     "agents": 42,
     "commands": 0,
-    "hooks": 26,
-    "edges": 731
+    "hooks": 27,
+    "edges": 723
   },
   "planets": [
     {
@@ -35,7 +35,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -49,7 +49,7 @@
             "help",
             "loop"
           ],
-          "detail": "Multi-pass adversarial review of a diff, PR or commit.",
+          "detail": "Multi-pass adversarial review of a diff.",
           "sourceRef": ".claude/skills/review/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "high"
@@ -79,7 +79,7 @@
             "fix",
             "loop"
           ],
-          "detail": "Root-cause debugging ending in a diagnostic report, not an edit.",
+          "detail": "Root-cause debugging ending in a report, not an edit.",
           "sourceRef": ".claude/skills/investigate/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -95,7 +95,7 @@
             "loop",
             "chom"
           ],
-          "detail": "Finds where things live: parallel repo sweep, file map.",
+          "detail": "Finds where things live: repo sweep.",
           "sourceRef": ".claude/skills/scout/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -114,19 +114,6 @@
           "criticality": "high"
         },
         {
-          "id": "evaluate",
-          "label": "mk:evaluate",
-          "kind": "skill",
-          "edge": "calls",
-          "sharedWith": [
-            "loop"
-          ],
-          "detail": "Drives a running build via browser, curl or CLI, records rubric evidence.",
-          "sourceRef": ".claude/skills/evaluate/SKILL.md",
-          "group": "testing",
-          "criticality": "high"
-        },
-        {
           "id": "memory",
           "label": "mk:memory",
           "kind": "skill",
@@ -134,9 +121,23 @@
           "sharedWith": [
             "fix"
           ],
-          "detail": "Appends or prunes decisions and gotchas in team memory.",
+          "detail": "Appends or prunes team memory entries.",
           "sourceRef": ".claude/skills/memory/SKILL.md",
           "group": "memory",
+          "criticality": "high"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "party",
+            "fix"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": ".claude/agents/developer.md",
+          "group": "lifecycle-core",
           "criticality": "high"
         }
       ]
@@ -145,8 +146,8 @@
       "id": "jira",
       "label": "mk:jira",
       "kind": "skill",
-      "sub": "Jira routing hub: picks the matching…",
-      "detail": "Jira routing hub: picks the matching mk:jira leaf.",
+      "sub": "Jira routing hub to the mk:jira leaf.",
+      "detail": "Jira routing hub to the mk:jira leaf.",
       "sourceRef": ".claude/skills/jira/SKILL.md",
       "group": "atlassian",
       "criticality": "medium",
@@ -173,7 +174,7 @@
           "sharedWith": [
             "confluence"
           ],
-          "detail": "Scores ticket complexity and dependencies against the codebase.",
+          "detail": "Scores ticket complexity against the codebase.",
           "sourceRef": ".claude/skills/planning-engine/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "medium"
@@ -194,16 +195,6 @@
           "criticality": "high"
         },
         {
-          "id": "jira-agile",
-          "label": "mk:jira-agile",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "mk:jira leaf: epics, sprints, backlog, ranking, points.",
-          "sourceRef": ".claude/skills/jira-agile/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
           "id": "jira-collaborate",
           "label": "mk:jira-collaborate",
           "kind": "skill",
@@ -211,7 +202,7 @@
           "sharedWith": [
             "intake"
           ],
-          "detail": "mk:jira leaf: comments, attachments, watchers.",
+          "detail": "mk:jira leaf: comments, watchers.",
           "sourceRef": ".claude/skills/jira-collaborate/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -221,8 +212,18 @@
           "label": "mk:jira-estimator",
           "kind": "skill",
           "edge": "calls",
-          "detail": "mk:jira leaf: read-only story points for one ticket.",
+          "detail": "mk:jira leaf: points for one ticket.",
           "sourceRef": ".claude/skills/jira-estimator/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-agile",
+          "label": "mk:jira-agile",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "mk:jira leaf: epics, sprints, backlog.",
+          "sourceRef": ".claude/skills/jira-agile/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
         },
@@ -231,7 +232,7 @@
           "label": "mk:jira-bulk",
           "kind": "skill",
           "edge": "calls",
-          "detail": "mk:jira leaf: 10+ issues at once, dry-run first.",
+          "detail": "mk:jira leaf: 10+ issues, dry-run first.",
           "sourceRef": ".claude/skills/jira-bulk/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -241,7 +242,7 @@
           "label": "mk:jira-evaluator",
           "kind": "skill",
           "edge": "calls",
-          "detail": "mk:jira leaf: scores one ticket's complexity and inconsistencies.",
+          "detail": "mk:jira leaf: scores a ticket's complexity.",
           "sourceRef": ".claude/skills/jira-evaluator/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -253,7 +254,7 @@
       "label": "mk:help",
       "kind": "skill",
       "sub": "Names the next workflow step from…",
-      "detail": "Names the next workflow step from plans, tests and git state.",
+      "detail": "Names the next workflow step from plans, tests, git.",
       "sourceRef": ".claude/skills/help/SKILL.md",
       "group": "research",
       "criticality": "medium",
@@ -270,7 +271,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -284,7 +285,7 @@
             "cook",
             "loop"
           ],
-          "detail": "Multi-pass adversarial review of a diff, PR or commit.",
+          "detail": "Multi-pass adversarial review of a diff.",
           "sourceRef": ".claude/skills/review/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "high"
@@ -309,7 +310,7 @@
           "label": "mk:agent-detector",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Picks the task agent and complexity tier at orient time.",
+          "detail": "Picks task agent and complexity tier.",
           "sourceRef": ".claude/skills/agent-detector/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "medium"
@@ -319,7 +320,7 @@
           "label": "mk:verify",
           "kind": "skill",
           "edge": "calls",
-          "detail": "One pass of build, lint, test, type-check, coverage.",
+          "detail": "One pass of build, lint, test, coverage.",
           "sourceRef": ".claude/skills/verify/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "high"
@@ -329,7 +330,7 @@
           "label": "mk:api-design-principles",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Designs and reviews REST, GraphQL, event API contracts.",
+          "detail": "Designs REST, GraphQL, event APIs.",
           "sourceRef": ".claude/skills/api-design-principles/SKILL.md",
           "group": "portability",
           "criticality": "high"
@@ -339,7 +340,7 @@
           "label": "mk:backend-development",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Implements backend endpoints, services, webhooks.",
+          "detail": "Implements endpoints, services, webhooks.",
           "sourceRef": ".claude/skills/backend-development/SKILL.md",
           "group": "portability",
           "criticality": "medium"
@@ -349,7 +350,7 @@
           "label": "mk:database",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Data model, schema, migration, query and index work.",
+          "detail": "Schema, migration, query work.",
           "sourceRef": ".claude/skills/database/SKILL.md",
           "group": "portability",
           "criticality": "high"
@@ -360,8 +361,8 @@
       "id": "intake",
       "label": "mk:intake",
       "kind": "skill",
-      "sub": "Scores a ticket or PRD: area,…",
-      "detail": "Scores a ticket or PRD: area, completeness, root cause.",
+      "sub": "Scores a ticket or PRD for completeness.",
+      "detail": "Scores a ticket or PRD for completeness.",
       "sourceRef": ".claude/skills/intake/SKILL.md",
       "group": "research",
       "criticality": "medium",
@@ -390,7 +391,7 @@
             "fix",
             "loop"
           ],
-          "detail": "Root-cause debugging ending in a diagnostic report, not an edit.",
+          "detail": "Root-cause debugging ending in a report, not an edit.",
           "sourceRef": ".claude/skills/investigate/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -406,7 +407,7 @@
             "loop",
             "chom"
           ],
-          "detail": "Finds where things live: parallel repo sweep, file map.",
+          "detail": "Finds where things live: repo sweep.",
           "sourceRef": ".claude/skills/scout/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -419,7 +420,7 @@
           "sharedWith": [
             "jira"
           ],
-          "detail": "mk:jira leaf: comments, attachments, watchers.",
+          "detail": "mk:jira leaf: comments, watchers.",
           "sourceRef": ".claude/skills/jira-collaborate/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -432,9 +433,22 @@
           "sharedWith": [
             "confluence"
           ],
-          "detail": "Reports requirements and gaps in a Confluence spec.",
+          "detail": "Reports requirements and gaps in a spec.",
           "sourceRef": ".claude/skills/confluence-spec-analyst/SKILL.md",
           "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "web-to-markdown",
+          "label": "mk:web-to-markdown",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "chom"
+          ],
+          "detail": "Fetches one URL as clean markdown.",
+          "sourceRef": ".claude/skills/web-to-markdown/SKILL.md",
+          "group": "docs",
           "criticality": "medium"
         },
         {
@@ -448,19 +462,6 @@
           "criticality": "medium"
         },
         {
-          "id": "web-to-markdown",
-          "label": "mk:web-to-markdown",
-          "kind": "skill",
-          "edge": "calls",
-          "sharedWith": [
-            "chom"
-          ],
-          "detail": "Fetches one URL and returns clean markdown.",
-          "sourceRef": ".claude/skills/web-to-markdown/SKILL.md",
-          "group": "docs",
-          "criticality": "medium"
-        },
-        {
           "id": "cso",
           "label": "mk:cso",
           "kind": "skill",
@@ -468,7 +469,7 @@
           "sharedWith": [
             "party"
           ],
-          "detail": "Security audit: secrets, dependencies, CI/CD, OWASP, STRIDE.",
+          "detail": "Security audit: secrets, deps, OWASP.",
           "sourceRef": ".claude/skills/cso/SKILL.md",
           "group": "security-audit",
           "criticality": "high"
@@ -479,8 +480,8 @@
       "id": "party",
       "label": "mk:party",
       "kind": "skill",
-      "sub": "Runs a 2-4 agent round-table on one…",
-      "detail": "Runs a 2-4 agent round-table on one trade-off.",
+      "sub": "2-4 agent round-table on a trade-off.",
+      "detail": "2-4 agent round-table on a trade-off.",
       "sourceRef": ".claude/skills/party/SKILL.md",
       "group": "research",
       "criticality": "medium",
@@ -496,7 +497,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Compares technical approaches for one decision.",
+          "detail": "Compares approaches for one decision.",
           "sourceRef": ".claude/skills/brainstorming/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -507,22 +508,13 @@
           "kind": "agent",
           "edge": "spawns",
           "sharedWith": [
+            "cook",
             "fix"
           ],
           "detail": "Implementation agent that writes production code following approved plans.",
           "sourceRef": ".claude/agents/developer.md",
           "group": "lifecycle-core",
           "criticality": "high"
-        },
-        {
-          "id": "orchestrator",
-          "label": "orchestrator",
-          "kind": "agent",
-          "edge": "spawns",
-          "detail": "Task router for every incoming request.",
-          "sourceRef": ".claude/agents/orchestrator.md",
-          "group": "lifecycle-core",
-          "criticality": "critical"
         },
         {
           "id": "ui-ux-designer",
@@ -542,10 +534,20 @@
           "sharedWith": [
             "intake"
           ],
-          "detail": "Security audit: secrets, dependencies, CI/CD, OWASP, STRIDE.",
+          "detail": "Security audit: secrets, deps, OWASP.",
           "sourceRef": ".claude/skills/cso/SKILL.md",
           "group": "security-audit",
           "criticality": "high"
+        },
+        {
+          "id": "orchestrator",
+          "label": "orchestrator",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Task router.",
+          "sourceRef": ".claude/agents/orchestrator.md",
+          "group": "lifecycle-core",
+          "criticality": "critical"
         },
         {
           "id": "reviewer",
@@ -562,7 +564,7 @@
           "label": "mk:team-config",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Sets up a parallel agent team: worktrees, ownership map, queue.",
+          "detail": "Sets up a parallel agent team.",
           "sourceRef": ".claude/skills/team-config/SKILL.md",
           "group": "git",
           "criticality": "medium"
@@ -586,8 +588,8 @@
       "id": "fix",
       "label": "mk:fix",
       "kind": "skill",
-      "sub": "Root-cause fixes for bugs, type…",
-      "detail": "Root-cause fixes for bugs, type errors, lint and CI failures.",
+      "sub": "Root-cause fixes for bugs, lint, CI.",
+      "detail": "Root-cause fixes for bugs, lint, CI.",
       "sourceRef": ".claude/skills/fix/SKILL.md",
       "group": "lifecycle-core",
       "criticality": "high",
@@ -604,7 +606,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -620,7 +622,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Compares technical approaches for one decision.",
+          "detail": "Compares approaches for one decision.",
           "sourceRef": ".claude/skills/brainstorming/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -635,7 +637,7 @@
             "intake",
             "loop"
           ],
-          "detail": "Root-cause debugging ending in a diagnostic report, not an edit.",
+          "detail": "Root-cause debugging ending in a report, not an edit.",
           "sourceRef": ".claude/skills/investigate/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -651,7 +653,7 @@
             "loop",
             "chom"
           ],
-          "detail": "Finds where things live: parallel repo sweep, file map.",
+          "detail": "Finds where things live: repo sweep.",
           "sourceRef": ".claude/skills/scout/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -664,7 +666,7 @@
           "sharedWith": [
             "cook"
           ],
-          "detail": "Appends or prunes decisions and gotchas in team memory.",
+          "detail": "Appends or prunes team memory entries.",
           "sourceRef": ".claude/skills/memory/SKILL.md",
           "group": "memory",
           "criticality": "high"
@@ -675,6 +677,7 @@
           "kind": "agent",
           "edge": "spawns",
           "sharedWith": [
+            "cook",
             "party"
           ],
           "detail": "Implementation agent that writes production code following approved plans.",
@@ -697,7 +700,7 @@
           "label": "mk:docs-finder",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Fetches current library and API docs via Context7.",
+          "detail": "Fetches current library docs via Context7.",
           "sourceRef": ".claude/skills/docs-finder/SKILL.md",
           "group": "docs",
           "criticality": "medium"
@@ -708,8 +711,8 @@
       "id": "loop",
       "label": "mk:loop",
       "kind": "skill",
-      "sub": "Iterates on one measurable metric in…",
-      "detail": "Iterates on one measurable metric in git-tracked trials.",
+      "sub": "Iterates one metric in git trials.",
+      "detail": "Iterates one metric in git trials.",
       "sourceRef": ".claude/skills/loop/SKILL.md",
       "group": "memory",
       "criticality": "medium",
@@ -726,7 +729,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -740,7 +743,7 @@
             "cook",
             "help"
           ],
-          "detail": "Multi-pass adversarial review of a diff, PR or commit.",
+          "detail": "Multi-pass adversarial review of a diff.",
           "sourceRef": ".claude/skills/review/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "high"
@@ -771,7 +774,7 @@
             "chom",
             "grill"
           ],
-          "detail": "Compares technical approaches for one decision.",
+          "detail": "Compares approaches for one decision.",
           "sourceRef": ".claude/skills/brainstorming/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -786,7 +789,7 @@
             "intake",
             "fix"
           ],
-          "detail": "Root-cause debugging ending in a diagnostic report, not an edit.",
+          "detail": "Root-cause debugging ending in a report, not an edit.",
           "sourceRef": ".claude/skills/investigate/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -802,7 +805,7 @@
             "fix",
             "chom"
           ],
-          "detail": "Finds where things live: parallel repo sweep, file map.",
+          "detail": "Finds where things live: repo sweep.",
           "sourceRef": ".claude/skills/scout/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -825,10 +828,7 @@
           "label": "mk:evaluate",
           "kind": "skill",
           "edge": "calls",
-          "sharedWith": [
-            "cook"
-          ],
-          "detail": "Drives a running build via browser, curl or CLI, records rubric evidence.",
+          "detail": "Drives a running build, records evidence.",
           "sourceRef": ".claude/skills/evaluate/SKILL.md",
           "group": "testing",
           "criticality": "high"
@@ -839,8 +839,8 @@
       "id": "chom",
       "label": "mk:chom",
       "kind": "skill",
-      "sub": "Ports a feature from an external repo…",
-      "detail": "Ports a feature from an external repo or product here.",
+      "sub": "Ports a feature from an external repo.",
+      "detail": "Ports a feature from an external repo.",
       "sourceRef": ".claude/skills/chom/SKILL.md",
       "group": "research",
       "criticality": "medium",
@@ -857,7 +857,7 @@
             "loop",
             "grill"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -873,7 +873,7 @@
             "loop",
             "grill"
           ],
-          "detail": "Compares technical approaches for one decision.",
+          "detail": "Compares approaches for one decision.",
           "sourceRef": ".claude/skills/brainstorming/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -889,7 +889,7 @@
             "fix",
             "loop"
           ],
-          "detail": "Finds where things live: parallel repo sweep, file map.",
+          "detail": "Finds where things live: repo sweep.",
           "sourceRef": ".claude/skills/scout/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -902,7 +902,7 @@
           "sharedWith": [
             "intake"
           ],
-          "detail": "Fetches one URL and returns clean markdown.",
+          "detail": "Fetches one URL as clean markdown.",
           "sourceRef": ".claude/skills/web-to-markdown/SKILL.md",
           "group": "docs",
           "criticality": "medium"
@@ -912,7 +912,7 @@
           "label": "mk:agent-browser",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Drives a browser via CLI: click, fill, screenshot.",
+          "detail": "Drives a browser via CLI.",
           "sourceRef": ".claude/skills/agent-browser/SKILL.md",
           "group": "utility",
           "criticality": "medium"
@@ -922,7 +922,7 @@
           "label": "mk:multimodal",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Analyses and generates images, video, audio, PDFs.",
+          "detail": "Analyses and generates images, video, audio.",
           "sourceRef": ".claude/skills/multimodal/SKILL.md",
           "group": "utility",
           "criticality": "medium"
@@ -945,7 +945,7 @@
           "label": "mk:sequential-thinking",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Step-by-step hypothesis-and-evidence reasoning before acting.",
+          "detail": "Step-by-step hypothesis reasoning.",
           "sourceRef": ".claude/skills/sequential-thinking/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -956,8 +956,8 @@
       "id": "confluence",
       "label": "mk:confluence",
       "kind": "skill",
-      "sub": "Confluence Cloud router to the…",
-      "detail": "Confluence Cloud router to the mk:confluence-* leaf.",
+      "sub": "Confluence router to the mk:confluence-…",
+      "detail": "Confluence router to the mk:confluence-* leaf.",
       "sourceRef": ".claude/skills/confluence/SKILL.md",
       "group": "atlassian",
       "criticality": "medium",
@@ -984,7 +984,7 @@
           "sharedWith": [
             "jira"
           ],
-          "detail": "Scores ticket complexity and dependencies against the codebase.",
+          "detail": "Scores ticket complexity against the codebase.",
           "sourceRef": ".claude/skills/planning-engine/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "medium"
@@ -997,7 +997,7 @@
           "sharedWith": [
             "intake"
           ],
-          "detail": "Reports requirements and gaps in a Confluence spec.",
+          "detail": "Reports requirements and gaps in a spec.",
           "sourceRef": ".claude/skills/confluence-spec-analyst/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -1007,7 +1007,7 @@
           "label": "mk:confluence-page",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Confluence page CRUD, copy, move, hierarchy.",
+          "detail": "Confluence page CRUD, copy, move.",
           "sourceRef": ".claude/skills/confluence-page/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -1017,7 +1017,7 @@
           "label": "mk:confluence-bulk",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Bulk Confluence ops on 10+ pages, dry-run first.",
+          "detail": "Bulk Confluence ops on 10+ pages.",
           "sourceRef": ".claude/skills/confluence-bulk/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -1027,7 +1027,7 @@
           "label": "confluence-collaborate",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Confluence comments, attachments, labels on one page.",
+          "detail": "Confluence comments, labels.",
           "sourceRef": ".claude/skills/confluence-collaborate/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -1037,7 +1037,7 @@
           "label": "mk:confluence-search",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Confluence CQL search, space listing, export.",
+          "detail": "Confluence CQL search, export.",
           "sourceRef": ".claude/skills/confluence-search/SKILL.md",
           "group": "atlassian",
           "criticality": "medium"
@@ -1048,8 +1048,8 @@
       "id": "grill",
       "label": "mk:grill",
       "kind": "skill",
-      "sub": "Grills the user on their own plan, one…",
-      "detail": "Grills the user on their own plan, one question at a time.",
+      "sub": "Grills the user on their plan.",
+      "detail": "Grills the user on their plan.",
       "sourceRef": ".claude/skills/grill/SKILL.md",
       "group": "research",
       "criticality": "medium",
@@ -1066,7 +1066,7 @@
             "loop",
             "chom"
           ],
-          "detail": "Writes the multi-file implementation plan before building.",
+          "detail": "Writes the multi-file plan before building.",
           "sourceRef": ".claude/skills/plan-creator/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "critical"
@@ -1082,7 +1082,7 @@
             "loop",
             "chom"
           ],
-          "detail": "Compares technical approaches for one decision.",
+          "detail": "Compares approaches for one decision.",
           "sourceRef": ".claude/skills/brainstorming/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -1092,7 +1092,7 @@
           "label": "mk:advise",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Interviews one question at a time, then gives ONE verdict.",
+          "detail": "One question at a time, then ONE verdict.",
           "sourceRef": ".claude/skills/advise/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -1102,7 +1102,7 @@
           "label": "mk:elicit",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Second-pass review: pre-mortem, inversion, red team.",
+          "detail": "Second-pass review: pre-mortem, inversion.",
           "sourceRef": ".claude/skills/elicit/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -1112,7 +1112,7 @@
           "label": "mk:plan-ceo-review",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Founder-mode critique of a plan's ambition and scope.",
+          "detail": "Founder-mode critique of plan scope.",
           "sourceRef": ".claude/skills/plan-ceo-review/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "medium"
@@ -1122,7 +1122,7 @@
           "label": "mk:office-hours",
           "kind": "skill",
           "edge": "calls",
-          "detail": "YC-style check that an idea is worth building.",
+          "detail": "YC-style check an idea is worth building.",
           "sourceRef": ".claude/skills/office-hours/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -1132,7 +1132,7 @@
           "label": "mk:project-context",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Generates docs/project-context.md, conventions every agent loads.",
+          "detail": "Generates docs/project-context.md.",
           "sourceRef": ".claude/skills/project-context/SKILL.md",
           "group": "docs",
           "criticality": "medium"
@@ -1142,7 +1142,7 @@
           "label": "mk:ask-me",
           "kind": "skill",
           "edge": "calls",
-          "detail": "Answers factual project questions with file:line citations.",
+          "detail": "Answers project questions with file:line cites.",
           "sourceRef": ".claude/skills/ask-me/SKILL.md",
           "group": "research",
           "criticality": "medium"
@@ -1213,12 +1213,12 @@
     }
   ],
   "belt": {
-    "count": 139,
+    "count": 140,
     "byKind": {
       "skills": 77,
       "agents": 36,
       "commands": 0,
-      "hooks": 26
+      "hooks": 27
     },
     "sample": [
       "vue",
@@ -1226,10 +1226,10 @@
       "jira-analyst",
       "jira-lifecycle",
       "jira-search",
-      "sprint-contract",
       "vue-testing-best-practices",
       "jira-fields",
       "jira-relationships",
+      "sprint-contract",
       "story-sizer",
       "vue-best-practices",
       "docs-init"

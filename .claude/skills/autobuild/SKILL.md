@@ -21,7 +21,7 @@ keywords:
   - generator-evaluator
   - harness-contract
   - adaptive-density
-when_to_use: "A full product spec should build unattended."
+when_to_use: "A full product spec to build."
 user-invocable: true
 meowkit:
   portability: provider-only

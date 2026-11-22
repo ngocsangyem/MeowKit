@@ -1,6 +1,6 @@
 ---
 name: mk:ghpm
-description: "GitHub issues, Projects v2 boards, milestones via gh. NOT for mk:review-pr."
+description: "GitHub issues, Projects v2, milestones. NOT for mk:review-pr."
 keywords:
   - github
   - github-projects
@@ -12,7 +12,7 @@ keywords:
   - handoff
   - sprint-status
   - issue-triage
-when_to_use: "Creating an issue or moving a board item."
+when_to_use: "Create an issue."
 user-invocable: true
 owner: git
 criticality: medium

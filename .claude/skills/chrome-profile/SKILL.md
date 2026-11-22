@@ -1,6 +1,6 @@
 ---
 name: mk:chrome-profile
-description: "Attaches automation to a real Chrome profile via CDP. NOT for mk:agent-browser."
+description: "Attaches to a real Chrome profile. NOT for mk:agent-browser."
 keywords:
   - chrome-profile
   - chrome-user-profile
@@ -10,7 +10,7 @@ keywords:
   - devtools-protocol
   - profile-discovery
   - chrome-automation
-when_to_use: "Needs the user's Chrome login or extensions."
+when_to_use: "Needs the user's logins."
 user-invocable: true
 owner: utility
 criticality: medium

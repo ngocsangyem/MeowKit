@@ -2,7 +2,7 @@
 name: mk:retro
 preamble-tier: 2
 version: 2.0.0
-description: "Engineering retrospective from commit history. NOT for mk:memory."
+description: "Engineering retrospective from commits. NOT for mk:memory."
 allowed-tools:
   - Bash
   - Read
@@ -16,7 +16,7 @@ keywords:
   - git-history
   - postmortem
   - reflection
-when_to_use: "End of a week or sprint."
+when_to_use: "End of a sprint."
 user-invocable: true
 owner: docs
 criticality: medium

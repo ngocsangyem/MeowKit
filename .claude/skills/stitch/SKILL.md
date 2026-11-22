@@ -1,8 +1,8 @@
 ---
 name: mk:stitch
-description: "Generates a new UI design from a text prompt via Stitch AI. NOT for mk:figma."
+description: "Generates a UI design via Stitch AI. NOT for mk:figma."
 user-invocable: true
-when_to_use: "No design source exists."
+when_to_use: "No design source."
 category: frontend
 phase: on-demand
 keywords:

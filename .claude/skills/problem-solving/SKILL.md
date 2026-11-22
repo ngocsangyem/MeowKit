@@ -1,7 +1,7 @@
 ---
 name: mk:problem-solving
 version: 1.0.0
-description: "Unsticks a stalled approach via inversion, first principles. NOT for mk:investigate."
+description: "Unsticks a stalled approach. NOT for mk:investigate."
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - approach-design
   - decomposition
   - analytical-thinking
-when_to_use: "The implementation path keeps spiralling."
+when_to_use: "Path keeps spiralling."
 user-invocable: true
 owner: research
 criticality: medium

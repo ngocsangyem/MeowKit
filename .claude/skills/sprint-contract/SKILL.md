@@ -2,7 +2,7 @@
 name: mk:sprint-contract
 version: 1.0.0
 preamble-tier: 3
-description: "Negotiates generator and evaluator acceptance criteria before code. NOT for mk:plan-creator."
+description: "Negotiates acceptance criteria before code. NOT for mk:plan-creator."
 argument-hint: '[propose | review | amend | sign | sprint-goal] [task-slug | sprint-goal-text] [--sprint N]'
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ keywords:
   - generator-evaluator-handshake
   - scope-negotiation
   - rubric-tie-in
-when_to_use: "Sprint scope must be signed first."
+when_to_use: "Sign sprint scope."
 user-invocable: true
 owner: lifecycle
 criticality: high

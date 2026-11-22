@@ -1,7 +1,7 @@
 ---
 name: mk:improve-codebase-architecture
 version: 1.0.0
-description: "Finds shallow modules and proposes deepening refactors. NOT for mk:arch."
+description: "Finds shallow modules, proposes refactors. NOT for mk:arch."
 allowed-tools:
   - Read
   - Grep
@@ -21,7 +21,7 @@ keywords:
   - refactor
   - patch-emission
   - testability
-when_to_use: "Asked where the codebase is shallow."
+when_to_use: "Where is it shallow?"
 user-invocable: true
 preamble-tier: 2
 phase: on-demand

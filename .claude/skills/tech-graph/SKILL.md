@@ -1,8 +1,8 @@
 ---
 name: mk:tech-graph
-description: "Renders publish-grade SVG/PNG diagrams: architecture, flow, ER. NOT for mk:preview."
+description: "Publish-grade SVG/PNG diagrams. NOT for mk:preview."
 user-invocable: true
-when_to_use: "Diagram for a blog, slide or doc."
+when_to_use: "Diagram for a blog or doc."
 keywords:
   - diagrams
   - architecture

@@ -7,7 +7,7 @@ keywords:
   - injection-defense
   - scaffold
   - copy-template
-when_to_use: "Auto-invoked while scaffolding a skill."
+when_to_use: "Auto when scaffolding."
 user-invocable: false
 trust_level: kit-authored
 injection_risk: low

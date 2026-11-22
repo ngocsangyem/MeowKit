@@ -11,7 +11,7 @@ keywords:
   - feature-build
   - seven-phase
   - single-task
-when_to_use: "One scoped feature or approved plan."
+when_to_use: "One scoped feature."
 user-invocable: true
 owner: lifecycle
 criticality: critical

@@ -1,6 +1,6 @@
 ---
 name: mk:jira-dev
-description: "mk:jira leaf: branch names, PR bodies, commit links. NOT for mk:ship."
+description: "mk:jira leaf: branch names, PR bodies. NOT for mk:ship."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - pr-description
   - smart-commit
   - jira-git
-when_to_use: "Derive a branch name or PR body from a ticket."
+when_to_use: "Derive a branch or PR body."
 user-invocable: true
 context: fork
 agent: jira-dev

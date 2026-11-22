@@ -1,6 +1,6 @@
 ---
 name: mk:figma
-description: "Figma MCP gateway: reads designs, extracts tokens. NOT for mk:stitch."
+description: "Figma MCP gateway: designs, tokens. NOT for mk:stitch."
 version: 1.2.0
 keywords:
   - figma
@@ -12,7 +12,7 @@ keywords:
   - code-connect
   - figma-gateway
   - evidence-packet
-when_to_use: "A Figma link must become specs or code."
+when_to_use: "A Figma link becomes code."
 user-invocable: true
 owner: utility
 criticality: medium

@@ -2,7 +2,7 @@
 name: mk:plan-ceo-review
 preamble-tier: 3
 version: 1.0.0
-description: "Founder-mode critique of a plan's ambition and scope. NOT for mk:validate-plan."
+description: "Founder-mode critique of plan scope. NOT for mk:validate-plan."
 benefits-from:
   - office-hours
 allowed-tools:
@@ -19,7 +19,7 @@ keywords:
   - ambition-check
   - plan-evaluation
   - executive-review
-when_to_use: "Asked if the plan is ambitious enough."
+when_to_use: "Is the plan ambitious?"
 user-invocable: true
 owner: lifecycle
 criticality: medium

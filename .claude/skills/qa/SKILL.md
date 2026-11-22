@@ -2,7 +2,7 @@
 name: mk:qa
 preamble-tier: 3
 version: 2.0.0
-description: "Tests a running web app black-box, fixes bugs, re-verifies. NOT for mk:qa-manual."
+description: "Tests a running web app, fixes bugs. NOT for mk:qa-manual."
 allowed-tools:
   - Bash
   - Read
@@ -19,7 +19,7 @@ keywords:
   - health-score
   - manual-test
   - verification
-when_to_use: "Test this site and fix what breaks."
+when_to_use: "Test this site."
 user-invocable: true
 owner: testing
 criticality: medium

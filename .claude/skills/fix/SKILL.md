@@ -1,6 +1,6 @@
 ---
 name: mk:fix
-description: "Root-cause fixes for bugs, type errors, lint and CI failures. NOT for mk:investigate."
+description: "Root-cause fixes for bugs, lint, CI. NOT for mk:investigate."
 source: local
 version: 0.1.0
 argument-hint: "[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd|--advice"
@@ -11,7 +11,7 @@ keywords:
   - apply-fix
   - error-recovery
   - memory-driven-fix
-when_to_use: "Something is broken and should be fixed."
+when_to_use: "Something is broken."
 user-invocable: true
 owner: lifecycle
 criticality: high

@@ -2,7 +2,7 @@
 name: mk:evaluate
 version: 1.0.0
 preamble-tier: 3
-description: "Drives a running build via browser, curl or CLI, records rubric evidence. NOT for mk:review."
+description: "Drives a running build, records evidence. NOT for mk:review."
 argument-hint: '[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - running-build
   - active-verification
   - skeptic-persona
-when_to_use: "Grade a built artifact by behaviour."
+when_to_use: "Grade a built artifact."
 user-invocable: true
 owner: testing
 criticality: high

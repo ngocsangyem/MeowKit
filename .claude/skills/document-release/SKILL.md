@@ -18,7 +18,7 @@ keywords:
   - changelog
   - readme-update
   - sync-documentation
-when_to_use: "Shipped, pull request not yet merged."
+when_to_use: "Shipped, PR not merged."
 user-invocable: true
 owner: docs
 criticality: medium

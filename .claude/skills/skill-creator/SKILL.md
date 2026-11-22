@@ -1,6 +1,6 @@
 ---
 name: mk:skill-creator
-description: "Scaffolds and registers a new skill with compliance checks. NOT for mk:skill-template-secure."
+description: "Scaffolds and registers a new skill. NOT for mk:skill-template-secure."
 argument-hint: '[skill-name] [description]'
 source: local
 original_path: .claude/skills/skill-creator/SKILL.md
@@ -11,7 +11,7 @@ keywords:
   - scaffold-skill
   - authoring-template
   - gotchas-section
-when_to_use: "Creating an mk: skill."
+when_to_use: "New skill."
 user-invocable: true
 owner: portability
 criticality: medium

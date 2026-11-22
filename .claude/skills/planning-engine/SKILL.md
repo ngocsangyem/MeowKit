@@ -1,7 +1,7 @@
 ---
 name: mk:planning-engine
 version: 1.0.0
-description: "Scores ticket complexity and dependencies against the codebase."
+description: "Scores ticket complexity against the codebase."
 phase: 1
 source: local
 argument-hint: review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]
@@ -16,7 +16,7 @@ keywords:
   - sprint-planning
   - dependency-mapping
   - tech-review
-when_to_use: "Asked how big a ticket is or what to pick first."
+when_to_use: "How big is a ticket?"
 user-invocable: true
 owner: lifecycle
 criticality: medium

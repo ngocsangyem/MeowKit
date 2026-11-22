@@ -1,6 +1,6 @@
 ---
 name: mk:llms
-description: "Generates llms.txt from project docs per llmstxt.org."
+description: "Generates llms.txt from project docs."
 argument-hint: '[path] [--full] [--output path] [--url base]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
@@ -11,7 +11,7 @@ keywords:
   - llm-friendly-docs
   - ai-discoverability
   - agentic-content
-when_to_use: "Making a project discoverable to AI via llms.txt."
+when_to_use: "Make a project AI-discoverable."
 user-invocable: true
 owner: docs
 criticality: medium

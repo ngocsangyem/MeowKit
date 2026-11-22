@@ -2,7 +2,7 @@
 name: mk:cso
 preamble-tier: 2
 version: 2.0.0
-description: "Security audit: secrets, dependencies, CI/CD, OWASP, STRIDE. NOT for mk:vulnerability-scanner."
+description: "Security audit: secrets, deps, OWASP. NOT for mk:vulnerability-scanner."
 allowed-tools:
   - Bash
   - Read
@@ -21,7 +21,7 @@ keywords:
   - owasp
   - supply-chain
   - secrets-archaeology
-when_to_use: "Asked for a security audit or threat model."
+when_to_use: "Security audit."
 user-invocable: true
 owner: security
 criticality: high

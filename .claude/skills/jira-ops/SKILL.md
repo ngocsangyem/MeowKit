@@ -1,6 +1,6 @@
 ---
 name: mk:jira-ops
-description: "mk:jira leaf: Jira cache status, clear, project discovery."
+description: "mk:jira leaf: Jira cache status, clear."
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - jira-cache
   - jira-discover
   - jira-diagnostic
-when_to_use: "Inspect or clear the Jira cache."
+when_to_use: "Inspect or clear the cache."
 user-invocable: true
 context: fork
 agent: jira-ops

@@ -1,7 +1,7 @@
 ---
 name: mk:vue-testing-best-practices
-description: "Advisory Vue 3 test design: Vitest, Test Utils, Pinia. NOT for mk:testing."
-when_to_use: "How to test a Vue component or store."
+description: "Vue 3 test design: Vitest, Test Utils. NOT for mk:testing."
+when_to_use: "How to test a Vue component."
 keywords:
   [
     vue-testing,

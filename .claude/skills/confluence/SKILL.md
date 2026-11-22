@@ -1,6 +1,6 @@
 ---
 name: mk:confluence
-description: "Confluence Cloud router to the mk:confluence-* leaf. NOT an executor."
+description: "Confluence router to the mk:confluence-* leaf. NOT an executor."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - atlassian-wiki
   - wiki
   - spec-page
-when_to_use: "Confluence work with an unclear leaf."
+when_to_use: "Confluence leaf unclear."
 user-invocable: true
 owner: confluence
 criticality: medium

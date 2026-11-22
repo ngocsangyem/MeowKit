@@ -2,6 +2,15 @@
 
 Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL written by `append-trace.cjs`.
 
+## Contents
+
+- [Top-Level Fields](#top-level-fields)
+- [Canonical Event Types](#canonical-event-types)
+- [Field Conventions](#field-conventions)
+- [Secret Scrubbing](#secret-scrubbing)
+- [Rotation](#rotation)
+- [Reading Records](#reading-records)
+
 ## Top-Level Fields
 
 | Field | Type | Required | Source |

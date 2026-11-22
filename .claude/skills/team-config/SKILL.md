@@ -1,6 +1,6 @@
 ---
 name: mk:team-config
-description: "Sets up a parallel agent team: worktrees, ownership map, queue. NOT for mk:worktree."
+description: "Sets up a parallel agent team. NOT for mk:worktree."
 argument-hint: '"task description" --agents N'
 source: local
 allowed-tools:

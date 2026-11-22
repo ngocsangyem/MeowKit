@@ -1,6 +1,6 @@
 ---
 name: mk:showcase
-description: "Builds a standalone HTML showcase page from given paths. NOT for mk:preview."
+description: "Builds a standalone HTML showcase page. NOT for mk:preview."
 user-invocable: true
 version: 1.0.0
 source: port
@@ -15,7 +15,7 @@ keywords:
   - portfolio
   - visual
   - publish
-when_to_use: "One shareable demo or summary page."
+when_to_use: "One shareable demo page."
 argument-hint: <mission> [artifact-paths…] [--no-screenshots] [--no-publish] [--languages en|vi|en,vi]
 owner: utility
 criticality: medium

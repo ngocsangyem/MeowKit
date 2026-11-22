@@ -1,6 +1,6 @@
 ---
 name: mk:task-queue
-description: "Shared task claiming with file-ownership enforcement for parallel agents."
+description: "Shared task claiming with file-ownership checks."
 source: local
 keywords:
   - task-queue

@@ -2,7 +2,7 @@
 name: mk:benchmark
 version: 1.0.0
 preamble-tier: 3
-description: "Manual harness canary recording benchmark scores."
+description: "Manual harness canary recording scores."
 argument-hint: '[run | compare <a> <b>] [--full]'
 allowed-tools:
   - Bash

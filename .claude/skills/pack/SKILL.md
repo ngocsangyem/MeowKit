@@ -1,6 +1,6 @@
 ---
 name: mk:pack
-description: "Packs an external repo into one markdown, xml or json file. NOT for mk:scout."
+description: "Packs an external repo into one file. NOT for mk:scout."
 argument-hint: <source> [--style markdown|xml|json|plain] [--include pattern] [--ignore pattern] [--remove-comments] [--compress] [--self] [--no-security-check]
 trust_level: kit-authored
 injection_risk: medium
@@ -12,7 +12,7 @@ keywords:
   - third-party-snapshot
   - ai-friendly-export
   - handoff
-when_to_use: "Handing a third-party repo to an LLM."
+when_to_use: "Feed a repo to an LLM."
 user-invocable: true
 owner: lifecycle
 criticality: medium

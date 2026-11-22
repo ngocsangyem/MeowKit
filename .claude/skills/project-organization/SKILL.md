@@ -1,6 +1,6 @@
 ---
 name: mk:project-organization
-description: "Picks the path and name for a new file. NOT for mk:docs-init."
+description: "Picks path and name for a new file. NOT for mk:docs-init."
 argument-hint: '[directories or files to organize]'
 source: local
 original_path: .claude/skills/project-organization/SKILL.md
@@ -12,7 +12,7 @@ keywords:
   - plan-organization
   - report-routing
   - directory-layout
-when_to_use: "New report, plan or asset with no obvious home."
+when_to_use: "File has no home."
 user-invocable: true
 owner: docs
 criticality: medium

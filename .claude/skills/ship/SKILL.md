@@ -21,7 +21,7 @@ keywords:
   - branch-push
   - deploy-pipeline
   - pre-landing-review
-when_to_use: "Review passed; change must land."
+when_to_use: "Review passed."
 user-invocable: true
 owner: lifecycle
 criticality: high
