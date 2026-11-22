@@ -122,17 +122,16 @@ fn cell(runtime: &str, scope: Scope) {
     };
     assert_eq!(status(&cell).as_deref(), Some("ok"), "{cell}: {checks:#}");
     let hooks = format!("{runtime} hooks ({})", scope.dirs().label);
-    // The kit installs no Antigravity hook, so doctor warns instead of passing.
-    let expected = if runtime == "antigravity" {
-        "warn"
-    } else {
-        "ok"
-    };
-    assert_eq!(
-        status(&hooks).as_deref(),
-        Some(expected),
-        "{cell}: {checks:#}"
-    );
+    assert_eq!(status(&hooks).as_deref(), Some("ok"), "{cell}: {checks:#}");
+    // The Antigravity guards are installed but no live run has shown them deny, so the
+    // coverage row warns rather than passing.
+    if runtime == "antigravity" {
+        assert_eq!(
+            status("antigravity hook coverage").as_deref(),
+            Some("warn"),
+            "{cell}: {checks:#}"
+        );
+    }
 
     let edited = owned
         .iter()
