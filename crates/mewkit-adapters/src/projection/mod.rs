@@ -81,7 +81,7 @@ pub fn project_text(text: &str, skills: &BTreeSet<String>, target: &Target) -> S
 }
 
 /// The order is part of the contract: skill references first, then the path
-/// classes from most to least specific, then host words, then anchoring,
+/// classes from most to least specific, then host words and tools, then anchoring,
 /// which needs the final paths. The note about prefixing paths by hand goes
 /// first, while it still reads as the source wrote it; links to reworded
 /// headings are fixed last, once every heading has its final text.
@@ -105,6 +105,7 @@ fn project(
     let text = host_words::environment(&text, target);
     let text = paths::host_paths(&text, target);
     let text = host_words::host_name(&text, target);
+    let text = host_words::host_tools(&text);
     let text = match skill {
         Some(skill) => {
             let own = format!(

@@ -1,5 +1,5 @@
 //! Words that name the authoring host: environment variables, the context
-//! file, the product name and model ids.
+//! file, the product name, model ids and the tools only that host provides.
 use super::Target;
 use super::scan::{Hit, first, is_word, last, replace_each, run};
 
@@ -27,6 +27,74 @@ const PROPER_NAMES: &[&str] = &[
     "arrow-claude",
 ];
 
+/// Variables only the authoring host sets, beyond the two `environment` gives
+/// a target form, as what they stand for. Each is matched as a whole word, so
+/// `CLAUDE_MODEL` does not match inside `CLAUDE_MODEL_ID`.
+const HOST_VARS: &[(&str, &str)] = &[
+    (
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS",
+        "the host's agent-teams mode",
+    ),
+    ("CLAUDE_MODEL_ID", "the host's model variable"),
+    ("CLAUDE_MODEL", "the host's model variable"),
+    ("CLAUDE_PROJECT_DIR", "the project root"),
+    ("CLAUDE_SKILL_DIR", "the skill's own directory"),
+];
+
+/// Tools only the authoring host provides, as the step they take. The
+/// question wording matches what the shared hooks say on other runtimes.
+const HOST_TOOLS: &[(&str, &str)] = &[
+    ("AskUserQuestion", "a question to the user"),
+    ("TodoWrite", "the to-do list"),
+    ("TaskCreate", "a new task"),
+    ("TaskUpdate", "a task update"),
+    ("TaskGet", "a task read"),
+    ("TaskList", "the shared task list"),
+    ("TaskClaim", "a task claim"),
+    ("SendMessage", "a message"),
+];
+
+/// Each whole-word `name` outside a shell expansion becomes `phrase`. A
+/// `=value` after it goes with it (`X=1` is enabled), code quotes around it
+/// are dropped as a pair, and a call's argument list is kept after a space.
+/// Joined to a word by a hyphen (`per-X`), the phrase drops its article and
+/// joins by hyphens too.
+fn phrase_each(text: &str, name: &str, phrase: &str) -> String {
+    replace_each(text, name, |before, after| {
+        let joined = last(before).is_some_and(|c| is_word(c) || c == '$' || c == '{');
+        if joined || first(after).is_some_and(is_word) {
+            return None;
+        }
+        let value = after
+            .strip_prefix('=')
+            .map_or(0, |rest| 1 + run(rest, is_word).len());
+        let rest = &after[value..];
+        let quoted = before.ends_with('`') && rest.starts_with('`');
+        let call = if rest.starts_with('(') { " " } else { "" };
+        let hyphened = before[..before.len() - usize::from(quoted)].ends_with('-');
+        let phrase = if hyphened {
+            let bare = phrase.split_once(' ').map_or(phrase, |(_, rest)| rest);
+            bare.replace(' ', "-")
+        } else {
+            phrase.to_owned()
+        };
+        Some(
+            Hit::new(format!("{phrase}{call}"))
+                .before(usize::from(quoted))
+                .after(value + usize::from(quoted)),
+        )
+    })
+}
+
+/// The authoring host's own tools, named as the step they take.
+pub fn host_tools(text: &str) -> String {
+    HOST_TOOLS
+        .iter()
+        .fold(text.to_owned(), |text, (name, phrase)| {
+            phrase_each(&text, name, phrase)
+        })
+}
+
 /// Whether the `needle` between `before` and `after` is part of a proper name.
 fn in_proper_name(before: &str, needle: &str, after: &str) -> bool {
     PROPER_NAMES.iter().any(|name| {
@@ -36,10 +104,11 @@ fn in_proper_name(before: &str, needle: &str, after: &str) -> bool {
     })
 }
 
-/// `CLAUDE_PLUGIN_DATA` and `$CLAUDE_PROJECT_DIR` (braced or not).
+/// `CLAUDE_PLUGIN_DATA` and `$CLAUDE_PROJECT_DIR` (braced or not) take the
+/// target's form; any other host variable named in prose, what it stands for.
 pub fn environment(text: &str, target: &Target) -> String {
     let text = text.replace("CLAUDE_PLUGIN_DATA", target.plugin_data_var);
-    replace_each(&text, "CLAUDE_PROJECT_DIR", |before, after| {
+    let text = replace_each(&text, "CLAUDE_PROJECT_DIR", |before, after| {
         // A closing brace belongs to the variable only when it opened one:
         // in `${X:-$CLAUDE_PROJECT_DIR}` it closes the outer expansion.
         let (sigil, brace) = if before.ends_with("${") {
@@ -54,6 +123,9 @@ pub fn environment(text: &str, target: &Target) -> String {
                 .before(sigil)
                 .after(brace),
         )
+    });
+    HOST_VARS.iter().fold(text, |text, (name, phrase)| {
+        phrase_each(&text, name, phrase)
     })
 }
 
@@ -95,7 +167,33 @@ mod tests {
         let src = "\"${CLAUDE_PLUGIN_DATA:-x}\" cd \"$CLAUDE_PROJECT_DIR\" && ls ${CLAUDE_PROJECT_DIR}/a; ${X:-$CLAUDE_PROJECT_DIR}; per-`CLAUDE_PROJECT_DIR`";
         assert_eq!(
             environment(src, &CODEX),
-            "\"${PLUGIN_DATA:-x}\" cd \"$(git rev-parse --show-toplevel)\" && ls $(git rev-parse --show-toplevel)/a; ${X:-$(git rev-parse --show-toplevel)}; per-`CLAUDE_PROJECT_DIR`"
+            "\"${PLUGIN_DATA:-x}\" cd \"$(git rev-parse --show-toplevel)\" && ls $(git rev-parse --show-toplevel)/a; ${X:-$(git rev-parse --show-toplevel)}; per-project-root"
+        );
+    }
+
+    #[test]
+    fn a_host_variable_in_prose_reads_as_what_it_stands_for() {
+        let src = "**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled. \
+                   2. `CLAUDE_MODEL` (legacy); CLAUDE_MODEL_ID; `CLAUDE_SKILL_DIR` in `${…}` form; \
+                   ${CLAUDE_MODEL:-x}; MY_CLAUDE_MODEL";
+        assert_eq!(
+            environment(src, &CODEX),
+            "**When:** the host's agent-teams mode is enabled. \
+             2. the host's model variable (legacy); the host's model variable; \
+             the skill's own directory in `${…}` form; ${CLAUDE_MODEL:-x}; MY_CLAUDE_MODEL"
+        );
+    }
+
+    #[test]
+    fn a_host_tool_reads_as_the_step_it_takes() {
+        let src = "Check `TaskList`, claim via `TaskUpdate`; \
+                   TaskUpdate(taskId, status=\"completed\") then SendMessage to lead; \
+                   use AskUserQuestion; TodoWrite; MyTaskList";
+        assert_eq!(
+            host_tools(src),
+            "Check the shared task list, claim via a task update; \
+             a task update (taskId, status=\"completed\") then a message to lead; \
+             use a question to the user; the to-do list; MyTaskList"
         );
     }
 
