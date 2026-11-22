@@ -43,6 +43,7 @@ pub mod semver;
 pub mod setup;
 pub mod sidecar_lock;
 pub mod skill_env;
+pub mod skill_store;
 pub mod snapshot;
 pub mod state_paths;
 pub mod system_deps;

@@ -58,5 +58,6 @@ failed_from!(
     mewkit_core::exec::ExecError,
     mewkit_core::ownership::IndexError,
     mewkit_core::fsx::PathError,
+    mewkit_core::skill_store::StoreError,
     mewkit_adapters::EmitError
 );

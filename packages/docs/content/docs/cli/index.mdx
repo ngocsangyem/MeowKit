@@ -457,13 +457,15 @@ Guided post-scaffold configuration
 
 ### `mewkit skill`
 
-Per-skill interpreter environments
+Per-skill environments and the skill store (status of installed skills)
 
-Subcommands: `env`.
+Subcommands: `env`, `status`.
 
 | Flag | What it does |
 |---|---|
 | `--list` | List every skill that declares a runtime and the state of its environment |
+| `--global` | Act on your home directory instead of this project (skill store verbs) |
+| `--json` | Print one JSON document instead of text (skill store verbs) |
 
 ### `mewkit pack`
 

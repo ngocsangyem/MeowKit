@@ -1,4 +1,5 @@
 //! `skill env` — create, repair or list per-skill interpreter environments.
+//! The skill store's verbs are dispatched to [`super::skill_store`].
 //!
 //! The only command in the kit that creates an interpreter environment, and it
 //! does so only when a user names a skill. Nothing calls it implicitly: a skill
@@ -24,13 +25,19 @@ use crate::failure::{FAILED, Failure, OK, USAGE};
 
 #[derive(Args, Debug)]
 pub struct SkillArgs {
-    /// `env`.
+    /// `env` or `status`.
     pub subcommand: Option<String>,
-    /// The skill whose environment to create or repair.
+    /// The skill to act on.
     pub skill: Option<String>,
     /// List every skill that declares a runtime and the state of its environment.
     #[arg(long)]
     pub list: bool,
+    /// Act on your home directory instead of this project (skill store verbs).
+    #[arg(long)]
+    pub global: bool,
+    /// Print one JSON document instead of text (skill store verbs).
+    #[arg(long)]
+    pub json: bool,
 }
 
 const USAGE_TEXT: &str = "mewkit skill env \u{2014} per-skill interpreter environments
@@ -44,6 +51,9 @@ pub fn run(args: &SkillArgs) -> Result<u8, Failure> {
     let Some(sub) = args.subcommand.as_deref() else {
         return Ok(invocation_error("`mewkit skill` needs a subcommand."));
     };
+    if super::skill_store::VERBS.contains(&sub) {
+        return super::skill_store::run(sub, args);
+    }
     if sub != "env" {
         return Ok(invocation_error(&format!(
             "Unknown `skill` subcommand: {sub}"
@@ -65,7 +75,10 @@ pub fn run(args: &SkillArgs) -> Result<u8, Failure> {
 /// The catalogue's refusal, word for word, on stderr with exit 2.
 fn invocation_error(headline: &str) -> u8 {
     eprintln!("{headline}");
-    eprintln!("Valid subcommands: env");
+    eprintln!(
+        "Valid subcommands: env, {}",
+        super::skill_store::VERBS.join(", ")
+    );
     eprintln!("Run `mewkit skill --help` for usage.");
     USAGE
 }

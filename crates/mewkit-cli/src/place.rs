@@ -81,6 +81,22 @@ impl Place {
         self.rel(tail).under(&self.scope.root)
     }
 
+    /// Where this scope keeps its skill store: the sidecar beside the
+    /// ownership ledgers, the rest machine-local under the state directory.
+    pub fn store_paths(&self) -> mewkit_core::skill_store::StorePaths {
+        let (ownership, dir, lock) = if self.state == ".meowkit" {
+            ("state/ownership", "state/skill-store", "state/mewkit.lock")
+        } else {
+            ("ownership", "skill-store", "mewkit.lock")
+        };
+        mewkit_core::skill_store::StorePaths {
+            sidecar: self.rel(&format!("{ownership}/skill-store.json")),
+            dir: self.rel(dir),
+            lock: self.rel(lock),
+            backups: self.rel("backups"),
+        }
+    }
+
     pub fn cache_dir(&self) -> PathBuf {
         self.rel("cache/kits").under(&self.scope.root)
     }

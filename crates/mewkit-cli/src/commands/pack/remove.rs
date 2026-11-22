@@ -156,6 +156,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
         hashes.insert(rel.to_string(), hash.clone());
         ops.ops.push(Op::RemoveFile { path: rel });
     }
+    let store = crate::commands::skill_store::lifecycle::before(&ctx.place);
     let report = execute(
         &ops,
         &ctx.place.exec_scope(e),
@@ -163,6 +164,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
         &|p| hashes.get(p.as_str()).cloned(),
         ExecOptions::default(),
     )?;
+    crate::commands::skill_store::lifecycle::after(&ctx.place, store.as_ref());
     let deleted: Vec<String> = report
         .removed
         .iter()
