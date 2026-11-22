@@ -2,7 +2,7 @@
 name: mk:investigate
 preamble-tier: 2
 version: 1.0.0
-description: "Root-cause debugging ending in a diagnostic report, not an edit. NOT for mk:fix."
+description: "Root-cause debugging ending in a report, not an edit. NOT for mk:fix."
 allowed-tools:
   - Bash
   - Read
@@ -27,7 +27,7 @@ keywords:
   - four-phase
   - iron-law
   - systematic-debugging
-when_to_use: "Asked why something is broken."
+when_to_use: "Why is it broken?"
 user-invocable: true
 owner: research
 criticality: medium

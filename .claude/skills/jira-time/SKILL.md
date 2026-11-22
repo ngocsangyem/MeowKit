@@ -1,6 +1,6 @@
 ---
 name: mk:jira-time
-description: "mk:jira leaf: log work, worklogs, estimates, time reports."
+description: "mk:jira leaf: worklogs, estimates, time reports."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jira-estimate
   - time-tracking
   - jira-report
-when_to_use: "Log hours on a ticket or pull a worklog report."
+when_to_use: "Log hours or pull a report."
 user-invocable: true
 context: fork
 agent: jira-time

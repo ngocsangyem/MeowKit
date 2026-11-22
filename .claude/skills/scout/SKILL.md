@@ -1,6 +1,6 @@
 ---
 name: mk:scout
-description: "Finds where things live: parallel repo sweep, file map. NOT for mk:research."
+description: "Finds where things live: repo sweep. NOT for mk:research."
 source: local
 keywords:
   - scout

@@ -1,7 +1,7 @@
 ---
 name: mk:vue-best-practices
 version: 1.0.0
-description: "Deep Vue 3 review: built-ins, slots, performance. NOT for mk:vue."
+description: "Deep Vue 3 review: slots, performance. NOT for mk:vue."
 allowed-tools:
   - Read
   - Grep
@@ -17,7 +17,7 @@ keywords:
   - render-functions
   - slots
   - recommendations
-when_to_use: "Review Vue code or suggest improvements."
+when_to_use: "Review Vue code."
 user-invocable: true
 owner: utility
 criticality: medium

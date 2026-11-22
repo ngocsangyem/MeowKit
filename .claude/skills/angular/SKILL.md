@@ -1,7 +1,7 @@
 ---
 name: mk:angular
 version: 1.0.0
-description: "Angular v20+ patterns: components, signals, forms, SSR. NOT for mk:typescript."
+description: "Angular v20+: components, signals, SSR. NOT for mk:typescript."
 allowed-tools:
   - Read
   - Grep
@@ -27,7 +27,7 @@ keywords:
   - angular-cli
   - framework-specific
   - ts-angular
-when_to_use: "Editing .ts files in an angular.json project."
+when_to_use: "Editing Angular .ts."
 user-invocable: true
 owner: utility
 criticality: medium

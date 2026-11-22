@@ -1,6 +1,6 @@
 ---
 name: mk:henshin
-description: "Plans how existing code becomes a CLI, MCP server or companion skill; builds nothing. NOT for mk:cook."
+description: "Plans wrapping code as CLI or MCP. NOT for mk:cook."
 argument-hint: '[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]'
 phase: on-demand
 trust_level: kit-authored
@@ -14,7 +14,7 @@ keywords:
   - wrap-as-tool
   - expose-feature
   - npm-publish
-when_to_use: "Asked to expose code as MCP or wrap as CLI."
+when_to_use: "Wrap code as MCP."
 user-invocable: true
 owner: research
 criticality: medium

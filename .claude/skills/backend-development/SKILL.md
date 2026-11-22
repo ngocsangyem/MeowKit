@@ -1,6 +1,6 @@
 ---
 name: mk:backend-development
-description: "Implements backend endpoints, services, webhooks. NOT for mk:api-design-principles."
+description: "Implements endpoints, services, webhooks. NOT for mk:api-design-principles."
 version: 1.0.0
 argument-hint: '[backend change]'
 source: local
@@ -21,7 +21,7 @@ keywords:
   - failure-semantics
   - backend-architecture
   - auth-integration
-when_to_use: "Changing a server-side endpoint or job."
+when_to_use: "Endpoint work."
 user-invocable: true
 owner: portability
 criticality: medium

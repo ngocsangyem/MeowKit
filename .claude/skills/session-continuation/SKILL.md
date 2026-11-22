@@ -1,6 +1,6 @@
 ---
 name: mk:session-continuation
-description: "Saves and restores workflow progress across context resets. NOT for mk:memory."
+description: "Saves and restores progress across resets. NOT for mk:memory."
 triggers:
   - handoff
   - save state
@@ -15,7 +15,7 @@ keywords:
   - resume-workflow
   - context-reset
   - state-persistence
-when_to_use: "Auto-invoked on compaction or resume."
+when_to_use: "Auto on compaction."
 user-invocable: false
 owner: docs
 criticality: medium

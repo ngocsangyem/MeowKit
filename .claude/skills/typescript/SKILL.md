@@ -1,6 +1,6 @@
 ---
 name: mk:typescript
-description: "TypeScript authoring and strict type-safety fixes. NOT for mk:react-patterns."
+description: "TypeScript authoring and type fixes. NOT for mk:react-patterns."
 source: aura-frog
 original_skills:
   - typescript-expert
@@ -13,7 +13,7 @@ keywords:
   - null-handling
   - utility-types
   - ts-eslint
-when_to_use: "Editing .ts or fixing type errors."
+when_to_use: "Editing .ts."
 user-invocable: true
 owner: utility
 criticality: medium

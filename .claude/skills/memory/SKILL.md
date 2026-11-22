@@ -1,6 +1,6 @@
 ---
 name: mk:memory
-description: "Appends or prunes decisions and gotchas in team memory. NOT for mk:retro."
+description: "Appends or prunes team memory entries. NOT for mk:retro."
 keywords:
   - memory
   - decisions
@@ -9,7 +9,7 @@ keywords:
   - prune
   - persistence
   - team-knowledge
-when_to_use: "Asked to remember a lesson or prune entries."
+when_to_use: "Remember a lesson or prune."
 user-invocable: true
 owner: memory
 criticality: high

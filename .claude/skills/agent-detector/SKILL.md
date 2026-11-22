@@ -1,6 +1,6 @@
 ---
 name: mk:agent-detector
-description: "Picks the task agent and complexity tier at orient time. NOT for mk:scale-routing."
+description: "Picks task agent and complexity tier. NOT for mk:scale-routing."
 triggers:
   - every message
   - always first
@@ -13,7 +13,7 @@ keywords:
   - phase-0-orient
   - auto-detect
   - complexity-classification
-when_to_use: "Auto-invoked at workflow start."
+when_to_use: "Auto at workflow start."
 user-invocable: false
 owner: lifecycle
 criticality: medium

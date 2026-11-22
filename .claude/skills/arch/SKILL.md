@@ -1,6 +1,6 @@
 ---
 name: mk:arch
-description: "Manages ADRs in docs/architecture/adr/. NOT for mk:improve-codebase-architecture."
+description: "Manages ADRs. NOT for mk:improve-codebase-architecture."
 argument-hint: new [title] | list | review [ADR file stem] | impact [change description]
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - decision-record
   - impact-analysis
   - boundary-review
-when_to_use: "An architecture choice needs an ADR."
+when_to_use: "A choice needs an ADR."
 user-invocable: true
 owner: docs
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: mk:simplify
-description: "Simplifies fresh code without changing behavior. NOT for mk:clean-code."
+description: "Simplifies fresh code, same behavior. NOT for mk:clean-code."
 argument-hint: '[file_or_directory]'
 source: local
 allowed-tools:
@@ -16,7 +16,7 @@ keywords:
   - refactor
   - reduce-complexity
   - yagni-pass
-when_to_use: "Build is green; shrink the diff first."
+when_to_use: "Build green; shrink diff."
 user-invocable: true
 owner: docs
 criticality: medium

@@ -2,7 +2,7 @@
 name: mk:office-hours
 preamble-tier: 3
 version: 2.0.0
-description: "YC-style check that an idea is worth building. NOT for mk:plan-ceo-review."
+description: "YC-style check an idea is worth building. NOT for mk:plan-ceo-review."
 allowed-tools:
   - Bash
   - Read
@@ -20,7 +20,7 @@ keywords:
   - forcing-questions
   - brainstorm-builder
   - design-doc
-when_to_use: "A new idea has unproven problem and value."
+when_to_use: "Unproven idea."
 user-invocable: true
 owner: research
 criticality: medium

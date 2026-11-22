@@ -1,6 +1,6 @@
 ---
 name: mk:chom
-description: "Ports a feature from an external repo or product here. NOT for mk:web-to-markdown."
+description: "Ports a feature from an external repo. NOT for mk:web-to-markdown."
 argument-hint: <source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]
 phase: on-demand
 trust_level: kit-authored
@@ -13,7 +13,7 @@ keywords:
   - clone-feature
   - port-from
   - build-like
-when_to_use: "Asked to copy or replicate a feature."
+when_to_use: "Copy a feature."
 user-invocable: true
 owner: research
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-spec-analyst
-description: "Reports requirements and gaps in a Confluence spec. NOT for mk:confluence-page."
+description: "Reports requirements and gaps in a spec. NOT for mk:confluence-page."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - gap-detection
   - story-suggestion
   - weasel-word
-when_to_use: "Pull requirements from a spec."
+when_to_use: "Spec requirements."
 user-invocable: true
 context: fork
 agent: confluence-spec-analyst

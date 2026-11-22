@@ -20,7 +20,7 @@ keywords:
   - destructive-commands
   - prod-mode
   - guardrails
-when_to_use: "Working on prod or shared environments."
+when_to_use: "Working on prod."
 user-invocable: true
 owner: research
 criticality: medium

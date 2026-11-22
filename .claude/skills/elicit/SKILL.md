@@ -2,7 +2,7 @@
 name: mk:elicit
 version: 1.0.0
 preamble-tier: 3
-description: "Second-pass review: pre-mortem, inversion, red team. NOT for mk:review."
+description: "Second-pass review: pre-mortem, inversion. NOT for mk:review."
 allowed-tools:
   - Read
   - Grep
@@ -17,7 +17,7 @@ keywords:
   - red-team-analysis
   - socratic
   - inversion
-when_to_use: "A verdict exists and needs a deeper look."
+when_to_use: "Deeper look at a verdict."
 user-invocable: true
 owner: research
 criticality: medium

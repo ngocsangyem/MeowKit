@@ -1,6 +1,6 @@
 ---
 name: mk:jira-agile
-description: "mk:jira leaf: epics, sprints, backlog, ranking, points. NOT for mk:jira-estimator."
+description: "mk:jira leaf: epics, sprints, backlog. NOT for mk:jira-estimator."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-backlog
   - story-points
   - velocity
-when_to_use: "Move items between sprints or read totals."
+when_to_use: "Sprint moves."
 user-invocable: true
 context: fork
 agent: jira-agile

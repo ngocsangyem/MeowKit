@@ -1,6 +1,6 @@
 ---
 name: mk:intake
-description: "Scores a ticket or PRD: area, completeness, root cause. NOT for mk:breakdown."
+description: "Scores a ticket or PRD for completeness. NOT for mk:breakdown."
 phase: 0
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - completeness-scoring
   - triage
   - jira-linear-github
-when_to_use: "One Jira, Linear or GitHub item needs triage."
+when_to_use: "Triage a ticket."
 user-invocable: true
 owner: research
 criticality: medium

@@ -3,7 +3,7 @@ name: mk:research
 preamble-tier: 2
 version: 1.0.0
 argument-hint: "[topic] [--deep] [--html]"
-description: "Cited multi-source technical research for a decision. NOT for mk:docs-finder."
+description: "Cited multi-source technical research. NOT for mk:docs-finder."
 allowed-tools:
   - Read
   - Grep
@@ -22,7 +22,7 @@ keywords:
   - multi-source
   - evidence-gathering
   - best-practices
-when_to_use: "Choosing between technologies."
+when_to_use: "Choosing technologies."
 user-invocable: true
 owner: research
 criticality: medium

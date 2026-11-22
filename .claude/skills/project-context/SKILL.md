@@ -1,6 +1,6 @@
 ---
 name: mk:project-context
-description: "Generates docs/project-context.md, conventions every agent loads. NOT for mk:docs-init."
+description: "Generates docs/project-context.md. NOT for mk:docs-init."
 triggers:
   - generate context
   - project context
@@ -18,7 +18,7 @@ keywords:
   - conventions
   - anti-patterns
   - docs-init
-when_to_use: "Conventions moved; the context file is stale."
+when_to_use: "The context file is stale."
 user-invocable: true
 owner: docs
 criticality: medium

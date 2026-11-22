@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-page
-description: "Confluence page CRUD, copy, move, hierarchy. NOT for mk:confluence-collaborate."
+description: "Confluence page CRUD, copy, move. NOT for mk:confluence-collaborate."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - page-version
   - copy-page
   - move-page
-when_to_use: "Create, edit or delete one page."
+when_to_use: "Edit one page."
 user-invocable: true
 context: fork
 agent: confluence-page

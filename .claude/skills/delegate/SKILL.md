@@ -1,6 +1,6 @@
 ---
 name: mk:delegate
-description: "Assembles a context-isolated subagent prompt. NOT for mk:team-config."
+description: "Assembles an isolated subagent prompt. NOT for mk:team-config."
 argument-hint: '[task description] [--silent]'
 source: local
 trust_level: kit-authored
@@ -16,7 +16,7 @@ keywords:
   - context-isolation
   - prompt-builder
   - subagent-handoff
-when_to_use: "One bounded job goes to a subagent."
+when_to_use: "One job to a subagent."
 user-invocable: true
 owner: lifecycle
 criticality: medium

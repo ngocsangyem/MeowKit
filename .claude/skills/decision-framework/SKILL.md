@@ -17,7 +17,7 @@ keywords:
   - escalation
   - case-management
   - operational-decisions
-when_to_use: "Asked how to handle a class of cases."
+when_to_use: "Handling a class of cases."
 user-invocable: true
 owner: research
 criticality: medium

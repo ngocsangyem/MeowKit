@@ -1,6 +1,6 @@
 ---
 name: mk:orchestrate
-description: "Splits a job across agent CLIs and subagents in worktrees. NOT for mk:cook."
+description: "Splits a job across agent CLIs. NOT for mk:cook."
 argument-hint: '<job-spec.yaml | task description | --resume <run-dir>> [--yes] [--internal]'
 source: local
 version: '1.0.0'
@@ -19,7 +19,7 @@ keywords:
   - resume
   - job-spec
   - cross-toolkit
-when_to_use: "Work needs several runtimes or parallel writers."
+when_to_use: "Parallel writers."
 owner: lifecycle
 criticality: medium
 status: active

@@ -1,6 +1,6 @@
 ---
 name: mk:testing
-description: "Writes and runs tests; red-green-refactor in TDD mode. NOT for mk:nyquist."
+description: "Writes and runs tests; TDD cycle. NOT for mk:nyquist."
 keywords:
   - testing
   - unit-tests

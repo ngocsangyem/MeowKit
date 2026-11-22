@@ -11,7 +11,7 @@ keywords:
   - get-issue
   - update-issue
   - delete-issue
-when_to_use: "One Jira issue by key: open, edit, delete."
+when_to_use: "One issue by key."
 user-invocable: true
 context: fork
 agent: jira-issue

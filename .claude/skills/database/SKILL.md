@@ -1,6 +1,6 @@
 ---
 name: mk:database
-description: "Data model, schema, migration, query and index work. NOT for mk:api-design-principles."
+description: "Schema, migration, query work. NOT for mk:api-design-principles."
 version: 2.0.0
 argument-hint: '[model|migration|query|index|orm|store] [description]'
 source: local
@@ -22,7 +22,7 @@ keywords:
   - data-invariants
   - backfill
   - recovery
-when_to_use: "Changing a schema or slow query."
+when_to_use: "Schema change."
 user-invocable: true
 owner: portability
 criticality: high

@@ -14,7 +14,7 @@ keywords:
   - complexity-routing
   - csv-routing
   - execution-tier
-when_to_use: "Auto-invoked while tiering. Not user-callable."
+when_to_use: "Auto while tiering."
 owner: portability
 criticality: medium
 status: active

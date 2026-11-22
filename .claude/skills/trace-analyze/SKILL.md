@@ -2,7 +2,7 @@
 name: mk:trace-analyze
 version: 1.0.0
 preamble-tier: 3
-description: "Mines harness trace logs for recurring failures, with a human approval step. NOT for mk:retro."
+description: "Mines harness traces for failures. NOT for mk:retro."
 argument-hint: '[--runs N] [--pattern <type>]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - scatter-gather
   - hitl-gate
   - model-upgrade-audit
-when_to_use: "Harness runs keep failing alike."
+when_to_use: "Harness runs keep failing."
 user-invocable: true
 owner: observability
 criticality: medium

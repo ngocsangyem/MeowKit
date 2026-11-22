@@ -13,7 +13,7 @@ keywords:
   - triage
   - just-in-time
   - sub-agent
-when_to_use: "Context nears budget mid-task."
+when_to_use: "Near budget."
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

@@ -2,7 +2,7 @@
 name: mk:grill
 preamble-tier: 3
 version: 1.0.0
-description: "Grills the user on their own plan, one question at a time. NOT for mk:advise."
+description: "Grills the user on their plan. NOT for mk:advise."
 allowed-tools:
   - Read
   - Grep
@@ -20,7 +20,7 @@ keywords:
   - plan-interrogation
   - tacit-knowledge
   - shared-understanding
-when_to_use: "Asked to grill or stress-test a design."
+when_to_use: "Stress-test a design."
 user-invocable: true
 owner: research
 criticality: medium

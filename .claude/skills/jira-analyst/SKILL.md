@@ -1,6 +1,6 @@
 ---
 name: mk:jira-analyst
-description: "mk:jira leaf: reads one ticket with comments, links, media. NOT for mk:jira-evaluator."
+description: "mk:jira leaf: reads one ticket. NOT for mk:jira-evaluator."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - ticket-rca
   - media-analysis
   - attachment-analysis
-when_to_use: "Want full context or RCA on a ticket."
+when_to_use: "Ticket context."
 user-invocable: true
 context: fork
 agent: jira-analyst

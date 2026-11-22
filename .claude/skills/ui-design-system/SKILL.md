@@ -1,7 +1,7 @@
 ---
 name: mk:ui-design-system
 version: 2.0.0
-description: "Designs UI components and design systems; audits WCAG. NOT for mk:frontend-design."
+description: "UI components, design systems, WCAG. NOT for mk:frontend-design."
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - wcag
   - accessibility-audit
   - responsive-design
-when_to_use: "Palette, fonts or contrast questions."
+when_to_use: "Palette or contrast."
 user-invocable: true
 owner: utility
 criticality: medium

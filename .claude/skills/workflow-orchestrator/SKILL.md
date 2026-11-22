@@ -1,6 +1,6 @@
 ---
 name: mk:workflow-orchestrator
-description: "Routes complex-feature intent through the 7-phase workflow. NOT for mk:cook."
+description: "Routes complex features through 7 phases. NOT for mk:cook."
 triggers:
   - implement feature
   - build feature
@@ -20,7 +20,7 @@ keywords:
   - intent-detection
   - fasttrack
   - complex-feature
-when_to_use: "Auto-invoked on complex feature intent."
+when_to_use: "Auto on complex features."
 user-invocable: false
 owner: lifecycle
 criticality: high

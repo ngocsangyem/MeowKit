@@ -1,6 +1,6 @@
 ---
 name: mk:multimodal
-description: "Analyses and generates images, video, audio, PDFs. NOT for mk:html-video."
+description: "Analyses and generates images, video, audio. NOT for mk:html-video."
 version: 2.1.0
 argument-hint: '[file-path] [task]'
 phase: on-demand
@@ -30,7 +30,7 @@ keywords:
   - video
   - audio
   - minimax
-when_to_use: "Asked to transcribe, describe or generate media."
+when_to_use: "Describe media."
 user-invocable: true
 allowed-tools:
   - Bash

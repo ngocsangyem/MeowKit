@@ -1,6 +1,6 @@
 ---
 name: mk:story-sizer
-description: "Fibonacci-sizes pasted stories before Jira tickets exist. NOT for mk:jira-estimator."
+description: "Fibonacci-sizes pasted stories. NOT for mk:jira-estimator."
 argument-hint: '--paste [--scout] [--story <id>] | --paste --auto-create --project <KEY> [--epic <KEY>]'
 phase: on-demand
 source: local

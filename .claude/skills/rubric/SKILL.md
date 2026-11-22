@@ -2,7 +2,7 @@
 name: mk:rubric
 version: 1.0.0
 preamble-tier: 3
-description: "Loads, composes, validates weighted PASS/WARN/FAIL rubrics. NOT for mk:evaluate."
+description: "Loads, composes, validates weighted rubrics. NOT for mk:evaluate."
 argument-hint: '[list | load <name> | compose <preset> | validate]'
 allowed-tools:
   - Bash

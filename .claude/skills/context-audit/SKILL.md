@@ -2,7 +2,7 @@
 name: mk:context-audit
 preamble-tier: 1
 version: 1.0.0
-description: "Read-only audit of .claude/ overhead by tokens saved. NOT for mk:context-engineering."
+description: "Read-only audit of .claude/ overhead. NOT for mk:context-engineering."
 allowed-tools:
   - Bash
   - Read
@@ -19,7 +19,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: "Session feels bloated."
+when_to_use: "Bloated session."
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

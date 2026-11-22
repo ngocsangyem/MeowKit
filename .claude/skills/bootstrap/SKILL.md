@@ -1,7 +1,7 @@
 ---
 name: mk:bootstrap
 version: 2.1.0
-description: "Scaffolds a new project from idea to running code. NOT for mk:autobuild."
+description: "Scaffolds a new project to running code. NOT for mk:autobuild."
 allowed-tools:
   - Bash
   - Read
@@ -18,7 +18,7 @@ keywords:
   - new-project
   - initial-scaffolding
   - greenfield-init
-when_to_use: "An empty repo needs its first code."
+when_to_use: "Empty repo."
 user-invocable: true
 owner: lifecycle
 criticality: medium

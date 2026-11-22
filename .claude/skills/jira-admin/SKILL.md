@@ -1,6 +1,6 @@
 ---
 name: mk:jira-admin
-description: "mk:jira leaf: project, user, group, scheme admin. NOT for mk:jira-jsm."
+description: "mk:jira leaf: project, user admin. NOT for mk:jira-jsm."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - group-admin
   - permission-scheme
   - jira-automation
-when_to_use: "Create a Jira project or manage users, groups."
+when_to_use: "Manage projects or users."
 user-invocable: true
 context: fork
 agent: jira-admin

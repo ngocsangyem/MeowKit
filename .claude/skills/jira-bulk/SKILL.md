@@ -1,6 +1,6 @@
 ---
 name: mk:jira-bulk
-description: "mk:jira leaf: 10+ issues at once, dry-run first. NOT for mk:jira-issue."
+description: "mk:jira leaf: 10+ issues, dry-run first. NOT for mk:jira-issue."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - bulk-delete
   - bulk-clone
   - dry-run
-when_to_use: "A Jira change sweeping ten or more issues."
+when_to_use: "Change ten+ issues."
 user-invocable: true
 context: fork
 agent: jira-bulk

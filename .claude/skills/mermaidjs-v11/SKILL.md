@@ -2,7 +2,7 @@
 name: mk:mermaidjs-v11
 description: "Writes inline Mermaid v11 diagrams. NOT for mk:tech-graph."
 user-invocable: true
-when_to_use: "A diagram belongs in markdown or a README."
+when_to_use: "A diagram in markdown."
 keywords:
   - mermaid
   - mermaid-v11

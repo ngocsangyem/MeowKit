@@ -1,6 +1,6 @@
 ---
 name: mk:web-to-markdown
-description: "Fetches one URL and returns clean markdown. NOT for mk:docs-finder."
+description: "Fetches one URL as clean markdown. NOT for mk:docs-finder."
 argument-hint: <url> [--wtm-accept-risk] [--wtm-approve]
 keywords:
   - web-to-markdown
@@ -8,7 +8,7 @@ keywords:
   - page-to-markdown
   - external-page
   - one-shot-fetch
-when_to_use: "Read a blog, RFC or issue link as text."
+when_to_use: "Read a blog or RFC link."
 user-invocable: true
 owner: docs
 criticality: medium

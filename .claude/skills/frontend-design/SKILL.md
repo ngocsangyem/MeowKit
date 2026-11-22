@@ -1,6 +1,6 @@
 ---
 name: mk:frontend-design
-description: "Designs and reviews UI components and accessibility. NOT for mk:ui-design-system."
+description: "Designs and reviews UI, accessibility. NOT for mk:ui-design-system."
 source: local
 original_skills:
   - ui-ux-pro-max
@@ -12,7 +12,7 @@ keywords:
   - screenshot-replication
   - design-implementation
   - best-practices
-when_to_use: "Building or critiquing one screen."
+when_to_use: "Critique a screen."
 user-invocable: true
 owner: utility
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: mk:agent-browser
-description: "Drives a browser via CLI: click, fill, screenshot. NOT for mk:chrome-profile."
+description: "Drives a browser via CLI. NOT for mk:chrome-profile."
 allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*)
 source: vercel-labs/agent-browser
 version: 0.2.0

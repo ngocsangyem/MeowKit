@@ -2,7 +2,7 @@
 name: mk:prompt-enhancer
 version: 1.3.1
 argument-hint: '[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]'
-description: "Rewrites a draft agent prompt into goal, context, constraints. NOT for mk:elicit."
+description: "Rewrites a draft agent prompt. NOT for mk:elicit."
 source: local
 allowed-tools:
   - Read

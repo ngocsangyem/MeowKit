@@ -2,7 +2,7 @@
 name: mk:resolving-merge-conflicts
 preamble-tier: 2
 version: 1.0.0
-description: "Resolves a merge or rebase conflict hunk by hunk. NOT for mk:ship."
+description: "Resolves merge conflicts by hunk. NOT for mk:ship."
 allowed-tools:
   - Bash
   - Read
@@ -17,7 +17,7 @@ keywords:
   - conflict-resolution
   - unmerged-paths
   - three-way-merge
-when_to_use: "git status shows unmerged paths."
+when_to_use: "Unmerged paths."
 user-invocable: true
 owner: git
 criticality: high
