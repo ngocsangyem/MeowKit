@@ -73,7 +73,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 
 | Handler | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
-| `pre-task-check.cjs` | PreToolUse | Bash | pre-task-check | — | Reports prompt-injection patterns in a command to the model as additionalContext (advisory) |
+| `pre-task-check.cjs` | PreToolUse | Bash | pre-task-check | — | Reports blocking-class prompt-injection patterns in a command to the model as additionalContext (advisory); length and outside-project paths are not reported |
 | `delegation-brief-check.cjs` | PreToolUse | Task\|Agent | delegation-brief-check | — | Notes, as additionalContext, a delegation brief with no `Goal:` or `Return:` label; records one trace event |
 | `build-verify.cjs` | PostToolUse | Edit\|Write | build-verify | — | Runs the project build after an edit |
 | `loop-detection.cjs` | PostToolUse | Edit\|Write | loop-detection | — | Reminds the model, as additionalContext, at 4 and 8 edits to one file, then every 4 |
