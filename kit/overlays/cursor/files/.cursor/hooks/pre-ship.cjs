@@ -17,7 +17,7 @@
 "use strict";
 
 process.on("uncaughtException", (err) => {
-	const reason = `MeowKit ship check could not run: the ship check crashed (${err && err.message ? err.message : String(err)}). The ship is unverified.`;
+	const reason = `Ship check could not run: the ship check crashed (${err && err.message ? err.message : String(err)}). The ship is unverified.`;
 	process.stdout.write(JSON.stringify({ permission: "ask", user_message: reason, agent_message: reason }));
 	process.exit(0);
 });
@@ -42,6 +42,6 @@ const lines = [...result.stderr, ...result.stdout.filter((l) => /FAIL|DID NOT FI
 const reason = lines.join("\n");
 emit({
 	permission: result.outcome === "could_not_run" ? "ask" : "deny",
-	user_message: `MeowKit ship check: ${reason}`,
+	user_message: `Ship check: ${reason}`,
 	agent_message: reason,
 });

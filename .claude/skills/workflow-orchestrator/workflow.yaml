@@ -1,5 +1,5 @@
 ---
-# Canonical workflow specification for the MeowKit 7-phase lifecycle.
+# Canonical workflow specification for the 7-phase lifecycle.
 #
 # This file is the single source of truth for phase names, leads and
 # required-output path patterns. All prose files that describe the lifecycle
@@ -87,7 +87,7 @@ contract_substep:
   required_output: "tasks/contracts/*-{slug}-sprint-*.md"
 
 # Prose lifecycle files that the drift-check will scan.
-# Paths are relative to the MeowKit project root (the parent of .claude/),
+# Paths are relative to the project root (the parent of .claude/),
 # which is the working directory the validate command runs from.
 # Each file must contain a "Canonical source: workflow.yaml" pointer.
 # The always-on core rule carries the lifecycle line and is the always-loaded

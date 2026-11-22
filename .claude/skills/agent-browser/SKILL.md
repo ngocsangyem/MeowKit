@@ -132,7 +132,7 @@ For full command flags, read [references/commands.md](references/commands.md).
 For agent workflows, derive a stable session once and reuse it:
 
 ```bash
-SESSION="$(agent-browser session id --scope worktree --prefix meowkit)"
+SESSION="$(agent-browser session id --scope worktree --prefix mk)"
 agent-browser --session "$SESSION" --restore open https://app.example.com/dashboard
 agent-browser --session "$SESSION" snapshot -i
 agent-browser --session "$SESSION" close

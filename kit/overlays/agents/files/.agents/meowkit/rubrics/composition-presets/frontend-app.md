@@ -16,7 +16,7 @@ rubrics:
 
 # Preset: frontend-app
 
-Default composition for any frontend / browser-rendered build. **Pruned in v2.0.0** to the 4 rubrics that close evaluation gaps the rest of the meowkit ecosystem doesn't already cover.
+Default composition for any frontend / browser-rendered build. **Pruned in v2.0.0** to the 4 rubrics that close evaluation gaps the rest of the kit doesn't already cover.
 
 ## When to Use
 

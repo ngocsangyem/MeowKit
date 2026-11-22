@@ -22,7 +22,7 @@ const MARKER = '@@GATE_BLOCK@@';
 
 /** Answer `ask` with the reason, so a person decides whether an unverified ship goes ahead. */
 function askHuman(lines) {
-  const reason = ['MeowKit ship check could not run, so this ship is unverified.', ...lines].join('\n');
+  const reason = ['Ship check could not run, so this ship is unverified.', ...lines].join('\n');
   process.stdout.write(`${JSON.stringify({
     hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'ask', permissionDecisionReason: reason },
   })}\n`);

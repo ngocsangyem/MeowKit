@@ -22,6 +22,6 @@ if (!verdict.blocked) {
 
 emit(
 	verdict.blocked
-		? { permission: "deny", user_message: `Blocked by MeowKit privacy gate: ${verdict.reason}` }
+		? { permission: "deny", user_message: `Blocked by privacy gate: ${verdict.reason}` }
 		: { permission: "allow" },
 );

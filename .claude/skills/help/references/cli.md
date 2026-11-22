@@ -24,7 +24,7 @@ Options:
       --delivery <SHAPE>      Claude Code only: `native` (the host's own directory) or `plugin` (the same content plus a plugin manifest)
       --mcp-profiles <NAMES>  Cursor: MCP profile names, or `all`, to merge into .cursor/mcp.json. Without it no MCP config is written
       --allow-cloud-mcp       Cursor: second opt-in for applying an MCP profile to a project that has a git remote (Cursor Cloud Agents run no local MCP hooks)
-      --allow-kit-source      Run even in the MeowKit source repo (whose `.claude/` is the kit's authored source, and which an install would overwrite)
+      --allow-kit-source      Run even in the kit's source repo (whose `.claude/` is the kit's authored source, and which an install would overwrite)
       --dry-run               Show what would change and change nothing installed (a downloaded kit is still kept in the cache)
       --adopt-from <TAG>      The kit release the files here came from (e.g. v3.0.0), when a project has the kit's files and no install record. Files that still match that release are taken as the kit's; the rest stay yours
   -y, --yes                   Answer every question with its default and do not ask any

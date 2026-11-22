@@ -1,4 +1,4 @@
-// MeowKit guards for Pi: every tool call is judged by .agents/meowkit/hooks/guard.cjs before it
+// Kit guards for Pi: every tool call is judged by .agents/meowkit/hooks/guard.cjs before it
 // runs (the privacy guard on every call, the ship check on a shell command).
 //
 // Written against @earendil-works/pi-coding-agent 1.5.2, docs/extensions.md: a default-exported
@@ -42,9 +42,9 @@ export default function (pi: any) {
 				throw new Error(`no answer from ${guard} (exit ${result.code}): ${String(result.stderr).trim()}`);
 			}
 			if (result.code === 0 && answer.block === false) return undefined;
-			return { block: true, reason: answer.reason || "MeowKit guard blocked this call." };
+			return { block: true, reason: answer.reason || "Kit guard blocked this call." };
 		} catch (error) {
-			return { block: true, reason: `MeowKit guard could not run, so the call is not allowed: ${error}` };
+			return { block: true, reason: `Kit guard could not run, so the call is not allowed: ${error}` };
 		} finally {
 			if (scratch) rmSync(scratch, { recursive: true, force: true });
 		}

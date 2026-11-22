@@ -157,7 +157,7 @@ function locateCliOnPath(root, env) {
 function installBlock(root, env = process.env) {
   if (locateCliOnPath(root, env) !== null) return [];
   return [
-    '## MeowKit CLI not available',
+    '## mewkit CLI not available',
     'This project carries `.claude/` but no `mewkit` CLI (no committed launcher, no node_modules, nothing on PATH).',
     'Guards and observers all still run — none of them needs it — but the checks that call it skip instead.',
     'Install the `mewkit` binary (https://docs.meowkit.dev/installation), then run `mewkit doctor` to see what this clone is missing.',

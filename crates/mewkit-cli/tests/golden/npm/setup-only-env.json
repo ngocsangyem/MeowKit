@@ -3,6 +3,6 @@
   "stdout": "\nMeowKit Setup\n\n  ✓ env: Created .meowkit/.env — add your API keys.\n      did mkdir .meowkit\n      did create .meowkit/.env\n\n  Summary: 1 configured, 0 skipped\n",
   "stderr": "",
   "files": {
-    ".meowkit/.env": "# MeowKit Environment Variables\n# Never commit this file to git. Shell exports take precedence.\n\n# Gemini (recommended — analysis, image gen, video gen)\n# Get from: https://aistudio.google.com/apikey\nMEOWKIT_GEMINI_API_KEY=\n\n# MiniMax (optional — TTS, music, Hailuo video, image fallback)\n# Get from: https://platform.minimax.io/\n# MEOWKIT_MINIMAX_API_KEY=\n\n# OpenRouter (optional — image gen fallback)\n# Get from: https://openrouter.ai/keys\n# MEOWKIT_OPENROUTER_API_KEY=\n# MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true\n\n"
+    ".meowkit/.env": "# Environment Variables\n# Never commit this file to git. Shell exports take precedence.\n\n# Gemini (recommended — analysis, image gen, video gen)\n# Get from: https://aistudio.google.com/apikey\nMEOWKIT_GEMINI_API_KEY=\n\n# MiniMax (optional — TTS, music, Hailuo video, image fallback)\n# Get from: https://platform.minimax.io/\n# MEOWKIT_MINIMAX_API_KEY=\n\n# OpenRouter (optional — image gen fallback)\n# Get from: https://openrouter.ai/keys\n# MEOWKIT_OPENROUTER_API_KEY=\n# MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true\n\n"
   }
 }

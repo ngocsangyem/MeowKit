@@ -38,7 +38,6 @@ allowed-tools:
   - Edit
 argument-hint: '[generate|export|quota] [args]'
 metadata:
-  author: meowkit
   version: 1.0.0
 owner: utility
 criticality: medium

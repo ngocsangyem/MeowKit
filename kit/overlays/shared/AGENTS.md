@@ -1,4 +1,4 @@
-# MeowKit working rules
+# Working rules
 
 Read in every session; procedures belong in skills.
 

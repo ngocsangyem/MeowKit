@@ -85,7 +85,9 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 
 ### Migration Notes
 
-- Installed text changed. A script or hook that matched `MeowKit ship check` or a `# MeowKit` heading needs the new wording. A file you edited keeps your edit, and `upgrade` exits 6 on it, as before.
+- `mewkit setup` now writes `# Environment Variables` at the top of `.meowkit/.env` and starts the `.gitignore` block with `# mewkit`; an existing block is left as it is.
+- An older `mewkit doctor --hard-gates` run against the 3.1.0 kit reports one false failure on the injection-scan row, because it looks for the old message; upgrade the binary to 0.2.0.
+- Installed text changed. A script or hook that matched `MeowKit ship check` or a `# MeowKit` heading needs the new wording: `# MeowKit Core` is now `# Core Rules`, the shared `AGENTS.md` heading is now `# Working rules`, and hook messages drop the prefix (`Ship check: …`, `Injection scan flagged …`). A file you edited keeps your edit, and `upgrade` exits 6 on it, as before.
 - An archived plan can no longer be read by an agent on any runtime. The shipped code is the source of truth; the plan is kept for the record.
 - The plan threshold is more than two files or about 30 minutes everywhere. `plan-creator` had said one hour.
 - Antigravity's guards are unverified. Check them on a live run before you rely on them.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Git Worktree Manager for MeowKit
+ * Git Worktree Manager
  *
  * Usage: node worktree.cjs <command> [options]
  * Commands:
@@ -708,7 +708,7 @@ function cmdPrune() {
 }
 
 function showHelp() {
-  console.log(`Git Worktree Manager for MeowKit
+  console.log(`Git Worktree Manager
 
 Usage: node worktree.cjs <command> [options]
 

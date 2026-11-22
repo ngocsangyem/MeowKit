@@ -40,7 +40,7 @@ const STATE_ONLY_KEYS = {
 
 /** Key prefixes that are rejected outright rather than being unknown keys. */
 const FORBIDDEN_NAMESPACES = {
-  gates: 'MeowKit has no configurable gates; the ship check is not a preference',
+  gates: 'There are no configurable gates; the ship check is not a preference',
   paths: 'a configurable workflow path would move writes out of the paths the guards key off',
 };
 
