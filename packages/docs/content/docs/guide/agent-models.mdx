@@ -35,11 +35,12 @@ Sources: the `model:` field of each `.claude/agents/<name>.md`, and the effort v
 
 Lowering a tier does not lower a check. Confirmation prompts, dry-run requirements, scope checks and wrapper validation do not depend on the model.
 
-## Grok, Pi and OMP
+## Grok, Pi, OMP and Antigravity
 
 - Grok: its documentation names no model per tier and no agent file format, so the agent prompts installed for Grok carry no `model`.
 - Pi: no subagents, so no agents are installed.
 - OMP: the agents are written without `model`, which OMP treats as optional, so they run on the session's model.
+- Antigravity: an agent's `model` is `inherit`, `flash` or `pro` (https://antigravity.google/docs/subagents, read 2026-11-22; not probed). The page does not say which models those are, so the tiers map by size: `haiku` to `flash`, `sonnet` to `inherit`, `opus` and `fable` to `pro`.
 
 ## Change a pin
 

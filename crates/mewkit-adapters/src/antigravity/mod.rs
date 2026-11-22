@@ -4,17 +4,30 @@
 //! `AGENTS.md`, the two places Codex, Pi and OMP read too
 //! (https://antigravity.google/docs/skills, https://antigravity.google/docs/rules,
 //! read 2026-11-22). Its content is therefore the shared `.agents/` tree (see
-//! [`crate::agents_tree`]) and the kit's block in `AGENTS.md`.
+//! [`crate::agents_tree`]) and the kit's block in `AGENTS.md`, plus what only
+//! Antigravity loads:
+//! - `.agents/rules/*.md`, the rule files that load on demand (see [`rules`]);
+//!   the always-on rules stay in the `AGENTS.md` block, so the safety text has
+//!   one copy;
+//! - `.agents/agents/<name>.md`, each kit agent with the tools and model
+//!   Antigravity takes (see `agents`).
 //!
 //! No hook is installed: the runtime reads `.agents/hooks.json`, but a guard
 //! written from its documentation alone has not been seen to deny, so the
 //! emitter says "guards not installed" instead of shipping one that may never
 //! fire. The shared tree carries the guard script, which nothing runs here.
+mod agents;
+pub mod rules;
+
 use crate::agents_tree;
 use crate::contract::{
     EmitError, EmitRequest, Emitter, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
 use crate::{report_gate, strip};
+
+const OVERLAY: &str = "kit/overlays/antigravity";
+/// The folder Antigravity loads agent definitions from.
+pub const AGENTS_DIR: &str = ".agents/agents";
 
 /// What an install of Antigravity says about its guards.
 pub const NO_GUARDS: &str = "guards not installed: Antigravity runs no privacy guard and no ship check from this kit, so nothing here refuses a read of a credential file or a failing commit";
@@ -45,6 +58,7 @@ impl Emitter for Antigravity {
     fn roots(&self, _scope: &Scope) -> Vec<RelPath> {
         agents_tree::ROOTS
             .iter()
+            .chain([rules::DIR, AGENTS_DIR].iter())
             .map(|r| RelPath::new(r).expect("static root"))
             .collect()
     }
@@ -58,6 +72,16 @@ impl Emitter for Antigravity {
         }
         let spec = agents_tree::spec(Runtime::Antigravity, req.placement);
         let mut plan = agents_tree::plan(req, spec)?;
+        plan.ops.extend(agents_tree::overlay_files(req, OVERLAY)?);
+        rules::check_plan(&plan)?;
+        let (ops, dropped) = agents::definitions(&req.kit.dir, &plan)?;
+        plan.ops.extend(ops);
+        if !dropped.is_empty() {
+            plan.notices.push(format!(
+                "Antigravity has no tool for {}: left out of the agents' tool lists",
+                dropped.join(", ")
+            ));
+        }
         plan.notices.push(NO_GUARDS.into());
         plan.notices.extend(agents_tree::also_read(
             req,

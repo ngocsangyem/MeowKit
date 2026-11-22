@@ -53,13 +53,14 @@ const GROK_OVERLAY = "kit/overlays/grok";
 // The always-on text every runtime that reads `AGENTS.md` gets, authored once.
 const SHARED_ALWAYS_ON = "kit/overlays/shared/AGENTS.md";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
-// Codex, Pi and OMP share `.agents/`; Pi and OMP add only their guard module.
+// Codex, Pi, OMP and Antigravity share `.agents/`; Pi and OMP add their guard module, Antigravity
+// its rule files.
 const AGENTS_OVERLAY = "kit/overlays/agents";
 const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY, GROK_OVERLAY, AGENTS_OVERLAY].flatMap((b) => [
 	`${b}/overlay.toml`,
 	`${b}/files`,
 	`${b}/catalog/skill-packs.json`,
-]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`, "kit/overlays/pi/files", "kit/overlays/omp/files", SHARED_ALWAYS_ON);
+]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`, "kit/overlays/pi/files", "kit/overlays/omp/files", "kit/overlays/antigravity/files", SHARED_ALWAYS_ON);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.
