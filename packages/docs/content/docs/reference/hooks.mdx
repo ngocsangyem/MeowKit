@@ -23,7 +23,7 @@ Only exit code 2 blocks a tool call. Any other exit is advisory, which is why th
 | Hook | Event and matcher | What it does | Blocks |
 | --- | --- | --- | --- |
 | `privacy-block.cjs` | PreToolUse: Edit\|Write, Read, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH) and unsafe web-fetch targets | Yes (exit 2) |
-| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check | Yes (exit 2) |
+| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check | Yes: exit 2 when a check fails; the `ask` permission decision when a check could not run (crash, missing tool, deadline) |
 
 `privacy-block.cjs` also blocks when the hook itself fails (`onFailure: block`). `mewkit doctor --hard-gates` runs both guards, and the injection scanner, in a scratch project and reports which block.
 
@@ -101,7 +101,7 @@ Every hook runs on Node. A registration is `command: node` plus an `args` list, 
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"], "timeout": 300 },
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"], "timeout": 300, "onFailure": "block" },
           { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs", "PreToolUse", "Bash"], "timeout": 10 }
         ]
       }

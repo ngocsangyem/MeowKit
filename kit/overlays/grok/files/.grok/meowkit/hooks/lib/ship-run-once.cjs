@@ -47,6 +47,9 @@ function reused(marker) {
     exit: marker.exit,
     stdout: ['Ship check already ran for this command and tree state; reporting that result.'],
     stderr: marker.exit === 0 ? [] : marker.stderr || [],
+    // A marker written before outcomes were recorded can only say pass or block.
+    outcome: marker.outcome || (marker.exit === 0 ? 'passed' : 'failed'),
+    cause: marker.cause || '',
   };
 }
 
@@ -86,7 +89,7 @@ function runOnce(root, command, waitMs, check) {
     fs.rmSync(file, { force: true });
     throw err;
   }
-  fs.writeFileSync(file, JSON.stringify({ status: 'done', exit: result.exit, stderr: result.stderr }));
+  fs.writeFileSync(file, JSON.stringify({ status: 'done', exit: result.exit, stderr: result.stderr, outcome: result.outcome, cause: result.cause }));
   return result;
 }
 

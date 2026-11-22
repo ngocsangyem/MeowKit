@@ -26,6 +26,7 @@ Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL wr
 | `contract_signed` | `mk:sprint-contract` sign action | `{slug: str, sprint: int, generator_sha: str, evaluator_sha: str}` |
 | `verdict_written` | `mk:evaluate` step-04 | `{slug: str, overall: str, weighted_score: float, hard_fail: bool, evidence_count: int}` |
 | `cost_sample` | `budget-tracker.sh` | `{step: str, usd: float, cumulative_usd: float}` |
+| `ship_check` | `lib/core/pre-ship.cjs` (every runtime's ship check) | `{outcome: "passed" \| "failed" \| "could_not_run", cause?: str, action?: str}` — never the command text |
 | `session_end` | `post-session.cjs` | `{duration_seconds: int, total_cost_usd: float, error_count: int}` |
 | `dead_weight_audit_needed` | `post-session.cjs` (model change) | `{old_model: str, new_model: str}` |
 | `benchmark_result` | the `mk:benchmark` canary script, this repository only (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |

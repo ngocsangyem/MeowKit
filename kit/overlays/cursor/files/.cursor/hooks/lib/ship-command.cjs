@@ -113,8 +113,9 @@ function ghShip(args) {
 }
 
 /**
- * `{ kind, args }` for the first ship action in `command`, or null. `kind` is `commit`, `push`,
- * `merge`, `pr-create` or `pr-merge`; `args` are the words after the subcommand.
+ * `{ kind, args, assignments }` for the first ship action in `command`, or null. `kind` is
+ * `commit`, `push`, `merge`, `pr-create` or `pr-merge`; `args` are the words after the
+ * subcommand; `assignments` are the `NAME=value` words in front of that simple command.
  * @param {string} command
  * @param {{ root?: string, depth?: number }} [opts]
  */
@@ -125,7 +126,10 @@ function parseShipCommand(command, { root = '', depth = 0 } = {}) {
     if (!words.length) continue;
     const program = programName(words[0]);
     const found = program === 'git' ? gitShip(words.slice(1), root, depth) : program === 'gh' ? ghShip(words.slice(1)) : null;
-    if (found) return found;
+    if (found) {
+      const assignments = raw.slice(0, raw.length - words.length).filter((w) => /^[A-Za-z_][A-Za-z0-9_]*=/.test(w));
+      return { ...found, assignments };
+    }
   }
   return null;
 }

@@ -27,5 +27,9 @@ if (!root) deny("Ship check cannot locate the project root this command ships fr
 
 const result = decidePreShip({ root, command, env: process.env });
 if (result.stdout.length) process.stderr.write(`${result.stdout.join("\n")}\n`);
-if (result.exit === 2) deny([...result.stderr, ...result.stdout.filter((l) => /FAIL|DID NOT FINISH|did not run/.test(l))].join("\n"));
+if (result.exit === 2) {
+	const lines = [...result.stderr, ...result.stdout.filter((l) => /FAIL|DID NOT FINISH|COULD NOT RUN|did not run/.test(l))];
+	if (result.outcome === "could_not_run") lines.push("This runtime has no permission prompt for the ship check, so the ship is denied. To ship anyway, run the command in your own terminal.");
+	deny(lines.join("\n"));
+}
 process.exit(0);
