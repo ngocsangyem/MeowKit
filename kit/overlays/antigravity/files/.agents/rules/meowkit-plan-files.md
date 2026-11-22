@@ -1,7 +1,7 @@
 ---
 trigger: glob
 globs: tasks/plans/**/*.md
-description: Layout of a MeowKit implementation plan.
+description: Layout of an implementation plan.
 ---
 
 # Plan files

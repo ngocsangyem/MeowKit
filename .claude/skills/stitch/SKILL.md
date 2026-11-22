@@ -38,7 +38,6 @@ allowed-tools:
   - Edit
 argument-hint: '[generate|export|quota] [args]'
 metadata:
-  author: meowkit
   version: 1.0.0
 owner: utility
 criticality: medium
@@ -132,7 +131,7 @@ and the handoff contract are in [references/stitch-operations.md](references/sti
 - Local quota can drift from real Stitch usage (e.g., designs made via the Stitch web UI); if you hit `RATE_LIMITED` despite the tracker showing credits, run `stitch-quota.ts reset`
 - Quota limits and paid-tier availability are volatile; load [quota-management.md](references/quota-management.md) before making a quota-based decision.
 - Screen IDs returned by `generate` are stable (Tool Contract Rule 2); project name auto-detection uses git remote then CWD basename
-- The optional MCP integration is configured in your runtime's MCP config (`.mcp.json` at the project root on Claude Code). Reference the key as `${STITCH_API_KEY}` there and never paste the raw key into the file
+- The optional MCP integration is configured in your runtime's MCP config (on Claude Code, `.mcp.json` at the project root). Reference the key as `${STITCH_API_KEY}` there and never paste the raw key into the file
 - `stitch-write-output.ts` validates CDN URLs against a Google-domain allowlist; if Stitch changes CDN domains, update `ALLOWED_CDN_SUFFIXES` in that script
 
 ## References

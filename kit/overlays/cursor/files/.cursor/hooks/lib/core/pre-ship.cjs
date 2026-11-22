@@ -47,7 +47,7 @@ function refusedOverrides(ship, env) {
   for (const flag of new Set(flags)) found.push(flag);
   for (const word of ship.assignments || []) if (looksLikeSkip(word.slice(0, word.indexOf('=')))) found.push(word);
   for (const [name, value] of Object.entries(env || {})) if (value && looksLikeSkip(name)) found.push(`${name} (environment)`);
-  return found.map((what) => `Refused: ${what} does not skip the MeowKit ship check; the checks ran as usual.`);
+  return found.map((what) => `Refused: ${what} does not skip the ship check; the checks ran as usual.`);
 }
 
 /** A blocking result for a check that gave no verdict. */

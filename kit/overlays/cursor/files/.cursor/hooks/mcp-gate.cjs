@@ -15,7 +15,7 @@ emit(
 		killSwitchActive: isKillSwitchActive(),
 		blocked: verdict.blocked,
 		reason: verdict.reason,
-		blockedOutput: { permission: "deny", user_message: `Blocked by MeowKit MCP allowlist gate: ${verdict.reason}` },
+		blockedOutput: { permission: "deny", user_message: `Blocked by MCP allowlist gate: ${verdict.reason}` },
 		allowedOutput: { permission: "allow" },
 	}),
 );

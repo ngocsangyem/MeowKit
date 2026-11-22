@@ -17,7 +17,7 @@
 
 process.on("uncaughtException", (err) => {
 	process.stderr.write(
-		`MeowKit ship check could not run: the ship check crashed (${err && err.message ? err.message : String(err)}).\n` +
+		`Ship check could not run: the ship check crashed (${err && err.message ? err.message : String(err)}).\n` +
 			"Codex has no permission prompt for this hook, so the ship is denied. To ship anyway, run the command in your own terminal.\n",
 	);
 	process.exit(2);

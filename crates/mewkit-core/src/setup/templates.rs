@@ -18,7 +18,7 @@ pub const DEFAULT_MCP: &str = r#"{
 }
 "#;
 
-pub const DEFAULT_ENV: &str = "# MeowKit Environment Variables
+pub const DEFAULT_ENV: &str = "# Environment Variables
 # Never commit this file to git. Shell exports take precedence.
 
 # Gemini (recommended \u{2014} analysis, image gen, video gen)
@@ -37,7 +37,7 @@ MEOWKIT_GEMINI_API_KEY=
 ";
 
 /// Mirrors `.meowkit/gitignore.meowkit`; used only when that template is absent.
-pub const DEFAULT_GITIGNORE: &str = "# MeowKit
+pub const DEFAULT_GITIGNORE: &str = "# mewkit
 .env
 .env.local
 session-state/

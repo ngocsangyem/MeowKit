@@ -1,6 +1,6 @@
 ---
 trigger: model_decision
-description: MeowKit commit, push, pull-request and documentation-impact conventions. Use when about to commit, push, open a pull request or finish an implementation.
+description: Commit, push, pull-request and documentation-impact conventions. Use when about to commit, push, open a pull request or finish an implementation.
 ---
 
 # Shipping conventions

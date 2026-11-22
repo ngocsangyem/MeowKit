@@ -54,7 +54,7 @@ module.exports = function preTaskCheck(ctx) {
     return {
       context: [
         // The opening words are the phrase `mewkit doctor --hard-gates` matches, older binaries included.
-        'MeowKit injection scan flagged this Bash command: it matches blocking-class prompt-injection patterns. '
+        'Injection scan flagged this Bash command: it matches blocking-class prompt-injection patterns. '
           + 'The scan is advisory; the command was not stopped.',
         ...blocks.map((m) => `- ${m}`),
       ].join('\n'),

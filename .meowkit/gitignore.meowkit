@@ -1,4 +1,4 @@
-# MeowKit — append to your .gitignore
+# mewkit — append to your .gitignore
 #
 # Nothing under `.meowkit/` is listed here. `.meowkit/.gitignore` is
 # authoritative for that directory: it denies everything and re-includes the

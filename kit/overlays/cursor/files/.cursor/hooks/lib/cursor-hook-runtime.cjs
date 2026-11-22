@@ -57,7 +57,7 @@ function isKillSwitchActive() {
  *  downgrades a deny/ask decision to allow, so a human sees the gate is disabled
  *  even though stdout only carries the (now-allow) JSON decision. */
 function warnLoud(message) {
-	process.stderr.write(`\n!!! MEOWKIT CURSOR HOOK KILL SWITCH ACTIVE !!!\n${message}\n\n`);
+	process.stderr.write(`\n!!! KIT HOOK KILL SWITCH ACTIVE !!!\n${message}\n\n`);
 }
 
 /** Emit the hook's JSON decision on stdout and exit 0. Every command hook in this

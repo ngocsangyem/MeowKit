@@ -52,7 +52,7 @@ pub struct InitArgs {
     /// has a git remote (Cursor Cloud Agents run no local MCP hooks).
     #[arg(long)]
     pub allow_cloud_mcp: bool,
-    /// Run even in the MeowKit source repo (whose `.claude/` is the kit's
+    /// Run even in the kit's source repo (whose `.claude/` is the kit's
     /// authored source, and which an install would overwrite).
     #[arg(long)]
     pub allow_kit_source: bool,

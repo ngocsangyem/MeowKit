@@ -19,7 +19,7 @@ emit(
 		reason: verdict.reason,
 		blockedOutput: {
 			permission: verdict.permission,
-			user_message: `MeowKit tool gate (${verdict.matcherId}): ${verdict.reason}`,
+			user_message: `Tool gate (${verdict.matcherId}): ${verdict.reason}`,
 		},
 		allowedOutput: { permission: "allow" },
 	}),

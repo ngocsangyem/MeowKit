@@ -29,7 +29,7 @@ pub const SCHEMA_URL: &str = "https://meowkit.dev/schemas/config-v1.json";
 pub const FORBIDDEN_NAMESPACES: &[(&str, &str)] = &[
     (
         "gates",
-        "MeowKit has no configurable gates; the ship check is not a preference",
+        "There are no configurable gates; the ship check is not a preference",
     ),
     (
         "paths",

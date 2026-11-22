@@ -34,7 +34,7 @@ Files under these paths are ALWAYS skipped regardless of extension:
 
 - `node_modules/`, `.venv/`, `venv/`, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `out/`
 - `*.min.js`, `*.map`, `*.lock`, `*lock.json`
-- `tasks/`, `docs/`, `.claude/`, `plans/` — meowkit working directories, not source code
+- `tasks/`, `docs/`, `.claude/`, `plans/` — kit working directories, not source code
 - `*.test.*`, `*.spec.*`, `*/__tests__/*` — tests should run as tests, not build-verify
 
 ## Cache

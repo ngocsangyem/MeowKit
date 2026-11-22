@@ -21,9 +21,9 @@ def _find_meowkit_dir(start: Path) -> Optional[Path]:
     """Walk up for the project's `.meowkit/` state dir. Bounded so a script run from
     outside a project cannot climb to the filesystem root."""
     for candidate in [start, *start.parents][:12]:
-        meowkit = candidate / '.meowkit'
-        if meowkit.is_dir():
-            return meowkit
+        state_dir = candidate / '.meowkit'
+        if state_dir.is_dir():
+            return state_dir
     return None
 
 

@@ -119,13 +119,13 @@ describe("session-start context injection", () => {
 		const root = project({ ".claude/hooks/dispatch.cjs": "" });
 		const noCli = { PATH: path.join(root, "nowhere") } as NodeJS.ProcessEnv;
 		const first = text(loader({ root, session_id: "clone" }, undefined, noCli));
-		expect(first).toContain("## MeowKit CLI not available");
+		expect(first).toContain("## mewkit CLI not available");
 		expect(first).toContain("mewkit doctor");
 		expect(first.split("mewkit doctor")).toHaveLength(2);
 
 		// A resume or a compaction re-runs the handler under the same session id.
 		const again = text(loader({ root, session_id: "clone" }, undefined, noCli));
-		expect(again).not.toContain("## MeowKit CLI not available");
+		expect(again).not.toContain("## mewkit CLI not available");
 	});
 
 	it("says nothing about the CLI when one is resolvable", () => {
@@ -133,7 +133,7 @@ describe("session-start context injection", () => {
 		const out = text(
 			loader({ root, session_id: "installed" }, undefined, { PATH: path.join(root, "nowhere") } as NodeJS.ProcessEnv),
 		);
-		expect(out).not.toContain("## MeowKit CLI not available");
+		expect(out).not.toContain("## mewkit CLI not available");
 	});
 
 	// The config block is the only description of these settings an agent gets,

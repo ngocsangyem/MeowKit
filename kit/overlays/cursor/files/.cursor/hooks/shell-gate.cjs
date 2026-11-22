@@ -16,7 +16,7 @@ emit(
 		killSwitchActive: isKillSwitchActive(),
 		blocked: notAllowed,
 		reason: verdict.reason,
-		blockedOutput: { permission: decisionPermission, user_message: `MeowKit shell gate: ${verdict.reason}` },
+		blockedOutput: { permission: decisionPermission, user_message: `Shell gate: ${verdict.reason}` },
 		allowedOutput: { permission: "allow" },
 	}),
 );

@@ -29,7 +29,7 @@ keywords:
 when_to_use: "Optimize a metric."
 user-invocable: true
 metadata:
-  attribution: Loop pattern adapted from autoresearch by Udit Goenka (MIT); MeowKit-native stops, git policy, and artifacts.
+  attribution: Loop pattern adapted from autoresearch by Udit Goenka (MIT); kit-native stops, git policy, and artifacts.
 owner: memory
 criticality: medium
 status: active

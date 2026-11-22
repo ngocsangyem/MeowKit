@@ -145,8 +145,10 @@ pub fn score_skills(claude_dir: &Path) -> Vec<SkillRubricRow> {
         .collect()
 }
 
+/// The file's text with CRLF folded to LF, so a Windows checkout scores the same
+/// as any other: sizes and token estimates must not count carriage returns.
 fn read(path: &Path) -> String {
-    String::from_utf8_lossy(&std::fs::read(path).unwrap_or_default()).into_owned()
+    String::from_utf8_lossy(&std::fs::read(path).unwrap_or_default()).replace("\r\n", "\n")
 }
 
 #[cfg(test)]

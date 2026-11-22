@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use super::schema::{KeySpec, SCALAR_KEYS, SCHEMA_URL, ValueKind, key_doc};
 
 const HEADER: &[&str] = &[
-    "# MeowKit project configuration — committed, human-owned, schema-validated.",
+    "# Project configuration — committed, human-owned, schema-validated.",
     "#",
     "# Every setting below is commented out. Uncomment only what this project",
     "# decides, so the committed file reads as a list of choices rather than a",

@@ -28,7 +28,7 @@ function decideWithKillSwitch({ killSwitchActive, blocked, reason, blockedOutput
 	return {
 		...allowedOutput,
 		user_message:
-			`MeowKit Cursor hook kill switch is ACTIVE: a security gate would have blocked this (${reason}), ` +
+			`Kit hook kill switch is ACTIVE: a security gate would have blocked this (${reason}), ` +
 			"but the kill switch downgraded it to allow. Disable the kill switch once the underlying issue is fixed.",
 	};
 }
