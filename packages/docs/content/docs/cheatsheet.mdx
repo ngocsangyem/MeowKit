@@ -113,10 +113,10 @@ The ones you meet most often. [Hooks](/reference/hooks) lists them all.
 | Hook | Event | What it does | Refuses the action? |
 |------|-------|-------------|---------------------|
 | `pre-ship.cjs` | PreToolUse (Bash) | Ship check: lint, related tests and type-check before commit, push, merge or PR | Yes |
-| `privacy-block.cjs` | PreToolUse | Blocks reads of `.env`, keys and credential files | Yes |
+| `privacy-block.cjs` | PreToolUse | Blocks reads of `.env`, keys and credential files, and of archived plans under `tasks/plans/archive/` | Yes |
 | `post-write.cjs` | PostToolUse (Edit\|Write) | Security scan of the written file; a hit goes back to the model | No |
 | `build-verify.cjs` | PostToolUse (Edit\|Write) | Compile or lint after an edit; a failure goes back to the model | No |
-| `pre-task-check.cjs` | PreToolUse (Bash) | Injection pattern detection, reported to the model | No |
+| `pre-task-check.cjs` | PreToolUse (Bash) | Reports blocking-class injection patterns to the model | No |
 | `delegation-brief-check.cjs` | PreToolUse (Task\|Agent) | Notes a subagent brief with no `Goal:` or `Return:` label, reported to the model | No |
 | `project-context-loader.cjs` | SessionStart | Loads `docs/project-context.md` | No |
 | `post-session.cjs` | Stop | Cost log and session trace | No |

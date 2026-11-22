@@ -30,7 +30,7 @@ export default function HomePage() {
           <p className="max-w-[56ch] text-fd-muted-foreground">
             A planned, reviewed workflow and a ship check that refuses a commit
             whose lint, tests or type-check fail, on Claude Code, Codex, Cursor,
-            Grok, Pi and OMP.
+            Grok, Pi, OMP and Antigravity. Antigravity's guards are unverified.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

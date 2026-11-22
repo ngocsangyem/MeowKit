@@ -13,18 +13,85 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
-## Unreleased
+## 3.1.0 (unreleased)
+
+Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgrade`: the CLI changes below are in the binary.
+
+### Highlights
+
+- Plan state follows the checkboxes. On Claude Code, Codex and Cursor the stop hook brings a changed plan up to date, `mewkit plan sync` does it on demand, and the ship check reminds you to archive a finished plan on every runtime.
+- Skills you customise survive upgrades. `mewkit skill overlay`, `fork` and `rollback` keep your version of a kit skill, and a separated edit to a Claude Code skill with eval cases merges with the kit's change.
+- The eval harness measures a skill. `mewkit eval run` and `mewkit eval compare` drive Claude Code or Codex over the kit's cases, which ship as an opt-in pack.
+- Antigravity is a seventh target. Its guards are installed as unverified.
+
+### New Commands
+
+- `mewkit plan sync <dir> [--check] [--json]` derives phase status, the Overview line, the plan.md table and `.plan-state.json` from the Todo List checkboxes. It never ticks a box or archives.
+- `mewkit skill status`, `skill overlay`, `skill fork` and `skill rollback`. See [Customising and Upgrading Skills](/guide/customising-skills).
+- `mewkit eval run` and `mewkit eval compare`. See [Cost and Telemetry](/cli/telemetry#eval).
 
 ### CLI
 
+- `mewkit init --target antigravity` installs skills under `.agents/skills`, the instruction block in `AGENTS.md`, two on-demand rule files, the agents, and the privacy guard and ship check in `.agents/hooks.json`. `init` and `doctor` name the guards as unverified. `mewkit validate --target antigravity` checks the install.
+- `mewkit init --skill-packs eval` and `mewkit pack add eval` install the eval pack to `.meowkit/eval/`. No default install, profile or `all` includes it.
+- `mewkit doctor` adds a `skill listing: <runtime>` row per installed runtime, against that runtime's documented budget, and a `skill store` row. `rules: always-on` fails when an always-on rule file is missing or blank.
+- `mewkit validate` fails on dead skill file paths and links, unknown slash commands, drifted shared-family files, agents without the A1 status block, and hook registrations that point at a missing file. `--skill-rubric` scores each skill on six mechanical criteria and writes a report; it never fails.
+- `mewkit trace --friction --skill <name>` attributes a note to one skill.
+- `mewkit validate` and `doctor` report the `hooks.<name>` toggle of a removed handler as a warning instead of rejecting the config.
 - The installers and `mewkit self-update` no longer place `mewkit-next`, and remove the one the 0.1.0 and 0.1.1 installers left. Run `mewkit` or `mk`.
+
+### Features
+
+- **Plan state on every runtime.** The stop hook syncs the plans changed in a session and prints one line; `hooks.plan-state-sync: false` switches it off. The ship check prints the plan drift line and the archive reminder, read-only, on all seven runtimes.
+- **Archived plans are not read.** Reads of `tasks/plans/archive/` and `tasks/plans/ceo-plans/archive/` are refused on every runtime, through read and search tools and read-type shell commands. Moving or writing those folders is not refused.
+- **Skill store.** `mewkit skill status` lists each installed skill as `kit`, `overlaid`, `forked`, `local` or `unverified`, with its digests. Install, upgrade and uninstall keep forked, local, unverified and overlaid skills whole and report them as `kept`; a kept skill does not make `upgrade` exit 6.
+- **Overlay and rollback.** `mewkit skill overlay` stores your version of chosen kit files outside the kit's trees; an overlay from a clone places only after this machine approves it. `mewkit skill rollback` restores any recorded digest of a skill.
+- **Upgrade merge.** On Claude Code, `upgrade` merges an edit made in place to a project skill with the kit's change when the two edits are separated, the skill has eval cases and the cached previous kit matches the ledger. Otherwise the file is kept and `upgrade` exits 6, as before.
+- **Eval harness.** Each run uses a fresh copy of the case's fixture with the kit installed from `--kit-archive`, an empty runtime home and a shared cost ceiling. The baseline suite has 108 cases: 80 trigger, 16 paired and 12 parachute. The `toolInputMatches` assertion checks what a tool was called with, such as the `Goal:` line of a subagent brief.
+- **Antigravity target.** Skills, agents, two rule files and the instruction block are built from the vendor's documentation (read 2026-11-22). Nothing was probed live.
+- **Skill descriptions on every runtime.** The description written for runtimes without a `when_to_use` field now carries it as "Use when: ...", so their routing sees the trigger text.
+- **Delegation brief check.** The `delegation-brief-check` observer notes to the model when a subagent brief has no `Goal:` or `Return:` label. It never blocks. Switch it with `hooks.delegation-brief-check: false`.
+- **Trace keys.** Trace records may carry `skill`, `session_id` and a closed-set `signal`. Readers ignore keys they do not know.
+- **Skill audit.** `mewkit validate --skill-rubric` and the [Skill Audit](/guide/skill-audit) page publish each skill's scores.
+- **Opt-in skills.** A skill whose `SKILL.md` sets `install_default: false` installs only when selected in `.meowkit/state/skill-selection.json`. No shipped skill sets it yet.
+- **Verified marker.** The "verified" rule marker is written only when the always-on rules match a session-start digest. `doctor` reports a marker whose digest no longer matches.
 
 ### Improvements
 
+- Installed files do not use the product name. Hook messages, rule headings and skill text say what the step does; paths and commands keep their names. See [Installation](/installation#product-name-in-installed-files).
+- The injection scan reports only blocking-class patterns to the model. A long command or a path outside the project no longer adds context.
+- Skill listings on Codex, Grok, Pi and OMP were about 15,600 characters against a 12,000 ceiling. Descriptions are shortened and the listing is about 11,600 on each, with the NOT-for routing kept.
+- Skill and agent text share one tier vocabulary (TRIVIAL, STANDARD, COMPLEX), one delegation template with `Goal` and `Return` fields, one challenger policy for plan red team and review, and shared sections that `validate` checks for drift.
+- The kit's rules now agree on one answer each: a plan is written for a change of more than two files or about 30 minutes; code review is COMPLEX; the only TDD exemption is the micro-task; ADRs are named `docs/architecture/adr/YYMMDD-decision.md`; `mk:cook --fast` skips the plan only for work of two files or fewer and about 30 minutes or less.
+- The orchestrator applies when a request's specialist agent or model tier is unclear, not at the start of every task.
+- The plan-creator and cook entry files moved their reference tables into `references/`, so both stay under the 5,000-token budget that survives compaction.
 - The ship check fails closed. A check that could not run (a crash, a missing tool, or a check stopped at the 270-second deadline) now blocks with a `PRE-SHIP COULD NOT RUN` message naming the cause, separate from `PRE-SHIP BLOCKED` for a failed check. Before, a missing tool counted as a failed check, and a hook the host stopped at its timeout let the command through.
 - On Claude Code a check that could not run answers with the permission prompt (`ask`), so you decide; a failed check is still refused. Cursor asks too. Codex has no prompt for hooks, so it refuses and tells you to run the command in your own terminal. The Claude Code registration sets `onFailure: "block"` (Claude Code 2.1.295 or later) and the Cursor entry `failClosed: true`, so a ship-check hook that cannot start or reaches its timeout blocks.
 - Nothing in the command or the environment skips the ship check. `--no-verify`, `-n` on a commit, a skip-style variable and `MEWKIT_CURSOR_HOOKS_KILL_SWITCH` are named in the output as refused. The Cursor kill switch no longer stands the ship check down.
 - Each ship check writes one `ship_check` trace record: outcome `passed`, `failed` or `could_not_run`, the cause and the action, never the command text.
+
+### Removals
+
+- The `mk:ship` reference `adversarial-review.md`, which nothing read. Adversarial review belongs to `mk:review`.
+- The trace events `build_verify_result` and `loop_warning` are no longer documented: nothing writes them.
+
+### Bug Fixes
+
+- A tool result was priced at the output rate, which overstated the cost estimate about fivefold. It is priced as input now, and the model is detected in one order shared by the hooks.
+- A plan whose boxes were ticked still read as `pending` everywhere. `plan sync` and the stop hook bring the status in line with the checkboxes.
+- On Windows, `mewkit skill fork` kept the kit's `name:` in a `SKILL.md` checked out with CRLF endings.
+- On Windows, the ship check could not start `npm` or `npx`, which are `.cmd` shims. Every ship reported `Not found: npm`, and a failed check exited 0 and let the command through.
+- Skill text named 52 `mk:<name>/` file paths, 11 skill-local files and 22 slash commands that do not exist. They now point at real files and commands, and `validate` fails on any that come back.
+
+### Migration Notes
+
+- Installed text changed. A script or hook that matched `MeowKit ship check` or a `# MeowKit` heading needs the new wording. A file you edited keeps your edit, and `upgrade` exits 6 on it, as before.
+- An archived plan can no longer be read by an agent on any runtime. The shipped code is the source of truth; the plan is kept for the record.
+- The plan threshold is more than two files or about 30 minutes everywhere. `plan-creator` had said one hour.
+- Antigravity's guards are unverified. Check them on a live run before you rely on them.
+- The first `upgrade` of an install made before skill selections existed writes `.meowkit/state/skill-selection.json` with every installed skill. A smaller default later reaches fresh installs only.
+- A `hooks.<name>` key for a handler that a release removed now warns instead of failing the config. Delete the key when you see the warning.
+- An older `mewkit` that changes the ownership ledger marks the affected skills `unverified` in the skill store. `mewkit skill rollback <name>` settles one.
 
 ## 3.0.1 (2026-11-21)
 

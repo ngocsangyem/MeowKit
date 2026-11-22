@@ -2,7 +2,7 @@
 title: "Hooks"
 description: "The hooks the kit registers, what each one does, which can block, and how to switch observers off."
 sourceOfTruth: ".claude/settings.json"
-lastVerified: "2026-11-20"
+lastVerified: "2026-11-22"
 ---
 
 The kit ships 28 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 24 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
@@ -12,7 +12,7 @@ The kit ships 28 hook scripts, all Node `.cjs` modules: 4 entrypoints directly u
 | Kind | Scripts | Registered | When it fails |
 | --- | --- | --- | --- |
 | Guards | `privacy-block.cjs`, `pre-ship.cjs` | Directly in `.claude/settings.json` | Closed: a crash, a syntax error or a missing library still blocks the call |
-| Observers | The 22 files in `handlers/` | Through `dispatch.cjs`, which reads `.claude/hooks/handlers.json` | Open: a handler that throws is reported and the others still run |
+| Observers | The 24 files in `handlers/` | Through `dispatch.cjs`, which reads `.claude/hooks/handlers.json` | Open: a handler that throws is reported and the others still run |
 
 `append-trace.cjs` is the fourth entrypoint. A skill runs it by path to append one record to `.meowkit/telemetry/trace-log.jsonl`. Records are scrubbed of secrets, written atomically through a lock, and the file rotates at 50 MB.
 
@@ -22,8 +22,8 @@ Only exit code 2 blocks a tool call. Any other exit is advisory, which is why th
 
 | Hook | Event and matcher | What it does | Blocks |
 | --- | --- | --- | --- |
-| `privacy-block.cjs` | PreToolUse: Edit\|Write, Read, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH) and unsafe web-fetch targets | Yes (exit 2) |
-| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check | Yes: exit 2 when a check fails; the `ask` permission decision when a check could not run (crash, missing tool, deadline) |
+| `privacy-block.cjs` | PreToolUse: Edit\|Write, Read\|Grep\|Glob, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH), reads of archived plans under `tasks/plans/archive/` and `tasks/plans/ceo-plans/archive/`, and unsafe web-fetch targets | Yes (exit 2) |
+| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check. Before the check it prints the plan drift line and archive reminder, which change nothing | Yes: exit 2 when a check fails; the `ask` permission decision when a check could not run (crash, missing tool, deadline) |
 
 `privacy-block.cjs` also blocks when the hook itself fails (`onFailure: block`). `mewkit doctor --hard-gates` runs both guards, and the injection scanner, in a scratch project and reports which block.
 
@@ -49,7 +49,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 | `post-session` | Stop | Records cost and trace data to `.meowkit/telemetry/` |
 | `control-probe` | Stop | Logs a known-good fire, to tell an event the host does not support from a broken logger |
 | `pre-completion-check` | Stop | Opt-in. See below |
-| `plan-state-sync` | Stop | Always on. Brings changed plans' derived state (phase status, Overview line, plan.md table and status, `.plan-state.json`) up to date with their checkboxes and prints one line when it changed something or a plan is ready for `mewkit plan archive`. Never blocks |
+| `plan-state-sync` | Stop | On by default; `hooks.plan-state-sync: false` turns it off. Brings changed plans' derived state (phase status, Overview line, plan.md table and status, `.plan-state.json`) up to date with their checkboxes and prints one line when it changed something or a plan is ready for `mewkit plan archive`. Never blocks |
 | `model-detector` | SessionStart | Writes the detected model tier and density to `.meowkit/state/detected-model.json` and prints one status line |
 | `orientation-ritual` | SessionStart | On resume, clear or compact, runs `mewkit orient --no-record` and injects the result. When the CLI is unavailable it falls back to the last checkpoint and labels it as a fallback |
 | `project-context-loader` | SessionStart | Injects the project context and resets per-session state |
@@ -88,6 +88,7 @@ Observer switches live in `.meowkit/config.yaml`. `hooks.<name>: false` turns on
 | `hooks.build-verify: false` | Skip `build-verify` |
 | `hooks.loop-detection: false` | Skip `loop-detection` |
 | `hooks.pre-completion-check: true` | Turn on `pre-completion-check` |
+| `hooks.plan-state-sync: false` | Skip the stop-time sync of changed plans (the ship check's drift line still prints) |
 | `autobuild.mode: MINIMAL` | Skip `build-verify` |
 | `MEOWKIT_HOOK_PROFILE=fast` | Skip `learning-observer`, `post-session` and `pre-task-check`; `pre-ship` still runs |
 

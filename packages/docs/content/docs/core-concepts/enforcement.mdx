@@ -1,8 +1,8 @@
 ---
 title: "Enforcement & Security"
-description: "What MeowKit enforces with hooks on each of the six runtimes, what it leaves to the workflow, and its four-layer security model."
+description: "What MeowKit enforces with hooks on each of the seven runtimes, what it leaves to the workflow, and its four-layer security model."
 sourceOfTruth: ".claude/hooks/hook-coverage.json"
-lastVerified: "2026-11-20"
+lastVerified: "2026-11-22"
 ---
 
 ## Planning and review are practices
@@ -20,6 +20,7 @@ The ship check is the one control a hook enforces at ship time. On `git commit`,
 - `MEOWKIT_HOOK_PROFILE=fast` does not turn it off.
 - A ship command run inside `bash -c`, a script or a Makefile target is not seen.
 - The check stops itself after 270 seconds and reports what did not finish.
+- Before it runs, the same check prints the plan drift line and the archive reminder when a plan under `tasks/plans/` needs one (see [Planning and Tasks](/cli/planning#plan)). Both are read-only: they never change the decision, and they appear on all seven runtimes.
 
 Push, merge and force-push are approved through your host's own permission prompt when the host is set to ask. MeowKit adds no prompt of its own.
 
@@ -37,7 +38,7 @@ An Enforced cell means a registered hook refuses the action. Advisory means an i
 | Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent | Absent |
-| Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Advisory at ship check | Advisory at ship check | Advisory at ship check | Advisory at ship check |
+| Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Drift line at ship check | Drift line at ship check | Drift line at ship check | Drift line at ship check |
 | Archived-plan reads | Enforced on Read, Grep, Glob and Bash | Enforced on Bash only | Enforced on file reads, search tools and shell | Enforced on every tool | Enforced on every tool call | Enforced on every tool call | Unverified on every tool (from documentation) |
 
 Cells that say Absent mean the host's own permissions are the only control. On Claude Code the `careful` and `freeze` skills block destructive commands only while the skill is active.
@@ -71,6 +72,8 @@ A commit refused with `PRE-SHIP BLOCKED` means lint, a related test or the type-
 Nothing in the command or the environment skips the check. `--no-verify`, `-n` on a commit, a variable such as `MEOWKIT_SKIP_SHIP_CHECK=1` and the Cursor kill switch are named in the output as refused, and the checks run as usual.
 
 A read refused with `@@PRIVACY_BLOCK@@` means the file looks like a credential (`.env`, `.envrc`, `.npmrc`, a private key, `.kube/config`, a credentials or secrets file). Approve the read explicitly if the task needs it.
+
+A read of an archived plan under `tasks/plans/archive/` or `tasks/plans/ceo-plans/archive/` is refused on all seven runtimes, with the reason "archived plans are kept out of context; the shipped code is the source of truth". Moving, copying or writing those folders is not refused, and `mewkit plan archive` writes them as usual.
 
 ## Security model: four layers
 

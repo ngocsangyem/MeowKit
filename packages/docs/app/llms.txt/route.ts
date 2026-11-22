@@ -11,7 +11,7 @@ export function GET() {
   });
   const body = `# MeowKit Documentation
 
-> AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi and OMP: skills, agents, a planned and reviewed workflow, a ship check that refuses failing commits, and a credential read guard.
+> AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi, OMP and Antigravity: skills, agents, a planned and reviewed workflow, a ship check that refuses failing commits, and a credential read guard.
 
 ## Pages
 

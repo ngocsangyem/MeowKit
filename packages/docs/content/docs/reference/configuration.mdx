@@ -2,7 +2,7 @@
 title: "Configuration"
 description: "Every MeowKit setting: the always-on rules, the project config file, hook registrations, the dotenv file and environment variables."
 sourceOfTruth: ".meowkit/.env.example"
-lastVerified: "2026-11-20"
+lastVerified: "2026-11-22"
 ---
 
 MeowKit reads settings from these places:
@@ -58,7 +58,7 @@ hooks:
 
 ### Hook switches
 
-`hooks.<name>: false` turns one observer off. The name is the handler's file base name (`build-verify`, `loop-detection`, `post-write`, `learning-observer`, `tdd-flag-detector` and the rest of the 23 listed in [Hooks](/reference/hooks)). The default is `true`, except `hooks.pre-completion-check`, which is off until you set it to `true`. These names are rejected in every config scope, and their hooks keep running: `privacy-block`, `pre-ship`, `check-careful`, `check-freeze` and `check-report-path`. A `hooks.<name>` set to `true` or `false` whose name is not a registered handler, such as the toggle of a handler a release removed, is skipped with a warning instead of rejecting the file: the rest of the file still applies, `mewkit validate` reports the key on its project-config row, and the session-start config block names it.
+`hooks.<name>: false` turns one observer off. The name is the handler's file base name (`build-verify`, `loop-detection`, `post-write`, `learning-observer`, `tdd-flag-detector` and the others listed in [Hooks](/reference/hooks)). The default is `true`, except `hooks.pre-completion-check`, which is off until you set it to `true`. These names are rejected in every config scope, and their hooks keep running: `privacy-block`, `pre-ship`, `check-careful`, `check-freeze` and `check-report-path`. A `hooks.<name>` set to `true` or `false` whose name is not a registered handler, such as the toggle of a handler a release removed, is skipped with a warning instead of rejecting the file: the rest of the file still applies, `mewkit validate` reports the key on its project-config row, and the session-start config block names it.
 
 ### Model routing
 
