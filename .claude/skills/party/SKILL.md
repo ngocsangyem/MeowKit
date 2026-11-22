@@ -15,7 +15,7 @@ keywords:
   - architecture-decision
   - trade-off-discussion
   - design-review
-when_to_use: "'X or Y?'"
+when_to_use: "Asked 'X or Y?'"
 user-invocable: true
 owner: research
 criticality: medium
