@@ -1,7 +1,9 @@
 use std::fs;
 use std::path::Path;
+#[cfg(unix)]
 use std::time::Duration;
 
+#[cfg(unix)]
 use super::runner::run_child;
 use super::sandbox::*;
 use super::*;
