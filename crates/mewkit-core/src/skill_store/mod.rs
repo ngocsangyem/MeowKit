@@ -17,16 +17,21 @@
 //! rebuilt from the ledger.
 mod digest;
 mod index;
+pub mod keep;
+mod overlay;
 mod persist;
 mod record;
+mod rows;
 
 pub use digest::{TreeFile, read_tree, tree_digest};
-pub use index::{
-    Ledgers, Observed, Rows, Survey, build, ledger_rows, mark_unverified, no_rows_hash,
-    skill_key_of,
+pub use index::{Observed, Survey, build};
+pub use overlay::{
+    Approvals, OVERLAY_SCHEMA_VERSION, Overlay, OverlayStore, StoredFile, overlay_files,
+    overlay_to_json, stored_copy,
 };
 pub use persist::{Write, apply};
 pub use record::{OverlayFile, SCHEMA_VERSION, Sidecar, SkillRecord, State, StoreError};
+pub use rows::{Ledgers, Rows, ledger_rows, mark_unverified, no_rows_hash, skill_key_of};
 
 use crate::fsx::RelPath;
 
@@ -35,8 +40,10 @@ use crate::fsx::RelPath;
 pub struct StorePaths {
     /// The sidecar, beside the ownership ledgers.
     pub sidecar: RelPath,
-    /// Machine-local store state (never shared through git).
+    /// Machine-local store state (never shared through git): approvals.
     pub dir: RelPath,
+    /// Stored overlays, outside every kit-owned tree; a team may commit them.
+    pub overlays: RelPath,
     /// The scope's lock, shared with every lifecycle command.
     pub lock: RelPath,
     /// Where pre-change copies of skill files go.

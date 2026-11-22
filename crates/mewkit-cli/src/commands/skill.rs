@@ -25,13 +25,25 @@ use crate::failure::{FAILED, Failure, OK, USAGE};
 
 #[derive(Args, Debug)]
 pub struct SkillArgs {
-    /// `env` or `status`.
+    /// `env`, `status`, `overlay` or `fork`.
     pub subcommand: Option<String>,
     /// The skill to act on.
     pub skill: Option<String>,
+    /// `fork`: the name of the copy.
+    pub new_name: Option<String>,
     /// List every skill that declares a runtime and the state of its environment.
     #[arg(long)]
     pub list: bool,
+    /// `overlay`: a file of the skill to store (repeatable; default: every
+    /// file edited since install).
+    #[arg(long, value_name = "PATH")]
+    pub file: Vec<String>,
+    /// `overlay`: show an overlay this machine has not approved and place it.
+    #[arg(long)]
+    pub approve: bool,
+    /// Confirm `overlay --approve` in a session with no terminal.
+    #[arg(long)]
+    pub yes: bool,
     /// Act on your home directory instead of this project (skill store verbs).
     #[arg(long)]
     pub global: bool,

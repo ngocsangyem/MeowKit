@@ -1,6 +1,6 @@
 {
   "exit_code": 2,
   "stdout": "",
-  "stderr": "Unknown `skill` subcommand: bogus\nValid subcommands: env, status\nRun `mewkit skill --help` for usage.\n",
+  "stderr": "Unknown `skill` subcommand: bogus\nValid subcommands: env, status, overlay, fork\nRun `mewkit skill --help` for usage.\n",
   "files": {}
 }

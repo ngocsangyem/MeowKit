@@ -11,10 +11,22 @@ pub fn run(place: &Place, json_out: bool) -> Result<u8, Failure> {
     let store = open(place)?;
     let (next, survey) = store.index(&store.checked())?;
     store.save(&next)?;
+    let pending = store.overlays.pending(&store.approvals);
     let rows: Vec<(&String, &SkillRecord, Vec<String>)> = next
         .records
         .iter()
-        .map(|(key, record)| (key, record, notes(record, survey.get(key))))
+        .map(|(key, record)| {
+            let mut lines = notes(record, survey.get(key));
+            lines.extend(overlay_notes(record, survey.get(key)));
+            if pending.contains(key) {
+                lines.push(format!(
+                    "an overlay is stored but not approved on this machine; \
+                     `mewkit skill overlay {} --approve` shows it (waiting for approval)",
+                    record.name
+                ));
+            }
+            (key, record, lines)
+        })
         .collect();
     if json_out {
         let skills: Vec<Value> = rows
@@ -98,6 +110,26 @@ fn notes(r: &SkillRecord, seen: Option<&Observed>) -> Vec<String> {
         }
         if !seen.missing.is_empty() {
             out.push(format!("missing: {}", seen.missing.join(", ")));
+        }
+    }
+    out
+}
+
+/// Drift of an overlaid skill: upstream changed a file since the overlay, or
+/// the file was edited in place after the overlay was stored.
+fn overlay_notes(r: &SkillRecord, seen: Option<&Observed>) -> Vec<String> {
+    let mut out = Vec::new();
+    for (path, file) in &r.overlay {
+        if file.upstream != file.base {
+            out.push(format!("upstream changed {path} since the overlay"));
+        }
+        let on_disk = seen.and_then(|s| s.files.iter().find(|f| f.path == *path));
+        if on_disk.is_some_and(|f| f.sha256 != file.projected) {
+            out.push(format!(
+                "{path} was edited after the overlay was stored, so the stored overlay is out \
+                 of date; the file is kept as it is (`mewkit skill overlay {}` stores it)",
+                r.name
+            ));
         }
     }
     out
