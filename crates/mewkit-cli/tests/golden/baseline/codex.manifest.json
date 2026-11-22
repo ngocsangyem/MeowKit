@@ -4276,11 +4276,6 @@
       "size": 858
     },
     {
-      "path": ".agents/skills/mk-team-config/templates/ownership-map-template.md",
-      "sha256": "45c78e216255b0d2a10d9ca83378e35b798173fd27e6b0990c1b875a416590a8",
-      "size": 832
-    },
-    {
       "path": ".agents/skills/mk-tech-graph/SKILL.md",
       "sha256": "91bc687712d9e5c8f86643dda79b96a2078f9cd8607bdacb2b99ea890723bd33",
       "size": 4331

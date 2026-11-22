@@ -19,7 +19,7 @@ Universal principles for generating project structure — any stack, any languag
 
 ## Naming Convention Enforcement
 
-Follow `agent-conduct.md` (B1) for the detected stack:
+Follow these conventions for the detected stack:
 
 - **TypeScript/Node**: kebab-case files, camelCase functions, PascalCase classes
 - **Vue**: PascalCase components, kebab-case files, `use` prefix for composables

@@ -1,81 +1,11 @@
 # Workflow: Full (--full)
 
-Maximum user control. User approval at every major step. Use for critical projects.
+Maximum control: the user approves at every major step. For critical projects. Shared steps: `shared-phases.md`.
 
-## Step 0: Git Init
-
-Ask user: "Initialize git repository? [Y/n]"
-If yes: `git init && git add -A && git commit -m "chore: initial commit"`
-
-## Step 1: Clarify Requirements
-
-Ask questions by asking the user — **one question at a time**, wait for answer before next.
-Continue until 100% clear on: what the project does, who uses it, key features, constraints.
-
-**After clarity: proceed IMMEDIATELY to Step 2. Do NOT stop.**
-
-## Step 2: Research
-
-Spawn 2-4 researcher subagents in parallel. Each report ≤150 lines.
-
-Include the save path in each researcher's prompt:
-- "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"- Researcher 1: Validate the idea — does this already exist? Competition?
-- Researcher 2: Tech stack options — what frameworks/libraries fit?
-- Researcher 3+: Domain-specific research (only if needed — auth, payments, etc.)
-
-**Approval step:** Present research summary. User approves before proceeding.
-
-**After approval: proceed IMMEDIATELY to Step 3. Do NOT stop.**
-
-## Step 3: Tech Stack + Design
-
-1. Run `scripts/detect-stack.sh` for existing project markers
-2. If new project: activate mk:brainstorming --depth deep to explore stack options
-3. **Approval step:** User approves tech stack selection
-
-If frontend work detected:
-4. Spawn `ui-ux-designer` subagent for design guidelines + wireframes
-5. Save to `docs/design-guidelines.md`
-6. **Approval step:** User approves design direction
-
-**After ALL approvals: proceed IMMEDIATELY to Step 4. Do NOT stop.**
-
-## Step 4: Planning (before scaffolding)
-
-**Pre-condition:** Research reports and design guidelines from prior steps already exist.
-Plan-creator will detect these and skip its own discovery step (no duplicate research).
-
-Activate mk:plan-creator skill:
-
-```
-/mk:plan-creator [requirements summary] --hard
-```
-
-This creates the plan in `tasks/plans/`; agree it with the user before scaffolding.
-The plan defines architecture, modules, file structure — guides what gets scaffolded.
-
-> **Comprehensive bootstrap tip:** For projects spanning 5+ directories, use `--deep` instead of `--hard`. `--deep` provides per-phase file inventory and dependency maps, and triggers automatically when that many root dirs are detected. Gives the generator clearer scope boundaries across complex module layouts.
-
-Optional: activate mk:plan-ceo-review on the plan for product-level review.
-
-**Once the plan is agreed: proceed IMMEDIATELY to Step 5. Do NOT stop.**
-
-## Step 5: Scaffold Files (guided by plan)
-
-Follow the plan's architecture and the scaffolding principles:
-1. Generate directory tree matching plan's file structure → print → user confirms
-2. Config files → source scaffolds → test scaffolds (progressive)
-3. Validate with `scripts/validate-bootstrap.sh`
-4. Save stack profile to config.json
-
-**After scaffold validates: proceed IMMEDIATELY to Step 6. Do NOT stop.**
-
-## Step 6: Implementation → Docs
-
-Then run the shared phases (implementation → docs → final report) in order:
-
-1. **Phase A:** Activate mk:cook skill: `/mk:cook [plan-path]` (interactive mode)
-2. **Phase B:** Activate mk:docs-init for documentation
-3. **Phase C:** Print final report and ask about commit
-
-**The bootstrap is NOT complete until all shared phases finish.**
+1. **Git init** (ask first).
+2. **Clarify requirements:** one question at a time until what the project does, who uses it, key features and constraints are clear.
+3. **Research:** up to 4 researchers, each with a goal and return shape: idea validation and competition; tech stack options; domain-specific topics (auth, payments) only if needed. **Approval:** user approves the research summary.
+4. **Tech stack and design:** `scripts/detect-stack.sh`; for a new project `mk:brainstorming --depth deep`. **Approval:** stack. Frontend: `ui-ux-designer` writes guidelines and wireframes to `docs/design-guidelines.md`. **Approval:** design direction.
+5. **Plan:** `/mk:plan-creator [requirements summary] --hard` (use `--deep` for 5+ root directories); optionally `mk:plan-ceo-review`. **Approval:** user agrees the plan.
+6. **Scaffold:** print the directory tree for the user to confirm, then generate.
+7. **Phase A:** `/mk:cook [plan-path]` (interactive), then Phase B and Phase C with the commit offer.

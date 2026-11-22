@@ -1,7 +1,7 @@
 ---
 name: mk:team-config
 description: "Sets up a parallel agent team. NOT for mk:worktree."
-argument-hint: '"task description" --agents N'
+argument-hint: '"task description"'
 source: local
 allowed-tools:
   - Read
@@ -24,61 +24,28 @@ runtime: claude-code
 
 # Team Configuration
 
-Sets up the infrastructure for parallel agent execution. Called by orchestrator when a COMPLEX task is decomposed into independent subtasks.
-
-## What It Does
-
-1. **Analyzes the task** — identifies independent subtasks from the plan
-2. **Generates ownership map** — assigns file ownership globs per subtask
-3. **Creates worktrees** — one git worktree per parallel agent
-4. **Initializes task queue** — `.meowkit/state/task-queue.json` with claiming protocol
-5. **Validates no overlap** — checks ownership globs for conflicts before starting
+Sets up parallel agent execution when a COMPLEX task splits into independent subtasks. The lead (the main session) calls it; it is not user-invocable. For small, single-file or sequential work, do not use it: one agent is cheaper and faster.
 
 ## Setup Flow
 
-```
-Plan agreed with the user
-    ↓
-Orchestrator identifies parallel opportunity
-    ↓
-mk:team-config
-    ├── 1. Parse plan for independent subtasks
-    ├── 2. Generate ownership map (which agent owns which files)
-    ├── 3. Validate zero overlap between ownerships
-    ├── 4. Create git worktrees via mk:worktree
-    └── 5. Create task-queue.json via mk:task-queue
-    ↓
-Parallel agents start claiming tasks
-```
+1. **Decompose.** Find the independent subtasks in the agreed plan.
+2. **Write the queue.** Create `.meowkit/state/task-queue.json` in the format owned by `mk:task-queue`, one task per agent with its `ownership` globs. That file is the ownership map.
+3. **Check overlap.** Compare the globs yourself. If two tasks share a file, restructure the split or handle the shared file in a sequential pre-step; do not start overlapping agents.
+4. **Create worktrees** via `mk:worktree`, one per agent, branched from the current feature branch HEAD.
+5. **Start the agents.** Build each agent's brief with `mk:delegate` (goal, owned files, acceptance, return shape).
+
+Limits (agent count, COMPLEX-only, zero overlap, no parallel planning or review, integration test) are owned by `.claude/skills/cook/references/parallel-execution-rules.md`; follow it rather than restating them here.
 
 ## Team Coordination Rules
 
-When team mode activates, `Read` `references/team-coordination.md` — the team-only
-coordination rules (file ownership per task, no force-push, worktree-branch commits,
-actionable completion messages, lead docs-impact ownership). These were moved out of
-always-loaded `.claude/skills/cook/references/parallel-execution-rules.md` so they load only on team activation.
-
-## Ownership Map Template
-
-See `templates/ownership-map-template.md` for the format agents use to declare file ownership.
-
-## Constraints
-
-- Max 3 parallel agents (from `.claude/skills/cook/references/parallel-execution-rules.md`)
-- Only COMPLEX tasks qualify (orchestrator enforces this)
-- Planning and review are never parallelized
-- All worktrees branch from current feature branch HEAD
+When team mode activates, read `references/team-coordination.md`: the team-only rules (ownership per task, no force-push, worktree-branch commits, actionable completion messages, lead docs-impact). They load only on team activation so single-session work pays nothing for them.
 
 ## Gotchas
 
-- **Overlapping ownership kills parallelism** — if two subtasks need the same file, they can't be parallel. Restructure the decomposition or handle the shared file in a sequential pre-step
-- **Worktree naming with special characters** — skill names with `:` (e.g., `mk:review`) need quoting in shell paths
-- **Stale worktrees from crashed sessions** — run `git worktree list` to check for orphaned worktrees before creating new ones
-- **Run the full test suite after merging all worktrees** — each worktree passed alone, so a failure here is the first sign of a conflict between them.
+- **Overlapping ownership kills parallelism**: two subtasks that need the same file cannot run in parallel.
+- **Stale worktrees from crashed sessions**: run `git worktree list` for orphans before creating new ones.
+- **Run the full test suite after merging all worktrees**: each worktree passed alone, so a failure here is the first sign of a conflict between them.
 
 ## Teardown
 
-After all parallel agents complete and integration test passes:
-1. Merge all worktree branches to feature branch
-2. Remove worktrees via `mk:worktree cleanup`
-3. Archive `.meowkit/state/task-queue.json`
+After the agents finish and the integration test passes, merge the worktree branches into the feature branch, remove the worktrees with `mk:worktree cleanup`, and archive `task-queue.json`.

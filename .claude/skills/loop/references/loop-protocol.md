@@ -11,7 +11,6 @@ railroad keystrokes.
 - The Four Hard Stops
 - Stop Conditions
 - Recursion / Concurrency Guards
-- Loop Progress checklist (copy-paste)
 - Sibling references: [`config-and-metrics.md`](config-and-metrics.md),
   [`git-memory-and-rollback.md`](git-memory-and-rollback.md),
   [`safety-screen.md`](safety-screen.md), [`result-schema.md`](result-schema.md)
@@ -70,9 +69,6 @@ STAGE 4  Summary
          mk:verify / mk:review / mk:ship as next steps (never auto-chain). Clear the
          .meowkit/state progress lock. Mask secrets in every artifact.
 ```
-
-A rendered `stateDiagram-v2` of this lifecycle is kept with the plan research notes, not
-in this shipped reference.
 
 ---
 
@@ -173,20 +169,3 @@ trigger a false plateau or a false keep.
 - **Concurrent-run lock:** `.meowkit/state/mk-loop-progress.json` marks an active run; a
   second `mk:loop` in the same session refuses to start. A stale lock from a prior
   session-id is cleared on start.
-
----
-
-## Loop Progress (copy-paste checklist)
-
-```
-[ ] Stage 0  config parsed (required fields present)
-[ ] Stage 1  git repo / named branch / clean tree verified
-[ ] Stage 1  Verify + Guard passed the safety screen
-[ ] Stage 1  Verify dry-run printed a single number: ____
-[ ] STOP A   user approved config + cap
-[ ] Stage 2  baseline metric ____ at SHA ____ logged
-[ ] Stage 3  iterating (consecutive_discards: __ / cap: __)
-[ ] STOP B/C/D handled if triggered
-[ ] Stage 4  summary.md + handoff.json written; progress lock cleared
-[ ] next step suggested (mk:verify / mk:review / mk:ship)
-```

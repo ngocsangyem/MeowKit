@@ -1,41 +1,44 @@
-# Shared Phases (Post-Plan)
+# Shared Steps
 
-These phases run after planning completes, regardless of bootstrap mode.
-Run the three phases in order without stopping between them: each one feeds the next.
+Every mode runs these steps; the workflow file for the mode says only where it differs (approvals, research fan-out, flags). Run them in order without pausing, except at the mode's approval points.
+
+## Git init
+
+`git init` and `git commit --allow-empty -m "chore: initial commit"`. Full mode asks first. The empty commit stages nothing, so no secret can enter it.
+
+## Research briefs
+
+Each researcher gets a goal line and a return shape:
+
+```
+Goal: [the decision this research feeds, e.g. pick a stack for X]
+Return: report of at most 150 lines at tasks/reports/researcher-NN-[topic-slug].md,
+        ending with a one-line recommendation and open questions.
+```
+
+The count in a workflow file is a ceiling ("up to N"): use fewer when the topic does not need that many angles.
+
+## Planning
+
+Research reports (`tasks/reports/`) and `docs/design-guidelines.md` already exist, so tell `mk:plan-creator` to reuse them and skip its own discovery. It writes the plan under `tasks/plans/` with architecture, modules, file structure and acceptance criteria. Use the mode's plan flag.
+
+## Scaffold
+
+1. Pick the stack from research or `scripts/detect-stack.sh`.
+2. Generate files from the plan's structure, following `references/scaffolding-principles.md`: config, then source, then tests, progressively. Modes that confirm print the tree first.
+3. Save the stack profile as `config.json` at the project root (shape: `config.example.json`).
+4. Done check: `scripts/validate-bootstrap.sh` exits 0 and the scaffold builds or compiles.
 
 ## Phase A: Implementation
 
-Activate mk:cook skill with the plan path:
-
-- Full mode → `/mk:cook [plan-path]` (interactive, all approval steps)
-- Auto mode → `/mk:cook [plan-path] --auto`
-- Fast mode → `/mk:cook [plan-path] --auto`
-- Parallel mode → `/mk:cook [plan-path] --parallel`
-
-mk:cook handles: TDD, implementation, review cycle, fix-first resolution.
-
-If frontend work: mk:cook uses `ui-ux-designer` subagent per `docs/design-guidelines.md`.
-
-**After cook completes: proceed IMMEDIATELY to Phase B. Do NOT stop.**
+Activate `mk:cook` with the plan path and the mode's cook flag. It handles TDD (when enabled), implementation and review. For frontend work it uses the `ui-ux-designer` subagent per `docs/design-guidelines.md`.
 
 ## Phase B: Documentation
 
-Activate mk:docs-init skill:
+Activate `mk:docs-init`: it scouts the new codebase and generates `docs/` (project overview, codebase summary, code standards, system architecture) and the README.
 
-```
-/mk:docs-init
-```
+## Phase C: Final report
 
-mk:docs-init will:
-- Scout the newly-created codebase
-- Generate docs/ directory (project-overview, codebase-summary, code-standards, system-architecture)
-- Generate or update README.md
-
-**After docs created: proceed IMMEDIATELY to Phase C. Do NOT stop.**
-
-## Phase C: Final Report
-
-Print summary:
 ```
 BOOTSTRAP COMPLETE
 Project: [name]
@@ -44,12 +47,7 @@ Files generated: [count]
 Plan: [plan path]
 Docs: [list of docs/ files]
 
-Next steps:
-- Review generated code and docs
-- Use mk:plan-creator to plan next feature
-- Use mk:document-release after shipping to keep docs in sync
+Next steps: review the code and docs; plan the next feature with mk:plan-creator; run mk:document-release after shipping.
 ```
 
-Ask user: "Want to commit all changes?" If yes → `git add -A && git commit -m "feat: bootstrap [project-name]"`
-
-**Bootstrap is complete only after this report is printed.**
+Print it only after the scaffold check passed and Phases A and B finished. Then offer a commit. Stage the generated files by path and leave out `.env*`, credentials and keys, because a blanket `git add -A` can pick up secrets. Commit as `feat: bootstrap [project-name]`; never push.

@@ -4,8 +4,7 @@
 run report directory. This file owns the durable data shape and execution
 semantics. It does not own a runtime roster, model catalog, or provider route.
 
-Resolve every runtime, model, agent, flag, and safety control from live evidence
-before dispatch:
+Resolve routes before dispatch per [runtime-matrix.md](runtime-matrix.md); see also:
 
 - [runtime-matrix.md](runtime-matrix.md): live candidate evidence;
 - [model-routing.md](model-routing.md): the sole selection policy;
@@ -119,9 +118,8 @@ runtime that would execute it.
 - Jobs with no dependencies form the first stage.
 - A job starts only after every dependency succeeds.
 - A stage may run up to `concurrency` jobs when ownership and isolation allow
-  — for `runtime: internal` jobs this is additionally capped at 3 concurrent
-  per [internal-routing.md](internal-routing.md); external CLI runtimes are
-  not bound by that internal cap.
+  — `runtime: internal` jobs are also capped per
+  [internal-routing.md](internal-routing.md); external CLI runtimes are not.
 - Failed or timed-out dependencies block their dependents.
 - A failed job is not retried unless the user explicitly requests it.
 - Fallback selection reruns the full capability and risk gate for that runtime.

@@ -4,10 +4,8 @@ This reference defines the evidence collected for each live orchestration
 harness. It is not a runtime catalog and does not choose routes. The sole
 selection policy is [model-routing.md](model-routing.md).
 
-Harness behavior changes with the installed version, host OS, account policy,
-and invocation mode. Build profiles during preflight and store them in
-`<run-dir>/runtimes.json`; never reuse this document as proof that a runtime is
-installed, authenticated, safe, or capable.
+Build profiles during preflight and store them in `<run-dir>/runtimes.json`
+(live-evidence rules: [runtime-matrix.md](runtime-matrix.md)).
 
 ## Contents
 

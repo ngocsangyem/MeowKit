@@ -43,8 +43,8 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs info --json
 node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
 ```
 
-Before creating the first parallel worktree in a repo, verify `.worktrees/` is in `.gitignore`.
-If not, append it:
+Before the first parallel worktree in a repo, make sure `.worktrees/` is in `.gitignore`;
+if not, append it:
 
 ```bash
 echo '.worktrees/' >> .gitignore
@@ -61,8 +61,7 @@ Merge a completed parallel branch back to the feature branch using no-fast-forwa
 git merge --no-ff {branch} -m "merge: parallel/{agent-name} into {feature-branch}"
 ```
 
-On conflict: list conflicting files, STOP, report to orchestrator. Do NOT auto-resolve —
-human or lead agent decides.
+On conflict: list the conflicting files, stop and report to the lead (see Gotchas).
 
 On success: run the full test suite (.claude/skills/cook/references/parallel-execution-rules.md Rule 5). After integration
 test passes, delegate to `project-manager` (background):
@@ -84,8 +83,6 @@ in `mk:task-queue`. Then:
 ```bash
 node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" --json
 ```
-
-Never cleanup a worktree with uncommitted changes — commit or stash first.
 
 ### list
 
@@ -144,32 +141,19 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --sweep --dry-ru
 
 ## Gotchas
 
-- `review-pr` worktrees are DETACHED (no branch) and owned by their manifest nonce;
-  `review-pr-cleanup` refuses any worktree whose in-worktree back-reference nonce does not
-  match the manifest — this is what makes cross-session deletion impossible
-- Worktree creation fails if the branch name already exists — script handles this with
-  BRANCH_CHECKED_OUT error; timestamps in orchestrated branches prevent collisions
-- `git worktree remove` fails silently if the directory was already deleted manually —
-  script checks existence first via `getWorktreeRecords()`
-- Worktrees share the same `.git` — force-pushing from a worktree affects the main
-  checkout (Safety Rule: NEVER force-push)
-- `.worktrees/` directory must be gitignored — add to `.gitignore` before first parallel run
-- Merge conflicts on `SKILL.md`/`CLAUDE.md` are common in parallel runs — always stop
-  and report to orchestrator, never auto-resolve
-- `mk:task-queue` ownership must be released before worktree cleanup, or the next agent
-  cannot claim that task
-- Max 3 active worktrees at any time (.claude/skills/cook/references/parallel-execution-rules.md Rule 2) — `status`
-  command shows current count
-- On macOS, paths with `:` in skill names need quoting in shell commands
+One list, each rule with its reason.
 
-## Safety Rules
-
-- NEVER create worktrees on `main` or `master` — only on feature branches
-- Clean up worktrees after merge — stale ones keep their branches checked out
-- NEVER force-delete a worktree with uncommitted changes — commit or stash first
-- NEVER force-push from a worktree — it affects the shared `.git`
-- Check `.worktrees/` is in `.gitignore` before creating the first worktree
-- Release `mk:task-queue` task ownership before calling cleanup, or the task stays claimed
+- **Never create worktrees on `main` or `master`**; use a feature branch, so parallel work never lands on the protected branch.
+- **Add `.worktrees/` to `.gitignore` before the first parallel run**, or the worktree directories show up as untracked files.
+- **Never force-push from a worktree.** Worktrees share one `.git`, so a force-push rewrites history for the main checkout too.
+- **Never remove a worktree with uncommitted changes**; commit or stash first, or the work is lost. (`review-pr-cleanup` is the exception: review worktrees are legitimately dirty, and the manifest nonce is the guard.)
+- **Clean up worktrees after merge.** A stale worktree keeps its branch checked out and blocks reuse of the name.
+- **Release the task's ownership in `mk:task-queue` before cleanup**, or the task stays claimed and no other agent can take it.
+- **Keep to three active worktrees**: the cap in `parallel-execution-rules.md` Rule 2. The script does not enforce it; `status` lists the worktrees so you can count.
+- **Stop on merge conflicts** (common in `SKILL.md` and `CLAUDE.md` during parallel runs), report to the lead, and do not auto-resolve: a human or the lead agent decides.
+- **`review-pr` worktrees are detached** (no branch) and owned by their manifest nonce; `review-pr-cleanup` refuses any worktree whose back-reference nonce does not match, which is what makes cross-session deletion impossible.
+- **Creation fails if the branch already exists** (`BRANCH_CHECKED_OUT`); timestamps in orchestrated branch names prevent most collisions.
+- **`git worktree remove` fails silently if the directory was already deleted by hand**; the script checks existence first via `getWorktreeRecords()`.
 
 ## Integration
 

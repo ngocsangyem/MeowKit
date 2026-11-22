@@ -43,7 +43,8 @@ mk:bootstrap [requirements] --fast
 mk:bootstrap [requirements] --parallel
 ```
 
-Do NOT invoke when: project already has source code, or you only need kit setup (use CLI).
+Do not invoke when the project already has source code, or you only need kit setup (use the CLI).
+A small utility (fewer than 5 files expected) should use `--fast`.
 
 ## Modes
 
@@ -51,7 +52,7 @@ Do NOT invoke when: project already has source code, or you only need kit setup 
 |------|------|-------|----------|--------|-----------|-----------|
 | **Auto** | (default) | Design only | Parallel researchers | UI/UX if frontend | `--auto` | `--auto` |
 | **Full** | `--full` | Every step | Parallel researchers | UI/UX if frontend | `--hard` | (interactive) |
-| **Fast** | `--fast` | None | 6 parallel batch | Skip | `--fast` | `--auto` |
+| **Fast** | `--fast` | None | 1-2 researchers | Skip | `--fast` | `--auto` |
 | **Parallel** | `--parallel` | Design only | Parallel researchers | UI/UX if frontend | `--parallel` | `--parallel` |
 
 ## Routing
@@ -62,18 +63,15 @@ Parse first flag from arguments:
 - `--parallel` → load `references/workflow-parallel.md`
 - default → load `references/workflow-auto.md`
 
-Each workflow file defines the exact steps for that mode. Load `references/scaffolding-principles.md` with it for the scaffold step, and `references/shared-phases.md` for implementation → docs → final report after plan + scaffold.
+Each workflow file lists only what differs for its mode: the approval points, the research fan-out and the plan and cook flags. The steps every mode shares (git init, plan, scaffold, implementation, docs, report) live in `references/shared-phases.md`; load it with the workflow file, and load `references/scaffolding-principles.md` for the scaffold step.
 
-## Planning BEFORE Scaffolding
+**Run order.** Run the steps in order without pausing, except at the approval points the mode names. Each step's output feeds the next, so stopping between them only loses context.
 
-**Plan first, scaffold second.** The plan tells us WHAT to scaffold.
+**Exit.** If research shows the idea is already solved or the stack cannot meet the requirement, stop and ask the user before planning.
 
-1. **Plan** — invoke mk:plan-creator with mode-matched flag. Plan defines: architecture, modules, file structure, acceptance criteria.
-2. **Scaffold** — generate files following the plan's architecture + `references/scaffolding-principles.md`. Detect stack via `scripts/detect-stack.sh`. Validate with `scripts/validate-bootstrap.sh`.
+## Plan First, Scaffold Second
 
-Optional: invoke `mk:plan-ceo-review` on the plan (Full mode).
-
-**Planning is NOT optional.** Every bootstrap creates a plan before generating any source files.
+The plan decides what to scaffold, so every bootstrap writes a plan (`mk:plan-creator`, mode-matched flag) before generating any source file. Full mode may add `mk:plan-ceo-review`.
 
 ## Gotchas (top 3)
 

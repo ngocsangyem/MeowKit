@@ -2,12 +2,11 @@
 
 Update when bootstrap fails in new scenarios.
 
-- **Duplicating CLI init**: generating .claude/ files that the installer already provides → NEVER touch .claude/; bootstrap owns src/ and tests/ only
-- **Over-scaffolding**: generating 20+ files for a simple project → ask user about scope first; match generated files to actual needs in config.json
-- **Context overflow on large stacks**: generating NestJS monorepo in one shot → progressive generation: structure first, then one module at a time; verify compilation between steps
-- **Wrong naming conventions**: CamelCase files in TypeScript project → always check `agent-conduct.md` (B1) for detected stack; ask user if stack is unknown
-- **Placeholder leak**: `[PROJECT_NAME]` or `[TODO]` left in generated files → validate-bootstrap.sh catches these; fix before declaring BOOTSTRAP_VALID
-- **Stale scaffold patterns**: generating patterns from outdated framework versions → use mk:docs-finder to check current framework docs before generating; don't hardcode framework boilerplate
-- **Broken imports after generation**: files reference modules that don't exist yet → generate in dependency order; entry point last (it imports everything)
-- **Skipping research on "simple" projects**: projects that seem simple have hidden complexity (auth, state management, deployment) → always run research phase unless --fast mode
-- **Running full pipeline on tiny scripts**: bootstrapping a 50-line utility with research + design + plan → detect project size; if <5 files expected, use --fast mode automatically
+- **Over-scaffolding**: 20+ files for a simple project bury the user in code they did not need. Ask about scope first and match generated files to `config.json`.
+- **Context overflow on large stacks**: a NestJS monorepo in one shot loses coherence. Generate the structure first, then one module at a time, checking compilation between steps.
+- **Wrong naming conventions**: CamelCase files in a TypeScript project. Use the conventions in `scaffolding-principles.md`; ask if the stack is unknown.
+- **Placeholder leak**: `[PROJECT_NAME]` or `[TODO]` left in files; `validate-bootstrap.sh` catches these, so fix them before declaring BOOTSTRAP_VALID.
+- **Stale scaffold patterns**: boilerplate from an old framework version. Check current docs with `mk:docs-finder` rather than hardcoding.
+- **Broken imports after generation**: generate in dependency order and the entry point last, since it imports everything.
+- **Skipping research on "simple" projects**: they hide auth, state and deployment complexity, so research unless `--fast`.
+- **Tiny scripts through the full pipeline**: under 5 files expected, use `--fast`.

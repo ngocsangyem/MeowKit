@@ -4942,11 +4942,6 @@
       "size": 905
     },
     {
-      "path": ".claude/skills/team-config/templates/ownership-map-template.md",
-      "sha256": "45c78e216255b0d2a10d9ca83378e35b798173fd27e6b0990c1b875a416590a8",
-      "size": 832
-    },
-    {
       "path": ".claude/skills/tech-graph/SKILL.md",
       "sha256": "5a75159423cfb783de5df399f2223e5403873c8d842445614591b69839c2a299",
       "size": 4701
@@ -10638,11 +10633,6 @@
       "path": ".meowkit/cache/.claude/skills/team-config/references/team-coordination.md",
       "sha256": "7d48a229ba132ccf2fd1ec2a206ac605875f9f13b21b017e419ee5e558cc6d2c",
       "size": 905
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/team-config/templates/ownership-map-template.md",
-      "sha256": "45c78e216255b0d2a10d9ca83378e35b798173fd27e6b0990c1b875a416590a8",
-      "size": 832
     },
     {
       "path": ".meowkit/cache/.claude/skills/tech-graph/SKILL.md",

@@ -29,13 +29,15 @@ runtime: claude-code
 # Orchestrate
 
 Coordinate headless coding-agent jobs and in-session toolkit subagents through a
-staged, captured, resumable workflow. This is a skill-level coordinator — not a
-daemon, scheduler, or new runtime. It coordinates runtimes that already exist on
-the machine.
+staged, captured, resumable workflow. It is a skill-level coordinator, not a
+daemon or a new runtime. Use it for parallel writers, staged dependencies,
+runtime diversity or an independent arbiter. When one agent, one file or a
+sequential task would do, do not orchestrate: prefer a direct single-agent
+workflow (`mk:cook`) and say so plainly rather than manufacturing jobs.
 
-Runtime and model catalogs drift constantly. **Resolve every route from live
-execution-time evidence.** Never treat a runtime, provider, model, alias, flag,
-or agent seen in this file or an older report as currently available.
+Runtime and model catalogs drift, so resolve every route from live evidence per
+[runtime-matrix.md](references/runtime-matrix.md); nothing named in this file or
+an older report is known to be available.
 
 ## Inputs
 
@@ -61,16 +63,16 @@ Never override an explicit runtime, model, or agent pin silently.
 ## Authority Map
 
 Each durable contract lives in exactly one reference. Do not copy runtime or
-model catalogs into this file. When references disagree, STOP and report the
+model catalogs into this file. When references disagree, stop and report the
 contract mismatch.
 
-| Reference | Owns |
-|---|---|
-| [model-routing.md](references/model-routing.md) | Sole route-selection authority: capability/risk tiers, task defaults, internal selection, fallback qualification, model-family independence |
-| [runtime-matrix.md](references/runtime-matrix.md) | Live candidate discovery, probing, command verification, OS evidence, `<run-dir>/runtimes.json` |
-| [harness-profiles.md](references/harness-profiles.md) | Evidence schema for permissions, isolation, capture, budgets, enablement |
-| [internal-routing.md](references/internal-routing.md) | In-session subagent dispatch, capture, timeout, resume mechanics |
-| [job-spec.md](references/job-spec.md) | YAML schema and execution-state contract |
+| Reference | Owns | Open when |
+|---|---|---|
+| [model-routing.md](references/model-routing.md) | Sole route-selection authority: capability/risk tiers, task defaults, internal selection, fallback qualification, model-family independence | choosing a route for a job or qualifying a fallback |
+| [runtime-matrix.md](references/runtime-matrix.md) | Live candidate discovery, probing, command verification, OS evidence, `<run-dir>/runtimes.json` | building the runtime inventory or a CLI command |
+| [harness-profiles.md](references/harness-profiles.md) | Evidence schema for permissions, isolation, capture, budgets, enablement | profiling a candidate before routing |
+| [internal-routing.md](references/internal-routing.md) | In-session subagent dispatch, capture, timeout, resume mechanics | any job with `runtime: internal` |
+| [job-spec.md](references/job-spec.md) | YAML schema and execution-state contract | writing or validating a spec, or resuming |
 
 ## Toolkit Integration
 
@@ -85,19 +87,19 @@ them:
   project-manager, git-manager, shipper, ui-ux-designer). Resolve the live agent
   list per [internal-routing.md](references/internal-routing.md); never assume an
   agent from this list still exists.
-- **Parallel limits** — in-session fan-out honors `.claude/skills/cook/references/parallel-execution-rules.md`:
-  **max 3 concurrent internal agents**, zero file-ownership overlap, worktree
-  isolation for writers. External CLI runtimes may exceed 3 but default
-  conservative.
+- **Parallel limits** — in-session fan-out follows
+  `.claude/skills/cook/references/parallel-execution-rules.md` (max concurrent
+  agents, ownership overlap, worktree isolation). It binds internal agents only;
+  external CLI runtimes are not capped by it but default conservative.
 - **Prompt building** — use `mk:delegate` to assemble each job's subagent prompt
   from the delegation template (task + files + acceptance criteria + ownership).
-- **Task claiming** — for durable multi-session runs, `mk:task-queue` enforces
-  ownership; the run's `state.json` is the coordinator's own record.
-- **Tier bridge** — the capability tiers (C1/C2/C3) and risk tiers (R0–R3) in
-  [model-routing.md](references/model-routing.md) are the job-routing axes;
-  `mk:scale-routing` + `.claude/skills/agent-detector/references/model-selection-rules.md` remain the source for
-  the toolkit's TRIVIAL/STANDARD/COMPLEX model-tier mapping when routing internal
-  agents.
+- **Task claiming** — for durable multi-session runs, `mk:task-queue` records
+  ownership as an advisory convention; the run's `state.json` is the
+  coordinator's own record.
+- **Tier bridge** — C1/C2/C3 and R0–R3 (see
+  [model-routing.md](references/model-routing.md)) route jobs; the toolkit's
+  TRIVIAL/STANDARD/COMPLEX model tiers stay with
+  `.claude/skills/agent-detector/references/model-selection-rules.md`.
 
 ## Safety Authority
 
@@ -119,18 +121,16 @@ Orchestration never relaxes the toolkit's non-negotiable rules:
 
 ## Pipeline
 
-Copy this checklist and track progress:
+Seven stages: intake, job graph, route, safety gate, dispatch and capture,
+arbiter review, report. These invariants hold on every run:
 
-```
-Orchestrate Progress:
-- [ ] 1. Brainstorm & intake (outcome, constraints, acceptance, secrets refused)
-- [ ] 2. Build the job graph (task, cwd, timeout, expected output, ownership)
-- [ ] 3. Discover, profile, route (live runtimes → profiles → capability/risk route)
-- [ ] 4. Apply the safety gate (least privilege, bypass off, destructive approval)
-- [ ] 5. Dispatch & capture (worktrees first, state.json per transition, redacted)
-- [ ] 6. Arbiter review (independent C3 route verifies claims vs evidence)
-- [ ] 7. Report (statuses, resolved routes, artifacts, verdict, repro, questions)
-```
+- Every job has an owner (runtime or agent), a cwd, a timeout and an expected output.
+- Every route comes from live evidence and meets its capability and risk floors.
+- Destructive or credentialed work has explicit approval for its exact scope;
+  secrets are refused at intake and redacted from every artifact.
+- `state.json` is updated on each job transition; failures are not retried silently.
+- The arbiter checks each claim against an artifact, command output or test, and
+  the report lists unresolved questions. Unverified work is not reported as complete.
 
 ### 1. Brainstorm and intake
 
@@ -139,9 +139,8 @@ Orchestrate Progress:
 - Identify dependencies, destructive or external intent, expected outputs, and
   runtime constraints.
 - Refuse secrets at the door (see Safety Authority).
-- **Prefer a direct single-agent workflow when orchestration would add no useful
-  parallelism, staged dependency, runtime diversity, or arbiter value** — and say
-  so plainly rather than manufacturing jobs.
+- If orchestration adds no parallelism, staged dependency, runtime diversity or
+  arbiter value, stop here and use a single agent.
 
 ### 2. Build the job graph
 
@@ -166,8 +165,7 @@ Orchestrate Progress:
   controls, evidence source, and fallback reason.
 - A missing, unauthenticated, unverified, or insufficiently controlled candidate
   cannot satisfy a route.
-- Re-profile fallbacks and rebuild their commands; never carry model names or
-  flags between runtimes.
+- Re-profile fallbacks and rebuild their commands from scratch.
 - Mark the job `blocked` when no candidate meets both capability and risk floors.
   Never budget-route judgment or silently weaken safety.
 
@@ -190,8 +188,8 @@ Orchestrate Progress:
 
 - Create each required worktree (via `mk:worktree`) before dispatch and pin the
   job's cwd to it.
-- Start independent jobs together only up to `concurrency` (and the max-3
-  internal-agent limit).
+- Start independent jobs together only up to `concurrency` (and the internal-agent
+  limit in `parallel-execution-rules.md`).
 - Update `<run-dir>/state.json` on every job transition.
 - For CLI jobs, capture redacted command, bounded stdout/stderr, exit status,
   wall time, artifacts, and usage when reliably reported.
@@ -205,14 +203,14 @@ Orchestrate Progress:
 
 - Wait for all runnable jobs to settle.
 - Use a separate C3 judgment route selected by
-  [model-routing.md](references/model-routing.md).
+  [model-routing.md](references/model-routing.md). A single read-only scout job
+  needs no separate arbiter route: check its output against `expected_output` yourself.
 - Prefer an independently configured or different-family reviewer when live
   evidence proves it; disclose a same-family fallback.
 - Compare each result with `expected_output` and the original intent; run the
   spec's checks.
 - Flag contradictions, unsupported claims, missing artifacts, safety gaps,
   timeouts, and failed checks.
-- **Do not summarize unverified work as complete.**
 
 ### 7. Report
 
@@ -281,19 +279,13 @@ tasks/reports/orchestrate-history.jsonl
 }
 ```
 
-## Arbiter Checklist
+## Arbiter Check
 
-The final report is blocked until the arbiter answers:
-
-- Did every required job produce its expected artifact?
-- Did any job fail, time out, request permission, or emit uncertainty?
-- Do outputs contradict each other?
-- Were all listed checks run, and did they pass?
-- Are claims supported by paths, command output, citations, tests, or artifacts?
-- Did every route meet its capability and risk floor?
-- Was runtime/model/agent availability revalidated for this run?
-- Are destructive actions approved and reversible?
-- Are unresolved questions listed plainly?
+Before the report, the arbiter confirms each required job produced its expected
+artifact, every listed check ran and passed, outputs do not contradict each
+other, claims are backed by paths, command output or tests, and no job failed,
+timed out or asked for permission unreported. Destructive actions must be
+approved and reversible.
 
 ## Failure Modes
 
@@ -329,17 +321,15 @@ The final report is blocked until the arbiter answers:
 
 ## Gotchas
 
-- The run directory placeholders (`<verified-cli-runtime>`, `<resolved-model>`,
-  …) are deliberate. Resolve them from live evidence per run; never fill them in
-  from memory or a prior report.
-- `tasks/reports/` is the canonical toolkit reports location — do not emit to
-  `plans/reports/` (the upstream Orchestrate default).
+- The placeholders (`<verified-cli-runtime>`, `<resolved-model>`, …) are
+  deliberate: fill them from live evidence each run, because a remembered value
+  may name a runtime that is gone.
+- Reports go to `tasks/reports/`, the kit's reports location.
 - `--internal` prefers in-session agents but does not forbid CLI fallback; the
-  max-3 parallel limit applies only to in-session agents, not external CLIs.
+  parallel cap applies only to in-session agents, not external CLIs.
 - A worktree is not a sandbox: it stops edit collisions, not network or process
   side effects. Keep destructive/credentialed work off prompt-only internal
   isolation.
-- (none yet — grow from observed failures)
 
 ## Completion Report
 

@@ -1,6 +1,6 @@
 # Worktree Command Reference
 
-Full option tables, JSON field docs, and usage examples for all 6 commands.
+Option tables, JSON field docs and usage for the script verbs: `create`, `remove`, `list`, `status`, `prune`, `info`, `review-pr` and `review-pr-cleanup`. There is no `merge` verb: SKILL.md's merge action is plain `git merge --no-ff`.
 
 ## Table of Contents
 
@@ -10,6 +10,8 @@ Full option tables, JSON field docs, and usage examples for all 6 commands.
 - [create](#create)
 - [remove](#remove)
 - [prune](#prune)
+- [review-pr](#review-pr)
+- [review-pr-cleanup](#review-pr-cleanup)
 - [Global Options](#global-options)
 - [Error Codes](#error-codes)
 
@@ -193,6 +195,31 @@ node scripts/worktree.cjs prune --json
 
 ---
 
+## review-pr
+
+Creates a detached, SHA-bound worktree at `.worktrees/review-pr-*` from a PR head, for review. Fetches `pull/N/head` from the PR's base remote and writes a manifest to `tasks/reviews/<session>/manifest.json`.
+
+```bash
+node scripts/worktree.cjs review-pr --pr <n> --remote <base-remote> --session <id> [--base <branch>] [--dry-run] --json
+```
+
+Required: `--pr` (positive integer), `--remote` (must be the base repo, not a fork), `--session` (letters, digits, `. _ -`). `--dry-run` validates and prints the manifest without fetching or creating anything. The output carries the manifest fields, including `worktreePath`, `ref` and the head SHA.
+
+---
+
+## review-pr-cleanup
+
+Removes a review worktree. Accepts only a manifest path, or a sweep of stale sessions.
+
+```bash
+node scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
+node scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json   # --apply to execute
+```
+
+Removal proceeds only when the manifest nonce matches the in-worktree `.mewkit-review.json` and the target is a detached `.worktrees/review-pr-*` worktree; otherwise `CLEANUP_REFUSED`.
+
+---
+
 ## Global Options
 
 | Option | Description |
@@ -235,4 +262,13 @@ All errors emit `{ success: false, error: { code, message, ...details } }` and e
 | `WORKTREE_REMOVE_FAILED` | remove | `git worktree remove` failed |
 | `WORKTREE_LIST_ERROR` | list/status/remove | `git worktree list` failed |
 | `WORKTREE_PRUNE_FAILED` | prune | `git worktree prune` failed |
+| `MISSING_SESSION` / `INVALID_SESSION` | review-pr | `--session` absent or not path-safe |
+| `MISSING_PR` / `INVALID_PR` | review-pr | `--pr` absent or not a positive integer |
+| `MISSING_REMOTE` / `INVALID_REMOTE` | review-pr | `--remote` absent or not a valid remote name |
+| `REMOTE_NOT_FOUND` / `REMOTE_NOT_GITHUB` | review-pr | Remote missing or not a GitHub remote |
+| `PR_FETCH_FAILED` | review-pr | Could not fetch `pull/N/head` |
+| `WORKTREE_ADD_FAILED` | review-pr | `git worktree add` failed |
+| `MISSING_MANIFEST` / `MANIFEST_NOT_FOUND` | review-pr-cleanup | No manifest path given, or none at that path |
+| `INVALID_MANIFEST` | review-pr-cleanup | Manifest fails validation |
+| `CLEANUP_REFUSED` | review-pr-cleanup | Ownership nonce or target check failed |
 | `UNKNOWN_COMMAND` | main | Unrecognized command name |
