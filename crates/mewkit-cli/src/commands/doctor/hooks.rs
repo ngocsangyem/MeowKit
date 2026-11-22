@@ -16,6 +16,15 @@ use crate::place::Place;
 const COVERAGE: &str = ".claude/hooks/hook-coverage.json";
 
 pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Check> {
+    // The kit installs no Antigravity hook, so there is no hook file to read and
+    // no coverage row that describes a guard that is there.
+    if runtime == Runtime::Antigravity {
+        return vec![Check::new(
+            format!("{} hooks ({})", runtime.name(), place.label()),
+            Status::Warn,
+            mewkit_adapters::antigravity::NO_GUARDS,
+        )];
+    }
     let mut out = vec![scripts(place, runtime)];
     if place.scope.kind == ScopeKind::Project {
         match runtime {

@@ -122,3 +122,32 @@ fn a_grok_tree_is_detected_by_its_hook_runtime_config_and_fails_what_is_missing(
         rows[1].detail
     );
 }
+
+#[test]
+fn an_antigravity_tree_is_a_kit_skill_and_says_its_guards_are_not_installed() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    std::fs::create_dir_all(dir.path().join(".agents/skills/mine")).expect("create a skill folder");
+    assert!(
+        !detects_target("antigravity", dir.path()),
+        "a skill the user made is not an install"
+    );
+    let skill = dir.path().join(".agents/skills/mk-cook");
+    std::fs::create_dir_all(&skill).expect("create a kit skill folder");
+    std::fs::write(
+        skill.join("SKILL.md"),
+        "---\nname: \"mk-cook\"\ndescription: \"Builds.\"\n---\n",
+    )
+    .expect("write the skill");
+    assert!(detects_target("antigravity", dir.path()));
+
+    let rows = check_target("antigravity", dir.path());
+    let guards = rows.last().expect("a guards row");
+    assert_eq!(guards.status, Status::Warn);
+    assert!(
+        guards.detail.contains("guards not installed"),
+        "{}",
+        guards.detail
+    );
+    // AGENTS.md and the guard script are not there.
+    assert_eq!(rows[0].status, Status::Fail, "{rows:?}");
+}

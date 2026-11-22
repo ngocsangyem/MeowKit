@@ -51,13 +51,14 @@ fn an_unknown_target_lists_the_known_ones() {
         .fixture("validate-flat-copy")
         .args(&["validate", "--target", "emacs"])
         .redact(
-            ", grok, pi, omp",
+            ", grok, pi, omp, antigravity",
             "",
-            "the grok, pi and omp profiles were added after the npm CLI was retired",
+            "the grok, pi, omp and antigravity profiles were added after the npm CLI was retired",
         )
         .run();
     assert!(
-        rust.stderr.contains("codex, cursor, grok, pi, omp."),
+        rust.stderr
+            .contains("codex, cursor, grok, pi, omp, antigravity."),
         "{}",
         rust.describe()
     );

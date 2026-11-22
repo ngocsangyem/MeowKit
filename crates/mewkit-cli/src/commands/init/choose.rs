@@ -60,13 +60,17 @@ pub fn pick_targets(yes: bool, installed_here: bool) -> Result<(Vec<Runtime>, bo
         (Runtime::Grok, "installs .grok/"),
         (Runtime::Pi, "installs .agents/ and .pi/"),
         (Runtime::Omp, "installs .agents/ and .omp/"),
+        (Runtime::Antigravity, "installs .agents/"),
     ]
     .into_iter()
     .map(|(r, hint)| Choice::plain(r.name()).with_hint(hint))
     .collect();
     let ask = Ask::new(
         "Select the toolkits to set up",
-        Flag::with_value("--target", "claude-code|codex|cursor|grok|pi|omp"),
+        Flag::with_value(
+            "--target",
+            "claude-code|codex|cursor|grok|pi|omp|antigravity",
+        ),
     );
     let picked = default_prompt().multi_select(&ask, &choices)?;
     let runtimes: Vec<Runtime> = picked
