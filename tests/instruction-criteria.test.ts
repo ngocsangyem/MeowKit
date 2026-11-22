@@ -1,12 +1,13 @@
 // The instruction-criteria checker: every mechanical criterion flags its failing fixture and
 // passes its passing one, the baseline fails only on growth, and the real trees pass against
 // the committed baseline.
-import { describe, expect, it } from "vitest";
-import { spawnSync } from "node:child_process";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { execFile, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const FIX = path.join(REPO, "tests", "fixtures", "instruction-criteria");
@@ -49,6 +50,26 @@ const { alwaysOnFiles } = require("../scripts/check-instruction-criteria.cjs") a
 };
 
 const pins = readPins(path.join(FIX, "model-pins.md"));
+const execFileAsync = promisify(execFile);
+
+/**
+ * Run a repo script in a child node and await it. The installs behind the real-tree checks
+ * take tens of seconds; run synchronously they block the worker's event loop past vitest's
+ * RPC timeout, which reports an unhandled error even when every assertion passed.
+ */
+async function runScript(args: string[]): Promise<{ status: number; stdout: string; stderr: string }> {
+	try {
+		const { stdout, stderr } = await execFileAsync(process.execPath, args, {
+			cwd: REPO,
+			maxBuffer: 64 * 1024 * 1024,
+		});
+		return { status: 0, stdout, stderr };
+	} catch (error) {
+		const failed = error as { code?: unknown; stdout?: string; stderr?: string };
+		const status = typeof failed.code === "number" ? failed.code : 1;
+		return { status, stdout: failed.stdout ?? "", stderr: failed.stderr ?? String(error) };
+	}
+}
 
 /** Criteria a fixture raises, with `rel` the path the checker would see inside a tree. */
 function criteria(fixture: string, kind: Kind, rel = path.basename(fixture)): string[] {
@@ -190,14 +211,25 @@ describe("baseline", () => {
 });
 
 describe("the real trees", () => {
+	// The Cursor install the checker reads as `installed:cursor`, built once in a child process.
+	let cursorTree = "";
+	beforeAll(async () => {
+		const run = await runScript(["scripts/lib/installed-tree.cjs", "cursor"]);
+		expect(run.status, run.stderr).toBe(0);
+		cursorTree = run.stdout.trim();
+	}, 120_000);
+	afterAll(() => {
+		if (cursorTree) fs.rmSync(cursorTree, { recursive: true, force: true });
+	});
+
 	it("count Cursor rules marked alwaysApply as always-on", () => {
-		const files = alwaysOnFiles("installed:cursor").map((f) => path.basename(f));
+		const files = alwaysOnFiles(cursorTree).map((f) => path.basename(f));
 		expect(files).toContain("runtime-invariants.mdc");
 		expect(files).not.toContain("domain-planning.mdc");
 	});
 
 	it("sum the Cursor always-on bytes to the A8 ceiling", () => {
-		const bytes = alwaysOnFiles("installed:cursor").reduce((n, f) => n + fs.statSync(f).size, 0);
+		const bytes = alwaysOnFiles(cursorTree).reduce((n, f) => n + fs.statSync(f).size, 0);
 		expect(bytes).toBeLessThanOrEqual(10641);
 	});
 
@@ -209,12 +241,12 @@ describe("the real trees", () => {
 		expect(run.status).toBe(2);
 	});
 
-	it("pass against the committed baseline", () => {
-		const run = spawnSync(
-			process.execPath,
-			["scripts/check-instruction-criteria.cjs", "--baseline", "scripts/instruction-criteria-baseline.json"],
-			{ cwd: REPO, encoding: "utf8" },
-		);
+	it("pass against the committed baseline", async () => {
+		const run = await runScript([
+			"scripts/check-instruction-criteria.cjs",
+			"--baseline",
+			"scripts/instruction-criteria-baseline.json",
+		]);
 		expect(run.stdout).toContain("No findings.");
 		expect(run.status).toBe(0);
 		// One install per runtime other than Claude Code, five in all.
