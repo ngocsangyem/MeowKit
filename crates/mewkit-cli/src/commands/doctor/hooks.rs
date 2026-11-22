@@ -45,7 +45,7 @@ pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Ch
                 "Pi loads .pi/extensions and the project's .agents/skills only in a project you trusted (/trust); whether this one is trusted is not read here",
             )),
             // OMP has no trust step: its hook module runs from the first session.
-            Runtime::Omp => {}
+            Runtime::Omp | Runtime::Antigravity => {}
         }
     }
     if runtime != Runtime::ClaudeCode {
@@ -62,6 +62,7 @@ pub(super) fn hook_file(runtime: Runtime) -> &'static str {
         Runtime::Grok => ".grok/hooks/meowkit.json",
         Runtime::Pi => ".pi/extensions/meowkit.ts",
         Runtime::Omp => ".omp/hooks/pre/meowkit.ts",
+        Runtime::Antigravity => ".agents/hooks.json",
     }
 }
 

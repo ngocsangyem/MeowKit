@@ -132,7 +132,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     let skill_packs = choose::skill_packs(args.skill_packs.as_deref());
     let mut mcp_notes = Vec::new();
 
-    // Codex, Pi and OMP write one `.agents/` tree between them, in wording
+    // Codex, Pi, OMP and Antigravity write one `.agents/` tree between them, in wording
     // that depends on which of them are here. One that is installed already is
     // planned again, first, so its files are in the wording the newcomer writes.
     let rejoining = depends_on(&targets, &place.installed()?, place.scope.kind);
