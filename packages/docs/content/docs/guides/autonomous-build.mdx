@@ -86,8 +86,6 @@ The developer reads the signed contract before editing source. No hook checks th
 | `--budget N` | Spend cap in USD |
 | `--tdd` | Write the TDD sentinel so the developer waits on the tester before each generator round |
 | `--advice` | The `athena` agent advises at named checkpoints (at most 5 per run). Its advice is evidence, never an approval |
-| `--teams` | Use agent teams instead of file-based subagents. Subagents are the default |
-| `--resume RUN_ID` | Continue an interrupted run at its last completed step |
 
 ## What a run leaves behind
 
@@ -99,7 +97,7 @@ The developer reads the signed contract before editing source. No hook checks th
 | Evaluator verdict | `tasks/reviews/{slug}-evalverdict.md` |
 | Run report | `tasks/autobuild-runs/YYMMDD-HHMM-{slug}/run.md` |
 
-The run report records the density decision and its source, one section per step, and the budget trail. It is append-only, and it is the file `--resume` reads.
+The run report records the density decision and its source, one section per step, and the budget trail. It is append-only, and a killed run restarts from the `next_step` it records.
 
 ## Reading the verdict
 
@@ -113,7 +111,7 @@ The verdict holds a score per rubric, a weighted overall score and a pointer to 
 
 **The evaluator says FAIL and the build looks fine.** Open the evidence directory, which holds output behind every graded criterion. `/mk:elicit` examines one rubric in more depth, and you can recalibrate anchors in `.claude/skills/rubric/rubrics/`.
 
-**The run was interrupted.** Run `/mk:autobuild --resume {run-id}`.
+**The run was interrupted.** Open `run.md` in the run directory and continue from the step named by `next_step`.
 
 ## Next steps
 

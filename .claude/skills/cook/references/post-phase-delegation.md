@@ -17,18 +17,18 @@ fire points, skip conditions, and invocation form.
 
 [CONTEXTUAL] — applies only when an orchestration skill is active.
 
-## Rule 1: Orchestration Skills MUST Delegate Post-Phase
+## Rule 1: Orchestration Skills Delegate Post-Phase
 
-The following skills MUST delegate to `project-manager` at the fire points
+The following skills delegate to `project-manager` at the fire points
 listed below. Delegation is via natural language in the skill body —
 hooks cannot invoke the Agent tool (verified).
 
 | Skill                          | Fire point                                                 | Mode        |
 | ------------------------------ | ---------------------------------------------------------- | ----------- |
-| `mk:cook`                    | After a review verdict of PASS, before Phase 5 ship        | background  |
+| `mk:cook`                    | After a review verdict of PASS on a multi-phase plan, before Phase 5 ship | background  |
 | `mk:autobuild`                 | Step 5 pre-escalation (before asking the user on iter cap) | **foreground** |
 | `mk:autobuild`                 | Step 6 final run report                                    | background  |
-| `mk:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
+| `mk:workflow-orchestrator`   | After the Phase 4 verdict                                   | background  |
 | `mk:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
 | `mk:worktree`                | After merge integration test passes                        | background  |
 
@@ -64,6 +64,7 @@ PM is NOT invoked when ANY of the following is true:
 - `mk:autobuild` with `MEOWKIT_AUTOBUILD_MODE=MINIMAL` (dead-weight thesis)
 - Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/mk:status` still works)
 - No active plan at `tasks/plans/` (nothing to track)
+- A single-phase plan, where the verdict and the run summary already say everything a status report would
 - Docs-only or rule-only updates with no active implementation plan; report docs impact directly instead
 
 WHY: Skip paths avoid delivery tracking when there is no useful plan/report surface.

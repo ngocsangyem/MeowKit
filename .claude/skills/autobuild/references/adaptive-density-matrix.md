@@ -61,15 +61,7 @@ The chosen density and its source are logged in the run report's "Density Decisi
 
 ## When the Matrix Will Need Updating
 
-Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a new model tier rolls out:
-
-1. Re-run the calibration set (Phase 8 — `mk:benchmark`, available only in this repository) with the new model on FULL density
-2. Re-run the same set on LEAN density
-3. If LEAN performance matches FULL within 5%, downgrade the tier's matrix entry from FULL to LEAN
-4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), upgrade aggressively
-5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per Rule 6 of the dead-weight audit rules, which the maintainers keep in the kit's source repository
-
-The matrix is **not** static. It encodes the current best understanding of "where does scaffolding stop helping and start hurting?" — and that boundary moves with model capability.
+Every model upgrade is a chance to test whether the scaffolding is still load-bearing. After one: run the same calibration builds on FULL and on LEAN. If LEAN matches FULL within about 5%, move that tier's entry to LEAN; if LEAN beats FULL, move it at once. `mk:benchmark` records the scores. The matrix encodes the current best view of where scaffolding stops helping, and that boundary moves with model capability.
 
 ## Anti-Patterns
 
@@ -77,11 +69,10 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 |---|---|
 | Hardcoding LEAN for all Opus models | Opus 4.5 and older still benefit from FULL — only 4.6 and later have the auto-compaction that justifies LEAN |
 | Setting MEOWKIT_AUTOBUILD_MODE=LEAN to "save time" on Sonnet | Sonnet without scaffolding produces worse output AND wastes more time on rework |
-| Forcing FULL on a LEAN model because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding <!-- research-citation --> |
+| Forcing FULL on a LEAN model because "more is safer" | False — over-scaffolding capable models adds noise. a measured finding in the harness research |
 | Skipping the calibration replay after a model upgrade | The whole policy depends on measured performance per tier; skipping is how the matrix becomes dead weight itself |
 
 ## See Also
 
 - `.claude/skills/cook/references/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
 - `.claude/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
-- Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

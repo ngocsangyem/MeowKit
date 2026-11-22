@@ -1,127 +1,54 @@
 # mk:autobuild — Workflow
 
-7-step workflow (numbered 0–6) orchestrating an autonomous multi-hour build via planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density.
+Seven steps, numbered 0–6, run in order: tier detection, plan, contract, generate, evaluate, iterate or ship, run report. Read one step file at a time and finish it before the next, because each step consumes the previous step's output.
 
-## Step-File Contract
+Steps run as written. The step files name the fragile ones (the budget check, the ship question, the signed contract); everywhere else use judgment about how to reach the step's goal. A step that cannot meet its goal stops the run and goes to the report, not around the problem.
 
-- One step at a time: load one step file, not several.
-- Read the ENTIRE step file before executing any instruction in it.
-- Complete the current step before reading the next; the steps depend on each other's output, so do not skip or reorder them.
-- Follow the step's instructions exactly — do not improvise, add steps, or deviate.
-- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
-- A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
+## Run state
 
-## Rules
+`tasks/autobuild-runs/{run_id}/run.md` is the run's state and its audit trail. Its frontmatter holds `run_id`, `density`, `model`, `budget_cap`, `budget_spent`, `iterations`, `status`, `next_step`, `started`, and `supervisionRunId` when `--advice` is on. A step reads it on entry and updates it with the edit tool on exit. `next_step` names the file to open after the current step and defaults to the next in order; it lives in the file so a subagent or a restarted session finds it. Step 6 owns the final report format.
 
-- ALWAYS halt at iteration cap (`--max-iter`, default 3) — escalate to human, don't loop forever
-- ALWAYS write a run report (step-06) even on failure / timeout / escalation
-- ALWAYS commit per step — every step's output gets a git commit for resumability
-- ALWAYS honor the budget tracker — when `budget-tracker.sh` reports BLOCK, halt immediately
-- 6-hour wall-clock hard timeout
+`run_id` is `YYMMDD-HHMM-{slug}`, with a short kebab-case slug of the task. A killed run restarts from `run.md`: open the file named by `next_step`; finished steps are not repeated.
 
-### Next-Step Discovery (Critical)
+## Shared rules
 
-Steps do NOT use `goto` — bash has no goto. Branching is done via the `next_step` variable, which is **persisted to `run.md` frontmatter** so it survives subagent context resets and JIT step loads.
+- **Iteration cap.** `--max-iter`, default 3. At the cap, ask the user.
+- **Report always.** Step 6 runs on every end state: pass, fail, timeout, escalation.
+- **Commit per step**, so the run can restart from the last finished step.
+- **Budget.** After each step that spends, run `scripts/budget-tracker.sh check`. Exit 0 is fine, 1 a warning, 2 or 3 halts the run with `final_status=TIMED_OUT`. Record cost with `budget-tracker.sh add <usd> <step>` only from a figure the host reported; otherwise record `0.00` rather than an estimate, because the budget gate is only as good as its input. Thresholds: `.meowkit/config.yaml`.
+- **Wall-clock.** At 6 hours, stop and report.
+- **Evaluator separation.** The generator never grades its own work; the evaluator runs the build and cites evidence from it. A density override or `--tier` changes the scaffolding, not that rule or the review.
+- **Subagent returns.** Every brief asks for the four-status block (`DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT`, `.claude/rules/agent-conduct.md`) plus the artifact path. `BLOCKED` and `NEEDS_CONTEXT` get an answer (more context, a smaller task, or the user) before any retry; the same approach is not retried.
+- **Briefs** carry the goal, the fixed constraints, the files in scope and the return shape (template: `.claude/skills/cook/references/orchestration-rules.md`). Do the work in the session instead of delegating when it is small and sequential.
 
-After completing each step, the agent reads the persisted `next_step` field from `$run_dir/run.md` and opens that file:
+## Variables
 
-```bash
-next_step=$(grep -E '^next_step:' "$run_dir/run.md" | head -1 | sed -E 's/^next_step:[[:space:]]*//')
-# Open and follow $next_step
-```
+| Variable | Set by | Meaning |
+|---|---|---|
+| `task_description` | invoker | the original task |
+| `density` | step 0 | `MINIMAL`, `FULL` or `LEAN` |
+| `run_id`, `run_dir` | step 0 | run identity and `tasks/autobuild-runs/{run_id}/` |
+| `plan_dir`, `slug` | step 1 | product plan directory and task slug |
+| `contract_path` | step 2 | signed contract, or `null` when skipped |
+| `handoff_path` | step 3 | generator handoff file |
+| `verdict_path`, `verdict` | step 4 | evaluator verdict file and `PASS`, `WARN` or `FAIL` |
+| `iteration`, `max_iter` | step 3, invoker | current round and the cap |
+| `budget_cap`, `budget_spent` | invoker, steps | USD |
+| `final_status` | step 5 | `PASS`, `WARN`, `FAIL`, `ESCALATED` or `TIMED_OUT` |
 
-If `next_step` is unset, the agent follows the default linear progression (step-N → step-N+1).
+`final_status` has no other values. A user who ships a build despite a FAIL at the cap is recorded as `FAIL` with the decision noted in the report, not as a new status.
 
-## Steps
+## Density
 
-0. `step-00-tier-detection.md` — Call `mk:scale-routing` (or `density-select.sh`); pick `MINIMAL|FULL|LEAN`; record decision in run report
-1. `step-01-plan.md` — Invoke `mk:plan-creator --product-level` (or `--fast` for MINIMAL); produce product-level spec
-2. `step-02-contract.md` — Invoke `mk:sprint-contract propose → review → sign` (skipped on LEAN with small sprint OR MINIMAL)
-3. `step-03-generate.md` — Spawn `developer` subagent with the 4-subphase pattern; generator implements per signed contract
-4. `step-04-evaluate.md` — Spawn `evaluator` subagent via `mk:evaluate`; produces graded verdict
-5. `step-05-iterate-or-ship.md` — Verdict PASS → ask the user about shipping, then route to shipper on a yes (Phase 5 of the 7-phase model); FAIL → loop back to step-3 with feedback (max `--max-iter` rounds; escalate after)
-6. `step-06-run-report.md` — Write the final audit trail at `tasks/autobuild-runs/{run-id}/run.md`
+A one-line summary; the matrix owns the rules. `MINIMAL` hands the task to `mk:cook`. `FULL` runs every step with a required contract and up to 3 rounds. `LEAN` makes the contract optional and expects 0–1 rounds. The selection order and the model table are in `references/adaptive-density-matrix.md`.
 
-## Variables Passed Between Steps
+## End states and returns
 
-| Variable | Set by | Used by | Values |
-|---|---|---|---|
-| `task_description` | invoker | step-01 | Original natural-language task |
-| `density` | step-00 | step-01..05 | `MINIMAL`, `FULL`, `LEAN` |
-| `model_id` | step-00 | step-06 | e.g., `claude-opus-5-5`, `claude-sonnet-5-5` |
-| `tier` | step-00 | step-06 | `TRIVIAL`, `STANDARD`, `COMPLEX` |
-| `run_id` | step-00 | all | `YYMMDD-HHMM-{slug}` |
-| `run_dir` | step-00 | all | `tasks/autobuild-runs/{run_id}/` |
-| `plan_dir` | step-01 | step-02..06 | Absolute path to product-level plan dir |
-| `slug` | step-01 | step-02..06 | Kebab-case task identifier |
-| `contract_path` | step-02 | step-03..06 | Path to signed contract OR `null` (skipped) |
-| `handoff_path` | step-03 | step-04..06 | Path to generator handoff file |
-| `verdict_path` | step-04 | step-05..06 | Path to evaluator verdict file |
-| `verdict` | step-04 | step-05 | `PASS`, `WARN`, `FAIL` |
-| `iteration` | step-05 | step-03 (re-entry), step-06 | Integer, 1..max_iter |
-| `max_iter` | invoker / default 3 | step-05 | Integer |
-| `budget_cap` | invoker / default 50 | step-03..05 | USD |
-| `budget_spent` | running tally | step-06 | USD |
-| `final_status` | step-05 | step-06 | `PASS`, `WARN`, `FAIL`, `ESCALATED`, `TIMED_OUT` |
-| `next_step` | step-03/04/05 | JIT loader | filename of next step file to read; persisted to run.md frontmatter so it survives subagent context resets |
-| `supervisionRunId` | invoker (`--advice` only) | step-02, step-05 | Opaque run id for `--advice` checkpoints; persisted to run.md frontmatter for the same reason as `next_step` — a resumed run that loses it would start a fresh supervision budget. Unset when the flag is absent, and never passed to a spawned subagent |
+| End state | Return status |
+|---|---|
+| shipped or accepted by the user, no unresolved WARN | `DONE` |
+| shipped or accepted with WARNs or a FAIL the user accepted | `DONE_WITH_CONCERNS` |
+| budget block, timeout, escalation, or a step that cannot continue | `BLOCKED` |
+| the task or spec is too vague to plan | `NEEDS_CONTEXT` |
 
-## Flow
-
-```
-/mk:autobuild "build a kanban app" [--tier auto|full|lean|minimal] [--max-iter 3] [--budget 50]
-    ↓
-Step 0: Tier Detection
-    ├── density-select.sh OR mk:scale-routing
-    ├── env override: MEOWKIT_AUTOBUILD_MODE
-    ├── --tier flag override
-    └── Create tasks/autobuild-runs/{run_id}/
-         ↓
-Step 1: Plan
-    ├── mk:plan-creator --product-level
-    ├── (MINIMAL → --fast instead)
-    └── Output: tasks/plans/{plan_dir}/plan.md
-         ↓
-Step 2: Contract (conditional)
-    ├── If density == MINIMAL → SKIP entirely
-    ├── If density == LEAN AND sprint criteria < 5 → SKIP (single-pass build)
-    ├── Otherwise: mk:sprint-contract propose → review → sign
-    └── Output: tasks/contracts/{contract_path}.md
-         ↓
-Step 3: Generate
-    ├── Spawn developer subagent
-    ├── Pass: signed contract path + 4-subphase pattern instruction
-    ├── Developer runs understand → design → implement → verify → handoff
-    └── Output: tasks/handoff/{slug}-sprint-{N}.md
-         ↓
-Step 4: Evaluate
-    ├── Invoke mk:evaluate <handoff> --rubric-preset {detected}
-    ├── Active verification required (evidence checked by validate-verdict.sh)
-    └── Output: tasks/reviews/{slug}-evalverdict.md + verdict (PASS|WARN|FAIL)
-         ↓
-Step 5: Iterate or Ship
-    ├── PASS → ask the user about shipping → on a yes route to shipper, set final_status=PASS, go to step-06
-    ├── WARN + iteration < max_iter → loop to step-3 with feedback
-    ├── FAIL + iteration < max_iter → loop to step-3 with feedback
-    ├── iteration == max_iter → escalate to human by asking the user
-    └── budget breach OR 6h timeout → halt, set final_status=TIMED_OUT
-         ↓
-Step 6: Run Report
-    ├── Aggregate per-step artifacts + budget trail + density decision
-    ├── Write tasks/autobuild-runs/{run_id}/run.md
-    └── Print summary to user
-```
-
-## Mode Notes
-
-- **MINIMAL** (Haiku/trivial): Runs `mk:cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
-- **FULL** (Sonnet/Opus 4.5): Standard pipeline. Contract required. 1–3 iteration rounds.
-- **LEAN** (Opus 4.6+, Fable): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning.
-
-## Resume
-
-If a run is killed mid-flight, resume via `/mk:autobuild --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
-
-## Next
-
-Read and follow `step-00-tier-detection.md`.
+Start with `step-00-tier-detection.md`.

@@ -1065,11 +1065,6 @@
       "size": 5423
     },
     {
-      "path": ".agents/skills/mk-development/references/skill-loader.md",
-      "sha256": "493921271fe47c39cc444ad33bc3cedd10494f856bfc0153405f87966e1231da",
-      "size": 3350
-    },
-    {
       "path": ".agents/skills/mk-development/references/tdd-enforcement.md",
       "sha256": "067a4775e63794ce5852436c323304be4b02af128acd9949496b5cb799e64d86",
       "size": 3472

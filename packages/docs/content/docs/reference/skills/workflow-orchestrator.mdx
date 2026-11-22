@@ -16,7 +16,7 @@ description: "Internal router that sends complex-feature requests through the ph
 
 ## What it does
 
-`mk:workflow-orchestrator` activates at session start when you describe a complex feature: new features, multi-file changes, tasks over two hours, or work you want to run with TDD. Triggers include "implement feature", "build feature", `workflow:start` and a `fasttrack:` prefix. It is not user-invocable. `workflow.yaml` in the skill folder is the only source for the phase order, leads and required outputs, and this skill does not restate them.
+`mk:workflow-orchestrator` activates at session start when you describe a complex feature: new features, multi-file changes, tasks over two hours, or work you want to run with TDD. Triggers include "implement feature", "build feature" and a `fasttrack:` prefix. It is not user-invocable. `workflow.yaml` in the skill folder is the only source for the phase order, leads and required outputs, and this skill does not restate them.
 
 ## When not to use it
 
@@ -28,20 +28,20 @@ description: "Internal router that sends complex-feature requests through the ph
 
 ## Steps
 
-1. Run the pre-execution checklist: select the lead agent with `mk:agent-detector`, show the agent banner, check that the task is complex enough and ask clarifying questions before Phase 1.
-2. Detect the mode. A `fasttrack:` prefix or an Agent Teams trigger loads `references/fasttrack-and-teams.md`. Otherwise run the standard flow.
-3. Follow `references/workflow-phases.md`, which renders `workflow.yaml`.
-4. At each phase boundary, check the token budget (warn at 75 percent, hand off at 90 percent), say what comes next and save state with `workflow:handoff` when context is nearly full. Delegate to `project-manager` in the background after each transition unless `MEOWKIT_PM_AUTO=off`.
+1. Pick the lead agent and tier with `mk:agent-detector`. If the task is simple, say so and suggest the lighter route.
+2. Route to `mk:plan-creator` and agree the plan with you before building.
+3. Follow `workflow.yaml` phase by phase. `references/workflow-phases.md` renders it as a table.
+4. A `fasttrack:` prefix or an Agent Teams request loads `references/fasttrack-and-teams.md`.
+5. After the Phase 4 verdict, a background `project-manager` report is optional, and `mk:session-continuation` carries a run across a context reset.
 
 For a non-trivial task it routes to `mk:plan-creator` and the plan is agreed with you before building. Fasttrack accepts only a spec you have already settled. Phase 4 leaves a review verdict. Shipping and reflection need your explicit direction and do not run on their own after review.
 
 ## Rules
 
 - TDD is opt-in. Default mode skips the Phase 2 red step, and `--tdd` or `MEOWKIT_TDD=1` turns it on.
-- The target is 30K tokens or fewer for the full workflow.
 - It never enables `--advice`. If you already started a phase skill with that flag, only the `supervisionRunId` is carried across phases, so a resumed run keeps one budget.
 
 ## Gotchas
 
 - Two parallel subagents editing one file conflict. Define exclusive file ownership before spawning them.
-- A long workflow can run out of context. Check the remaining context at each boundary and escalate below 20 percent.
+- A long workflow can run out of context. Check at each phase boundary and hand off rather than push on.

@@ -1,10 +1,6 @@
 ---
 source: original
 applies_to: [Phase 0, 1, 2, 3, 4, 5, 6]
-# Unconditional load — target task directories (`tasks/plans/`, `tasks/contracts/`)
-# contain only `.gitkeep` at plan-creation time. Path-scoping would defer the rule
-# until a plan exists, which is too late for orchestrators that need it at session
-# start. (Red-team finding #2 — 2026-05-09 plan validation.)
 ---
 
 <!-- Canonical source: workflow.yaml -->

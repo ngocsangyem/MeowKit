@@ -1787,11 +1787,6 @@
       "size": 5423
     },
     {
-      "path": ".claude/skills/development/references/skill-loader.md",
-      "sha256": "4f569214c42f4a035df1ff14b1fcf971bb286b5877f9c26ef708c615be72c0a8",
-      "size": 3242
-    },
-    {
       "path": ".claude/skills/development/references/tdd-enforcement.md",
       "sha256": "067a4775e63794ce5852436c323304be4b02af128acd9949496b5cb799e64d86",
       "size": 3472
@@ -7550,11 +7545,6 @@
       "path": ".meowkit/cache/.claude/skills/development/references/code-patterns.md",
       "sha256": "22656eb28704adae61c13256512790d27723a66e738620793b631f58b3b7a62f",
       "size": 5423
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/development/references/skill-loader.md",
-      "sha256": "4f569214c42f4a035df1ff14b1fcf971bb286b5877f9c26ef708c615be72c0a8",
-      "size": 3242
     },
     {
       "path": ".meowkit/cache/.claude/skills/development/references/tdd-enforcement.md",

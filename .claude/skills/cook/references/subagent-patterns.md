@@ -56,7 +56,7 @@ Multiple researchers in parallel for different topics. After research:
 delegate a subagent (agent="planner", prompt="Activate mk:plan-creator skill. Create implementation plan from reports: [report-paths]. Save to tasks/plans/YYMMDD-name/", description="Plan [feature]")
 ```
 
-**Scope (planner):** pass researcher report paths, scout summary, 5-dimension requirements (per cook SKILL.md Exact-Requirements Contract), file-ownership constraints. Do NOT pass full researcher verbose output, session history.
+**Scope (planner):** pass researcher report paths, scout summary, the five requirements (expected output, acceptance criteria, scope boundary, constraints, touchpoints), file-ownership constraints. Do NOT pass full researcher verbose output, session history.
 
 Note: `agent="planner"` is the agent role. The agent should activate the `mk:plan-creator` skill for template selection and validation.
 
@@ -79,7 +79,7 @@ Single developer:
 delegate a subagent (agent="developer", prompt="Implement [phase-file] to make all failing tests pass. TDD: implement only enough to pass tests. Run type checking after each file. Files to modify: [list]", description="Implement [phase]")
 ```
 
-**Scope (developer):** pass phase-file path, failing-test paths, file-ownership glob, type-check command. Do NOT pass plan-wide overview, other phases' content, session history.
+**Scope (developer):** pass the goal in one sentence, phase-file path, failing-test paths, file-ownership glob, type-check command. Add the plan overview (`plan.md`) when the phase depends on cross-phase decisions; leave out other phases' bodies and session history.
 
 ### Parallel Execution
 
@@ -142,7 +142,7 @@ delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path]
 delegate a subagent (agent="documenter", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
 ```
 
-**Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per the kit's docs-reference contract, maintained in the source repo and not shipped). Do NOT pass plan internals, session conversation, code diffs.
+**Scope (documenter):** pass changed-file list, docs/ root, the doc paths the project keeps. Do NOT pass plan internals, session conversation, code diffs.
 
 ## UI Work (Conditional)
 

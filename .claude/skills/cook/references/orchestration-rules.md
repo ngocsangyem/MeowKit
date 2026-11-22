@@ -18,14 +18,13 @@ These rules apply when the agent spawns subagents or coordinates parallel work.
 - [Responsibilities](#responsibilities)
 - [Isolation Boundaries](#isolation-boundaries)
 - [Inner Harness Compatibility](#inner-harness-compatibility)
-- [Rejected Patterns](#rejected-patterns)
 - [File Ownership](#file-ownership)
 - [Sequential vs Parallel](#sequential-vs-parallel)
 - [Subagent Completion Handling](#subagent-completion-handling)
 
 ## Orchestrator Entry Point Rule
 
-Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). Arbitration to avoid running the same phases twice:
+Two entry skills run the lifecycle: `mk:cook` (explicit invocation, one scoped task) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `mk:autobuild` is the entry for a green-field product build, and `mk:orchestrate` splits a job across agent CLIs, so neither competes for the same session. To avoid running the same phases twice:
 
 - **Explicit `/mk:cook` invocation** → `mk:cook` owns the full pipeline. `mk:workflow-orchestrator` does NOT activate for the remainder of the session.
 - **Session start with complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` activates via autoInvoke and routes through the 7-phase flow. It defers to `mk:cook` for single-task requests.
@@ -33,7 +32,7 @@ Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline
 
 ## Delegation Context
 
-When spawning a subagent, ALWAYS include in the prompt:
+Every subagent prompt carries these, so it can work without your conversation:
 
 1. **Work context path**: the git root of the files being worked on
 2. **Plan reference**: path to the active plan file
@@ -44,21 +43,6 @@ When spawning a subagent, ALWAYS include in the prompt:
 WHY: Explicit paths and scope prevent wrong-file edits and duplicate work.
 
 If current working directory differs from the project being edited, use the work context paths — not CWD-derived paths.
-
-### Pre-Delegation Checklist
-
-Before spawning any subagent, verify you have included:
-
-- [ ] **Work context path** — git root of the files being worked on
-- [ ] **Plan reference** — path to the active plan file (or "none" if ad-hoc)
-- [ ] **Reports path** — `tasks/reports/` under work context (or "none")
-- [ ] **Plans path** — `tasks/plans/` under work context (or "none")
-- [ ] **File ownership** — glob patterns for files this subagent may modify
-- [ ] **Acceptance criteria** — how to verify the subagent's work is complete
-- [ ] **Goal** — the outcome the task serves, so the subagent can tell when the approach no longer fits it
-- [ ] **Fixed constraints** — what must NOT change, only items the user set or you verified
-- [ ] **Current approach** — marked as open to challenge with `file:line` evidence; an example that pre-solves a cause is labelled "already diagnosed"
-- [ ] **Return** — the shape of the answer you will read
 
 ### Delegation Prompt Template
 
@@ -116,7 +100,7 @@ Five boundary types govern what context crosses between layers. Each row defines
 |---|---|---|---|
 | Session → Subagent | Prompt-only | Task desc + file paths + acceptance criteria + plan ref | Session history, prior conversation, CLAUDE.md contents |
 | Orchestrator → Worker | Slim brief | Specific subtask + relevant files + output format | Full plan, other workers' outputs, orchestrator's reasoning chain |
-| Plan → Phase | Phase file | Path to `phase-XX-*.md` | Full `plan.md` + all other phase files |
+| Plan → Phase | Phase file | Path to `phase-XX-*.md`, plus `plan.md` when the phase depends on cross-phase decisions | Other phases' bodies |
 | Memory → Subagent | Matching entries | The entries that matched the task keywords | Entire `.meowkit/memory/` directory |
 | Workflow → Step | Step file | Current step content only (JIT) | Prior step files, `workflow.md`, `SKILL.md` preamble |
 
@@ -130,27 +114,13 @@ The delegation template is inner-harness–agnostic. Inner harnesses vary along 
 |---|---|
 | Task / Agent tool surface | Can the harness start subagents at all? What is the call shape? |
 | Context auto-injection | Which root file (e.g. `CLAUDE.md`, `AGENTS.md`, `gemini.md`) does the harness inject into subagent context automatically, and what is its byte cap? |
-| SubagentStart hook | Is the hook surface available? On Claude Code, it IS and the old blanket "hooks fire inside subagents and infinite-loop" answer is withdrawn (verdict **adopt**, 2026-11-09 — see the Rejected Patterns note below). Other harnesses still vary, so the question stays. |
+| SubagentStart hook | Is the hook surface available? It varies by harness, so check before relying on it. |
 
 Constraints that apply when the inner harness's behavior is unknown or differs from the outer harness:
 
 - Do NOT assume rule files are auto-loaded into subagent context. If the inner harness has a small auto-injection cap (e.g. a 32 KB `AGENTS.md`), delegated prompts must stay lean.
 - Pass required rules content EXPLICITLY in the Task prompt if the inner harness will not inject it.
 - Use `mk:delegate --silent` when the inner harness cannot ask the user interactively — the silent path emits the template without the wizard.
-
-## Rejected Patterns
-
-Patterns deliberately NOT implemented in the toolkit, with the reason each was rejected.
-
-| Rejected pattern | Why rejected |
-|---|---|
-| `SubagentStart` hook for subagent context injection | **Still not implemented, but for a new reason — verdict `adopt`, 2026-11-09.** The "infinite-loop" reason was wrong: the host runtime's hooks reference (retrieved 2026-11-09) documents the event as firing once when a subagent is spawned or resumed, unable to block subagent creation, and context-injecting only. What is real is a *repetition* concern, not recursion: on in-process agent teams it fires again each time a teammate handles a new message, so a throttle is a design question with no answer yet. Nothing is registered — the empty array stays empty, because a hook shipped in the same change as its own feasibility study has no independent check. |
-| `PreToolUse:Task` hook validating subagent prompts | Violates outer-harness principle. Could break legitimate Task calls. Make-correct-path-easy beats block-incorrect-path. |
-| Per-task memory namespaces | Over-engineering. The 5 boundary types above (Isolation Boundaries) already cover the leakage paths; namespacing memory adds complexity without measured benefit. |
-| AI OS / agent runtime abstraction layer | The toolkit is the outer harness, not a runtime replacement. An abstraction layer would silently break inner-harness diversity — the harness contract is whatever the host runtime exposes, not a wrapper. |
-| Vector embedding / external memory store | YAGNI. The two plain-markdown memory files already cover the toolkit's recall needs, and grep reads them. |
-
-Documented here so future contributors recognize these as decided trade-offs, not gaps awaiting implementation.
 
 ## File Ownership
 
@@ -174,14 +144,13 @@ Pattern: Plan → Test → Implement → Review
 Tasks are independent with no shared files.
 Pattern: Component A + Component B + Tests (separate files)
 
-ALWAYS plan integration points before starting parallel work.
-NEVER start parallel agents that modify the same files.
+Plan integration points before starting parallel work, and never start parallel agents that modify the same files.
 
 Subagents receive only the context they need.
 
 Summarize decisions, provide specific paths, and never pass full session history.
 
-### Parallel execution infrastructure (Week 2 addition)
+### Parallel execution infrastructure
 
 For COMPLEX tasks with independent subtasks:
 
@@ -190,7 +159,7 @@ For COMPLEX tasks with independent subtasks:
 3. Follow `references/parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
 4. Agreeing the plan and reading the review verdict are never parallelized — each is one sequential step with the user
 
-### Party Mode (Week 2 addition)
+### Party Mode
 
 For architectural discussions and trade-off analysis:
 

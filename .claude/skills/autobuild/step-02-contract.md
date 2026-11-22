@@ -1,147 +1,52 @@
 <!-- Lifecycle canonical source: .claude/skills/workflow-orchestrator/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
-# Step 2: Sprint Contract (Conditional)
+# Step 2: Sprint Contract
 
-<!-- autobuild pipeline steps are named Step 0–6 to avoid clashing with the 7 lifecycle phases. -->
-Negotiate a sprint contract via `mk:sprint-contract` (autobuild contract stage). Skipped on `MINIMAL` (already short-circuited) and on `LEAN` for small builds.
+**Goal:** a signed contract that says what the generator will build and how the evaluator will test it, so neither can quietly substitute a different goal. This is a fragile step: when there is a contract, nothing is generated until it is signed.
 
-## Instructions
+**Inputs:** `plan_dir`, `slug`, `density`.
 
-### 2a. Skip-or-run decision
+## Skip or run
 
-```
-if density == "MINIMAL":  # already short-circuited at step-00
-    skip
-elif density == "LEAN":
-    if estimated_ac_count < 5:
-        skip with reason "LEAN small sprint — no contract"
-    else:
-        run
-elif density == "FULL":
-    run (always)
-```
+- `MINIMAL`: already left at step 0.
+- `LEAN`: skip when the product spec is small enough that the generator can hold its own criteria (a handful of features). Set `contract_path=null`, note the reason in `run.md` and go to step 3.
+- `FULL`: always run.
 
-`estimated_ac_count` is derived by reading the product-level plan from step-01 and counting numbered features. If `feature_count < 3`, the resulting contract would have fewer than 5 ACs and the contract overhead exceeds the value — skip.
+## Run
 
-When skipped, write:
+Use `mk:sprint-contract` (propose, review, sign). The contract template is `.claude/skills/sprint-contract/assets/contract-template.md` and rubric presets come from `.claude/skills/rubric/scripts/load-rubric.sh`. Write as many acceptance criteria as the sprint needs, each in Given/When/Then form with a Verification line and a rubric tie-in. If the contract fits on one page, drafting and reviewing it yourself is fine; otherwise use two subagents.
 
-```markdown
-## Step 02 — Contract
-- Skipped (density: {LEAN}, estimated ACs: {N}, threshold: 5)
-- Generator will work directly from product-level plan + rubric preset
-```
-
-Set `contract_path=null` and proceed to step-03.
-
-### 2b. Run the contract negotiation
-
-When density is `FULL` or `LEAN` with sufficient ACs:
+Proposer brief (`developer`):
 
 ```
-Agent(
-  agent="developer",
-  description="Propose sprint 1 contract for $slug",
-  prompt="
-    Use mk:sprint-contract propose action with task slug: $slug
-
-    Read the active product spec at $plan_dir/plan.md and the active rubric preset
-    via .claude/skills/rubric/scripts/load-rubric.sh --preset frontend-app (or backend-api / cli-tool / fullstack-product as appropriate to the task).
-
-    Draft 5–15 ACs in Given/When/Then form. Each must have a Verification line and a Rubric tie-in.
-
-    Save to tasks/contracts/{date-time}-{slug}-sprint-1.md.
-    Re-read the draft against assets/contract-template.md to confirm every section
-    and every AC form is present.
-
-    Goal: a sprint contract the generator and evaluator can both sign
-    Return: the contract path
-    Work context: $(pwd)
-    Plan: $plan_dir/plan.md
-    Reports: none
-    Plans: none
-    Files to modify: tasks/contracts/{date-time}-{slug}-sprint-1.md
-    Acceptance criteria: 5–15 ACs, each with a Verification line and a Rubric tie-in
-    Constraints: Do NOT edit source code or the product spec
-  "
-)
+Goal: a sprint contract the generator and evaluator can both sign
+Task: mk:sprint-contract propose for {slug}, from {plan_dir}/plan.md and a rubric preset that fits the project type
+Files to modify: tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-1.md
+Constraints: do not edit source code or the product spec
+Return: the contract path and a status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT)
 ```
 
-Then dispatch the evaluator for review:
+Reviewer brief (`evaluator`, using its Contract Reviewer Role in `.claude/agents/evaluator.md`):
 
 ```
-Agent(
-  agent="evaluator",
-  description="Review proposed contract for $slug",
-  prompt="
-    Read tasks/contracts/*-${slug}-sprint-1.md (newest).
-    Apply your Contract Reviewer Role (see evaluator.md).
-    Append Round 1 (reviewer) entries to the Negotiation Log section.
-    If clean, write 'Round 1 (reviewer): accepted'.
-    Hard cap: 2 rounds. Round 3 escalates to the user.
-
-    Goal: a contract whose criteria can each be tested
-    Return: Round 1 (reviewer) entries in the Negotiation Log
-    Work context: $(pwd)
-    Plan: $plan_dir/plan.md
-    Reports: none
-    Plans: none
-    Files to modify: tasks/contracts/*-${slug}-sprint-1.md (Negotiation Log only)
-    Acceptance criteria: the Negotiation Log carries a Round 1 (reviewer) entry
-    Constraints: Do NOT edit source code or any section other than the Negotiation Log
-  "
-)
+Goal: a contract whose criteria can each be tested
+Task: review tasks/contracts/*-{slug}-sprint-1.md and append your round to its Negotiation Log
+Files to modify: the Negotiation Log only
+Return: "accepted" or the findings, and a status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT)
 ```
 
-Iterate propose → review up to 2 rounds. After both sign:
+At most 2 propose-review rounds; a third goes to the user.
 
-```bash
-contract_path=$(ls -t tasks/contracts/*-${slug}-sprint-1.md | head -1)
-```
+## Done when
 
-### 2c. Verify both signatures present
+`grep -E '^(generator_signed|evaluator_signed|status):'` on the contract shows a real commit SHA in both signature fields and `status: signed`. A placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed: stop and ask the user.
 
-```bash
-grep -E '^(generator_signed|evaluator_signed|status):' "$contract_path"
-```
+Append the contract path, AC count and rounds to `run.md`, and run `budget-tracker.sh check`.
 
-Both signature fields must hold a real commit SHA and `status` must be `signed`. A
-placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed: the
-autobuild workflow halts — escalate to user.
+## `--advice` GUIDE checkpoint
 
-### 2d. Append to run report
-
-```markdown
-## Step 02 — Contract
-- Path: {contract_path}
-- Status: signed
-- ACs: {N}
-- Rounds: {1 or 2}
-- Generator SHA: {sha}
-- Evaluator SHA: {sha}
-- Time: {duration}
-- Cost: ~${cost}
-```
-
-Increment `budget_spent`. Run `budget-tracker.sh`.
-
-### 2z. GUIDE checkpoint (`--advice` runs only)
-
-Skip entirely unless the run was invoked with `--advice`.
-
-This is the run's single GUIDE checkpoint: the plan and the contract decision are both
-settled, and no source has been generated yet. Fire it here — after the skip-or-run
-decision above, before `step-03-generate.md` — and follow
-`references/advice-checkpoints.md`. A directive is input to the generator's brief; it
-does not amend the signed contract, and it grants no permission the contract withholds.
-
-## Output
-
-- `contract_path` (absolute path or `null`) set
-- Run report updated with Step 02 section
-- GUIDE checkpoint recorded (`--advice` runs only)
-
-Print: `"Contract: {signed | skipped}. Proceeding to step-03 (generate)."`
+Only with `--advice`. This is the run's one GUIDE call: the plan and the contract decision are settled and nothing is generated yet. Fire it here, before step 3, per `references/advice-checkpoints.md`. A directive feeds the generator's brief; it does not amend the signed contract or grant what the contract withholds.
 
 ## Next
 
-Read and follow `step-03-generate.md`.
+`step-03-generate.md`.

@@ -1,70 +1,24 @@
 # Code Review Cycle
 
-The review-fix cycle for Phase 4. The reviewer writes a verdict file in every mode; this
+The review-fix cycle for Phase 4. The reviewer writes a verdict file for every non-trivial change; this
 page is how the findings get acted on before shipping.
 
 ## Contents
 
-- [Interactive Cycle (max 3 cycles)](#interactive-cycle-max-3-cycles)
-- [Auto-Handling Cycle](#auto-handling-cycle)
+- [The cycle](#the-cycle)
 - [Returned Work (`--advice` runs only)](#returned-work---advice-runs-only)
 - [Regression Recovery Options](#regression-recovery-options)
 - [Critical Issues (Always Block)](#critical-issues-always-block)
-- [Output Formats](#output-formats)
 
-## Interactive Cycle (max 3 cycles)
+## The cycle
 
-```
-cycle = 0
-LOOP:
-  1. Spawn reviewer subagent → score, critical_count, warnings, suggestions
+The reviewer writes the verdict; you present the findings (score, critical, warnings, suggestions, each with `file:line`) and act on them.
 
-  2. DISPLAY FINDINGS:
-     Review: [score]/10
-     Critical ([N]): MUST FIX — [list with file:line]
-     Warnings ([N]): SHOULD FIX — [list with file:line]
-     Suggestions ([N]): NICE TO HAVE — [list]
+- **Interactive:** with critical findings the user chooses fix critical, fix all, ship as is (record the trade-off in the verdict) or abort; without, continue, fix warnings or abort. A fix goes back through Build, `mk:verify` and a fresh review.
+- **Auto:** fix critical findings, re-run the tests, review again, and put the verdict path in the run summary.
+- **Cap:** 3 review-fix cycles, because a verdict that keeps failing usually needs the user's judgment, not more rounds. After the third, stop and ask the user: continue with the noted issues or abort.
 
-  3. Ask the user (header: "Review"):
-     IF critical_count > 0:
-       - "Fix critical issues" → fix, re-run tester, cycle++, LOOP
-       - "Fix all issues" → fix all, re-run tester, cycle++, LOOP
-       - "Ship as is" → PROCEED (record the trade-off in the verdict)
-       - "Abort" → stop
-     ELSE:
-       - "Continue" → PROCEED
-       - "Fix warnings/suggestions" → fix, cycle++, LOOP
-       - "Abort" → stop
-
-  4. IF cycle >= 3 AND user selects fix:
-     → "3 review cycles completed. Final decision required."
-     → ask the user: "Continue with noted issues" / "Abort workflow"
-```
-
-## Auto-Handling Cycle
-
-Auto mode fixes what it can and does not pause.
-
-```
-cycle = 0
-LOOP:
-  1. Spawn reviewer → score, critical_count, warnings
-
-  2. IF critical_count > 0 AND cycle < 3:
-     → Auto-fix critical issues
-     → Re-run tester to verify fix
-     → cycle++, LOOP
-
-  3. ELSE IF critical_count > 0 AND cycle >= 3:
-     → ESCALATE TO USER — three cycles did not clear the criticals
-
-  4. ELSE (no critical):
-     → Record the verdict path in the run summary and continue
-```
-
-Either cycle: the workflow evidence index should name the verdict path and the verification
-commands that ran, so the run can be retraced afterwards. See `workflow-steps.md` →
-Workflow Evidence Index.
+The evidence index should name the verdict path and the verification commands that ran (`workflow-steps.md` -> Workflow Evidence Index).
 
 ## Returned Work (`--advice` runs only)
 
@@ -107,9 +61,3 @@ This pattern preserves the user's decision-making authority on cross-cutting cha
 - Architecture violations: wrong layer, broken boundaries
 - Data loss risks: CASCADE DELETE without approval
 - Breaking changes without migration path
-
-## Output Formats
-
-- Waiting: `Phase 4: Review [score]/10 — awaiting the user's call on [N] findings`
-- After fix: `Phase 4: [old]/10 → Fixed [N] issues → [new]/10 — verdict at [path]`
-- Done: `Phase 4: Review [score]/10 — verdict at [path]`

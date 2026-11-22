@@ -76,7 +76,7 @@ Detect multiple features from natural language:
 | no-test     | Yes      | Skip       | Yes                   | Discussed      | No        |
 | code        | Skip     | RED-strict | Already done          | Discussed      | Per plan  |
 
-Every mode writes a plan and ends Phase 4 with a review verdict; what varies is whether the run pauses to discuss them. `auto` does not pause — it puts the plan path, the structure-check result and the verdict path in the run summary, which the user reads before shipping. `code` mode skips the plan conversation because the plan it executes was already agreed when it was written.
+Every mode on a non-trivial change writes a plan and ends Phase 4 with a review verdict; what varies is whether the run pauses to discuss them. `fast` is the same profile as `quick` in `SKILL.md`: a trivial change needs no plan and no reviewer. `auto` does not pause — it puts the plan path, the structure-check result and the verdict path in the run summary, which the user reads before shipping. `code` mode skips the plan conversation because the plan it executes was already agreed when it was written.
 
 **TDD column:**
 
@@ -95,7 +95,7 @@ Modifier flags layer on TOP of the detected mode. They do not change the mode it
 | `--no-strict` | Suppress auto-strict trigger from scale-routing | — | — |
 | `--tdd` | Write failing tests before implementation | Phase 2 (Test RED) | Varies |
 
-† `[LIGHT]` vs `[HEAVY]` is a relative ordering only. Concrete cost depends on the inner harness, model tier, and target surface — see `SKILL.md` for the canonical variability note.
+† `[LIGHT]` vs `[HEAVY]` is a relative ordering only. Concrete cost depends on the inner harness, model tier, and target surface — see `SKILL.md`.
 
 **Priority:** `--strict` supersedes `--verify` (strict includes verification). If both present, only `--strict` runs.
 **Combination:** All modifiers can combine with any mode (`--verify --fast`, `--strict --parallel`, etc.).

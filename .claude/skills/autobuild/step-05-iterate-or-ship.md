@@ -1,236 +1,66 @@
 # Step 5: Iterate or Ship
 
-Branch on the verdict from step-04. PASS → ship. WARN/FAIL with iterations remaining → loop. Cap reached → escalate to human.
+**Goal:** act on the verdict: ask the user about shipping, go round again with feedback, or escalate at the cap. Two parts of this step are fragile: the budget check, and the ship question. A verdict is evidence for the user's decision, not the decision, so no shipper starts before the user answers.
 
-## Instructions
+**Inputs:** `verdict`, `verdict_path`, `iteration`, `max_iter`, `budget_spent`.
 
-### 5a. Decision matrix
+## Decide
 
-| verdict | iteration < max_iter? | budget OK? | Action |
-|---|---|---|---|
-| `PASS` | — | — | Ask the user about shipping (5c). On yes: route to shipper, set `final_status=PASS`, go to step-06 |
-| `WARN` | yes | yes | Loop to step-03 with feedback |
-| `WARN` | no | — | Ask the user about shipping (5c) with every WARN itemized. On yes: route to shipper, set `final_status=WARN`, go to step-06. On no: no ship |
-| `FAIL` | yes | yes | Loop to step-03 with feedback |
-| `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate by asking the user (5e) |
-| any | — | NO (budget breach) | `final_status=TIMED_OUT`, go to step-06 — no ship, no question |
+| verdict | rounds left? | Action |
+|---|---|---|
+| budget blocked (any verdict) | — | `final_status=TIMED_OUT`, step 6, no ship and no question |
+| `PASS` | — | ship question (below) |
+| `WARN` | yes | loop to step 3 with feedback |
+| `WARN` | no | ship question with every WARN itemized; on "no", no ship |
+| `FAIL` | yes | loop to step 3 with feedback |
+| `FAIL` | no | escalate (below) |
 
-Both ship-capable rows (`PASS`, `WARN`-at-cap) route through the SAME ship question in 5c.
-A "no" there means no ship, in either row.
+Run `budget-tracker.sh check` first; exit 2 or 3 is the first row. `iterations` in `run.md` already holds this round.
 
-### 5b. Compute the next action
+## Ship question
 
-This step does NOT branch with `goto`. Bash has no goto, and the autobuild workflow is JIT step-loaded — branching is done by setting a session variable `next_step` and the agent reading the appropriate file at the end.
+Both ship-capable rows go through this one question; there is no second ship route.
 
-Compute `next_action` based on verdict + iteration counter + budget. `next_step` is the
-step to read once this one finishes — for the two ship-capable actions (`ship`,
-`ship_with_warnings`) that only happens after the user has answered the ship question in
-5c, and only if the answer was yes. Setting `next_step` here does not skip 5c.
+With `--advice`, fire the REVIEW checkpoint first (`references/advice-checkpoints.md`). It may return the work for correction, in which case re-enter step 3 and re-evaluate, because the verdict put in front of the user must describe the code that exists.
 
-```bash
-# Persist iteration to run report frontmatter (for --resume)
-sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$run_dir/run.md.bak"
+Put the verdict path and its evidence in front of the user. For WARN, itemize each warning from the verdict's `## Warnings` section; a count is not an answer. Then ask (header "Ship"):
 
-# Check budget — bail early if breached
-if ! scripts/budget-tracker.sh check >/dev/null 2>&1; then
-  final_status=TIMED_OUT
-  next_step="step-06-run-report.md"
-elif [ "$verdict" = "PASS" ]; then
-  final_status=PASS
-  next_step="step-06-run-report.md"
-  next_action="ship"
-elif { [ "$verdict" = "WARN" ] || [ "$verdict" = "FAIL" ]; } && [ "$iteration" -lt "$max_iter" ]; then
-  next_step="step-03-generate.md"  # loop back
-  next_action="loop"
-elif [ "$verdict" = "WARN" ] && [ "$iteration" -ge "$max_iter" ]; then
-  # Ship-capable: goes through the SAME ship question as PASS (5c), with every
-  # WARN itemized. next_step is where 5c lands after a yes.
-  final_status=WARN
-  next_step="step-06-run-report.md"
-  next_action="ship_with_warnings"
-else
-  # FAIL at iteration cap → escalate
-  final_status=ESCALATED
-  next_step="step-06-run-report.md"
-  next_action="escalate"
-fi
-```
+- **Ship it** (any WARNs shown are accepted as-is): dispatch the shipper. `mk:review` still runs inside it for the structural audit.
+- **Iterate with feedback**: write the user's reason to `{run_dir}/feedback-iter-{n}.md`, set `next_step: step-03-generate.md`, and raise `max_iter` by 1 if at the cap.
+- **Abort**: `final_status=ESCALATED`, step 6, no shipper.
 
-### 5c. Action: ship (verdict was PASS, or WARN at the iteration cap)
-
-Handles BOTH ship-capable actions — `next_action == ship` and
-`next_action == ship_with_warnings`. Every path that reaches a shipper passes through
-here; there is no second ship route.
-
-A verdict is **evidence**, not a decision: it describes what the evaluator found, and the
-user decides what to do about it.
-
-**`--advice` runs only:** fire the REVIEW checkpoint here, **before** the question below,
-per `references/advice-checkpoints.md`. It reads the terminal verdict and its evidence
-and may return the work for correction — in which case re-enter step-03 and re-evaluate,
-because the verdict put in front of the user must describe the code that exists. A
-`READY_FOR_EXISTING_GATE` disposition means only that asking the ship question is the
-correct next step. Athena's read is a second piece of evidence beside the evaluator's verdict;
-it is not a decision.
-
-**First, ask the user. Do not dispatch the shipper before the user answers.**
-
-Surface the verdict and its evidence so the user decides on what the evaluator actually
-found — not on the fact that it returned a grade.
-
-For `ship_with_warnings`, itemize every WARN in the question so each one is seen; a count
-alone is not an answer:
-
-```bash
-# Itemize the WARNs so each one is acknowledged, not summarized away.
-awk '/^## Warnings/,/^## [^W]/' "$verdict_path" | sed '/^## /d;/^$/d' > "$run_dir/warns-iter-${iteration}.md"
-```
+On "Ship it", keep `final_status` as the verdict (`PASS` or `WARN`) and brief the shipper:
 
 ```
-ask_user(
-  question: "Autobuild finished $slug with a {PASS | WARN-at-cap} verdict after $iteration iteration(s).
-             Verdict: tasks/reviews/{slug}-evalverdict.md · Evidence: $run_dir/evidence/
-             {if ship_with_warnings: 'Unresolved WARNs you would be accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
-             Ship?",
-  options: [
-    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk:review still runs for the structural audit)." },
-    { label: "Iterate with feedback", description: "Not yet. Provide a reason; it becomes the feedback packet and re-enters step-03." },
-    { label: "Abort", description: "Stop the autobuild workflow. No ship, no further iterations; the evidence stays for manual triage." }
-  ]
-)
+Goal: the approved build shipped
+Inputs: verdict {verdict_path}; handoff tasks/handoff/{slug}-sprint-1.md; plan {plan_dir}/plan.md; the user chose to ship at step 5; acknowledged WARNs (if any) {list}
+Files to modify: release artifacts only (changelog, version, tags); no source files
+Constraints: run mk:review for the structural audit even though the evaluator passed; conventional commit and PR; record every acknowledged WARN in the release notes
+Return: the PR or release reference and a status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT)
 ```
 
-Routing:
+## Loop
 
-- **Ship it** → dispatch the shipper below, then step-06. Keep `final_status` as computed in 5b (`PASS` or `WARN`).
-- **Iterate with feedback** → write the user's reason to `$run_dir/feedback-iter-${iteration}.md`, set `next_step="step-03-generate.md"`, and re-enter the loop (raise `max_iter` by 1 if already at cap).
-- **Abort** → set `final_status=ESCALATED`, proceed to step-06 with no shipper dispatch.
+Copy the verdict's `## Iteration Feedback` section to `{run_dir}/feedback-iter-{n}.md`, set `next_step: step-03-generate.md`, and tell the user the round number. With `--advice`, the RESCUE checkpoint applies only on a plateau (two consecutive verdicts failing the same criteria with no change in the evidence) or drift outside the signed contract; a first FAIL with concrete feedback is the loop working. A rescue directive does not buy another round.
 
-This question is distinct from the 5e escalation prompt. 5e fires only on the FAIL-at-cap
-path and never runs on PASS or WARN — it is not a substitute for this step.
+## Escalate (FAIL at the cap)
 
-**After** the user says yes, dispatch the shipper subagent, then proceed to step-06.
-On `ship_with_warnings`, pass the acknowledged WARNs through so the release notes record
-what was accepted:
+Unless `MEOWKIT_PM_AUTO=off`, first run the one foreground project-manager delegation (`.claude/skills/cook/references/post-phase-delegation.md`, Rule 2 for the prompt and Rule 5 for why it is foreground) and include its headline in the question, so the user sees delivery state before deciding. Then ask (header "Escalate"):
 
-```
-Agent(
-  agent="shipper",
-  description="Ship $slug after the user chose to ship",
-  prompt="
-    Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
-    Read tasks/handoff/{slug}-sprint-1.md for the build summary.
+- **One more iteration**: `max_iter` + 1, back to step 3.
+- **Ship despite the FAIL**: the user accepts the risk. `final_status` stays `FAIL`; record the decision in the report, dispatch the shipper as above, and go to step 6.
+- **Abort and triage**: `final_status=ESCALATED`, step 6, the evidence stays for manual triage.
 
-    Goal: the approved build shipped
-    Return: the PR or release reference and a status
-    Work context: $(pwd)
-    Plan: $plan_dir/plan.md
-    Reports: tasks/reports/
-    Plans: none
-    Files to modify: standard ship pipeline files (CHANGELOG, VERSION, git tags)
-    Files to read: tasks/reviews/*-evalverdict.md, tasks/handoff/*.md, .claude/agents/shipper.md
-    Acceptance criteria:
-      - The user chose to ship at step-05 (recorded above) — the evaluator verdict is the
-        evidence that was presented, not the decision itself
-      - mk:review run for structural audit (do NOT skip)
-      - Conventional commit + PR created
-      - If shipping with warnings: every acknowledged WARN from
-        $run_dir/warns-iter-{N}.md is recorded in the release notes
-    Constraints:
-      - Do NOT skip mk:review even though the evaluator passed
-      - Do NOT modify source files; only release artifacts
-  "
-)
-```
+This escalation runs on its own schedule; an earlier `--advice` rescue neither delays nor replaces it, and the decision is the human's.
 
-### 5d. Action: loop (verdict was WARN/FAIL with iterations remaining)
+## Record
 
-When `next_action == loop`, build a feedback packet for the next iteration:
+Append a Step 05 entry to `run.md`: verdict in, action, the ship decision (including "no ship attempted"), advice checkpoints fired (`--advice` only), final status, iterations. A ship with no recorded user answer is the failure this step exists to prevent.
 
-```bash
-# Build feedback packet from the verdict's Iteration Feedback section
-awk '/^## Iteration Feedback/,/^## [^I]/' "$verdict_path" | head -50 > "$run_dir/feedback-iter-${iteration}.md"
+## Done when
 
-echo "$verdict verdict on iteration $iteration. Re-entering step-03 with feedback packet at $run_dir/feedback-iter-${iteration}.md"
-```
-
-The next session reads `step-03-generate.md` again. step-03 reads the iteration counter from the run report frontmatter (set at 5b) and the feedback packet to inform the next generator pass.
-
-**`--advice` runs only:** the RESCUE checkpoint is available on this path, but it is not
-a per-iteration call. Fire it only on a plateau — two consecutive verdicts failing the
-**same** criteria with no measurable change in the evidence — or on drift outside the
-signed contract's scope. A first FAIL with concrete, actionable feedback is the loop
-working; consulting there spends a slot on a round that was going to converge anyway.
-See `references/advice-checkpoints.md`. A rescue directive does not buy another round:
-the correction re-enters step-03 and consumes an `--max-iter` round like any other loop.
-
-### 5e. Action: escalate (verdict was FAIL at iteration cap)
-
-When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice by asking the user.
-
-This escalation fires on its own schedule. A `--advice` rescue earlier in the loop
-neither delays it nor substitutes for it, and Athena is not consulted here — the
-decision below is the human's.
-
-**PM foreground invocation (per `.claude/skills/cook/references/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
-
-```
-Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent (foreground):
-"Generate delivery status for plan at $plan_dir. Write report to
-$plan_dir/status-reports/$(date +%y%m%d)-status.md.
-Load template from .claude/skills/status/assets/pm-status-template.md."
-```
-
-Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.
-
-Then present by asking the user BEFORE proceeding to step-06:
-
-```
-ask_user(
-  question: "Autobuild reached max iterations ($max_iter) with FAIL verdict on $slug. How do you want to proceed?",
-  options: [
-    { label: "Continue with one more iteration", description: "Increase max_iter by 1 and re-enter step-03" },
-    { label: "Ship with FAIL warning", description: "Force-ship despite verdict — accept the risk" },
-    { label: "Abort and triage", description: "Stop the autobuild workflow; user takes over manually with the evidence" }
-  ]
-)
-```
-
-If user picks "Continue with one more iteration": increment `max_iter` by 1, set `next_step="step-03-generate.md"`, continue.
-If user picks "Ship with FAIL warning": set `final_status=PASS_WITH_OVERRIDE`, dispatch shipper, then step-06.
-If user picks "Abort and triage": set `final_status=ESCALATED`, proceed to step-06 (no shipper dispatch).
-
-### 5f. Append to run report
-
-```markdown
-## Step 05 — Iterate or Ship (iteration {N})
-- Verdict in: {PASS | WARN | FAIL}
-- Action: {ship | ship_with_warnings | loop | escalate | timeout}
-- Ship decision: {user said ship | user said no | N/A — no ship attempted}
-- Advice checkpoints (`--advice` runs only): {stage/checkpointId + disposition per call, or "none"}
-- Final status: {PASS | WARN | FAIL | ESCALATED | TIMED_OUT}
-- Iterations completed: {N}
-- WARNs acknowledged (if ship_with_warnings): {path to warns-iter-{N}.md}
-- Feedback packet (if loop): {path to feedback-iter-{N}.md}
-```
-
-Record the ship-decision line for every run. A ship recorded with no answer from the user
-is the thing this step exists to make visible.
-
-## Output
-
-- `final_status` set
-- Either looped back to step-03 OR proceeding to step-06
-- Run report updated with Step 05 section
-- No shipper dispatched without a recorded ship decision from the user
-
-Print: `"Action: {ship|ship_with_warnings|loop|escalate|timeout}. Ship decision: {ship|no|N/A}. Final status: $final_status."`
+`final_status` is set or `next_step` points back to step 3, and no shipper ran without a recorded yes.
 
 ## Next
 
-Read and follow whichever step is named in `$next_step`:
-
-- `step-03-generate.md` if looping (next iteration with feedback, or after the user declined to ship)
-- `step-06-run-report.md` for ship / escalate / timeout
-
-The loop control is the `$next_step` variable, not a goto statement. Bash has no goto.
+`next_step` from `run.md`: `step-03-generate.md` when looping, otherwise `step-06-run-report.md`.

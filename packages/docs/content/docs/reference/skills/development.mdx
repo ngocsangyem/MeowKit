@@ -1,6 +1,6 @@
 ---
 title: "mk:development"
-description: "Reference guides for writing feature code: stack patterns for NestJS, Vue 3 and Swift, opt-in TDD rules, and a loader that pulls in only the domain you touch."
+description: "Reference guides for writing feature code outside a pipeline: stack patterns for NestJS, Vue 3 and Swift, and a pointer to the opt-in TDD rules."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,7 +14,7 @@ description: "Reference guides for writing feature code: stack patterns for Nest
 
 {/* GENERATED:reference-facts END */}
 
-`mk:development` is a set of reference guides for implementation: code patterns per stack, TDD rules that apply only in TDD mode, and a loader that decides which domain references to read. It supports Phase 2 (Test) and Phase 3 (Build) and is what the `developer` agent reaches for when it needs stack-specific patterns. Use it when coding outside a phase pipeline.
+`mk:development` holds stack patterns for writing feature code outside a phase pipeline: NestJS, Vue 3 and Swift. The `developer` agent reaches for it when it needs stack-specific patterns. It is done when the code compiles or type-checks, the project's existing tests pass and nothing outside the task changed.
 
 ## When not to use it
 
@@ -22,47 +22,23 @@ To run a whole feature through the phases, use `mk:cook`. For quality standards 
 
 ## TDD
 
-TDD is opt-in. The default skips RED-phase enforcement, which suits prototypes and exploration. Turn it on with `--tdd` or `MEOWKIT_TDD=1` for production work. `references/tdd-enforcement.md` applies only then.
-
-| Rule | Content |
-|---|---|
-| 1 | No implementation code until failing tests exist |
-| 2 | Capture the failing output to prove the test runs and fails for the right reason |
-| 3 | The whole suite must pass after implementation, not only the new tests |
-| 4 | After 3 failed fix attempts, escalate to a person with all outputs |
-| 5 | A valid failing test runs to completion, asserts the expected behaviour and fails because it is not yet implemented. Syntax errors, import errors and skipped tests do not count |
+TDD is opt-in (`--tdd` or `MEOWKIT_TDD=1`). The default skips RED-phase enforcement, which suits prototypes and exploration. The rules live in `mk:cook`'s `references/tdd-rules.md`; `references/tdd-enforcement.md` here only points to them.
 
 ## References
 
 | File | Content |
 |---|---|
 | `references/code-patterns.md` | Module and file patterns with anti-patterns for NestJS, Vue 3 and Swift, plus rules for all stacks |
-| `references/tdd-enforcement.md` | Red, green, refactor cycle and the rules above |
-| `references/skill-loader.md` | Which references to load for which kind of task |
+| `references/tdd-enforcement.md` | A pointer to the opt-in TDD rules |
 
 Stack patterns in `code-patterns.md`:
 
 | Stack | Patterns |
 |---|---|
-| NestJS | Module, controller, service and DTO split. Guards on every protected controller. `ValidationPipe` on input. DTOs with validator decorators and no `any` |
+| NestJS | Module, controller, service and DTO split. Guards on every protected controller. `ValidationPipe` on input. DTOs with validator decorators |
 | Vue 3 | `<script setup lang="ts">`, Pinia stores in setup style, `useX()` composables only for reusable logic |
 | Swift | MVVM with an `ObservableObject` per screen, `async throws` for I/O, protocols for service dependencies |
-| All | No `any` (use `unknown` and narrow), explicit return types on public APIs, no magic strings, prefer immutability, one concern per file |
-
-## Skill loader
-
-The loader looks at the files a task touches and loads only the matching references, never everything at once. With several domains (NestJS and Vue in one feature) it loads each. If unsure which domain applies, it asks.
-
-| Detected | Loads |
-|---|---|
-| NestJS (`.ts` with decorators, `modules/` directories) | NestJS patterns, `review/references/adversarial-review.md`, `testing/references/red-green-refactor.md`, `document-release/references/general-documentation.md` |
-| Vue (`.vue` files, `vue` or `pinia` imports) | Vue 3 patterns, `testing/references/visual-qa.md`, `red-green-refactor.md` |
-| Swift (`.swift`, `.xcodeproj`) | Swift patterns, `red-green-refactor.md` |
-| Database (migrations, `.sql`, Supabase) | `plan-creator/references/adr-generation.md` |
-| Planning or architecture | `plan-creator/references/scope-challenge.md`, `adr-generation.md` |
-| Deploy, PR, release, rollback | `ship/SKILL.md` |
-
-`tdd-enforcement.md` is listed as always loaded, and its rules apply only in TDD mode.
+| All | Explicit return types on public APIs, no magic strings, prefer immutability, one concern per file |
 
 ## Gotchas
 
