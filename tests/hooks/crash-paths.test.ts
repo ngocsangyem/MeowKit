@@ -5,8 +5,11 @@
 // the dangerous failure for a write guard is not "it decided wrong", it is "it
 // crashed" — which by default reads as permission.
 //
-// Each scenario here breaks the guard a different way and demands the same
-// answer: exit 2, with the guard's marker on stderr so the model is told why.
+// Each scenario here breaks the guard a different way and demands a blocking
+// answer with the guard's marker, so the model is told why. For most that is
+// exit 2. The ship check answers a crash with the PreToolUse `ask` decision
+// instead (exit 0, JSON on stdout): a check that could not run is put in front of
+// the person at the permission prompt, which still stops the call until they answer.
 // The damage is done to a throwaway copy of the hook tree; nothing in the
 // repository is modified, and no scenario needs a shipped switch to simulate it.
 
@@ -71,7 +74,17 @@ function run(dir: string, entry: Entrypoint, stdin: string) {
 		env: { CLAUDE_PROJECT_DIR: dir, HOME: dir, PATH: process.env.PATH ?? "" },
 		encoding: "utf8",
 	});
-	return { exit: r.status ?? -1, stderr: `${r.stdout ?? ""}${r.stderr ?? ""}` };
+	return { exit: r.status ?? -1, stdout: r.stdout ?? "", stderr: `${r.stdout ?? ""}${r.stderr ?? ""}` };
+}
+
+/** The PreToolUse permission decision in a hook's stdout, or null when there is none. */
+function permissionDecision(stdout: string): string | null {
+	try {
+		const doc = JSON.parse(stdout.trim()) as { hookSpecificOutput?: { permissionDecision?: string } };
+		return doc.hookSpecificOutput?.permissionDecision ?? null;
+	} catch {
+		return null;
+	}
 }
 
 /** Make the library unparseable, the way a bad edit or a truncated write would. */
@@ -89,16 +102,19 @@ const SCENARIOS: Array<{
 	label: string;
 	prepare: (dir: string, e: Entrypoint) => void;
 	stdin: (e: Entrypoint) => string;
+	/** The guard crashed rather than received input it cannot read. */
+	crash: boolean;
 }> = [
-	{ label: "a library it requires has a syntax error", prepare: injectSyntaxError, stdin: (e) => e.stdin },
+	{ label: "a library it requires has a syntax error", prepare: injectSyntaxError, stdin: (e) => e.stdin, crash: true },
 	{
 		label: "a library it requires is deleted",
 		prepare: (d, e) => fs.rmSync(path.join(d, e.lib)),
 		stdin: (e) => e.stdin,
+		crash: true,
 	},
-	{ label: "stdin is empty", prepare: () => {}, stdin: () => "" },
-	{ label: "stdin is not JSON", prepare: () => {}, stdin: () => "not json at all\n" },
-	{ label: "a library function throws", prepare: patchExportToThrow, stdin: (e) => e.stdin },
+	{ label: "stdin is empty", prepare: () => {}, stdin: () => "", crash: false },
+	{ label: "stdin is not JSON", prepare: () => {}, stdin: () => "not json at all\n", crash: false },
+	{ label: "a library function throws", prepare: patchExportToThrow, stdin: (e) => e.stdin, crash: true },
 ];
 
 describe("safety entrypoints fail closed on every crash path", () => {
@@ -107,8 +123,14 @@ describe("safety entrypoints fail closed on every crash path", () => {
 			it(`${entry.name}: ${scenario.label}`, () => {
 				const dir = scratchTree();
 				scenario.prepare(dir, entry);
-				const { exit, stderr } = run(dir, entry, scenario.stdin(entry));
-				expect(exit, `${entry.name} exit for "${scenario.label}"`).toBe(2);
+				const { exit, stdout, stderr } = run(dir, entry, scenario.stdin(entry));
+				if (entry.name === "pre-ship" && scenario.crash) {
+					expect(exit, `${entry.name} exit for "${scenario.label}"`).toBe(0);
+					expect(permissionDecision(stdout), `${entry.name} decision for "${scenario.label}"`).toBe("ask");
+					expect(stdout, `${entry.name} reason for "${scenario.label}"`).toContain("could not run");
+				} else {
+					expect(exit, `${entry.name} exit for "${scenario.label}"`).toBe(2);
+				}
 				expect(stderr, `${entry.name} marker for "${scenario.label}"`).toContain(entry.marker);
 			});
 		}

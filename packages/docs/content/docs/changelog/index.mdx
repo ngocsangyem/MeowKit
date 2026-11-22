@@ -19,6 +19,13 @@ A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-n
 
 - The installers and `mewkit self-update` no longer place `mewkit-next`, and remove the one the 0.1.0 and 0.1.1 installers left. Run `mewkit` or `mk`.
 
+### Improvements
+
+- The ship check fails closed. A check that could not run (a crash, a missing tool, or a check stopped at the 270-second deadline) now blocks with a `PRE-SHIP COULD NOT RUN` message naming the cause, separate from `PRE-SHIP BLOCKED` for a failed check. Before, a missing tool counted as a failed check, and a hook the host stopped at its timeout let the command through.
+- On Claude Code a check that could not run answers with the permission prompt (`ask`), so you decide; a failed check is still refused. Cursor asks too. Codex has no prompt for hooks, so it refuses and tells you to run the command in your own terminal. The Claude Code registration sets `onFailure: "block"` (Claude Code 2.1.295 or later) and the Cursor entry `failClosed: true`, so a ship-check hook that cannot start or reaches its timeout blocks.
+- Nothing in the command or the environment skips the ship check. `--no-verify`, `-n` on a commit, a skip-style variable and `MEWKIT_CURSOR_HOOKS_KILL_SWITCH` are named in the output as refused. The Cursor kill switch no longer stands the ship check down.
+- Each ship check writes one `ship_check` trace record: outcome `passed`, `failed` or `could_not_run`, the cause and the action, never the command text.
+
 ## 3.0.1 (2026-11-21)
 
 Kit 3.0.1 ships with `mewkit` 0.1.1. Run `mewkit self-update`, then `mewkit upgrade`: the fixes below are in the binary.

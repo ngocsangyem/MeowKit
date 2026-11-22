@@ -22,6 +22,16 @@ const ALLOWED: Record<string, string[]> = {
 		"CURSOR_PROJECT_DIR",
 		// Path of the CLI the store lint runs.
 		"MEOWKIT_CLI",
+		// Labels on the one `ship_check` trace record a run appends (lib/trace-log.cjs and the
+		// model resolver it calls). They are written into the record and never reach the decision.
+		"ANTHROPIC_BASE_URL",
+		"ANTHROPIC_MODEL",
+		"CLAUDE_MODEL",
+		"CLAUDE_MODEL_ID",
+		"MEOWKIT_AUTOBUILD_MODE",
+		"MEOWKIT_HARNESS_VERSION",
+		"MEOWKIT_MODEL_HINT",
+		"MEOWKIT_RUN_ID",
 	],
 };
 

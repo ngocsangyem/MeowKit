@@ -46,7 +46,7 @@ Grok, Pi and OMP enforcement follows what each vendor documents and what the kit
 
 - Claude Code started in a subdirectory that does not see the project's `.claude/settings.json`, or a sparse checkout or worktree without `.claude/`.
 - Codex skips hooks that are new or changed since you last reviewed them. After an upgrade the ship check is inactive on Codex until you review the hooks.
-- Cursor with `MEWKIT_CURSOR_HOOKS_KILL_SWITCH=1` in the environment: the shell, MCP and tool guards and the ship check stand down. The credential read guard does not.
+- Cursor with `MEWKIT_CURSOR_HOOKS_KILL_SWITCH=1` in the environment: the shell, MCP and tool guards stand down. The credential read guard and the ship check do not.
 - Grok runs project hooks only after `/hooks-trust`, or when it starts with `--trust`.
 - Pi loads `.pi/extensions/meowkit.ts` only in a project you have trusted with `/trust`.
 - OMP has no trust step.
@@ -60,6 +60,10 @@ With `hooks.pre-completion-check: true` in `.meowkit/config.yaml`, a turn that e
 ## When a check blocks you
 
 A commit refused with `PRE-SHIP BLOCKED` means lint, a related test or the type-check failed on what you are shipping. The output names the failing check. Fix it and commit again.
+
+`PRE-SHIP COULD NOT RUN` means a check gave no verdict: the check crashed, a tool it needs was not found, or it did not finish within the 270-second deadline. The message names the cause. On Claude Code and Cursor the command waits at the permission prompt, and approving it ships without a verified check. Codex has no prompt for hooks, so it refuses the command; run it in your own terminal to ship anyway. The Claude Code registration sets `onFailure: "block"` (Claude Code 2.1.295 or later), so a ship-check hook that cannot start or reaches its 300-second timeout blocks the command too; Cursor's `failClosed: true` does the same.
+
+Nothing in the command or the environment skips the check. `--no-verify`, `-n` on a commit, a variable such as `MEOWKIT_SKIP_SHIP_CHECK=1` and the Cursor kill switch are named in the output as refused, and the checks run as usual.
 
 A read refused with `@@PRIVACY_BLOCK@@` means the file looks like a credential (`.env`, `.envrc`, `.npmrc`, a private key, `.kube/config`, a credentials or secrets file). Approve the read explicitly if the task needs it.
 

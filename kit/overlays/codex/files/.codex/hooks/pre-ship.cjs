@@ -6,15 +6,20 @@
 // (lib/core/pre-ship.cjs, copied from .claude/hooks/lib). Any other command passes untouched.
 //
 // Codex hook contract: deny = stdout JSON { hookSpecificOutput: { permissionDecision: "deny" } },
-// exit 0. `ask`, `approve` and `continue: false` fail the hook and let the call through on
-// Codex, so deny is the only blocking form used here.
+// exit 0, or exit 2 with the reason on stderr. `ask`, `approve` and `continue: false` fail the
+// hook and let the call through on Codex, so deny is the only blocking form used here.
 //
-// A crash denies the ship with the reason, as the Claude Code ship check does; a host timeout
-// does not block, which is why the checks stop at their own deadline first.
+// A failed check and a check that could not run (a crash, a missing tool, the deadline) both
+// deny. With no permission prompt to hand the decision to, the could-not-run message tells the
+// person to run the command in their own terminal, outside the agent. A host timeout does not
+// block on Codex, which is why the checks stop at their own deadline first.
 "use strict";
 
 process.on("uncaughtException", (err) => {
-	process.stderr.write(`Ship check could not run: ${err && err.message ? err.message : String(err)}\n`);
+	process.stderr.write(
+		`MeowKit ship check could not run: the ship check crashed (${err && err.message ? err.message : String(err)}).\n` +
+			"Codex has no permission prompt for this hook, so the ship is denied. To ship anyway, run the command in your own terminal.\n",
+	);
 	process.exit(2);
 });
 
@@ -32,5 +37,11 @@ if (!root) deny("Ship check cannot locate the project root this command ships fr
 
 const result = decidePreShip({ root, command, env: process.env });
 if (result.stdout.length) process.stderr.write(`${result.stdout.join("\n")}\n`);
-if (result.exit === 2) deny([...result.stderr, ...result.stdout.filter((l) => /FAIL|DID NOT FINISH|did not run/.test(l))].join("\n"));
+if (result.exit === 2) {
+	const lines = [...result.stderr, ...result.stdout.filter((l) => /FAIL|DID NOT FINISH|COULD NOT RUN|did not run/.test(l))];
+	if (result.outcome === "could_not_run") {
+		lines.push("Codex has no permission prompt for this hook, so the ship is denied. To ship anyway, run the command in your own terminal.");
+	}
+	deny(lines.join("\n"));
+}
 process.exit(0);
