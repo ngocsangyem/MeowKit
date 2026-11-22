@@ -9,6 +9,7 @@ mod overlay;
 mod overlay_approve;
 mod rollback;
 mod status;
+pub mod upgrade_merge;
 
 use std::collections::BTreeMap;
 

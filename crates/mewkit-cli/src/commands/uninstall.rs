@@ -102,6 +102,7 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
             plan,
             index,
             hashes,
+            merge_base: None,
         });
     }
     jobs.extend(rewrite_for_those_staying(
@@ -230,6 +231,7 @@ fn rewrite_for_those_staying(
             plan,
             index,
             hashes,
+            merge_base: None,
         });
     }
     Ok(jobs)

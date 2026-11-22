@@ -3,9 +3,14 @@
 //! Each engine is a pure text → text function so it can be property-tested:
 //! `strip(merge(user, x)) == user`. Malformed input is an error and the caller
 //! leaves the file untouched; writes go through the journal, never from here.
+//! [`text3`] is the exception in kind: a guarded three-way merge of a kit file
+//! the user edited, which refuses rather than errs.
 pub mod hook_groups;
 pub mod json_entries;
+mod line_diff;
 pub mod markdown_block;
+pub mod text3;
+mod text3_guard;
 pub mod toml_table;
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]

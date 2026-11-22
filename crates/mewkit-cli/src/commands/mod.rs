@@ -34,7 +34,7 @@ use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::registry::emitted;
 use mewkit_adapters::surface_table::table;
 use mewkit_adapters::{EmitRequest, Emitter, ScopeKind, emitter};
-use mewkit_core::exec::{ExecOptions, execute};
+use mewkit_core::exec::{ExecOptions, Merges, execute_merging};
 
 use crate::failure::Failure;
 use crate::kit_args::contract_label;
@@ -204,6 +204,10 @@ pub struct Job {
     pub index: OwnershipIndex,
     /// What the kit installs at each path, to corroborate removals.
     pub hashes: BTreeMap<String, String>,
+    /// For an upgrade: the previous kit's bytes for each skill file, the
+    /// base for merging the user's edits (empty when that kit is not in the
+    /// cache). `None` for every other command: nothing is merged.
+    pub merge_base: Option<BTreeMap<String, Vec<u8>>>,
 }
 
 /// Apply every job in order and print the outcomes. When one fails, the
@@ -225,16 +229,26 @@ pub fn run_jobs(
     for mut job in jobs {
         let hashes = std::mem::take(&mut job.hashes);
         let kept = skill_store::lifecycle::keep(store.as_mut(), &mut job.plan, &mut job.index);
-        let report = execute(
+        // Planned after `keep`, so a skill the store keeps is never merged;
+        // `--force` replaces edited files, so nothing is merged under it.
+        let merged = job.merge_base.as_ref().filter(|_| !opts.force).map(|base| {
+            skill_store::upgrade_merge::plan(place, job.e.target(), &job.plan, &job.index, base)
+        });
+        let report = execute_merging(
             &job.plan,
             &place.exec_scope(job.e),
             &mut job.index,
             &|p: &RelPath| hashes.get(p.as_str()).cloned(),
+            merged.as_ref().map_or(&Merges::new(), |m| &m.merges),
             opts,
         );
         match report {
             Ok(mut report) => {
                 report.preserved.extend(kept);
+                if let Some(m) = &merged {
+                    let lines = skill_store::upgrade_merge::notices(m, opts.dry_run);
+                    report.notices.extend(lines);
+                }
                 outcomes.push(Outcome {
                     runtime: job.e.target(),
                     scope: place.label(),

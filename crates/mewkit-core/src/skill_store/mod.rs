@@ -16,6 +16,7 @@
 //! the skill is marked `unverified` and kept until the user decides, never
 //! rebuilt from the ledger.
 mod digest;
+pub mod guarded_merge;
 mod index;
 pub mod keep;
 mod overlay;
