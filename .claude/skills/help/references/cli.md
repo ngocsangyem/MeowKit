@@ -578,17 +578,24 @@ Options:
 ## mewkit skill
 
 ```text
-Per-skill interpreter environments
+Per-skill environments and the skill store (status of installed skills)
 
-Usage: mewkit skill [OPTIONS] [SUBCOMMAND] [SKILL]
+Usage: mewkit skill [OPTIONS] [SUBCOMMAND] [SKILL] [NEW_NAME]
 
 Arguments:
-  [SUBCOMMAND]  `env`
-  [SKILL]       The skill whose environment to create or repair
+  [SUBCOMMAND]  `env`, `status`, `overlay`, `fork` or `rollback`
+  [SKILL]       The skill to act on
+  [NEW_NAME]    `fork`: the name of the copy
 
 Options:
-      --list  List every skill that declares a runtime and the state of its environment
-  -h, --help  Print help
+      --list         List every skill that declares a runtime and the state of its environment
+      --file <PATH>  `overlay`: a file of the skill to store (repeatable; default: every file edited since install)
+      --approve      `overlay`: show an overlay this machine has not approved and place it
+      --yes          Confirm `overlay --approve` in a session with no terminal
+      --to <DIGEST>  `rollback`: the recorded digest to restore (a unique prefix of at least 7 hex digits; default: the most recent earlier one)
+      --global       Act on your home directory instead of this project (skill store verbs)
+      --json         Print one JSON document instead of text (skill store verbs)
+  -h, --help         Print help
 ```
 
 ## mewkit pack

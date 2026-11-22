@@ -100,6 +100,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
             .clone()
             .ok_or_else(|| Failure::failed("no Claude Code install to add packs to"))?;
         index.packs = stored(&next);
+        let store = crate::commands::skill_store::lifecycle::before(&ctx.place);
         let report = execute(
             &plan,
             &ctx.place.exec_scope(e),
@@ -107,6 +108,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
             &|p| hashes.get(p.as_str()).cloned(),
             ExecOptions::default(),
         )?;
+        crate::commands::skill_store::lifecycle::after(&ctx.place, store.as_ref());
         for (path, why) in &report.preserved {
             eprintln!("note: kept {path}: {why}");
         }

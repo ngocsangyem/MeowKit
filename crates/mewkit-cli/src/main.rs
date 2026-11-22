@@ -88,7 +88,7 @@ enum Command {
     Budget(BudgetArgs),
     /// Guided post-scaffold configuration.
     Setup(SetupArgs),
-    /// Per-skill interpreter environments.
+    /// Per-skill environments and the skill store (status of installed skills).
     Skill(SkillArgs),
     /// Manage install packs.
     Pack(PackArgs),
