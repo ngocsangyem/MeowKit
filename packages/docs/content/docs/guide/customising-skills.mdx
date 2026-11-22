@@ -87,7 +87,7 @@ When you edit a kit skill file in place (no overlay) and the new kit changed the
 - the previous kit is in the project's kit cache (`.meowkit/cache/kits/`) and its version of the file hashes to what the ownership ledger recorded at install. An install from a local kit directory is never cached, and an offline upgrade cannot fetch a lost one, so those keep your file;
 - your edit and the kit's change are separated by at least one unchanged line that appears only once in each version, and do not overlap or touch;
 - neither edit touches the frontmatter or a gate line: a line containing `STOP`, `HARD`, `BLOCK`, `MUST` or `NEVER` (that case), or, in any case, a word starting with `gate`, `non-negotiable`, `must not`, `injection` or `untrusted`;
-- the skill has eval cases: an `eval/` folder for it from the eval pack (`.meowkit/eval-pack/<skill>/eval/`), or inside the skill in a kit checkout.
+- the skill has eval cases: an `eval/` folder for it from the eval pack (`.meowkit/eval/<skill>/eval/`), or inside the skill in a kit checkout.
 
 A skill merges as a whole: if one of its edited files cannot be merged, none of them is. The merged files and the kit's other new files for the skill are written in one journal, behind one backup, so a failure part way leaves the skill as it was. Each merged file is listed as `merged your edit with the kit's change`, each one refused as `not merged <path>: <reason>`, and a merged file does not make `upgrade` exit 6. The ledger keeps the kit's hash for the file, so it still counts as edited and the next upgrade merges again; the store records the new tree digest with the old one in the history, so `skill rollback` can undo the merge.
 

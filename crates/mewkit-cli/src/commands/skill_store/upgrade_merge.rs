@@ -16,8 +16,8 @@ use mewkit_core::skill_store::guarded_merge::{self, Inputs, Planned};
 use crate::place::Place;
 
 /// Where the opt-in eval pack puts each skill's cases (`<dir>/<skill>/eval/`),
-/// root-relative. The one place to change when the pack's folder moves.
-pub const EVAL_PACK_DIR: &str = ".meowkit/eval-pack";
+/// root-relative. Matches the folder `mewkit pack add eval` installs.
+pub const EVAL_PACK_DIR: &str = ".meowkit/eval";
 
 /// The previous kit's bytes for every skill file it wrote, from its plan.
 pub fn base_bytes(old: &Plan) -> BTreeMap<String, Vec<u8>> {
