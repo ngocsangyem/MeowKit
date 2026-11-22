@@ -6,10 +6,18 @@
 // (Read-only context) to skip the 10-file rule load on turns 2..N.
 //
 // State format: single append-only JSONL log in the session-marker state class,
-// `session-sentinels.jsonl`. Two line shapes for a session:
+// `session-sentinels.jsonl`. Three line shapes for a session:
 //
-//   verification (Stop):   {"session_id":"<id>","safety":true,"phase_zero":true,"ts":"<iso>"}
-//   re-arm (PreCompact):   {"session_id":"<id>","event":"precompact_rearm","ts":"<iso>"}
+//   baseline (SessionStart): {"session_id":"<id>","event":"rules_loaded","rules_sha256":"<hex>","phase_zero_sha256":"<hex>","ts":"<iso>"}
+//   verification (Stop):     {"session_id":"<id>","safety":true,"rules_sha256":"<hex>","phase_zero":true,"phase_zero_sha256":"<hex>","ts":"<iso>"}
+//   re-arm (PreCompact):     {"session_id":"<id>","event":"precompact_rearm","ts":"<iso>"}
+//
+// The Stop handler writes a flag only after checking its files are present,
+// non-empty and unchanged since the baseline. This reader checks again: a flag
+// is emitted only when the digest it recorded still matches the files on disk,
+// so a rule deleted, emptied or edited after the line was written — or a line
+// from an older writer that recorded no digest — yields no marker and the next
+// turn re-reads.
 //
 // Reader finds, for the current session, the latest verification line and the
 // latest re-arm line, then emits a flag's cached marker ONLY when that
@@ -20,9 +28,8 @@
 // Why the recency compare: compaction drops the safety-baseline rule TEXT from
 // context but not this sentinel. A verification that PRE-DATES the latest re-arm
 // is therefore stale (its rules are no longer in context), so the skip marker is
-// withheld until a genuine re-read writes a newer verification. The Stop hook's
-// unconditional `true` write is harmless: the post-re-read turn's verification
-// legitimately post-dates the re-arm. The log is append-only within a session, so
+// withheld until a genuine re-read writes a newer verification. The post-re-read
+// turn's verification legitimately post-dates the re-arm. The log is append-only within a session, so
 // a later file position == a more recent event — file position is the recency
 // signal (reliable for same-second ts ties).
 //
@@ -40,6 +47,7 @@
 const fs = require('fs');
 
 const { projectRoot, sessionStateFile } = require('../lib/meowkit-paths.cjs');
+const { markerDigests } = require('../lib/always-on-rules.cjs');
 
 const STATE_FILE = 'session-sentinels.jsonl';
 
@@ -87,11 +95,12 @@ module.exports = async function (ctx /*, state */) {
   // (rearmIdx === -1 → no re-arm this session → always trusted.)
   if (verifyIdx <= rearmIdx) return '';
 
+  const current = markerDigests(root);
   let out = '';
-  if (verifyRow.safety) {
+  if (verifyRow.safety === true && current.rules && verifyRow.rules_sha256 === current.rules) {
     out += `## Safety baseline: verified (cached, session ${sessionId})\n`;
   }
-  if (verifyRow.phase_zero) {
+  if (verifyRow.phase_zero === true && current.phaseZero && verifyRow.phase_zero_sha256 === current.phaseZero) {
     out += `## Phase-zero rules: verified (cached, session ${sessionId})\n`;
   }
   return out;

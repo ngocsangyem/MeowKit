@@ -190,7 +190,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
 
 /// Ask before deleting. No terminal means `--yes` is the only way to say so,
 /// and that refusal names it; a cancelled prompt is a "no".
-fn confirmed(message: &str) -> Result<bool, Failure> {
+pub(super) fn confirmed(message: &str) -> Result<bool, Failure> {
     match default_prompt().confirm(&Ask::new(message, Flag::new("--yes")), false) {
         Ok(answer) => Ok(answer),
         Err(PromptError::Cancelled { .. }) => Ok(false),

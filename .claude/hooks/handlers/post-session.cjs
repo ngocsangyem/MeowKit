@@ -16,6 +16,7 @@ const { scrubSecrets } = require('../lib/secret-scrub.cjs');
 const { sessionStateDir, sessionStateFile, telemetryDir } = require('../lib/meowkit-paths.cjs');
 const { resolveModel, UNKNOWN } = require('../lib/resolve-model.cjs');
 const { appendTrace } = require('../lib/trace-log.cjs');
+const { markerDigests } = require('../lib/always-on-rules.cjs');
 
 const MAX_COST_ENTRIES = 1000;
 
@@ -114,23 +115,49 @@ function checkModelChange({ root, stateDir, model }) {
 /** Host session identifiers are UUID-shaped; anything else could break the record. */
 const SAFE_SESSION_ID = /^[A-Za-z0-9_.-]+$/;
 
+/** The latest rule baseline the session-start handler recorded for this session. */
+function ruleBaseline(file, sessionId) {
+  let raw;
+  try { raw = fs.readFileSync(file, 'utf8'); } catch { return null; }
+  let baseline = null;
+  for (const line of raw.split('\n')) {
+    if (!line.trim()) continue;
+    let row;
+    try { row = JSON.parse(line); } catch { continue; }
+    if (row && row.session_id === sessionId && row.event === 'rules_loaded') baseline = row;
+  }
+  return baseline;
+}
+
 /**
- * Mark that this session completed its safety and orientation steps, so later
- * turns can skip re-reading them. One append-only log keyed by session id, not a
- * file per session; the session-start handler truncates it on a new session so
- * it never accumulates.
+ * Mark this session's safety rules and phase-zero files as verified, so later
+ * turns can skip re-reading them — but only for the set whose check ran and
+ * passed here: every file present and non-empty, and its digest equal to the
+ * one recorded when the session started. A set that fails is left out of the
+ * line, and when both fail nothing is written, so the next turn re-reads. The
+ * digests go into the line too, so the reader can refuse a marker whose files
+ * changed after it was written. One append-only log keyed by session id; the
+ * session-start handler truncates it on a new session so it never accumulates.
  */
 function writeSentinel(root, sessionId, now) {
   if (process.env.MEOWKIT_SKIP_SAFETY_SENTINEL === 'off') return;
   if (!sessionId || !SAFE_SESSION_ID.test(sessionId)) return;
   try {
     const dir = sessionStateDir(root);
-    fs.mkdirSync(dir, { recursive: true });
-    const ts = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
-    fs.appendFileSync(
-      path.join(dir, 'session-sentinels.jsonl'),
-      `{"session_id":"${sessionId}","safety":true,"phase_zero":true,"ts":"${ts}"}\n`,
-    );
+    const file = path.join(dir, 'session-sentinels.jsonl');
+    const baseline = ruleBaseline(file, sessionId);
+    if (!baseline) return;
+    const current = markerDigests(root);
+    const row = { session_id: sessionId };
+    if (current.rules && current.rules === baseline.rules_sha256) {
+      Object.assign(row, { safety: true, rules_sha256: current.rules });
+    }
+    if (current.phaseZero && current.phaseZero === baseline.phase_zero_sha256) {
+      Object.assign(row, { phase_zero: true, phase_zero_sha256: current.phaseZero });
+    }
+    if (!row.safety && !row.phase_zero) return;
+    row.ts = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    fs.appendFileSync(file, `${JSON.stringify(row)}\n`);
   } catch {
     // A lost marker costs a re-read next turn.
   }

@@ -43,19 +43,20 @@ function envBoolean(raw) {
   return undefined;
 }
 
-/** `{ ok, values }` or `{ ok: false, error }` for one config file; absent is empty. */
+/** `{ ok, values, warnings }` or `{ ok: false, error }` for one config file; absent is empty. */
 function loadScope(file, scope, root) {
   let source;
   try {
     source = fs.readFileSync(file, 'utf8');
   } catch {
-    return { ok: true, values: {}, present: false };
+    return { ok: true, values: {}, warnings: [], present: false };
   }
   const parsed = parseYamlSubset(source);
   if (!parsed.ok) return { ok: false, error: { ...parsed.error, file, scope }, present: true };
   const checked = applyRules(parsed.values, { root, scope });
   if (!checked.ok) return { ok: false, error: { ...checked.error, file, scope }, present: true };
-  return { ok: true, values: checked.values, present: true };
+  const warnings = (checked.warnings || []).map((w) => ({ ...w, file, scope }));
+  return { ok: true, values: checked.values, warnings, present: true };
 }
 
 const projectConfigPath = (root) => path.join(root, CONFIG_REL);
@@ -69,6 +70,7 @@ const userConfigPath = (home) => path.join(home, CONFIG_REL);
  */
 function resolveConfig({ root = process.env.CLAUDE_PROJECT_DIR || process.cwd(), env = process.env, home = os.homedir(), flags = {} } = {}) {
   const errors = [];
+  const warnings = [];
   const values = {};
   const levels = {};
 
@@ -83,11 +85,11 @@ function resolveConfig({ root = process.env.CLAUDE_PROJECT_DIR || process.cwd(),
 
   const user = loadScope(userConfigPath(home), 'user config', root);
   if (!user.ok) errors.push(user.error);
-  else assign(user.values, 'user');
+  else { assign(user.values, 'user'); warnings.push(...user.warnings); }
 
   const project = loadScope(projectConfigPath(root), 'project config', root);
   if (!project.ok) errors.push(project.error);
-  else assign(project.values, 'project');
+  else { assign(project.values, 'project'); warnings.push(...project.warnings); }
 
   assign(flags, 'flag');
 
@@ -98,7 +100,7 @@ function resolveConfig({ root = process.env.CLAUDE_PROJECT_DIR || process.cwd(),
     levels[key] = 'env';
   }
 
-  return { values, levels, errors };
+  return { values, levels, errors, warnings };
 }
 
 /** One key's resolved value and the level that answered, or the given default. */

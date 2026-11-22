@@ -29,6 +29,7 @@ use std::collections::BTreeMap;
 
 use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
+use mewkit_adapters::eval_pack;
 use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::registry::emitted;
 use mewkit_adapters::surface_table::table;
@@ -163,7 +164,9 @@ fn prepare_for(
         }
         ScopeKind::Global => None,
     };
-    let disabled = crate::skill_selection::disabled(place, kit, packs)?;
+    let mine = place.index(e.target()).ok().flatten();
+    let packs = &eval_pack::keep_installed(packs, mine.as_ref());
+    let disabled = crate::skill_selection::disabled(place, kit, &eval_pack::split(packs).0)?;
     Ok(e.prepare(&EmitRequest {
         kit,
         scope: &place.scope,
