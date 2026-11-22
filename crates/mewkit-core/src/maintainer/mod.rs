@@ -16,6 +16,8 @@ pub mod line_endings;
 pub mod locale_order;
 pub mod reference_pages;
 pub mod reference_render;
+pub mod skill_audit_page;
 pub mod table_cell;
 
 pub use generated::{GeneratedFile, counts_files, docs_files, substrate_file};
+pub use skill_audit_page::skill_audit_file;
