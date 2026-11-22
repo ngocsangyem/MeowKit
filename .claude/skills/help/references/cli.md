@@ -18,7 +18,7 @@ Install the kit into this project, or your home with --global
 Usage: mewkit init [OPTIONS]
 
 Options:
-      --target <TARGETS>      Runtimes to install for: claude-code, codex, cursor, grok, pi, omp (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker
+      --target <TARGETS>      Runtimes to install for: claude-code, codex, cursor, grok, pi, omp, antigravity (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker
       --profile <PROFILE>     Claude Code: install a subset (core, developer, product, atlassian, security, research, or full). Re-running with a narrower profile removes what the narrower profile no longer includes, unless you edited it
       --skill-packs <PACKS>   Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only
       --delivery <SHAPE>      Claude Code only: `native` (the host's own directory) or `plugin` (the same content plus a plugin manifest)
@@ -367,21 +367,23 @@ Arguments:
   [DIR]  The generated target directory to validate (with `--target`)
 
 Options:
-      --mode <MODE>        Maintainer override for the detected consumer profile
-      --target <PROVIDER>  Validate a generated provider target instead of a `.claude/` project
-      --portable           Include the portable provider-contract checks
-      --strict             Treat WARN as failure (exit 1)
-      --workflow           Run only the workflow.yaml drift check
-      --ownership          Run only the artifact ownership-completeness check
-      --agents             Run only the declared agent-contract conformance checks
-      --substrate          Run only the responsibility-substrate drift and untagged check
-      --packs              Run only the pack-manifest coherence and safety check
-      --rules              Run only the routing-table-breadth check
-      --capabilities       Run only the capability-manifest checks
-      --memory             Run only the committed team-memory store lint
-      --frontmatter        Run only the SKILL.md frontmatter schema and runtime-contract check
-      --docs-refs          Run only the `.claude` to `docs/*` reference allowlist check
-  -h, --help               Print help
+      --mode <MODE>                 Maintainer override for the detected consumer profile
+      --target <PROVIDER>           Validate a generated provider target instead of a `.claude/` project
+      --portable                    Include the portable provider-contract checks
+      --strict                      Treat WARN as failure (exit 1)
+      --workflow                    Run only the workflow.yaml drift check
+      --ownership                   Run only the artifact ownership-completeness check
+      --agents                      Run only the declared agent-contract conformance checks
+      --substrate                   Run only the responsibility-substrate drift and untagged check
+      --packs                       Run only the pack-manifest coherence and safety check
+      --rules                       Run only the routing-table-breadth check
+      --capabilities                Run only the capability-manifest checks
+      --memory                      Run only the committed team-memory store lint
+      --frontmatter                 Run only the SKILL.md frontmatter schema and runtime-contract check
+      --docs-refs                   Run only the `.claude` to `docs/*` reference allowlist check
+      --skill-rubric                Run only the mechanical skill-rubric scoring and write its JSON report
+      --skill-rubric-report <PATH>  Where the skill-rubric report goes (implies --skill-rubric; default .meowkit/telemetry/skill-rubric.json)
+  -h, --help                        Print help
 ```
 
 ## mewkit review
@@ -576,17 +578,24 @@ Options:
 ## mewkit skill
 
 ```text
-Per-skill interpreter environments
+Per-skill environments and the skill store (status of installed skills)
 
-Usage: mewkit skill [OPTIONS] [SUBCOMMAND] [SKILL]
+Usage: mewkit skill [OPTIONS] [SUBCOMMAND] [SKILL] [NEW_NAME]
 
 Arguments:
-  [SUBCOMMAND]  `env`
-  [SKILL]       The skill whose environment to create or repair
+  [SUBCOMMAND]  `env`, `status`, `overlay`, `fork` or `rollback`
+  [SKILL]       The skill to act on
+  [NEW_NAME]    `fork`: the name of the copy
 
 Options:
-      --list  List every skill that declares a runtime and the state of its environment
-  -h, --help  Print help
+      --list         List every skill that declares a runtime and the state of its environment
+      --file <PATH>  `overlay`: a file of the skill to store (repeatable; default: every file edited since install)
+      --approve      `overlay`: show an overlay this machine has not approved and place it
+      --yes          Confirm `overlay --approve` in a session with no terminal
+      --to <DIGEST>  `rollback`: the recorded digest to restore (a unique prefix of at least 7 hex digits; default: the most recent earlier one)
+      --global       Act on your home directory instead of this project (skill store verbs)
+      --json         Print one JSON document instead of text (skill store verbs)
+  -h, --help         Print help
 ```
 
 ## mewkit pack

@@ -15,7 +15,7 @@ const path = require("node:path");
 
 const CLAUDE_ENTRY_CAP_CHARS = 1536;
 const CHARS_PER_TOKEN = 4;
-const RUNTIMES = ["claude-code", "codex", "cursor", "grok", "pi", "omp"];
+const RUNTIMES = ["claude-code", "codex", "cursor", "grok", "pi", "omp", "antigravity"];
 const WINDOWS = [
 	["200K", 200_000],
 	["1M", 1_000_000],

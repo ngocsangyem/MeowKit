@@ -14,6 +14,7 @@ pub fn registry() -> &'static [&'static dyn Emitter] {
         &crate::grok::Grok,
         &crate::pi::Pi,
         &crate::omp::Omp,
+        &crate::antigravity::Antigravity,
     ]
 }
 

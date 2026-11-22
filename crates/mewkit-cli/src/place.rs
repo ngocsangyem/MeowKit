@@ -81,6 +81,34 @@ impl Place {
         self.rel(tail).under(&self.scope.root)
     }
 
+    /// Where this scope keeps its skill store: the sidecar beside the
+    /// ownership ledgers, approvals machine-local under the state directory,
+    /// stored overlays beside it where a team may choose to commit them.
+    pub fn store_paths(&self) -> mewkit_core::skill_store::StorePaths {
+        let (ownership, dir, lock, overlays) = if self.state == ".meowkit" {
+            (
+                "state/ownership",
+                "state/skill-store",
+                "state/mewkit.lock",
+                ".meowkit/skill-overlays",
+            )
+        } else {
+            (
+                "ownership",
+                "skill-store",
+                "mewkit.lock",
+                ".mewkit/skill-overlays",
+            )
+        };
+        mewkit_core::skill_store::StorePaths {
+            sidecar: self.rel(&format!("{ownership}/skill-store.json")),
+            dir: self.rel(dir),
+            overlays: RelPath::new(overlays).expect("static overlay path"),
+            lock: self.rel(lock),
+            backups: self.rel("backups"),
+        }
+    }
+
     pub fn cache_dir(&self) -> PathBuf {
         self.rel("cache/kits").under(&self.scope.root)
     }

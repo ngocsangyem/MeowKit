@@ -2,8 +2,8 @@
 //! when the install puts that file there, against this checkout's own kit.
 mod support;
 
-use mewkit_adapters::contract::{Runtime, Scope};
-use mewkit_adapters::registry::emitter;
+use mewkit_adapters::contract::Scope;
+use mewkit_adapters::registry::{emitted, emitter};
 use support::{kit, request};
 
 #[test]
@@ -12,7 +12,7 @@ fn no_installed_text_names_a_path_the_install_lacks() {
     let scope = Scope::project(dir.path());
     let kit = kit();
     let mut dangling = Vec::new();
-    for runtime in Runtime::ALL {
+    for runtime in emitted() {
         let plan = emitter(runtime)
             .unwrap()
             .prepare(&request(&kit, &scope, &[], &[]))

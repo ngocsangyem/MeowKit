@@ -5,6 +5,7 @@
 //! No colour is emitted: `picocolors` disables itself off a TTY, so plain text
 //! is already what CI and the pre-ship hook read.
 mod scoped;
+mod skill_rubric;
 mod target;
 
 use std::path::{Path, PathBuf};
@@ -18,6 +19,7 @@ use mewkit_core::validate::{
 use crate::failure::{FAILED, Failure};
 
 use scoped::scoped_run;
+use skill_rubric::skill_rubric_run;
 use target::validate_target;
 
 #[derive(Args, Debug)]
@@ -70,6 +72,13 @@ pub struct ValidateArgs {
     /// Run only the `.claude` to `docs/*` reference allowlist check.
     #[arg(long = "docs-refs")]
     pub docs_refs: bool,
+    /// Run only the mechanical skill-rubric scoring and write its JSON report.
+    #[arg(long = "skill-rubric")]
+    pub skill_rubric: bool,
+    /// Where the skill-rubric report goes (implies --skill-rubric; default
+    /// .meowkit/telemetry/skill-rubric.json).
+    #[arg(long = "skill-rubric-report", value_name = "PATH")]
+    pub skill_rubric_report: Option<PathBuf>,
 }
 
 pub fn run(args: &ValidateArgs) -> Result<u8, Failure> {
@@ -117,10 +126,18 @@ pub fn run(args: &ValidateArgs) -> Result<u8, Failure> {
     println!();
     let project_root = meowkit_dir.parent().unwrap_or(&cwd).to_path_buf();
 
-    match scoped_run(args, &meowkit_dir, &project_root) {
-        Some(results) => report(results, args.strict),
-        None => default_run(args, mode_override, &meowkit_dir, &project_root),
+    if let Some(results) = scoped_run(args, &meowkit_dir, &project_root) {
+        return report(results, args.strict);
     }
+    if args.skill_rubric || args.skill_rubric_report.is_some() {
+        let rows = skill_rubric_run(
+            args.skill_rubric_report.as_deref(),
+            &meowkit_dir,
+            &project_root,
+        )?;
+        return report(rows, args.strict);
+    }
+    default_run(args, mode_override, &meowkit_dir, &project_root)
 }
 
 fn default_run(

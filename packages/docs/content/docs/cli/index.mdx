@@ -91,7 +91,7 @@ Install the kit into this project, or your home with --global
 
 | Flag | What it does |
 |---|---|
-| `--target` `<TARGETS>` | Runtimes to install for: claude-code, codex, cursor, grok, pi, omp (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker |
+| `--target` `<TARGETS>` | Runtimes to install for: claude-code, codex, cursor, grok, pi, omp, antigravity (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker |
 | `--profile` `<PROFILE>` | Claude Code: install a subset (core, developer, product, atlassian, security, research, or full). Re-running with a narrower profile removes what the narrower profile no longer includes, unless you edited it |
 | `--skill-packs` `<PACKS>` | Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only |
 | `--delivery` `<SHAPE>` | Claude Code only: `native` (the host's own directory) or `plugin` (the same content plus a plugin manifest) |
@@ -331,6 +331,8 @@ Check this project's structure and wiring (not that the guards block)
 | `--memory` | Run only the committed team-memory store lint |
 | `--frontmatter` | Run only the SKILL.md frontmatter schema and runtime-contract check |
 | `--docs-refs` | Run only the `.claude` to `docs/*` reference allowlist check |
+| `--skill-rubric` | Run only the mechanical skill-rubric scoring and write its JSON report |
+| `--skill-rubric-report` `<PATH>` | Where the skill-rubric report goes (implies --skill-rubric; default .meowkit/telemetry/skill-rubric.json) |
 
 ### `mewkit review`
 
@@ -455,13 +457,19 @@ Guided post-scaffold configuration
 
 ### `mewkit skill`
 
-Per-skill interpreter environments
+Per-skill environments and the skill store (status of installed skills)
 
-Subcommands: `env`.
+Subcommands: `env`, `status`, `overlay`, `fork`, `rollback`.
 
 | Flag | What it does |
 |---|---|
 | `--list` | List every skill that declares a runtime and the state of its environment |
+| `--file` `<PATH>` | `overlay`: a file of the skill to store (repeatable; default: every file edited since install) |
+| `--approve` | `overlay`: show an overlay this machine has not approved and place it |
+| `--yes` | Confirm `overlay --approve` in a session with no terminal |
+| `--to` `<DIGEST>` | `rollback`: the recorded digest to restore (a unique prefix of at least 7 hex digits; default: the most recent earlier one) |
+| `--global` | Act on your home directory instead of this project (skill store verbs) |
+| `--json` | Print one JSON document instead of text (skill store verbs) |
 
 ### `mewkit pack`
 

@@ -1,0 +1,162 @@
+---
+title: "Skill Audit"
+description: "Every shipped skill scored on the rubric criteria a program can check: description shape, entry size, dead references, emphasis, harness tool names and duplicated passages."
+---
+
+{/* Generated from the skill rubric check. Do not edit by hand: run
+    `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_skill_audit` and commit the result. */}
+
+This table scores each skill on six criteria that `mewkit validate --skill-rubric` measures from the files alone. A skill earns one point per criterion it passes. The scores say how a skill is written by these measures, not whether it works better: no skill below has a behavioural result yet. Criteria that need a reader (goal and completion, degrees of freedom, hand-off, exits, verification, determinism) are not in this table.
+
+Run `mewkit validate --skill-rubric` in a kit checkout to get the same values as JSON in `.meowkit/telemetry/skill-rubric.json` (or the path given to `--skill-rubric-report`). The rows are PASS or WARN and never fail the run.
+
+## Criteria and thresholds
+
+| Criterion | Passes when |
+|---|---|
+| Description | The description says what the skill does, when to use it (`when_to_use` or a "when" clause) and when not to ("NOT for ..."); description at most 1,024 characters and description plus `when_to_use` at most 1,536 |
+| Entry | `SKILL.md` is at most 5,000 estimated tokens (characters / 4), so all of it returns after compaction |
+| Dead refs | No skill link, slash command or docs reference in the skill's files points at something the kit does not ship |
+| Emphasis | At most 10 emphatic marks (MUST, NEVER, ALWAYS, IMPORTANT, CRITICAL, NON-NEGOTIABLE, MANDATORY, or a bold span in capitals) per 1,000 words of the `SKILL.md` body |
+| Harness tools | Every harness-only tool name (`AskUserQuestion`, `TodoWrite`, `TaskCreate` and siblings, `SendMessage`, `Agent(`, `Task(`) has a fallback stated within 3 lines |
+| Duplicates | No paragraph of 40 or more words is copied word for word into another skill; copies listed in `.claude/shared-families.json` are kept identical on purpose and not counted |
+
+## Summary
+
+127 skills: 93 at 6 of 6, 31 at 5 of 6, 3 at 4 of 6.
+
+Skills failing each criterion: description 12, entry 0, dead refs 0, emphasis 3, harness tools 5, duplicates 17.
+
+## Scores
+
+A value in bold failed its criterion. Description shows the listing length (description plus `when_to_use`); Entry is estimated tokens; Emphasis is marks per 1,000 words.
+
+| Skill | Score | Description | Entry | Dead refs | Emphasis | Harness tools | Duplicates | Behaviour |
+|---|---|---|---|---|---|---|---|---|
+| `autobuild` | 4 of 6 | 101 chars | ~2440 | 0 | 2.9 | **8** | **2** | not behaviour-tested |
+| `cook` | 4 of 6 | 100 chars | ~4397 | 0 | 4.1 | **8** | **1** | paired cases written, baseline not yet run |
+| `trace-analyze` | 4 of 6 | 126 chars | ~1329 | 0 | 1.8 | **1** | **1** | not behaviour-tested |
+| `agent-detector` | 5 of 6 | 113 chars | ~2405 | 0 | 2.8 | **1** | 0 | not behaviour-tested |
+| `api-design-principles` | 5 of 6 | 127 chars | ~1976 | 0 | 0.0 | 0 | **1** | not behaviour-tested |
+| `backend-development` | 5 of 6 | 122 chars | ~1747 | 0 | 0.0 | 0 | **1** | not behaviour-tested |
+| `brainstorming` | 5 of 6 | 109 chars | ~1002 | 0 | 0.0 | 0 | **1** | not behaviour-tested |
+| `clean-code` | 5 of 6 | 112 chars | ~783 | 0 | **16.9** | 0 | 0 | not behaviour-tested |
+| `confluence` | 5 of 6 | **no when-not, 106 chars** | ~1352 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `database` | 5 of 6 | 118 chars | ~2436 | 0 | 0.0 | 0 | **1** | not behaviour-tested |
+| `devops` | 5 of 6 | 98 chars | ~2016 | 0 | 0.0 | 0 | **1** | not behaviour-tested |
+| `document-release` | 5 of 6 | 113 chars | ~1372 | 0 | 0.0 | 0 | **13** | not behaviour-tested |
+| `evaluate` | 5 of 6 | 128 chars | ~1364 | 0 | 1.8 | 0 | **1** | not behaviour-tested |
+| `help` | 5 of 6 | **no when-not, 97 chars** | ~2723 | 0 | 0.8 | 0 | 0 | not behaviour-tested |
+| `html-video` | 5 of 6 | **no when-not, 104 chars** | ~599 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira` | 5 of 6 | **no when-not, 108 chars** | ~1217 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-evaluator` | 5 of 6 | **no when-not, 110 chars** | ~342 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-fields` | 5 of 6 | **no when-not, 101 chars** | ~433 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-ops` | 5 of 6 | **no when-not, 90 chars** | ~371 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-relationships` | 5 of 6 | **no when-not, 96 chars** | ~424 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-time` | 5 of 6 | **no when-not, 105 chars** | ~441 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `llms` | 5 of 6 | **no when-not, 102 chars** | ~1047 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `office-hours` | 5 of 6 | 116 chars | ~1214 | 0 | 0.0 | 0 | **5** | not behaviour-tested |
+| `plan-ceo-review` | 5 of 6 | 117 chars | ~1433 | 0 | 0.0 | 0 | **6** | not behaviour-tested |
+| `plan-creator` | 5 of 6 | 125 chars | ~2931 | 0 | 4.7 | 0 | **2** | paired cases written, baseline not yet run |
+| `planning-engine` | 5 of 6 | **no when-not, 111 chars** | ~2231 | 0 | 1.1 | 0 | 0 | not behaviour-tested |
+| `qa` | 5 of 6 | 116 chars | ~1275 | 0 | 0.0 | 0 | **10** | not behaviour-tested |
+| `respond-pr` | 5 of 6 | 122 chars | ~1251 | 0 | **15.6** | 0 | 0 | not behaviour-tested |
+| `retro` | 5 of 6 | 89 chars | ~1617 | 0 | 0.0 | 0 | **13** | not behaviour-tested |
+| `review` | 5 of 6 | 114 chars | ~4549 | 0 | 3.3 | 0 | **11** | not behaviour-tested |
+| `ship` | 5 of 6 | 98 chars | ~3002 | 0 | 0.0 | 0 | **30** | not behaviour-tested |
+| `skill-template-secure` | 5 of 6 | 102 chars | ~630 | 0 | **19.3** | 0 | 0 | not behaviour-tested |
+| `task-queue` | 5 of 6 | **no when-not, 109 chars** | ~808 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `workflow-orchestrator` | 5 of 6 | 115 chars | ~1501 | 0 | 6.8 | **7** | 0 | not behaviour-tested |
+| `advise` | 6 of 6 | 115 chars | ~2217 | 0 | 0.8 | 0 | 0 | not behaviour-tested |
+| `agent-browser` | 6 of 6 | 108 chars | ~2183 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `angular` | 6 of 6 | 123 chars | ~893 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `arch` | 6 of 6 | 117 chars | ~942 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `ask-me` | 6 of 6 | 114 chars | ~1271 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `benchmark` | 6 of 6 | 87 chars | ~2601 | 0 | 0.9 | 0 | 0 | not behaviour-tested |
+| `bootstrap` | 6 of 6 | 107 chars | ~817 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `breakdown` | 6 of 6 | 122 chars | ~813 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `build-fix` | 6 of 6 | 91 chars | ~1517 | 0 | 1.4 | 0 | 0 | not behaviour-tested |
+| `careful` | 6 of 6 | 102 chars | ~624 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `chom` | 6 of 6 | 119 chars | ~2381 | 0 | 1.8 | 0 | 0 | not behaviour-tested |
+| `chrome-profile` | 6 of 6 | 123 chars | ~1804 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `confluence-bulk` | 6 of 6 | 110 chars | ~629 | 0 | 4.1 | 0 | 0 | not behaviour-tested |
+| `confluence-collaborate` | 6 of 6 | 110 chars | ~635 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `confluence-page` | 6 of 6 | 111 chars | ~738 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `confluence-search` | 6 of 6 | 107 chars | ~693 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `confluence-spec-analyst` | 6 of 6 | 109 chars | ~673 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `context-audit` | 6 of 6 | 107 chars | ~1324 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `context-engineering` | 6 of 6 | 102 chars | ~1937 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `cso` | 6 of 6 | 137 chars | ~1889 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `decision-framework` | 6 of 6 | 95 chars | ~1071 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `delegate` | 6 of 6 | 104 chars | ~1454 | 0 | 1.4 | 0 | 0 | not behaviour-tested |
+| `development` | 6 of 6 | 105 chars | ~481 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `docs-finder` | 6 of 6 | 125 chars | ~2629 | 0 | 0.9 | 0 | 0 | not behaviour-tested |
+| `docs-init` | 6 of 6 | 107 chars | ~839 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `elicit` | 6 of 6 | 112 chars | ~1681 | 0 | 9.5 | 0 | 0 | not behaviour-tested |
+| `figma` | 6 of 6 | 108 chars | ~2939 | 0 | 1.5 | 0 | 0 | not behaviour-tested |
+| `fix` | 6 of 6 | 125 chars | ~3947 | 0 | 5.5 | 0 | 0 | paired cases written, baseline not yet run |
+| `freeze` | 6 of 6 | 106 chars | ~778 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `frontend-design` | 6 of 6 | 115 chars | ~2016 | 0 | 3.5 | 0 | 0 | not behaviour-tested |
+| `ghpm` | 6 of 6 | 116 chars | ~902 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `grill` | 6 of 6 | 116 chars | ~2342 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `henshin` | 6 of 6 | 145 chars | ~864 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `improve-codebase-architecture` | 6 of 6 | 108 chars | ~3005 | 0 | 2.9 | 0 | 0 | not behaviour-tested |
+| `intake` | 6 of 6 | 122 chars | ~2949 | 0 | 1.5 | 0 | 0 | not behaviour-tested |
+| `investigate` | 6 of 6 | 110 chars | ~1914 | 0 | 0.0 | 0 | 0 | paired cases written, baseline not yet run |
+| `jira-admin` | 6 of 6 | 116 chars | ~548 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-agile` | 6 of 6 | 124 chars | ~1007 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-analyst` | 6 of 6 | 123 chars | ~409 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-bulk` | 6 of 6 | 113 chars | ~615 | 0 | 4.5 | 0 | 0 | not behaviour-tested |
+| `jira-collaborate` | 6 of 6 | 116 chars | ~412 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-dev` | 6 of 6 | 115 chars | ~472 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-estimator` | 6 of 6 | 120 chars | ~419 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-issue` | 6 of 6 | 117 chars | ~448 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-jsm` | 6 of 6 | 114 chars | ~535 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-lifecycle` | 6 of 6 | 120 chars | ~765 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `jira-search` | 6 of 6 | 99 chars | ~428 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `lint-and-validate` | 6 of 6 | 96 chars | ~934 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `loop` | 6 of 6 | 119 chars | ~2242 | 0 | 1.1 | 0 | 0 | not behaviour-tested |
+| `markdown-reader` | 6 of 6 | 119 chars | ~667 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `memory` | 6 of 6 | 117 chars | ~1378 | 0 | 1.3 | 0 | 0 | not behaviour-tested |
+| `mermaidjs-v11` | 6 of 6 | 100 chars | ~913 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `multimodal` | 6 of 6 | 121 chars | ~1677 | 0 | 1.8 | 0 | 0 | not behaviour-tested |
+| `nyquist` | 6 of 6 | 117 chars | ~745 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `orchestrate` | 6 of 6 | 123 chars | ~3881 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `pack` | 6 of 6 | 114 chars | ~1445 | 0 | 4.4 | 0 | 0 | not behaviour-tested |
+| `party` | 6 of 6 | 100 chars | ~3037 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `playwright-cli` | 6 of 6 | 121 chars | ~1299 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `preview` | 6 of 6 | 127 chars | ~2653 | 0 | 2.2 | 0 | 0 | not behaviour-tested |
+| `problem-solving` | 6 of 6 | 125 chars | ~1800 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `project-context` | 6 of 6 | 132 chars | ~1054 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `project-organization` | 6 of 6 | 108 chars | ~1350 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `prompt-enhancer` | 6 of 6 | 113 chars | ~3277 | 0 | 2.0 | 0 | 0 | not behaviour-tested |
+| `qa-manual` | 6 of 6 | 108 chars | ~1317 | 0 | 7.4 | 0 | 0 | not behaviour-tested |
+| `react-patterns` | 6 of 6 | 121 chars | ~682 | 0 | 9.2 | 0 | 0 | not behaviour-tested |
+| `research` | 6 of 6 | 107 chars | ~1555 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `resolving-merge-conflicts` | 6 of 6 | 98 chars | ~1866 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `review-pr` | 6 of 6 | 106 chars | ~1571 | 0 | 2.6 | 0 | 0 | not behaviour-tested |
+| `rubric` | 6 of 6 | 104 chars | ~1349 | 0 | 5.5 | 0 | 0 | not behaviour-tested |
+| `scale-routing` | 6 of 6 | 113 chars | ~1638 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `scout` | 6 of 6 | 99 chars | ~1160 | 0 | 2.4 | 0 | 0 | not behaviour-tested |
+| `sequential-thinking` | 6 of 6 | 129 chars | ~1081 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `session-continuation` | 6 of 6 | 115 chars | ~601 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `showcase` | 6 of 6 | 111 chars | ~1958 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `simplify` | 6 of 6 | 109 chars | ~735 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `skill-creator` | 6 of 6 | 115 chars | ~1968 | 0 | 2.4 | 0 | 0 | not behaviour-tested |
+| `sprint-contract` | 6 of 6 | 126 chars | ~2699 | 0 | 1.6 | 0 | 0 | not behaviour-tested |
+| `status` | 6 of 6 | 101 chars | ~1016 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `stitch` | 6 of 6 | 101 chars | ~1426 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `story-sizer` | 6 of 6 | 110 chars | ~1235 | 0 | 2.4 | 0 | 0 | not behaviour-tested |
+| `team-config` | 6 of 6 | 118 chars | ~770 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `tech-graph` | 6 of 6 | 116 chars | ~1160 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `testing` | 6 of 6 | 96 chars | ~601 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `typescript` | 6 of 6 | 111 chars | ~1494 | 0 | 8.4 | 0 | 0 | not behaviour-tested |
+| `ui-design-system` | 6 of 6 | 119 chars | ~829 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `validate-plan` | 6 of 6 | 116 chars | ~1680 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `verify` | 6 of 6 | 102 chars | ~2085 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `vue` | 6 of 6 | 106 chars | ~2129 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `vue-best-practices` | 6 of 6 | 105 chars | ~2100 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `vue-testing-best-practices` | 6 of 6 | 111 chars | ~2861 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `vulnerability-scanner` | 6 of 6 | 100 chars | ~833 | 0 | 0.0 | 0 | 0 | not behaviour-tested |
+| `web-to-markdown` | 6 of 6 | 106 chars | ~1536 | 0 | 3.1 | 0 | 0 | not behaviour-tested |
+| `worktree` | 6 of 6 | 128 chars | ~1701 | 0 | 5.4 | 0 | 0 | not behaviour-tested |

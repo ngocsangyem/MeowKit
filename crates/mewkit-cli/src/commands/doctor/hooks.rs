@@ -16,6 +16,15 @@ use crate::place::Place;
 const COVERAGE: &str = ".claude/hooks/hook-coverage.json";
 
 pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Check> {
+    // The kit installs no Antigravity hook, so there is no hook file to read and
+    // no coverage row that describes a guard that is there.
+    if runtime == Runtime::Antigravity {
+        return vec![Check::new(
+            format!("{} hooks ({})", runtime.name(), place.label()),
+            Status::Warn,
+            mewkit_adapters::antigravity::NO_GUARDS,
+        )];
+    }
     let mut out = vec![scripts(place, runtime)];
     if place.scope.kind == ScopeKind::Project {
         match runtime {
@@ -45,7 +54,7 @@ pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Ch
                 "Pi loads .pi/extensions and the project's .agents/skills only in a project you trusted (/trust); whether this one is trusted is not read here",
             )),
             // OMP has no trust step: its hook module runs from the first session.
-            Runtime::Omp => {}
+            Runtime::Omp | Runtime::Antigravity => {}
         }
     }
     if runtime != Runtime::ClaudeCode {
@@ -62,6 +71,7 @@ pub(super) fn hook_file(runtime: Runtime) -> &'static str {
         Runtime::Grok => ".grok/hooks/meowkit.json",
         Runtime::Pi => ".pi/extensions/meowkit.ts",
         Runtime::Omp => ".omp/hooks/pre/meowkit.ts",
+        Runtime::Antigravity => ".agents/hooks.json",
     }
 }
 

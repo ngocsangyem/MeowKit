@@ -40,6 +40,7 @@ const LISTING_CEILINGS = {
 	grok: 17300,
 	pi: 17300,
 	omp: 17300,
+	antigravity: 17300,
 };
 const LIMIT_SKILL_FILES_TOTAL_BYTES = 769000;
 const LIMIT_LARGEST_SKILL_FILE_BYTES = 27200;

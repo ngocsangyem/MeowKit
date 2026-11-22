@@ -3,6 +3,7 @@
 pub mod gate_kit;
 pub mod gate_retire;
 pub mod release;
+pub mod skill_store;
 pub mod temp_home;
 
 /// The adapters' kit builder and tree hashing, shared rather than copied.

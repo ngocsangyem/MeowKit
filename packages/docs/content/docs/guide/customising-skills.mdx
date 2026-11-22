@@ -1,0 +1,99 @@
+---
+title: "Customising and Upgrading Skills"
+description: "Keep your own version of a kit skill across upgrades with an overlay, copy one under your own name with a fork, and put a skill back with rollback. What the skill store records and what an older mewkit does with it."
+---
+
+`mewkit upgrade` replaces kit files you have not touched and keeps the ones you edited, exiting 6 so you notice. That is safe, but an edited file then stops receiving kit changes and every upgrade reports it again. The skill store gives each installed skill an identity so you can say what you meant by the edit: keep my version of these files (overlay), make this skill mine under another name (fork), or put it back as it was (rollback).
+
+## What the store records
+
+Every lifecycle command (`init`, `upgrade`, `uninstall`, `pack add`, `pack remove`) indexes the installed skills after it changes the install. For each skill directory, such as `.claude/skills/fix` or `.agents/skills/mk-fix`, the record holds:
+
+- the tree digest: a SHA-256 over every file's path, content and execute bit. Other permission bits do not count, so a checkout with a different umask has the same digest;
+- the owners: the runtimes whose ownership ledgers own files there, or `user`;
+- the base digest: the tree as the kit installed it (as copied, for a fork);
+- the earlier digests, oldest first (up to 20);
+- a hash of the ledger rows the record was built from.
+
+Records live in `.meowkit/state/ownership/skill-store.json` (global installs: `~/.mewkit/state/ownership/skill-store.json`), beside the ownership ledgers and committed with them. The files of each recorded digest are kept in `.meowkit/state/skill-store/trees/`, which stays on your machine, so a rollback can restore them.
+
+Indexing reads skill files and writes none of them, and running it twice writes the same bytes.
+
+## `mewkit skill status`
+
+Lists every skill with what it is and how it has drifted:
+
+| Status | Meaning |
+|---|---|
+| `kit` | Installed by the kit; upgrades replace its files. |
+| `overlaid` | Kit files with some replaced whole by your stored version. |
+| `forked` | A copy of another skill under a name you own. |
+| `local` | A skill mewkit did not install. |
+| `unverified` | The ledger changed without the store (another mewkit ran); kept as it is until you decide. |
+
+Below a skill, `status` lists files edited since install, missing files, upstream changes to overlaid files, and overlays waiting for approval. `--json` prints one document with every digest and the history.
+
+## Overlay: keep your version of kit files
+
+Edit the files, then store them:
+
+```bash
+mewkit skill overlay fix                          # every file of fix edited since install
+mewkit skill overlay fix --file SKILL.md          # only the files you name
+```
+
+The overlay is stored under `.meowkit/skill-overlays/`, outside every kit-owned tree. Your skill is the kit's files with each overlaid file replaced whole; nothing is merged.
+
+On upgrade:
+
+- the kit's new files for that skill are written, except the overlaid ones;
+- each overlaid file is reported as `kept … overlaid`; when the kit changed it since you stored the overlay, the line says `drift` and `skill status` shows `upstream changed`;
+- a kept overlay does not make `upgrade` exit 6. An edit to a kit file that is not overlaid still does.
+
+If you edit an overlaid file again in place, that edit is kept too, and `skill status` says the stored overlay is out of date. The stored copy never replaces the file; run `mewkit skill overlay fix` again to store the new version. Running it after a drift also records that you have taken the upstream change in.
+
+### Overlays from someone else
+
+`.meowkit/.gitignore` keeps `skill-overlays/` out of git, so an overlay stays on your machine unless your team decides to share it by re-including that directory. An overlay is instruction text, so a shared one does nothing on a machine until that machine approves it:
+
+```bash
+mewkit skill overlay fix --approve          # shows the diff, then asks
+mewkit skill overlay fix --approve --yes    # without a terminal
+```
+
+The stored copies are checked against their record before anything is placed. The approval is kept in `.meowkit/state/`, which git never sees, and names the exact content: a later change to the shared overlay needs approving again.
+
+## Fork: make a skill yours
+
+```bash
+mewkit skill fork fix my-fix
+```
+
+copies the skill beside the original in every skills directory it is installed in, with `name: my-fix` in its `SKILL.md`. No ledger owns the copy, so no kit change reaches it. The new name may not start with `mk-`, the prefix the kit gives its own skills on some runtimes.
+
+## What install, upgrade and uninstall keep
+
+| Skill | Install and upgrade | Uninstall and retire (the kit dropped the skill) |
+|---|---|---|
+| `forked`, `local`, `unverified` | left whole, even if the kit ships a skill of that name | left whole |
+| `overlaid` | the kit's files are written, the overlaid ones kept | left whole |
+
+Each is reported as `kept <path>: <reason>`. `--force` does not override any of these. When a removal is dropped, the files leave the ownership ledger and the skill is yours from then on (`status` shows `local`).
+
+## Rollback
+
+```bash
+mewkit skill rollback fix                    # the most recent earlier digest
+mewkit skill rollback fix --to 3f2a9c1       # any digest in the history, by prefix
+```
+
+The files come from the tree kept for that digest and are written through the same backup and journal as every lifecycle command: the backup path is printed, and a failure part way leaves the skill as it was. A rollback that leaves every overlaid file as the kit installed it stops applying the overlay here; the stored copy stays, and `skill overlay --approve` places it again. A digest whose files were never seen on this machine (for example one recorded on a teammate's machine) cannot be restored.
+
+## An older mewkit and the store
+
+An older `mewkit` does not know the store and ignores the sidecar and the overlays; the ownership ledger keeps the shape it reads. If it changes the ledger, for example by upgrading, the rows under the skills it touched no longer match their records. The next `mewkit skill status` or lifecycle command marks those skills `unverified`, keeps their records instead of rebuilding them from the ledger, and leaves their files alone, including on `upgrade --force`. To settle one:
+
+- `mewkit skill rollback <name>` restores the tree recorded before the older binary ran;
+- `mewkit skill rollback <name> --to <digest on disk now>` keeps the files as they are.
+
+`mewkit doctor` reports unverified skills, installed skills with no record and overlays waiting for approval in its `skill store` row.

@@ -15,6 +15,7 @@ pub mod review;
 pub mod self_update;
 pub mod setup;
 pub mod skill;
+pub mod skill_store;
 pub mod task;
 pub mod task_state;
 pub mod trace;
@@ -212,8 +213,15 @@ pub fn run_jobs(
     json: bool,
 ) -> Result<Vec<Outcome>, Failure> {
     let mut outcomes = Vec::new();
+    let mut store = skill_store::lifecycle::before(place);
+    let refresh = |store: Option<&_>| {
+        if !opts.dry_run {
+            skill_store::lifecycle::after(place, store);
+        }
+    };
     for mut job in jobs {
         let hashes = std::mem::take(&mut job.hashes);
+        let kept = skill_store::lifecycle::keep(store.as_mut(), &mut job.plan, &mut job.index);
         let report = execute(
             &job.plan,
             &place.exec_scope(job.e),
@@ -222,11 +230,14 @@ pub fn run_jobs(
             opts,
         );
         match report {
-            Ok(report) => outcomes.push(Outcome {
-                runtime: job.e.target(),
-                scope: place.label(),
-                report,
-            }),
+            Ok(mut report) => {
+                report.preserved.extend(kept);
+                outcomes.push(Outcome {
+                    runtime: job.e.target(),
+                    scope: place.label(),
+                    report,
+                });
+            }
             Err(err) => {
                 output::print(&outcomes, json);
                 let mut failure = Failure::from(err);
@@ -240,10 +251,12 @@ pub fn run_jobs(
                         "; the targets listed above were applied".into()
                     }
                 );
+                refresh(store.as_ref());
                 return Err(failure);
             }
         }
     }
+    refresh(store.as_ref());
     output::print(&outcomes, json);
     Ok(outcomes)
 }
@@ -271,8 +284,8 @@ pub fn drop_retired(
 }
 
 /// The runtimes among `installed` whose files depend on `changing` being here
-/// or not, `changing` itself left out. Codex, Pi and OMP write one `.agents/`
-/// tree in wording that depends on which of them are installed, and OMP
+/// or not, `changing` itself left out. Codex, Pi, OMP and Antigravity write one
+/// `.agents/` tree in wording that depends on which of them are installed, and OMP
 /// switches off its import of `.claude/` only beside Claude Code.
 pub fn depends_on(changing: &[Runtime], installed: &[Runtime], scope: ScopeKind) -> Vec<Runtime> {
     let sharers = mewkit_adapters::agents_tree::WRITERS;

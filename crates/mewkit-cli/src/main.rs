@@ -34,7 +34,7 @@ use commands::{
 #[command(
     name = "mewkit",
     version = mewkit_core::VERSION,
-    about = "Install and manage the MeowKit kit for Claude Code, Codex, Cursor, Grok, Pi and OMP.",
+    about = "Install and manage the MeowKit kit for Claude Code, Codex, Cursor, Grok, Pi, OMP and Antigravity.",
     arg_required_else_help = true
 )]
 struct Cli {
@@ -88,7 +88,7 @@ enum Command {
     Budget(BudgetArgs),
     /// Guided post-scaffold configuration.
     Setup(SetupArgs),
-    /// Per-skill interpreter environments.
+    /// Per-skill environments and the skill store (status of installed skills).
     Skill(SkillArgs),
     /// Manage install packs.
     Pack(PackArgs),

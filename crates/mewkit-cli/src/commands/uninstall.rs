@@ -187,7 +187,7 @@ fn keep_shared_blocks(
     }
 }
 
-/// Codex, Pi and OMP write one `.agents/` tree between them, in wording that
+/// Codex, Pi, OMP and Antigravity write one `.agents/` tree between them, in wording that
 /// depends on which of them are installed. When one leaves, each of the others
 /// that stays is planned again for the set that remains, so its files are in
 /// the wording it would have been installed with, and a later uninstall

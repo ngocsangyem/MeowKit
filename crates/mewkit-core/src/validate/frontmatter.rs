@@ -90,7 +90,7 @@ pub fn tool_contract_warnings(meta: &Map<String, Value>, body: &str) -> Vec<Stri
     warnings
 }
 
-fn skill_names(skills_root: &Path) -> Vec<String> {
+pub(super) fn skill_names(skills_root: &Path) -> Vec<String> {
     let mut names: Vec<String> = super::dir_order::sorted_entries(skills_root)
         .iter()
         .filter(|entry| entry.path().is_dir())

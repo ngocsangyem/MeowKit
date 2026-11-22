@@ -122,7 +122,17 @@ fn cell(runtime: &str, scope: Scope) {
     };
     assert_eq!(status(&cell).as_deref(), Some("ok"), "{cell}: {checks:#}");
     let hooks = format!("{runtime} hooks ({})", scope.dirs().label);
-    assert_eq!(status(&hooks).as_deref(), Some("ok"), "{cell}: {checks:#}");
+    // The kit installs no Antigravity hook, so doctor warns instead of passing.
+    let expected = if runtime == "antigravity" {
+        "warn"
+    } else {
+        "ok"
+    };
+    assert_eq!(
+        status(&hooks).as_deref(),
+        Some(expected),
+        "{cell}: {checks:#}"
+    );
 
     let edited = owned
         .iter()
@@ -205,6 +215,7 @@ cells! {
     grok_in_a_project: "grok" at Project;
     pi_in_a_project: "pi" at Project;
     omp_in_a_project: "omp" at Project;
+    antigravity_in_a_project: "antigravity" at Project;
     claude_code_globally: "claude-code" at Global;
     codex_globally: "codex" at Global;
     cursor_globally: "cursor" at Global;
