@@ -65,13 +65,14 @@ pub enum Section {
     Rules,
     Capabilities,
     Agents,
+    Skills,
     Memory,
     Target,
 }
 
 impl Section {
     /// Print order, mirroring the npm CLI's `SECTION_ORDER` key order.
-    pub const ORDER: [Section; 15] = [
+    pub const ORDER: [Section; 16] = [
         Section::Structure,
         Section::Hooks,
         Section::Portability,
@@ -85,6 +86,7 @@ impl Section {
         Section::Rules,
         Section::Capabilities,
         Section::Agents,
+        Section::Skills,
         Section::Memory,
         Section::Target,
     ];
@@ -104,6 +106,7 @@ impl Section {
             Section::Rules => "Rules",
             Section::Capabilities => "Capabilities",
             Section::Agents => "Agents",
+            Section::Skills => "Skills",
             Section::Memory => "Memory",
             Section::Target => "Target",
         }
