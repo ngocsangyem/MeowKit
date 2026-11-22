@@ -25,12 +25,21 @@ function project() {
   return root;
 }
 
+// The golden records a machine with no `mewkit` on PATH, as on CI. A developer's installed
+// CLI would run the real memory lint and add or drop lines, so directories holding one are
+// left out; git and node stay reachable wherever they are installed.
+const MEWKIT_NAMES = ['mewkit', 'mewkit.exe', 'mewkit.cmd'];
+const HERMETIC_PATH = (process.env.PATH || '')
+  .split(path.delimiter)
+  .filter((dir) => dir && !MEWKIT_NAMES.some((name) => fs.existsSync(path.join(dir, name))))
+  .join(path.delimiter);
+
 function run(hook, root, stdin, env = {}) {
   const result = spawnSync(process.execPath, [path.join(HOOKS, hook)], {
     input: stdin,
     encoding: 'utf8',
     cwd: root,
-    env: { PATH: process.env.PATH, HOME: root, CLAUDE_PROJECT_DIR: root, ...env },
+    env: { PATH: HERMETIC_PATH, HOME: root, CLAUDE_PROJECT_DIR: root, ...env },
   });
   const scrub = (s) => (s || '').split(root).join('<ROOT>');
   return { exit: result.status, stdout: scrub(result.stdout), stderr: scrub(result.stderr) };
