@@ -28,7 +28,7 @@ Grok, Pi and OMP install at project scope only, so `--global` covers Claude Code
 | --- | --- | --- |
 | `--profile <name>` | Claude Code | Install a subset: `core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`. Running `init` again with a narrower profile removes what it no longer includes, unless you edited it |
 | `--delivery native\|plugin` | Claude Code | The on-disk shape: the host's own directory, or the same content plus a plugin manifest. Refused with the other runtimes |
-| `--skill-packs <packs>` | Every runtime except Claude Code | Comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only |
+| `--skill-packs <packs>` | Every runtime except Claude Code | Comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only. `eval` applies to every runtime, Claude Code included, and adds the [eval pack](#the-eval-pack) without changing which skills install |
 | `--mcp-profiles <names\|all>` | Cursor | Merge MCP servers into `.cursor/mcp.json`; your own servers win. A project with a git remote also needs `--allow-cloud-mcp` |
 
 For Claude Code at project scope, `init` also writes the committed launcher `.meowkit/bin/mewkit` and the `.claude/runtime.json` that points the hooks at it ([how hooks reach mewkit](/cli#how-hooks-reach-mewkit)). In the MeowKit source repository itself, `init` refuses unless you pass `--allow-kit-source`, because `.claude/` there is the kit's authored source.
@@ -38,6 +38,12 @@ For Claude Code at project scope, `init` also writes the committed launcher `.me
 A skill whose `SKILL.md` sets `install_default: false` is left out of an install unless it is selected. It counts as selected when it is named in `.meowkit/state/skill-selection.json` (`.mewkit/state/skill-selection.json` for `--global`), when it is inside a pack chosen with `--profile` or `--skill-packs`, or when it is installed here already. A full install picks no pack, so it does not select an opt-in skill. A skill the kit lists in `retiredSkills` in `.meowkit/pack-manifest.json` is never installed, even when selected, and `upgrade` removes it.
 
 The selection file is machine-local and stays out of git. To select a skill by hand, add its name: `{"version": 1, "skills": ["ghpm"]}`. The first `upgrade` of an install made before selections existed writes the file with every installed skill, so a smaller default later reaches fresh installs only. `upgrade`, `init` and `uninstall` never remove an installed skill for being opt-in.
+
+### The eval pack
+
+The kit's eval cases, the input to [`mewkit eval`](/cli/telemetry#eval), are an opt-in pack. No install carries them unless asked: not `full`, not `--skill-packs all`. `--skill-packs eval` adds them, for any runtime; on a Claude Code install, `mewkit pack add eval` adds them later and `mewkit pack remove eval` takes them out. They go to `.meowkit/eval/<skill>/eval/`, a kit-owned folder outside every skills root, so no runtime lists a case as a skill. The ownership index records them like any kit file: `upgrade` keeps the pack without being asked again, and `uninstall` removes it.
+
+A release carries the cases under `kit/packs/eval/`, declared in `filePacks` in `.meowkit/pack-manifest.json`. A `mewkit` binary from before the pack ignores both, so it installs a newer kit exactly as before and never lays the cases down; it refuses `pack add eval` as an unknown pack.
 
 ### Taking over an npm install
 

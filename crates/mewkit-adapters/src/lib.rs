@@ -11,6 +11,7 @@ pub mod claude_code;
 pub mod codex;
 pub mod contract;
 pub mod cursor;
+pub mod eval_pack;
 pub mod grok;
 mod kit_files;
 pub mod omp;

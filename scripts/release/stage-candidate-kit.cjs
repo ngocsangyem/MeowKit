@@ -8,7 +8,7 @@
  */
 const fs = require("fs");
 const path = require("path");
-const { excludeMatcher, shipSetExclusions, shipSetFiles } = require("../kit-ship-set.cjs");
+const { excludeMatcher, filePackFiles, shipSetExclusions, shipSetFiles } = require("../kit-ship-set.cjs");
 
 const out = process.argv[2];
 if (!out) {
@@ -20,12 +20,14 @@ try {
 	if (fs.existsSync(out) && fs.readdirSync(out).length > 0) throw new Error(`${out} is not empty`);
 	const files = shipSetFiles(root, excludeMatcher(shipSetExclusions(root)));
 	if (files.length === 0) throw new Error("the ship set is empty");
-	for (const rel of files) {
-		const dest = path.join(out, rel);
+	// Opt-in file packs go to their archive paths (kit/packs/<name>/), as the zip carries them.
+	const entries = [...files.map((rel) => ({ from: rel, to: rel })), ...filePackFiles(root)];
+	for (const { from, to } of entries) {
+		const dest = path.join(out, to);
 		fs.mkdirSync(path.dirname(dest), { recursive: true });
-		fs.copyFileSync(path.join(root, rel), dest);
+		fs.copyFileSync(path.join(root, from), dest);
 	}
-	console.log(`staged ${files.length} kit files in ${out}`);
+	console.log(`staged ${entries.length} kit files in ${out}`);
 } catch (error) {
 	console.error(`stage-candidate-kit: ${error.message}`);
 	process.exit(1);

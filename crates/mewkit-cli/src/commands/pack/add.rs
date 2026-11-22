@@ -144,7 +144,7 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
 }
 
 /// The kit the install was made from when it can be had, else the newest.
-fn kit_for(ctx: &Context, args: &PackArgs) -> Result<Kit, Failure> {
+pub(super) fn kit_for(ctx: &Context, args: &PackArgs) -> Result<Kit, Failure> {
     let k = &args.kit;
     let explicit =
         k.kit_dir.is_some() || k.kit_archive.is_some() || k.offline || k.kit_version.is_some();

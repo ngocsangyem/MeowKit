@@ -6,6 +6,7 @@
 //! `.meowkit/telemetry/eval/`. The logic is [`mewkit_core::eval`]; this module
 //! parses arguments, drives processes and prints.
 mod arm;
+mod case_source;
 mod output;
 mod run;
 
@@ -47,10 +48,10 @@ pub struct RunArgs {
     /// Stop after this many runs (required unless --dry-run).
     #[arg(long)]
     pub max_runs: Option<u32>,
-    /// Folder holding `<skill>/eval/*.yaml` cases; defaults to this project's `.claude/skills`.
+    /// Folder holding `<skill>/eval/*.yaml` cases; defaults to the installed eval pack (`.meowkit/eval`), else this project's `.claude/skills`.
     #[arg(long)]
     pub case_root: Option<PathBuf>,
-    /// Accept a case root outside this project's `.claude/skills` (its cases run model turns).
+    /// Accept a --case-root outside this project's `.claude/skills` (its cases run model turns).
     #[arg(long)]
     pub trust_cases: bool,
     /// Only these case ids (repeatable).
