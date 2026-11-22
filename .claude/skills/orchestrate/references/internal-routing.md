@@ -80,10 +80,9 @@ assembles the task, file ownership, and acceptance-criteria fields the
 dispatch contract requires and keeps the shape consistent with every other
 in-session delegation.
 
-Independent same-stage jobs may launch together up to `concurrency`, capped at
-3 concurrent internal agents per `.claude/skills/cook/references/parallel-execution-rules.md` regardless of
-what the spec requests — a ceiling that applies only to internal dispatch, not
-to external CLI runtimes. Parallel writing jobs require disjoint ownership and
+Independent same-stage jobs may launch together up to `concurrency`, capped by
+`.claude/skills/cook/references/parallel-execution-rules.md` regardless of what
+the spec requests; the cap applies only to internal dispatch. Parallel writing jobs require disjoint ownership and
 separate worktrees, created via `mk:worktree`. The prompt pins the agent to
 its worktree, but that remains prompt-level isolation; never treat it as an OS
 sandbox.

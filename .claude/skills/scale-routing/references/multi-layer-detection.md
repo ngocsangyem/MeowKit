@@ -1,33 +1,32 @@
 # Multi-Layer Detection Reference
 
-Scale-routing v2.0 extends single-layer CSV matching with 3 additional layers.
-Each layer adds evidence. Layer 3 synthesizes all evidence into a confidence score.
+Beyond the CSV match, three more layers add evidence. Layer 3 turns it into a confidence.
 
 ## Contents
 
-- [Layer 0 — CSV Keyword Match (EXISTING)](#layer-0-csv-keyword-match-existing)
-- [Layer 1 — Task Content Analysis (NEW)](#layer-1-task-content-analysis-new)
-- [Layer 2 — Project Context Analysis (NEW)](#layer-2-project-context-analysis-new)
-- [Layer 3 — Confidence Scoring (NEW)](#layer-3-confidence-scoring-new)
+- [Layer 0 — CSV Keyword Match](#layer-0-csv-keyword-match)
+- [Layer 1 — Task Content Analysis](#layer-1-task-content-analysis)
+- [Layer 2 — Project Context Analysis](#layer-2-project-context-analysis)
+- [Layer 3 — Confidence](#layer-3-confidence)
 - [Anti-Pattern: Repo Type ≠ Task Domain](#anti-pattern-repo-type-task-domain)
 
 
 ---
 
-## Layer 0 — CSV Keyword Match (EXISTING)
+## Layer 0 — CSV Keyword Match
 
-Existing behavior — unchanged. Match task description keywords against `data/domain-complexity.csv`.
+Match task description keywords against `data/domain-complexity.csv`.
 
 - Matching is case-insensitive
 - First domain match wins for domain name
 - Multiple domain matches → use HIGHEST complexity level
 - No match → return `unknown`, fall back to manual classification
 
-**This layer is always run first. Layers 1–3 extend it — they do not replace it.**
+This layer runs first. Layers 1–3 add evidence; they do not replace it.
 
 ---
 
-## Layer 1 — Task Content Analysis (NEW)
+## Layer 1 — Task Content Analysis
 
 Analyze the actual task description beyond CSV keyword matching.
 
@@ -51,7 +50,7 @@ Analyze the actual task description beyond CSV keyword matching.
 
 ---
 
-## Layer 2 — Project Context Analysis (NEW)
+## Layer 2 — Project Context Analysis
 
 Check the actual project environment for domain signals.
 
@@ -80,34 +79,18 @@ Check the actual project environment for domain signals.
 
 ---
 
-## Layer 3 — Confidence Scoring (NEW)
+## Layer 3 — Confidence
 
-Score each detected domain from 0–100 using weighted evidence.
-
-| Evidence                              | Points |
-| ------------------------------------- | ------ |
-| CSV keyword match                     | +40    |
-| Task content mentions domain          | +30    |
-| Project has related files/directories | +20    |
-| Recent git changes in domain area     | +10    |
-
-**Confidence thresholds:**
-
-| Score | Confidence | Action                                 |
-| ----- | ---------- | -------------------------------------- |
-| ≥ 70  | HIGH       | Use domain routing — strong signal     |
-| 40–69 | MEDIUM     | Use domain routing with note in output |
-| < 40  | LOW        | Fall back to manual classification     |
+Weigh the evidence: a CSV match, the task naming the domain, related files or directories
+present, and recent git changes in the area. All four agree: HIGH, use the domain routing.
+A CSV match plus one more: MEDIUM, use it and note the uncertainty. A CSV match alone or
+less: LOW, fall back to manual classification.
 
 ---
 
 ## Anti-Pattern: Repo Type ≠ Task Domain
 
-**NEVER** classify a task based on repository type alone.
-
-A frontend task (e.g., "fix the login button styles") in a backend-heavy repository
-should route to **frontend** patterns — not backend — because the task content
-determines routing, not the repository's dominant language or structure.
-
-Evidence from task content (Layer 1) takes precedence over project structure
-signals (Layer 2) when they conflict.
+Do not classify a task on repository type alone. A frontend task (for example, "fix the login
+button styles") in a backend-heavy repository routes to frontend patterns, because the task
+content determines routing, not the repository's dominant language. Task content (Layer 1)
+outranks project structure (Layer 2) when they conflict.

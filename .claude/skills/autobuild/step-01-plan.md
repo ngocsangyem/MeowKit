@@ -1,91 +1,34 @@
-# Step 1: Plan (Product-Level)
+# Step 1: Plan
 
-Invoke `mk:plan-creator` in product-level mode (Phase 1 of the autobuild workflow plan). Produces an ambitious user-story spec at `tasks/plans/{date}-{slug}/plan.md` with no implementation details.
+**Goal:** a product-level spec the build can follow: user stories, features and design language, with no file paths, class names or schemas, because over-specified plans narrow what a capable generator can find on its own.
 
-## Instructions
+**Inputs:** `task_description`, `density`.
 
-### 1a. Mode selection by density
+## Do
 
-| density | plan-creator flag |
-|---|---|
-| `LEAN` | `--product-level` |
-| `FULL` | `--product-level` |
-| `MINIMAL` | (already short-circuited at step-00; never reaches here) |
+Delegate to the `planner` agent, which runs `mk:plan-creator` (`--product-level`; `--fast` is never needed here because `MINIMAL` already left). Ask for an ambitious spec that covers what the task needs, not a fixed feature count.
 
-### 1b. Invoke the planner
-
-Delegate to the `planner` agent. The planner runs `mk:plan-creator` internally.
+Brief:
 
 ```
-Agent(
-  agent="planner",
-  description="Product-level spec for $task_description",
-  prompt="
-    Use mk:plan-creator with --product-level mode.
-
-    Task: $task_description
-
-    Constraints:
-    - Produce 8–20 features (ambitious default)
-    - Each feature has ≥2 user stories
-    - NO file paths, NO class names, NO SQL DDL
-    - Run check-product-spec.sh at the end; must exit 0
-    - Save to tasks/plans/{date}-{slug}/plan.md
-    - Return the absolute plan path
-
-    Goal: a product spec the build steps can follow
-    Return: the absolute plan path
-    Work context: $(pwd)
-    Plan: none
-    Reports: tasks/reports/
-    Plans: tasks/plans/
-    Files to modify: tasks/plans/{date}-{slug}/
-    Acceptance criteria: check-product-spec.sh exits 0 and the absolute plan path is returned
-  "
-)
+Goal: a product spec the build steps can follow
+Task: {task_description}
+Mode: mk:plan-creator --product-level
+Constraints: no file paths, class names or SQL; save to tasks/plans/{YYMMDD}-{slug}/plan.md; `.claude/skills/plan-creator/scripts/check-product-spec.sh` must exit 0
+Work context: {project root}
+Return: the absolute plan path and a status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT)
 ```
 
-### 1c. Capture outputs
+Set `plan_dir` and `slug` from the path it returns. The planner agrees the plan with the user before returning; if the user rejected or reworked it, stop and report their feedback. Do not carry on with a plan the user did not want.
 
-The planner returns the absolute plan path. Capture:
+Run `budget-tracker.sh check`, and append a short Step 01 entry to `run.md`: plan path, whether the user agreed, feature count.
 
-```bash
-plan_dir=$(echo "$planner_output" | grep -E '^Plan:' | sed 's/Plan: //' | xargs dirname)
-slug=$(basename "$plan_dir" | sed -E 's/^[0-9]{6}(-[0-9]{4})?-//')
-```
+## Done when
 
-Persist `plan_dir` and `slug` for downstream steps.
+The plan exists at `plan_dir/plan.md`, `check-product-spec.sh` exited 0, and the user agreed it.
 
-### 1d. Check the plan landed
-
-The planner agrees the plan with the user before `mk:plan-creator` returns. If it reports the plan was rejected or reworked, halt the autobuild workflow and surface the user's feedback — do NOT proceed to step-02 on a plan the user did not want.
-
-### 1e. Append to run report
-
-```markdown
-## Step 01 — Plan
-- Mode: --product-level
-- Plan: {absolute path}
-- Slug: {slug}
-- Plan agreed with user: {yes | reworked}
-- Features: {N from check-product-spec.sh output}
-- User stories: {M}
-- Time: {duration}
-- Cost: ~${planner_cost}
-```
-
-Increment `budget_spent`. Run `budget-tracker.sh` to check threshold.
-
-## Output
-
-- `plan_dir` (absolute path) set
-- `slug` set
-- Run report updated with Step 01 section
-
-Print: `"Plan ready at {plan_dir}. {N} features. Proceeding to step-02 (contract)."`
-
-Print: `"Optional: /mk:plan-ceo-review {plan_dir}/plan.md — strategic review before implementation."`
+Optional: suggest `/mk:plan-ceo-review {plan_dir}/plan.md` for a strategic read before building.
 
 ## Next
 
-Read and follow `step-02-contract.md`.
+`step-02-contract.md`.

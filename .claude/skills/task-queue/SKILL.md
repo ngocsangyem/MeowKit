@@ -18,11 +18,11 @@ runtime: claude-code
 
 # Task Queue & Ownership Tracker
 
-Manages task assignment and file ownership during parallel execution.
+An advisory coordination convention for parallel work, not a service: `.meowkit/state/task-queue.json` is a plain file the **lead** (the session that decomposed the work, via `mk:team-config`) creates and edits. Nothing enforces it: no process serializes claims and no hook blocks a write, so it works only when the lead and the agents follow it. For one agent or sequential work you do not need it.
 
 ## Task Queue
 
-Tasks are tracked in `.meowkit/state/task-queue.json`:
+The lead writes one entry per task. This is the only ownership format in the kit; `mk:team-config` uses it too.
 
 ```json
 {
@@ -33,64 +33,33 @@ Tasks are tracked in `.meowkit/state/task-queue.json`:
       "owner": null,
       "status": "pending",
       "ownership": ["src/api/*", "src/routes/*"],
-      "blocked_by": []
-    },
-    {
-      "id": 2,
-      "description": "Implement UI components",
-      "owner": null,
-      "status": "pending",
-      "ownership": ["src/components/*", "src/pages/*"],
+      "worktree": null,
       "blocked_by": []
     }
   ]
 }
 ```
 
-## Task Lifecycle
+`ownership` globs are the files the task may write; `worktree` is set once the lead creates one for it. Status moves `pending` → `in_progress` → `completed`, or `blocked` while a `blocked_by` task is open.
 
-```
-pending → claimed (agent assigned) → in_progress → completed
-                                   → blocked (dependency not met)
-```
+## Assigning
 
-## Claiming Protocol
+1. The lead picks the lowest-ID task that is `pending` with every `blocked_by` task `completed`.
+2. The lead compares its `ownership` globs with those of the `in_progress` tasks. On overlap it restructures or sequences the tasks (see `.claude/skills/cook/references/parallel-execution-rules.md`, Rule 1) instead of assigning.
+3. With no overlap, the lead sets `owner` and `status=in_progress`.
 
-1. Agent requests next available task
-2. Queue returns lowest-ID task where: `status=pending` AND `blocked_by` all completed
-3. Agent declares ownership globs
-4. Queue checks for overlap with other in_progress tasks
-5. If overlap: REJECT claim, report conflict to orchestrator
-6. If no overlap: ASSIGN task, set `status=in_progress`, record `owner`
+Agents ask the lead for work instead of editing the file themselves: that keeps a single writer, which is the only protection against two agents taking the same task.
 
-## Ownership Enforcement
+## Ownership Check
 
-Each task declares file ownership via glob patterns.
-Before any file write, check if the file matches the agent's declared ownership.
-
-| Action | Owned File? | Result |
-|--------|------------|--------|
-| Read | Any | Always allowed |
-| Write/Edit | Owned | Allowed |
-| Write/Edit | Not owned | STOP — report ownership violation |
-| Write/Edit | Overlapping | STOP — report conflict to orchestrator |
-
-## Integration
-
-- **Orchestrator** creates the task queue when decomposing parallel work
-- **Parallel agents** claim and complete tasks
-- **Orchestrator** monitors queue for completion and triggers integration test
-- Queue is ephemeral (.meowkit/state/) — recreated per parallel execution
+Each agent writes only files that match its task's `ownership`. This is a review step, not enforcement: the lead checks the diff against the globs at integration. An agent that needs a file it does not own stops and reports to the lead.
 
 ## Team Coordination
 
-Team-mode coordination rules (file ownership, commit discipline, completion messages) live
-in `.claude/skills/team-config/references/team-coordination.md`, loaded by `mk:team-config`
-on team activation.
+Team-mode rules (commit discipline, completion messages) live in `.claude/skills/team-config/references/team-coordination.md`, loaded by `mk:team-config`.
 
 ## Gotchas
 
-- **Race condition on claims:** Two agents reading `task-queue.json` simultaneously may both claim the same task. Mitigation: orchestrator is the sole claim-serializer — agents REQUEST claims through orchestrator, never self-claim directly
-- **Ownership globs must not overlap:** `src/api/*` and `src/api/auth/*` overlap — the more specific glob must be in the SAME task, not split across agents
-- **Queue file doesn't auto-create:** Orchestrator must create `.meowkit/state/task-queue.json` before dispatching parallel agents. If missing, agents should STOP and report, not create it themselves
-- **Completed tasks are not removed:** Tasks stay in queue with `status=completed` for audit trail. Queue is cleaned up only when the parallel execution phase ends
+- **Overlapping globs:** `src/api/*` and `src/api/auth/*` overlap; keep the more specific path in the same task rather than splitting it across agents.
+- **The file is not created for you:** the lead creates it before dispatching. An agent that finds it missing stops and reports, because creating it would make a second writer.
+- **Completed tasks stay in the file** as an audit trail until the parallel run ends; the file is recreated per run.

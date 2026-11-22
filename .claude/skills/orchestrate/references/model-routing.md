@@ -5,9 +5,8 @@ decides which live runtime, model capability tier, and safety posture a job
 needs. Other orchestrate references describe evidence collection or dispatch
 mechanics and must link here instead of copying routes.
 
-Routing is resolved at execution time. Runtime availability, model catalogs,
-aliases, permission controls, and CLI flags are volatile. Never treat a model
-name, provider catalog, or previous run as current evidence.
+Routing is resolved at execution time from live evidence; see
+[runtime-matrix.md](runtime-matrix.md).
 
 Scope: CLI runtimes and the `runtime: internal` branch. Internal agents keep
 the model declared by their live agent definition; the coordinator selects an
@@ -185,13 +184,11 @@ still exists in the current session.
 ## Toolkit Tier Bridge
 
 C1/C2/C3 and R0–R3 are the job-routing axes this file owns; they are separate
-from — and layered on top of — the toolkit's own TRIVIAL/STANDARD/COMPLEX
-model-tier policy (`mk:scale-routing` plus `.claude/skills/agent-detector/references/model-selection-rules.md`).
-When a job routes to an internal agent, that agent's underlying model tier is
-decided entirely by the toolkit's existing tier policy; this file only decides
-which agent is qualified and how isolated its write must be. Do not re-derive
-TRIVIAL/STANDARD/COMPLEX here, and do not let a C-tier or R-tier assignment
-override a security escalation already forced by that policy.
+from — the toolkit's TRIVIAL/STANDARD/COMPLEX model tiers, which
+`.claude/skills/agent-detector/references/model-selection-rules.md` owns. An
+internal agent's model tier comes from that policy; this file only decides
+which agent is qualified and how isolated its write must be. A C-tier or R-tier
+assignment never overrides a security escalation forced by it.
 
 ## Fallbacks
 

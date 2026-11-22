@@ -83,28 +83,12 @@ Noise/Min-Delta semantics live in [`references/config-and-metrics.md`](reference
 
 ## Hard Stops
 
-Four human stops by asking the user. Stops sit at **boundaries only**, never per
-iteration (per-iteration approval would make this `mk:cook` with a metric).
-
-| Stop | When | Choice presented |
-| --- | --- | --- |
-| **A — Entry** | After config parse + safety screen + git checks. **No file edit before Approve.** | Approve / Edit config / Cancel |
-| **B — Cap** | Iteration cap reached | Stop / Approve N more |
-| **C — Escalation** | Stuck (consecutive discards) or plateau | Stop / Shift strategy / Approve more |
-| **D — Scope expansion** | A change needs a file outside `Scope` | Never auto-expand → Approve wider scope / Decline |
-
-Exact option sets and the full lifecycle are in
-[`references/loop-protocol.md`](references/loop-protocol.md).
+Four human stops by asking the user, at boundaries only, never per iteration
+(per-iteration approval would make this `mk:cook` with a metric): A entry (no file edit before Approve), B iteration cap, C stuck or plateau, D scope expansion (never auto-expand). Options and lifecycle: [`references/loop-protocol.md`](references/loop-protocol.md).
 
 ## Loop at a Glance
 
-```
-Stop A (approve) → baseline → [ pick one atomic change → commit → verify
-   → guard → keep if improved ≥ Min-Delta else git revert → log TSV ] × N
-   → Stop B/C/D as triggered → summary + handoff
-```
-
-Full spec: [`references/loop-protocol.md`](references/loop-protocol.md).
+One approved baseline, then bounded iterations of one atomic change, commit, verify, guard, and keep-or-revert, each logged to the TSV; stops B/C/D as triggered; then a summary. Full spec: [`references/loop-protocol.md`](references/loop-protocol.md).
 
 ## Phase Anchor
 
@@ -130,54 +114,15 @@ auto-fire from the 7-phase pipeline and calls no orchestration skill.
 
 ## Handoff
 
-`mk:loop` is a leaf executor: user-invoked, suggests downstream skills, never called by
-orchestration skills.
-
-| Direction | Skill | Relationship |
-| --- | --- | --- |
-| Upstream | `mk:plan-creator` / `mk:brainstorming` | supply the metric + scope to optimize |
-| Upstream | `mk:scout` | discover `Scope` globs |
-| Guard suggestion | `mk:verify` | a sensible regression guard for code projects (user supplies the command) |
-| Downstream | `mk:review` | structural review of kept commits |
-| Downstream | `mk:evaluate` | optional behavioral check AFTER the loop ends (not per-iteration) |
-| Downstream | `mk:ship` | PR — manual, never auto-chained |
+`mk:loop` is a leaf executor: user-invoked, never called by orchestration skills. It takes its metric and scope from `mk:plan-creator`, `mk:brainstorming` or `mk:scout`, and suggests `mk:verify` as a guard, `mk:review` on kept commits, `mk:evaluate` after the loop ends, and `mk:ship` (manual, never auto-chained).
 
 ## Stop Conditions
 
-| Condition | Threshold | Action |
-| --- | --- | --- |
-| Goal reached | metric crosses `Stop-At` | exit → summary |
-| Iteration cap | count == `Iterations` | Stop B |
-| Stuck | 5 consecutive discards | shift strategy (autonomous) |
-| Hard stuck | 8 consecutive discards | Stop C |
-| Plateau | no improving keep > `Min-Delta` over last 5 keeps | Stop C |
-| No-op | identical diff AND identical metric | skip; does not count as progress |
-| Interrupt | user stop / session change | mark `interrupted`, leave tree at last commit, summary |
-| Revert conflict | `git revert` fails | STOP + ask; never `reset --hard` |
-
-Full table with guards: [`references/loop-protocol.md`](references/loop-protocol.md).
+Goal reached, iteration cap, stuck (5 consecutive discards shifts strategy, 8 asks), plateau, no-op, interrupt, and a failed `git revert` (stop and ask; never `reset --hard`). Thresholds and actions: [`references/loop-protocol.md`](references/loop-protocol.md).
 
 ## Output
 
-On completion the loop writes to `tasks/reports/loop-{YYMMDD-HHMM}-{slug}/`:
-`loop-results.tsv`, `summary.md`, and `handoff.json`. Secrets are masked in all three.
-
-```json
-{
-  "goal": "<string>",
-  "metric": "<name+unit>",
-  "direction": "higher|lower",
-  "baseline": "<number>",
-  "final": "<number>",
-  "delta": "<signed number>",
-  "kept_commits": ["<sha>", "..."],
-  "status": "completed|capped|stuck|plateau|interrupted",
-  "suggested_next": ["mk:verify", "mk:review", "mk:ship"],
-  "report_dir": "tasks/reports/loop-<...>"
-}
-```
-
-Schema details (TSV columns, statuses, resume state): [`references/result-schema.md`](references/result-schema.md).
+On completion the loop writes `loop-results.tsv`, `summary.md` and `handoff.json` to `tasks/reports/loop-{YYMMDD-HHMM}-{slug}/`, with secrets masked. The TSV is the audit record. Field list and statuses: [`references/result-schema.md`](references/result-schema.md).
 
 ## References
 
@@ -201,7 +146,4 @@ Schema details (TSV columns, statuses, resume state): [`references/result-schema
 
 ## Lineage
 
-Loop pattern (Modify → Verify → Keep/Discard with safety guardrails) adapted from
-autoresearch by Udit Goenka (MIT). Toolkit-native re-homing: boundary-confirmed autonomy,
-conventional `*(loop):` commit policy, `tasks/reports` + `.meowkit/state` artifacts, and the
-Skill Rule of Two posture. Not a verbatim copy.
+Adapted from the autoresearch loop pattern by Udit Goenka (MIT); the stops, git policy and artifacts are the kit's own.

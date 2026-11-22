@@ -65,19 +65,22 @@ phases:
   - id: 5
     name: Ship
     lead: mk:ship
-    transition: auto
+    transition: explicit
     required_outputs: []
+    note: Starts only on an explicit user ship request; a PASS verdict is not a request.
 
   - id: 6
     name: Reflect
-    # Canonical lead list is the union across all lifecycle prose files:
-    # analyst + documenter + mk:memory (each mandatory; all three must run).
+    # Canonical lead list is the union across all lifecycle prose files.
+    # Spawn each only when the run needs it; plan sync and docs impact are
+    # always stated.
     leads:
       - analyst
       - documenter
       - mk:memory
-    transition: auto
+    transition: explicit
     required_outputs: []
+    note: Starts on an explicit close request, after shipping or instead of it.
 
 
 # autobuild sprint-contract substep (autobuild-only; not part of the 7 lifecycle phases).

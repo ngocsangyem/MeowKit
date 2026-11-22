@@ -5,8 +5,6 @@ triggers:
   - handoff
   - save state
   - resume workflow
-  - workflow:handoff
-  - workflow:resume
 allowed-tools: Read, Write, Bash
 source: aura-frog
 keywords:
@@ -23,49 +21,36 @@ status: active
 runtime: claude-code
 ---
 
-<!-- Split for progressive disclosure (checklist #11, #14): 427 → ~60 lines -->
-
 # Session Continuation
 
-Manage workflow state across sessions with handoff and resume.
+Carries unfinished work across a context reset. Use it when the runtime reports the context
+nearing its limit, or the user says handoff, save, pause or resume. Not for lessons worth
+keeping (that is `mk:memory`).
 
-## When to Use
+Durable state already lives in the plan files and the `mewkit` records; this skill keeps
+those current and reads them back. It adds no state file of its own.
 
-- Runtime reports that the session is approaching its context-warning threshold
-- User says "handoff", "save", "pause"
-- User says "resume" + workflow ID
-- Session ending with incomplete workflow
-- Incomplete workflow from previous session
+## Save (handoff)
 
-## Plan State
+1. Tick the plan checkboxes for work that is actually done, then run
+   `mewkit plan sync <plan-dir>` so the derived statuses match.
+2. If an active durable task exists (`mewkit task-state show`), record where you are:
+   `mewkit task-state update <id> --step "<what just finished>" --next "<next action>"`,
+   adding `--blocker` for anything stuck.
+3. Tell the user what was saved and the one-line next step.
 
-Saved workflow state lives in `.meowkit/logs/workflows/`; the active plan is resolved
-from `.meowkit/state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
-between sessions in the environment.
+Done when `mewkit orient` returns the next step you recorded.
 
-## Process
+## Resume
 
-1. **Detect trigger** — token limit, user command, or session ending
-2. **If handoff** — load `references/handoff-flow.md`, execute save + summary
-3. **If resume** — load `references/resume-and-state.md`, execute load + restore + continue
-4. **If list** — show all saved workflows from `.meowkit/logs/workflows/`
-
-## References
-
-| Reference | When to load | Content |
-|-----------|-------------|---------|
-| **[handoff-flow.md](./references/handoff-flow.md)** | On handoff/save trigger | State save format, summary generation |
-| **[resume-and-state.md](./references/resume-and-state.md)** | On resume trigger | Resume steps, state management, error handling, TOON format |
-
-## Quick Commands
-
-```
-workflow:handoff           → Save state + get resume instructions
-workflow:resume AUTH-123   → Load state + continue from last phase
-workflow:list              → Show all saved workflows
-```
+Run `mewkit orient`, then read the plan it points to (`mewkit plan status <plan-dir>`).
+Treat the output as a lead, not a fact: check it against the live files and git before
+acting. If a recorded path no longer exists, say so and re-plan that step rather than
+guessing.
 
 ## Gotchas
 
-- **Stale handoff after codebase changes**: Saved state references files that were renamed or deleted → Validate all file paths in handoff state before resuming
-- **TOON corruption on concurrent sessions**: Two agents writing state simultaneously → Use file locking or session-scoped state files
+- Saved state can name files that were renamed or deleted since: validate every path before resuming.
+- Several active plans: ask which to resume; do not pick one.
+- No `mewkit` on the PATH: update the plan checkboxes and write the next step into the plan, and say the resume will be manual.
+- The runtime's checkpoint hook writes its own snapshots; do not hand-edit them.

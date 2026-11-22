@@ -1,7 +1,7 @@
 # Delivery Status — {{plan_title}}
 
 **Plan:** `{{plan_dir}}`
-**Generated:** {{YYYY-MM-DD HH:MM Asia/Saigon}}
+**Generated:** {{local time, ISO: YYYY-MM-DDTHH:MM}}
 **By:** project-manager agent
 **Headline:** {{N}} of {{M}} tasks done, {{K}} blocked — {{on-track | at-risk | slipping}}
 

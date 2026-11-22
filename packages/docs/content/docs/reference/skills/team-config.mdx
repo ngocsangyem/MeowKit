@@ -25,7 +25,7 @@ To create or clean up a single git worktree, use `mk:worktree`. Team Config call
 ## Setup
 
 1. Parse the agreed plan for independent subtasks.
-2. Generate an ownership map that gives each agent a set of file globs (`templates/ownership-map-template.md`).
+2. Write the ownership map as task entries with file globs, in the format `mk:task-queue` owns.
 3. Check that no two ownerships overlap.
 4. Create one git worktree per agent through `mk:worktree`.
 5. Create `.meowkit/state/task-queue.json` through `mk:task-queue`.

@@ -36,10 +36,12 @@ mk:status <plan-slug>
 
 1. Resolve the plan. A path is used directly and a slug is matched with `ls -d tasks/plans/*{slug}*`. A slug with no match prints `Plan not found: {arg}` and stops.
 2. With no argument, the skill takes plans in `tasks/plans/*/plan.md` whose `status` is not `completed`, `cancelled` or `archived`. None prints `No active plan` and writes nothing. One is used. With several, it asks which plan to report on and never picks the most recent silently.
-3. Delegate to `project-manager` in the foreground, with the template `assets/pm-status-template.md`. It creates `status-reports/` if needed.
+3. Delegate to `project-manager` in the foreground, with the template `assets/pm-status-template.md`, taking task counts from `mewkit plan status <plan-dir>`. It creates `status-reports/` if needed.
 4. Print the absolute path of the report and its headline, for example `4 of 7 tasks done, 2 blocked, at-risk`.
 
-## Notes
+## Gotchas
+
+- With two or more active plans the skill asks which one; an unrelated plan's report reads as this plan's status.
 
 - The report name carries the date, so a same-day rerun overwrites and earlier days accumulate in the plan's `status-reports/` folder.
 - Reports travel with the plan when it is archived.

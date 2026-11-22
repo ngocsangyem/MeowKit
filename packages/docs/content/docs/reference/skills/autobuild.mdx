@@ -29,7 +29,6 @@ description: "Builds a green-field product unattended through a plan, contract, 
 /mk:autobuild build a kanban board with drag-and-drop
 /mk:autobuild build a todo app --tier full
 /mk:autobuild build a markdown editor --budget 25 --max-iter 2
-/mk:autobuild --resume 260501-1450-build-kanban
 /mk:autobuild "build payment system" --tdd
 /mk:autobuild build a kanban board --advice
 ```
@@ -41,7 +40,6 @@ description: "Builds a green-field product unattended through a plan, contract, 
 | `--budget USD` | Spend cap. The run stops at this value |
 | `--tdd` | Writes `.meowkit/state/tdd-mode`. The developer waits on the tester before each generator iteration |
 | `--advice` | Strategic supervision by the [athena](/reference/agents/athena) agent, off by default |
-| `--resume {run-id}` | Continue an interrupted run from the last completed step |
 
 ## Steps
 
@@ -50,7 +48,7 @@ description: "Builds a green-field product unattended through a plan, contract, 
 | 0 Tier detection | `mk:scale-routing` picks MINIMAL, FULL or LEAN |
 | 1 Plan | `mk:plan-creator --product-level`, written as user stories rather than file paths |
 | 2 Contract | `mk:sprint-contract`: required for FULL, optional for LEAN, skipped for MINIMAL |
-| 3 Generate | A developer subagent works in four sub-phases: Understand, Design, Implement, Verify |
+| 3 Generate | A developer subagent builds to the contract and hands off |
 | 4 Evaluate | `mk:evaluate` drives the running build against rubrics |
 | 5 Iterate or ship | PASS goes to the shipper. FAIL loops back to step 3 up to `--max-iter` rounds, then escalates to you |
 | 6 Run report | Appends the audit trail |
@@ -69,7 +67,7 @@ Density never skips the review of the diff or the verdict before shipping. The f
 
 | Limit | Value |
 |---|---|
-| Budget | Warns at $30 spent, asks for approval at $100, stops at `--budget` |
+| Budget | `scripts/budget-tracker.sh` warns, then blocks, then honours your `--budget` cap; thresholds come from `.meowkit/config.yaml` |
 | Wall clock | 6 hours, with a checkpoint at every step |
 | Iterations | 3 rounds by default, then escalates |
 
@@ -88,7 +86,7 @@ At macro checkpoints the athena agent gives direction at the plan and contract b
 | Sprint contract | `tasks/contracts/{date}-{slug}-sprint-N.md` |
 | Evaluator verdict | `tasks/reviews/{slug}-evalverdict.md` |
 
-The run report holds the density decision, per-step artifacts, the budget trail and the final status: PASS, WARN, FAIL, ESCALATED or TIMED_OUT. It is append-only.
+The run report holds the density decision, per-step artifacts, the budget trail and the final status: PASS, WARN, FAIL, ESCALATED or TIMED_OUT. It is append-only, and a killed run restarts from its `next_step`.
 
 ## Gotchas
 

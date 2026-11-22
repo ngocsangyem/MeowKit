@@ -1,6 +1,6 @@
 # Task Type Classification Reference
 
-Scale-routing v2.0 classifies incoming work into 8 actionable task types.
+Scale-routing classifies incoming work into 8 actionable task types.
 This enables suggesting the right skill — not just the right model tier.
 
 ---
@@ -16,7 +16,7 @@ This enables suggesting the right skill — not just the right model tier.
 | **DevOps** | "deploy", "CI/CD", "pipeline", "docker", "kubernetes" | `mk:cook` | Infrastructure as code follows standard flow |
 | **Documentation** | "docs", "README", "changelog", "API docs" | `mk:docs-init` or `mk:document-release` | MICRO-TASK eligible — may skip the plan file |
 | **Review** | "review", "PR", "pull request", "check" | `mk:review` | Adversarial 4-step review workflow |
-| **Intake** | "PRD", "ticket", "issue", "analyze ticket", "triage" | `mk:intake` | Phase 2 — not yet available in v1.x |
+| **Intake** | "PRD", "ticket", "issue", "analyze ticket", "triage" | `mk:intake` | Scores a raw ticket or PRD for completeness |
 
 ---
 
@@ -33,9 +33,9 @@ When multiple task types match, use this priority order:
 
 ## Confidence Interaction
 
-Task type classification feeds into Layer 3 confidence scoring:
+Task type classification feeds into the Layer 3 confidence:
 
-- Task type matches a domain keyword from CSV → +10 points (reinforcing signal)
+- Task type matches a domain keyword from the CSV: a reinforcing signal
 - Task type contradicts domain (e.g., task_type=docs but domain=fintech) → note in output, use domain level
 
 ---

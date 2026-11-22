@@ -32,17 +32,9 @@ The `domain-complexity.csv` file is user-editable. Teams should add rows for the
 
 WHY: User-editable rows keep routing relevant to project-specific domains.
 
-## Rule 6: Adaptive Density Emission (Phase 5 — 260408)
+## Rule 6: Autobuild Density Is Owned by Autobuild
 
-When `mk:scale-routing` returns a tier classification, it ALSO emits a `autobuild_density` field (`MINIMAL | FULL | LEAN`) for `mk:autobuild` consumers.
-
-**Single source of truth:** the full decision matrix lives at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
-
-WHY: Dead-weight thesis — over-scaffolding degrades capable models.
-
-Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
-
-GUARD: Density choice changes scaffolding amount, not the work. The plan, the review verdict, and the active-verification requirement on evaluator verdicts all still apply regardless of density mode.
+`mk:scale-routing` does not emit a density. `mk:autobuild` chooses its scaffolding density from the detected model; see `.claude/skills/autobuild/references/adaptive-density-matrix.md`. Density changes the amount of scaffolding, not the work: the plan, the review verdict and the evaluator's active-verification requirement apply in every mode.
 
 ## Rule 7: Auto-Strict for High-Complexity Cook Runs
 

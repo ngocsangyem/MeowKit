@@ -1,9 +1,8 @@
 # Skill Domain Routing
 
-> Loaded once per session by `mk:agent-detector` at Step 0b (sentinel-cached — read
-> on turn 1, suppressed on turns 2..N of the same session). This table is skill
-> dispatch only; it is NOT needed for agent/model-tier assignment, so it lives here
-> rather than in always-loaded `references/agent-routing.md`.
+> Read by `mk:agent-detector` when it hands a task to a skill. This table is skill
+> dispatch only; it is not needed to assign an agent or model tier, so it lives here
+> rather than in `references/agent-routing.md`.
 
 The orchestrator routes by skill names:
 

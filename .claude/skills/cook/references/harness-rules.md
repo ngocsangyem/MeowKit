@@ -21,13 +21,15 @@ The generator (developer agent) and evaluator (evaluator agent) are distinct sub
 
 Flow: generator → handoff → evaluator fresh context → graded verdict with evidence → ship/loop.
 
-## Rule 3: Sprint Contract Required in FULL Density; Optional in LEAN; Skipped in MINIMAL
+## Rule 3: Sprint Contract by Density
 
 Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-density-matrix.md`):
 
-- `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
-- `FULL` (Sonnet, Opus 4.5) — write and sign the contract before any source-code edit; no hook checks it, so the discipline is the harness's own
-- `LEAN` (Opus 4.6 and later, Fable) — contract OPTIONAL; skip if estimated ACs < 5
+- `MINIMAL` — contract skipped (harness short-circuits to `mk:cook`)
+- `FULL` — write and sign the contract before any source-code edit; no hook checks it, so the discipline is the harness's own
+- `LEAN` — contract optional; skip when few criteria are needed
+
+Which model gets which density is the matrix's decision, not this file's.
 
 **WHY:** Contracts prevent silent substitution on intermediate tiers but add dead weight on trivial/capable tiers.
 
@@ -45,30 +47,20 @@ The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:sca
 
 **Override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
 
-## Rule 6: Budget Thresholds — Warn at $30, Approve at $100, Hard Block at User Cap
+## Rule 6: Budget Thresholds
 
-The harness budget tracker (`.claude/skills/autobuild/scripts/budget-tracker.sh`) enforces three thresholds:
+`.claude/skills/autobuild/scripts/budget-tracker.sh` enforces them and `.meowkit/config.yaml` (`budget.warn`, `budget.block`, `budget.cap`) holds the values: a warning, then a hard block that halts the run with `final_status=TIMED_OUT`, and an optional user cap (`budget.cap` or `--budget`) that overrides the block. Read the script rather than restating its numbers.
 
-- **$30 warn** — print warning, continue
-- **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
-- **User cap** (`budget.cap` in `.meowkit/config.yaml`, or the `--budget` flag) — overrides hard block, can be lower OR higher
+**WHY:** multi-hour runs can spend quickly; thresholds catch a runaway.
 
-**WHY:** Multi-hour runs can spend quickly; thresholds catch runaway and intentional high-budget runs.
+## Rule 7: Re-check the Scaffolding When the Model Changes
 
-## Rule 7: Dead-Weight Audit Mandatory on Model Upgrade
+Every harness component encodes an assumption about what the model cannot do. After a model upgrade, check that each component is still load-bearing; `mk:benchmark` and its dead-weight audit rules are the maintainers' procedure for it. `post-session.cjs` flags a change only when `MEOWKIT_MODEL_HINT` is set, because the host does not export the model id to hooks.
 
-Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships, the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in the dead-weight audit rules the maintainers keep in the kit's source repository (an installed kit does not carry them, and the audit is a maintainer procedure).
-
-**WHY:** Model upgrades can turn useful scaffolding into dead weight.
-
-**Detection:** `post-session.cjs` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
-
-Use the audit playbook with measured baselines after model upgrades.
+**WHY:** model upgrades can turn useful scaffolding into dead weight.
 
 ## Rule 8: Active Verification Is Required of the Evaluator
 
-<!-- The evaluator runs at autobuild Step 4 (the evaluator stage). "Phase 3" was a former -->
-<!-- autobuild-internal label — Step 4 is the correct identifier in the current pipeline. -->
 The evaluator (autobuild Step 4 — evaluator stage) MUST drive the running build via active verification — browser navigation, curl, CLI invocation. Static-analysis-only verdicts are forbidden. `validate-verdict.sh` rejects PASS verdicts with empty `evidence/` directories and converts them to FAIL.
 
 **WHY:** Static checks miss real runtime failures; evaluator evidence must exercise the artifact.
@@ -81,9 +73,6 @@ The evaluator MUST re-anchor its skeptic persona (`.claude/skills/evaluate/promp
 
 ## Rule 10: No Density Override Lowers the Quality Bar
 
-<!-- The contract stage is the autobuild sprint-contract stage (Step 2 of the pipeline). -->
-<!-- "Phase 4" was a former autobuild-internal label — use "contract stage" to avoid -->
-<!-- clashing with lifecycle Phase 4 (Review). -->
 `MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, not the work. The plan, the review verdict, the autobuild contract stage (Step 2) and the evaluator's active verification still apply regardless of density mode.
 
 **WHY:** Density changes scaffolding amount, not the quality bar.

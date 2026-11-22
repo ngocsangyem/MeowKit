@@ -711,11 +711,6 @@
       "size": 8576
     },
     {
-      "path": ".cursor/skills/mk-agent-detector/references/after-detection.md",
-      "sha256": "bc45a530211869897b67413f519c940bdff8e149d9d56c75ba156092e38cc442",
-      "size": 2358
-    },
-    {
       "path": ".cursor/skills/mk-agent-detector/references/agent-routing.md",
       "sha256": "5e0534e02075a3fab24ad3a7a40335cde359d8036c5150d953a34bc088cf030d",
       "size": 3854
@@ -736,24 +731,9 @@
       "size": 2311
     },
     {
-      "path": ".cursor/skills/mk-agent-detector/references/complexity-detection.md",
-      "sha256": "a1ad49dc8d89846d7a8f858d5c07fcfce5e91fcfed72286aecd3567dd5b1c609",
-      "size": 1221
-    },
-    {
       "path": ".cursor/skills/mk-agent-detector/references/context-budget-rules.md",
       "sha256": "b912e9fe0b87d154a8ad22047abf38bcdb774ffe1d32f14056928b1a01296ac2",
       "size": 3991
-    },
-    {
-      "path": ".cursor/skills/mk-agent-detector/references/detection-process.md",
-      "sha256": "e6d4525cb545651124b1c511901e0c26556ecbb9f42c13b85dec3f30a412c60c",
-      "size": 4412
-    },
-    {
-      "path": ".cursor/skills/mk-agent-detector/references/examples.md",
-      "sha256": "024d7aa4bbc1f6cec972aace88cfa1b8025f6da5cd9574963ce88aab9d0cab3a",
-      "size": 3621
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/lifecycle-routing.md",
@@ -766,16 +746,6 @@
       "size": 6075
     },
     {
-      "path": ".cursor/skills/mk-agent-detector/references/model-selection.md",
-      "sha256": "5bab06ca60608b4124eb1db15d00ca61518faaa3844bdc68225728c2aabbf3f0",
-      "size": 2731
-    },
-    {
-      "path": ".cursor/skills/mk-agent-detector/references/multi-layer-detection.md",
-      "sha256": "75cdc7fc30fbe5ac806b3cb381879d803b68a38e1feae27981599a3574bcfc5b",
-      "size": 4436
-    },
-    {
       "path": ".cursor/skills/mk-agent-detector/references/risk-checklist.md",
       "sha256": "be5045092bd224853948f71d7f82b00442955eddc94d83ef942e6b40f72559a7",
       "size": 3982
@@ -786,24 +756,9 @@
       "size": 3003
     },
     {
-      "path": ".cursor/skills/mk-agent-detector/references/scoring-and-thresholds.md",
-      "sha256": "4a266b7891d5ed3fb48e1af7daeddf39529210a0f59a749e8ca6c01dfe0ceb4e",
-      "size": 1502
-    },
-    {
       "path": ".cursor/skills/mk-agent-detector/references/skill-domain-routing.md",
       "sha256": "f26041075acb8ce95d697087a5bf564ed0737ca1652fb94fb4786ad78c41fae6",
       "size": 3610
-    },
-    {
-      "path": ".cursor/skills/mk-agent-detector/references/team-mode.md",
-      "sha256": "c4ec172de0e4e3daf1288712809c4d24fd069d888062889cc4a0a390c1845de9",
-      "size": 2805
-    },
-    {
-      "path": ".cursor/skills/mk-agent-detector/references/token-budget-levels.md",
-      "sha256": "e5099c18a6ec2a155b71010a0459c16f57c3ebba8580979062e3d6a3c68bb398",
-      "size": 2705
     },
     {
       "path": ".cursor/skills/mk-angular/SKILL.md",
@@ -1642,11 +1597,6 @@
       "path": ".cursor/skills/mk-development/references/code-patterns.md",
       "sha256": "22656eb28704adae61c13256512790d27723a66e738620793b631f58b3b7a62f",
       "size": 5423
-    },
-    {
-      "path": ".cursor/skills/mk-development/references/skill-loader.md",
-      "sha256": "746d130a27818dc7bcf5a0ebd1a940014e3397d87bcbfb15c9e796f2f9cda3a1",
-      "size": 3350
     },
     {
       "path": ".cursor/skills/mk-development/references/tdd-enforcement.md",
@@ -4565,16 +4515,6 @@
       "size": 2140
     },
     {
-      "path": ".cursor/skills/mk-session-continuation/references/handoff-flow.md",
-      "sha256": "f29b0927758488d755acd74b5bc207d31ce13aeef7480727452331ac051cd48d",
-      "size": 1423
-    },
-    {
-      "path": ".cursor/skills/mk-session-continuation/references/resume-and-state.md",
-      "sha256": "381e85181a49faeb1563b5b2f366c38c63730e0a755d806d04771fadbfcaef02",
-      "size": 2032
-    },
-    {
       "path": ".cursor/skills/mk-ship/SKILL.md",
       "sha256": "857976821d69dd11d8bd459d5d8c63ce36537c52ab8b6b1cfe5202db7dce1974",
       "size": 11271
@@ -4913,11 +4853,6 @@
       "path": ".cursor/skills/mk-team-config/references/team-coordination.md",
       "sha256": "38ca3580fc8c3e9d28c061dbaa1a5fa688568a0f68764dce512140434379715c",
       "size": 858
-    },
-    {
-      "path": ".cursor/skills/mk-team-config/templates/ownership-map-template.md",
-      "sha256": "48ba87f56025ef0db0bc4d262645b57ced493ccfbc2fb29a88e4ee7039170054",
-      "size": 837
     },
     {
       "path": ".cursor/skills/mk-tech-graph/SKILL.md",

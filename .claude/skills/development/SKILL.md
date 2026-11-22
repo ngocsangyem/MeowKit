@@ -15,31 +15,20 @@ status: active
 runtime: claude-code
 ---
 
-# Development Toolkit
+# Development
 
-Reference guides for implementation: code patterns, TDD enforcement (opt-in), and skill lazy-loading.
+Write feature code in the supported stacks (NestJS, Vue 3, Swift) to the project's conventions, without running a plan-driven pipeline. Use it for coding outside a pipeline, or when the `developer` agent needs the stack patterns. For a plan-driven build with review and verification use `mk:cook`.
 
-## When to Use
+Done means the code compiles or type-checks, the project's existing tests pass, and nothing outside the task changed.
 
-- During Phase 3 (Build) for implementation guidance
-- When the `developer` agent needs coding pattern references
-- For TDD enforcement rules during red/green/refactor cycle (TDD mode only)
+| Open | When |
+| --- | --- |
+| `references/code-patterns.md` | writing or reviewing NestJS, Vue or Swift code |
+| `references/tdd-enforcement.md` | you want test-first work; it points to the opt-in rules in `mk:cook` |
 
-## Workflow Integration
-
-Operates in **Phase 2 (Test)** and **Phase 3 (Build)**. Output supports the `developer` and `tester` agents.
-
-TDD enforcement (`tdd-enforcement.md` reference) is OPT-IN as of the TDD-optional migration. Default mode skips RED-phase enforcement; enable with `--tdd` or `MEOWKIT_TDD=1`.
-
-## References
-
-| Reference | When to load | Content |
-|-----------|-------------|---------|
-| **[code-patterns.md](./references/code-patterns.md)** | During implementation | Coding patterns, architecture patterns, file organization |
-| **[tdd-enforcement.md](./references/tdd-enforcement.md)** | Phase 2-3 | RED/GREEN/REFACTOR cycle, test-first rules, coverage requirements |
-| **[skill-loader.md](./references/skill-loader.md)** | Skill activation | How to load skills on-demand, lazy loading patterns |
+TDD is opt-in (`--tdd` or `MEOWKIT_TDD=1`); without it, write tests the way the project already does.
 
 ## Gotchas
 
-- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Default mode (TDD off) is now the right choice for prototypes; opt into `--tdd` only when shipping production-quality work
-- **200-line file rule on generated code**: Auto-generated files (migrations, schemas) exceed limit by design → Exempt generated files explicitly in plan constraints
+- **Strict TDD slows prototyping.** Leave TDD off for exploratory work and turn it on for production-quality changes.
+- **The 200-line file guideline and generated code.** Migrations and schemas exceed it by design; exempt generated files explicitly in the plan constraints.

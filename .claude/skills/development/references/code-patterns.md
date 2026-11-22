@@ -29,6 +29,8 @@ Reference this skill when writing new code or reviewing existing code in any of 
 
 ## NestJS Patterns
 
+Why these: a fixed module, controller, service and DTO split keeps each layer testable on its own and gives guards and pipes one place to run.
+
 ### Pattern: Module/Controller/Service/DTO
 
 **When to use:** Every new feature or domain entity.
@@ -83,11 +85,13 @@ export class CreateFeatureDto {
 }
 ```
 
-**Anti-pattern:** Using raw `any` types or unvalidated objects as input.
+**Anti-pattern:** Unvalidated objects as input.
 
 ---
 
 ## Vue 3 Patterns
+
+Why these: script-setup components, Pinia stores and composables keep state and logic out of templates, so they can be reused and tested without mounting a component.
 
 ### Pattern: Composition API with Script Setup
 
@@ -136,6 +140,8 @@ export function useDebounce<T>(value: Ref<T>, delay: number): Ref<T> {
 
 ## Swift Patterns
 
+Why these: view models and protocol dependencies keep UI code free of I/O, which is what makes it testable without a device.
+
 ### Pattern: MVVM Architecture
 
 **When to use:** Every screen/view in the app.
@@ -180,7 +186,6 @@ protocol FeatureServiceProtocol {
 
 ## General Rules (All Stacks)
 
-- No `any` types. Ever. Use `unknown` if the type is truly unknown, then narrow.
 - Public API functions must have explicit return types.
 - No magic strings — use enums or constants.
 - Prefer immutability — use `const`, `let`, `readonly` where possible.

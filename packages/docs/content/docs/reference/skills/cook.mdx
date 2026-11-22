@@ -47,7 +47,7 @@ description: "Implements one feature, fix, refactor or existing plan through the
 | `--strict` | Full evaluator pass after review. An evaluator FAIL routes back to Phase 3. Supersedes `--verify`. Scale-routing can trigger it, and `--no-strict` suppresses that |
 | `--advice` | Supervision by the [athena](/reference/agents/athena) agent, up to 5 calls, approves nothing |
 
-A path to `plan.md` or `phase-*.md` runs in code mode. The words "fast" or "quick", "trust me" or "auto", "3 or more features" or "parallel", and "no test" pick the matching mode. Profiles are `quick`, `standard`, `release` (standard plus an explicit `mk:ship` request) and `high-assurance` (`--tdd --strict`). A quick run skips research and creates no report or ship action. It skips the plan only when the change is two files or fewer and about 30 minutes or less; a larger change keeps its plan. It moves to the standard profile if a risk flag or changed contract appears.
+A path to `plan.md` or `phase-*.md` runs in code mode. The words "fast" or "quick", "trust me" or "auto", "3 or more features" or "parallel", and "no test" pick the matching mode. Profiles are `quick`, `standard`, `release` (standard plus an explicit `mk:ship` request) and `high-assurance` (`--tdd --strict`). `quick` and `--fast` are one profile: research is skipped and the scout summary is short. A change of two files or fewer and about 30 minutes or less needs no plan and no reviewer; a larger change keeps its plan, `mk:verify` and its review verdict. A risk flag or changed contract moves the run to the standard profile.
 
 | Mode | Research | Tests |
 |---|---|---|
@@ -70,10 +70,10 @@ Without `--tdd`, Phase 2 is optional and the developer may implement directly fr
 | 3 Build | `developer` | `mk:investigate` after 3 failed self-heal attempts |
 | 3.5 Simplify | `developer` via `mk:simplify` | Mandatory after Build |
 | 3.6 Verify | `mk:verify` | Mandatory. A failure goes back to the developer before review |
-| 4 Review | `reviewer` via `mk:review` | Writes the review verdict in every mode |
+| 4 Review | `reviewer` via `mk:review` | Writes the review verdict for every non-trivial change |
 | 4.5 Verify | `agent-browser` or `evaluator` via `mk:evaluate` | Only with `--verify` or `--strict` |
 | 5 Ship | `shipper` via `mk:ship` | Only on an explicit ship request |
-| 6 Reflect | `analyst`, `documenter`, `mk:memory` | A memory entry only for a lesson that cannot be derived from the code |
+| 6 Reflect | `mewkit plan sync`, then `analyst`, `documenter` and `mk:memory` only when the run needs them | A memory entry only for a lesson that cannot be derived from the code |
 
 Write the plan and agree it with you before implementation code. Skipping the plan is reasonable only if you say "just code it" and Phase 0 found no risk flags, and the run summary notes it. No hook enforces any of this. The only enforced ship-time control is the ship check (see [Enforcement and security](/core-concepts/enforcement)).
 
@@ -86,14 +86,14 @@ When the reviewer reports a regression in existing behaviour (`Side Effects Dete
 | Plan | `tasks/plans/YYMMDD-name/` |
 | Review verdict | `tasks/reviews/` |
 | Workflow evidence index | `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`, a record of what happened with no score |
-| Status report | `{plan-dir}/status-reports/{YYMMDD}-status.md`, written in the background by `project-manager` after a PASS verdict. Off with `MEOWKIT_PM_AUTO=off` |
+| Status report | `{plan-dir}/status-reports/{YYMMDD}-status.md`, written in the background by `project-manager` after a PASS verdict on a multi-phase plan. Off with `MEOWKIT_PM_AUTO=off` |
 
 At each phase transition cook ticks the phase-file checkboxes and updates the plan's Agent State, so a fresh session can resume at the right phase.
 
 ## Gotchas
 
 - `--auto` can hide a bad review. Read the verdict and the evidence index before shipping.
-- Run `mk:simplify` between Phase 3 and Phase 4 every time.
+- Run `mk:simplify` between Phase 3 and Phase 4.
 - Do not skip the plan on a "simple" feature. Cancel it if the work really is trivial.
 - A code-mode run on a plan older than 14 days should start with a warning.
 - Fast mode produces plan-level tests with lower coverage.

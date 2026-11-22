@@ -47,163 +47,71 @@ context_cost: high
 
 <!-- Lifecycle canonical source: .claude/skills/workflow-orchestrator/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
-# mk:autobuild — Autonomous Multi-Hour Build Orchestration
+# mk:autobuild
 
-> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+> Script paths in this skill's other files are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with it before running; do not run them from the project root.
 
-Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (planner stage → contract stage → evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
-<!-- Note: autobuild pipeline stages are numbered Step 0–6 (see Workflow section below). -->
-<!-- "Stage" is used to name pipeline roles to avoid clashing with the 7 lifecycle phases. -->
+Build a green-field product from a spec, unattended: plan at product level, agree a sprint contract, generate, have an independent evaluator drive the running build, iterate within a cap, and leave an audit trail. The amount of scaffolding adapts to the model (density below).
 
-## When to Use
+Use it for "build me an app" scope, a multi-hour run with no hand-holding. Do not use it for a single feature, bug fix or refactor (`mk:cook`), a doc update, or "explain X" and "review Y".
 
-Activate when:
-- User runs `/mk:autobuild "build a X"` (or any green-field product description)
-- Existing kit detection routes a green-field "build me an app" intent here instead of `mk:cook`
-- A multi-hour autonomous build is requested with no manual handholding
+It coexists with `mk:cook`: both plan with the user first and review the result before shipping.
 
-Skip when:
-- The task is a single feature, bug fix, or refactor → use `/mk:cook` instead
-- The task is a doc update → use the existing doc skills
-- The request is "explain X" or "review Y" → use the appropriate single-shot skill
+## Constraints
 
-## Hard Constraints
-
-1. **Adaptive density** — picks scaffolding density via `mk:scale-routing` (or `density-select.sh`); honors `MEOWKIT_AUTOBUILD_MODE` env override
-2. **Budget caps** — warns at $30 spent, requires explicit approval at $100, hard-blocks at user-set `--budget` value
-3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs <!-- research-citation -->; checkpoints every step for resumability
-4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
-5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
-6. **Coexists with `mk:cook`** — does not replace it; both plan with the user first and review the diff before shipping
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED phase. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. The evaluator's active-verification requirement (Rule 8 of `.claude/skills/cook/references/harness-rules.md`) is independent of TDD mode and always applies.
+1. **Density adapts to the model.** the density matrix (`references/adaptive-density-matrix.md`) owns the table and the override order; `scripts/density-select.sh` implements it. An unknown model gets FULL. `MEOWKIT_AUTOBUILD_MODE` overrides detection.
+2. **Budget.** `scripts/budget-tracker.sh` warns, then blocks, then honours a user cap (`--budget`); its thresholds come from `.meowkit/config.yaml`. When it says block, the run halts even mid-iteration, because a runaway build costs more than an unfinished one.
+3. **Wall-clock stop at 6 hours.** Past that, long runs drift; write the report and ask the user. Each step ends with a commit so a run can restart from where it stopped.
+4. **Iteration cap of 3 rounds** between generator and evaluator (`--max-iter`). A build that has not converged by then needs a person.
+5. **Every run writes a report** at `tasks/autobuild-runs/YYMMDD-HHMM-{slug}/run.md`, including failed, timed-out and escalated runs.
+6. **The generator is not the evaluator.** They are separate subagents with separate contexts, and the evaluator must drive the running build (browser, curl or CLI), because a static read passes builds that do not run.
+7. **TDD is opt-in** (`--tdd`), as in `mk:cook`: the `.meowkit/state/tdd-mode` sentinel is written and the developer waits on the tester each iteration. Active verification applies either way.
 
 ## `--advice` (composable, off by default)
 
-Opt-in strategic supervision for one run. At named macro checkpoints — GUIDE at the
-Plan/Contract boundary, RESCUE on a plateau or scope drift, REVIEW after the terminal
-evaluator verdict and before the ship question, RECHECK after a correction; hard cap
-5 per run — the `athena` agent assesses the situation, recommends an operational path
-inside the locked scope, and may return the work for correction.
+Opt-in supervision by the `athena` agent at macro checkpoints only (GUIDE at the Plan/Contract boundary, RESCUE on a plateau or scope drift, REVIEW after the terminal verdict and before the ship question, RECHECK after a correction; cap 5 per run). It never approves: the ship decision stays the user's, the evaluator keeps its verdict, and supervision counts as no verification. Without the flag there are zero calls. Checkpoints: `references/advice-checkpoints.md`; contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only with the flag).
 
-It never approves. The ship decision at step-05 §5c stays the user's, the evaluator keeps
-its verdict and its active-verification requirement, the iteration cap and budget thresholds
-keep their own schedules, and supervision counts as no verification. Checkpoints are macro
-boundaries — never per generated artifact and never per evaluator iteration, so a
-five-round build makes no more calls than a one-round build.
+## Steps
 
-Without the flag there are zero calls and no state is written.
-
-Checkpoints: `references/advice-checkpoints.md`. Contract:
-`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
-
-## Workflow
-
-Execute via `workflow.md`. Step-file architecture — load one step at a time.
+Read `workflow.md`, then one step file at a time. Each step file gives its goal, inputs, done check and the brief for its subagent.
 
 ```
-Step 0: Tier Detection      → call mk:scale-routing; pick density (MINIMAL|FULL|LEAN)
-Step 1: Plan                → invoke mk:plan-creator --product-level
-Step 2: Contract            → invoke mk:sprint-contract (skipped if LEAN + small)
-Step 3: Generate            → spawn developer subagent w/ 4-subphase pattern
-Step 4: Evaluate            → invoke mk:evaluate
-Step 5: Iterate or Ship     → PASS → shipper; FAIL → loop to step-3 (max --max-iter)
-Step 6: Run Report          → write the audit trail
+Step 0  Tier detection   pick density (MINIMAL | FULL | LEAN), create the run directory
+Step 1  Plan             mk:plan-creator --product-level
+Step 2  Contract         mk:sprint-contract, skipped when density or size makes it dead weight
+Step 3  Generate         developer subagent builds to the contract
+Step 4  Evaluate         mk:evaluate drives the running build
+Step 5  Iterate or ship  PASS or cap reached: ask the user; otherwise back to Step 3
+Step 6  Run report       finish the audit trail
 ```
 
-### Rule Loads (just in time)
+## Stop and report
 
-These rules left the always-on set; the harness owns them at the canonical cook path — there is no duplicate copy under this skill.
-
-| Load at | Rule |
-| --- | --- |
-| Step 0, before density selection | `.claude/skills/cook/references/harness-rules.md` — the 10 harness rules this pipeline follows (density, generator ≠ evaluator, iteration cap, budget thresholds, active verification by the evaluator) |
-| Step 0, alongside the harness rules | `.claude/skills/cook/references/phase-contracts.md` — what each of the 7 phases expects and produces |
-| Step 3, only when the generator stage is parallelized | `.claude/skills/cook/references/parallel-execution-rules.md` — zero file overlap, max 3 agents, worktree isolation, integration test after merge |
-| Steps 5 and 6, before the project-manager delegation | `.claude/skills/cook/references/post-phase-delegation.md` — fire points (Step 5 foreground pre-escalation, Step 6 background) and skip conditions |
-
-## Density Modes
-
-| Mode | Tier | Planner | Contract | Iteration Loop | Context Reset |
-|---|---|---|---|---|---|
-| **MINIMAL** | TRIVIAL (Haiku) | Skip (use plan-creator --fast) | Skip | Skip | Skip |
-| **FULL** | STANDARD (Sonnet) / COMPLEX (Opus 4.5) | Required | Required | 1–3 rounds | Optional |
-| **LEAN** | COMPLEX (Opus 4.6+, Fable) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
-
-## Run Report Schema
-
-Every run writes `tasks/autobuild-runs/YYMMDD-{slug}/run.md`:
-
-```markdown
----
-run_id: 260408-1450-build-todo
-density: LEAN
-model: claude-opus-5-5
-budget_cap: 50
-budget_spent: 12.40
-iterations: 1
-status: PASS | WARN | FAIL | ESCALATED | TIMED_OUT
-started: 2026-04-08T14:50:00Z
-ended: 2026-04-08T15:18:00Z
----
-
-# Autobuild Run — {task description}
-
-## Density Decision
-- Detected tier: {tier}
-- Detected model: {model-id}
-- Density: {MINIMAL|FULL|LEAN}
-- Source: scale-routing | env-override | --tier flag
-
-## Per-Step Artifacts
-- step-00: {tier-detection result}
-- step-01: tasks/plans/{plan-dir}/plan.md
-- step-02: tasks/contracts/{contract}.md (or "skipped — LEAN small sprint")
-- step-03: handoff at tasks/handoff/{slug}-sprint-1.md
-- step-04: verdict at tasks/reviews/{slug}-evalverdict.md
-- step-05: iteration count + final action
-- step-06: this file
-
-## Budget Trail
-| Step | Spent | Cumulative |
-|---|---|---|
-| ... | ... | ... |
-
-## Final Verdict
-{PASS/FAIL/ESCALATED summary + next action}
-```
+Stop and tell the user, rather than working around it, when: the plan is rejected, a contract will not get signed, the budget blocks, the wall-clock stop is reached, the evaluator cannot run the build, or the cap is hit with a FAIL. Write the report first. The run returns the four-status block (`DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT`); `workflow.md` says which status fits which end state.
 
 ## Gotchas
 
-- **Don't run on a non-green-field task.** Use `mk:cook` for single features, bug fixes, refactors. The autobuild workflow is for "build me an app" scope.
-- **Density override stays in scope.** `MEOWKIT_AUTOBUILD_MODE=LEAN` drops the sprint contract, not the review: still review the diff and write the verdict before shipping.
-- **Iteration loops are bounded.** Max 3 by default. After round 3, escalate — don't keep iterating blindly.
-- **Budget check is authoritative.** If `budget-tracker.sh` says block, the autobuild workflow halts even mid-iteration.
-- **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
-- **Resumable.** If the autobuild workflow is killed mid-run, `/mk:autobuild --resume {run-id}` picks up at the last completed step.
+- **Not for single features.** Use `mk:cook`; autobuild is for "build me an app".
+- **A density override drops scaffolding, not the bar.** `LEAN` skips the contract, not the review: still review the diff and write the verdict before shipping.
+- **Iteration loops are bounded.** After round 3, escalate instead of iterating blindly.
+- **Reports are append-only.** Do not edit earlier steps' entries; the report is the audit trail.
+- **The ship question is the user's.** A PASS verdict is evidence for that decision, not the decision.
 
-## References
+## Rule loads (just in time)
+
+| Load at | File |
+| --- | --- |
+| Step 0 | the density matrix, `references/adaptive-density-matrix.md` (table and override order) |
+| Step 3, only when generation is parallelized | `.claude/skills/cook/references/parallel-execution-rules.md` |
+| Steps 5 and 6, before a project-manager delegation | `.claude/skills/cook/references/post-phase-delegation.md` |
+| A teams-versus-subagents question | `references/agent-teams-vs-subagents.md` |
+
+## Files
 
 | File | Purpose |
 |---|---|
-| `workflow.md` | Step sequence + variable table |
-| `step-00-tier-detection.md` | Density selection via scale-routing |
-| `step-01-plan.md` | Product-level planning |
-| `step-02-contract.md` | Sprint contract negotiation |
-| `step-03-generate.md` | Developer subagent dispatch with 4-subphase pattern |
-| `step-04-evaluate.md` | Evaluator dispatch |
-| `step-05-iterate-or-ship.md` | PASS/FAIL routing + iteration loop |
-| `step-06-run-report.md` | Audit trail writer |
-| `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
-| `references/adaptive-density-matrix.md` | Full decision table per tier × model |
-| `references/agent-teams-vs-subagents.md` | When to use teams vs file-based subagents |
-| `scripts/density-select.sh` | Standalone density selector for scriptable use |
-| `scripts/budget-tracker.sh` | Cost-log reader; threshold warnings + hard block |
-| `../plan-creator/` | Planner stage (Step 1) — product-level planner |
-| `../sprint-contract/` | Contract stage (Step 2) — contract negotiation |
-| `../rubric/` | Rubric stage (Step 2/4) — rubric library |
-| `../evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
-| `../scale-routing/` | Tier + density emission |
-
-## Start
-
-Read and follow `workflow.md`.
+| `workflow.md` | step order, run state, shared rules |
+| `step-00-tier-detection.md` … `step-06-run-report.md` | one per step |
+| `references/advice-checkpoints.md` | `--advice` checkpoints |
+| `scripts/density-select.sh`, `scripts/budget-tracker.sh` | density selector; cost log with threshold exit codes |
+| `../plan-creator/`, `../sprint-contract/`, `../rubric/`, `../evaluate/`, `../scale-routing/` | the skills each step calls |

@@ -22,7 +22,7 @@ Use product area config when your team needs:
 - Person-in-charge (PIC) suggestions per area
 - Custom keyword sets for internal domain language
 
-Without this file, scale-routing works identically to v1.0. It is purely additive.
+Without this file, scale-routing still routes from the CSV alone; the file only adds to it.
 
 ---
 

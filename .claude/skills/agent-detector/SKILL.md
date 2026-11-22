@@ -26,11 +26,12 @@ default_enabled: true
 
 # Agent Detector
 
-**Priority:** HIGHEST - Runs FIRST for every message. Automatically detects the correct agent, task complexity level, and model tier for each user message using a multi-layer scoring system. No manual agent selection needed -- the detector analyzes task content, explicit technology mentions, user intent, project context, and file patterns to route to the right agent with the right model.
-
-## When to Use
-
-**ALWAYS** - Every user message, no exceptions. This skill fires before any other skill or agent action. It determines who handles the task, at what complexity level, and with which model.
+Once per task, picks the specialist agent to own it, the complexity tier (TRIVIAL, STANDARD
+or COMPLEX) and any risk flags, and says so in one line. It is offered on every message;
+detect when a task starts or its scope changes, and otherwise reuse the result already given
+for the current task: a question, a one-line edit or a follow-up inside the same task needs
+no new detection. The domain-to-complexity CSV match is `mk:scale-routing`; this
+skill adds the agent and the horizontal risk flags.
 
 ## Workflow
 
@@ -64,66 +65,19 @@ default_enabled: true
 
    Do NOT proceed to detection. Do NOT route to any agent. Those rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
 
-0a. **Project context first.** When `docs/project-context.md` exists, `Read` it BEFORE any task-specific context — it is the project constitution (stack, conventions, anti-patterns), and loading it first prevents conflicting convention guesses (agent-conduct A2, detailed in `.claude/skills/cook/references/agent-conduct-extended.md`). If it is absent, log `project-context: absent; proceeding without it` and continue — this is never an abort.
+0a. **Project context.** If `docs/project-context.md` exists, read it before task-specific context; if it is absent, continue without it.
 
-0b. **Phase-zero rule load.** After the safety baseline is confirmed, scan context for the cached-sentinel marker:
+0b. **Routing rules.** Read what the steps below use, once per task: `.claude/skills/cook/references/phase-contracts.md`, `references/agent-routing.md`, `references/model-selection-rules.md` and `references/risk-checklist.md`. If the task names a Jira key or a sprint contract exists, also read `references/agile-story-gates.md`, `agile-sprint-commitment.md` and `agile-feedback-cycle.md`. If one is missing, say so and route from the rest.
 
-   ```
-   ## Phase-zero rules: verified (cached, session <id>)
-   ```
+1. **Pick the agent.** Choose from the live roster in `references/agent-routing.md` (the files in `.claude/agents/` are authoritative). The Jira and Confluence leaf agents are routed by `mk:jira` and `mk:confluence`, not here. If the user names an agent, use it.
+2. **Pick the tier.** Take the `mk:scale-routing` result when it matched a domain; otherwise judge from the size signals in `references/model-selection-rules.md` (that file owns the tier table, the escalation rules and the agent `model:` pins). A `high` level is COMPLEX. Do not downgrade the tier mid-task.
+3. **Check risk flags.** Match the task against `references/risk-checklist.md`. Any of AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC or EXT_SYSTEM makes the tier COMPLEX whatever the CSV said.
+4. **Report and hand off.** One line: `Agent: <name> | Tier: <tier> | Flags: [<ids>]`, then invoke the skill the task needs (`references/skill-domain-routing.md`; task signals in `references/lifecycle-routing.md`; per-phase read budgets in `references/context-budget-rules.md`).
 
-   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These moved out of the always-on set and are now loaded just in time, once per agent-detector invocation:
-   - `.claude/skills/cook/references/phase-contracts.md` — what each phase expects/produces
-   - `references/agent-routing.md` — agent → role → phase table
-   - `references/model-selection-rules.md` — task-type → model-tier mapping
-   - `references/scale-adaptive-rules.md` — domain CSV → complexity routing
-   - `references/risk-checklist.md` — 9 horizontal-risk flags
-   - `references/context-budget-rules.md` — per-phase × per-tier read budget for the tier this step assigns
-   - `references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
-
-   If any of the 6 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
-
-   **Agile context detection (additive — Agile-only load).** After the 6 phase-zero rule `Read`s succeed:
-
-   1. **PRE-FLIGHT.** Check that `references/agile-story-gates.md` exists beside this skill. If absent → log `agile rules: not deployed; skipping load` and skip steps 2–4. (Defensive: a partial install may lag the skill.)
-   2. **Detect Agile context — OR-logic, any one match triggers load:**
-      - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
-      - Active plan frontmatter has non-empty `jira_tickets:`
-      - `MEOW_JIRA_SITE_URL` env var is set
-      - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
-   3. **If Agile context detected, `Read` the 3 conditional rules:**
-      - `references/agile-story-gates.md`
-      - `references/agile-sprint-commitment.md`
-      - `references/agile-feedback-cycle.md`
-      Per-file Read failure (file absent inside the directory): log and skip THAT rule; do NOT abort Step 0b. The phase-zero baseline is already loaded.
-   4. **Sprint-goal banner.** If a sprint-state contract exists, parse `sprint_goal:` from the newest active sprint-state file (status: active) and surface in the orient banner.
-
-   Non-Agile sessions skip steps 1–4 silently — zero context cost.
-
-1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
-2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
-3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read `references/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `references/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
-5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
-
-## References
-
-- `references/lifecycle-routing.md` -- Task signal → phase → skill mapping (advisory, does not change scoring)
-- `references/complexity-detection.md` -- Complexity levels, auto-detection criteria, detection logic
-- `references/model-selection.md` -- Model mapping tables (complexity, task type, agent defaults)
-- `references/multi-layer-detection.md` -- Layers 0-4: task content, tech, intent, project context, file patterns
-- `references/scoring-and-thresholds.md` -- Scoring weights, agent thresholds, QA activation rules
-- `references/detection-process.md` -- Step-by-step process (cache, Steps 0-5, banner format)
-- `references/examples.md` -- Seven worked examples covering common detection scenarios
-- `references/team-mode.md` -- Team mode checks, composition rules, output format, handoff
-- `references/after-detection.md` -- Post-detection actions, available agents, manual override
-
-## Token Budget
-
-After complexity detection, check user depth signals per `references/token-budget-levels.md` to set response verbosity. Silent by default — do not surface to users.
+If the task is too vague to route, say what is missing and ask, rather than guessing an agent.
 
 ## Gotchas
 
-- **Misrouting trivial tasks to heavyweight agents**: Short messages that contain domain keywords (e.g., "fix the auth token") score high for complex agents even when the actual work is a one-line change. The detector favors keyword matches over scope signals. → If the banner shows an unexpected agent/model tier, override via `--quick` or use the explicit `/mk:fix --quick` shorthand to force the right complexity level.
-- **Cache stale after context switch**: The detection cache reuses the result from the previous workflow phase, but when a conversation pivots mid-session (e.g., "actually, let's do X instead"), the cached detection is wrong for the new task. The detector doesn't invalidate on pivot signals. → Confirm the banner after any explicit task change; if the agent/model is wrong, start a new message explicitly describing the new task so Layer 0 re-detects from scratch.
-- **Multi-domain tasks picking the wrong primary agent**: Tasks spanning two domains (e.g., "add a security check to the payment UI") split scores across agents and the highest scorer wins, which may be wrong for the dominant concern. The tiebreaker is the first keyword match, not importance. → For cross-domain tasks, state the primary concern explicitly at the start of the message (e.g., "Security task: ...") so Layer 0 domain detection anchors to the right agent before keyword scoring runs.
+- A short message with a domain keyword ("fix the auth token") scores as heavy work even when the change is one line: judge scope as well as keywords, and say the tier you chose so the user can correct it.
+- A pivot mid-conversation is a new task: detect again instead of reusing the earlier result.
+- A task that spans two domains ("add a security check to the payment UI") needs one primary agent: pick by the dominant concern and name the other as a reviewer.
