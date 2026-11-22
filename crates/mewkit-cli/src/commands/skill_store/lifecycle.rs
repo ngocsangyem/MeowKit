@@ -66,8 +66,8 @@ pub fn after(place: &Place, before: Option<&Sidecar>) {
         return;
     };
     let result = super::open(place).and_then(|store| {
-        let (next, _) = store.index(prior)?;
-        store.save(&next)
+        let (next, survey) = store.index(prior)?;
+        store.save(&next, &survey)
     });
     if let Err(e) = result {
         eprintln!("note: the skill store was not updated: {}", e.message);

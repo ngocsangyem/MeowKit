@@ -1,6 +1,6 @@
 {
   "exit_code": 2,
   "stdout": "",
-  "stderr": "`mewkit skill` needs a subcommand.\nValid subcommands: env, status, overlay, fork\nRun `mewkit skill --help` for usage.\n",
+  "stderr": "`mewkit skill` needs a subcommand.\nValid subcommands: env, status, overlay, fork, rollback\nRun `mewkit skill --help` for usage.\n",
   "files": {}
 }

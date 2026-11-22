@@ -6,9 +6,10 @@
 //! An overlay made here is approved here as it is made.
 use std::collections::BTreeMap;
 
-use mewkit_core::fsx::sha256_hex;
+use mewkit_core::fsx::{RelPath, sha256_hex};
 use mewkit_core::skill_store::{
-    Overlay, OverlayFile, Sidecar, State, StoredFile, Write, apply, overlay_to_json, stored_copy,
+    Overlay, OverlayFile, Sidecar, State, StoredFile, Survey, Write, apply, overlay_to_json,
+    stored_copy,
 };
 
 use super::{Store, matching, open, overlay_approve};
@@ -69,7 +70,7 @@ pub fn run(place: &Place, args: &SkillArgs) -> Result<u8, Failure> {
             let kit_hash = seen.owned.get(path).ok_or_else(|| {
                 Failure::usage(format!("{key}/{path} is not a file the kit installed"))
             })?;
-            let rel = mewkit_core::fsx::RelPath::new(&format!("{key}/{path}"))?;
+            let rel = RelPath::new(&format!("{key}/{path}"))?;
             let bytes = std::fs::read(store.layout.resolve(&rel))
                 .map_err(|e| Failure::failed(format!("cannot read {rel}: {e}")))?;
             let sha = sha256_hex(&bytes);
@@ -117,7 +118,14 @@ pub fn run(place: &Place, args: &SkillArgs) -> Result<u8, Failure> {
              name it with --file"
         )));
     }
-    commit(&store, &next, &overlays, &approvals, writes, removes)?;
+    commit(
+        &store,
+        (&next, &survey),
+        &overlays,
+        &approvals,
+        writes,
+        removes,
+    )?;
     for (key, files) in &done {
         println!(
             "overlaid {key}: {} (stored in {})",
@@ -129,35 +137,34 @@ pub fn run(place: &Place, args: &SkillArgs) -> Result<u8, Failure> {
 }
 
 /// Write the stored copies, the overlay store, this machine's approvals and
-/// the sidecar as one change.
+/// the sidecar as one change. The overlay files are backed up first.
 fn commit(
     store: &Store,
-    next: &Sidecar,
+    (next, survey): (&Sidecar, &Survey),
     overlays: &mewkit_core::skill_store::OverlayStore,
     approvals: &mewkit_core::skill_store::Approvals,
     mut writes: Vec<Write>,
-    mut removes: Vec<mewkit_core::fsx::RelPath>,
+    mut removes: Vec<RelPath>,
 ) -> Result<(), Failure> {
-    let manifest = store.overlay_manifest();
-    let approved = store.approvals_file();
     writes.push(Write {
-        path: manifest.clone(),
+        path: store.overlay_manifest(),
         bytes: overlay_to_json(overlays),
         mode: None,
     });
     writes.push(Write {
-        path: approved.clone(),
+        path: store.approvals_file(),
         bytes: overlay_to_json(approvals),
         mode: None,
     });
-    let (sidecar_writes, sidecar_removes) = store.sidecar_change(next);
-    writes.extend(sidecar_writes);
-    removes.extend(sidecar_removes);
-    let backed: Vec<&mewkit_core::fsx::RelPath> = writes
+    let backed: Vec<RelPath> = writes
         .iter()
-        .map(|w| &w.path)
-        .chain(removes.iter())
+        .map(|w| w.path.clone())
+        .chain(removes.iter().cloned())
         .collect();
+    let (store_writes, store_removes) = store.changes(next, survey)?;
+    writes.extend(store_writes);
+    removes.extend(store_removes);
+    let backed: Vec<&RelPath> = backed.iter().collect();
     apply(&store.layout, &store.paths, &writes, &removes, &backed)?;
     Ok(())
 }
