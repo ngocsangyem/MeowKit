@@ -149,7 +149,7 @@ One list, each rule with its reason.
 - **Never remove a worktree with uncommitted changes**; commit or stash first, or the work is lost. (`review-pr-cleanup` is the exception: review worktrees are legitimately dirty, and the manifest nonce is the guard.)
 - **Clean up worktrees after merge.** A stale worktree keeps its branch checked out and blocks reuse of the name.
 - **Release the task's ownership in `mk:task-queue` before cleanup**, or the task stays claimed and no other agent can take it.
-- **Keep to three active worktrees**: the cap in `parallel-execution-rules.md` Rule 2. The script does not enforce it; `status` lists the worktrees so you can count.
+- **Keep to three active worktrees**: the cap in `.claude/skills/cook/references/parallel-execution-rules.md` Rule 2. The script does not enforce it; `status` lists the worktrees so you can count.
 - **Stop on merge conflicts** (common in `SKILL.md` and `CLAUDE.md` during parallel runs), report to the lead, and do not auto-resolve: a human or the lead agent decides.
 - **`review-pr` worktrees are detached** (no branch) and owned by their manifest nonce; `review-pr-cleanup` refuses any worktree whose back-reference nonce does not match, which is what makes cross-session deletion impossible.
 - **Creation fails if the branch already exists** (`BRANCH_CHECKED_OUT`); timestamps in orchestrated branch names prevent most collisions.

@@ -23,7 +23,7 @@ Task tracking: where a tracked-task tool is unavailable (some GUI editor extensi
 
 Goal: know the mode, the tier and the codebase context before planning.
 
-1. Read `phase-contracts.md` once per run.
+1. Read the phase contracts once per run (SKILL.md, Rule Loads).
 2. Detect the mode (`intent-detection.md`).
 3. Declare the tier as `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → [model]`. Auth, payments and security are always COMPLEX; a feature under 5 files is STANDARD; a rename, typo or format is TRIVIAL.
 4. For a plan path: load it and parse the phases. If plan.md has an `## Autonomy Boundaries` block, read it once and follow it by mode: interactive runs ask on an "Ask first" item when it arises; auto runs defer it (skip the action, log the decision in the plan.md Agent State, take the safe default) because a blocking prompt mid-autonomous-run stalls the run. With no block, proceed on reversible in-scope changes. The block never relaxes a security rule.
@@ -49,7 +49,7 @@ Then present the plan summary and ask the user (header "Plan"): looks right, rev
 
 Goal: tests that describe the criteria before the code exists, when `--tdd` / `MEOWKIT_TDD=1` is on; otherwise optional.
 
-- `--tdd` (all modes except no-test): delegate to `tester` via `mk:testing` to write tests from the plan's acceptance criteria. They must run and fail; a compile or syntax error is not a failing test. If they pass already, they do not describe the change: rewrite them. Rules: `tdd-rules.md`.
+- `--tdd` (all modes except no-test): delegate to `tester` via `mk:testing` to write tests from the plan's acceptance criteria. They must run and fail; a compile or syntax error is not a failing test. If they pass already, they do not describe the change: rewrite them. Rules: `references/tdd-rules.md`.
 - `--fast`: tests cover plan intent only; say "coverage may be lower" in the summary.
 - `--no-test`: skip the phase (invalid together with `--tdd`).
 
@@ -59,7 +59,7 @@ Non-auto runs pause after the RED tests: show the test list and ask to proceed, 
 
 Goal: the plan's phase implemented, type-checked, with its tests passing.
 
-Before spawning any subagent read `orchestration-rules.md`; in parallel mode also `parallel-execution-rules.md`.
+Before spawning any subagent read the orchestration rules; in parallel mode also the parallel-execution rules (both in SKILL.md, Rule Loads).
 
 **Premise check.** On the standard path, when the plan carries open `[ASSUMPTION]` items, delegate one read-only `researcher` run before the first edit to check each against the code. It returns `holds` or `false` per item with `file:line`; an item it cannot check is reported unchecked, and a finding without `file:line` is dropped. A `false` assumption goes back to the plan before building. Skip it in quick runs and when no assumption is open.
 
@@ -107,7 +107,7 @@ Advisory: the run continues either way and the user decides.
 
 ### `--strict` [HEAVY]
 
-Fires on `--strict`, or when `mk:scale-routing` returned `level=high` at Phase 0 (say which). Supersedes `--verify`. Read `harness-rules.md` first.
+Fires on `--strict`, or when `mk:scale-routing` returned `level=high` at Phase 0 (say which). Supersedes `--verify`. Read the harness rules first (SKILL.md, Rule Loads).
 
 Delegate to `evaluator` to run `/mk:evaluate` on the build: target is the project root, rubric preset auto-detected from `package.json`, with the changed files and the review and test outcomes as context; it returns PASS, WARN or FAIL plus the verdict path. PASS: report completion. WARN: the user decides. FAIL: do not report completion; route back to Build with the evaluator feedback, at most 2 evaluator iterations.
 

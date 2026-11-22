@@ -45,7 +45,7 @@ The lead writes one entry per task. This is the only ownership format in the kit
 ## Assigning
 
 1. The lead picks the lowest-ID task that is `pending` with every `blocked_by` task `completed`.
-2. The lead compares its `ownership` globs with those of the `in_progress` tasks. On overlap it restructures or sequences the tasks (see `parallel-execution-rules.md`, Rule 1) instead of assigning.
+2. The lead compares its `ownership` globs with those of the `in_progress` tasks. On overlap it restructures or sequences the tasks (see `.claude/skills/cook/references/parallel-execution-rules.md`, Rule 1) instead of assigning.
 3. With no overlap, the lead sets `owner` and `status=in_progress`.
 
 Agents ask the lead for work instead of editing the file themselves: that keeps a single writer, which is the only protection against two agents taking the same task.

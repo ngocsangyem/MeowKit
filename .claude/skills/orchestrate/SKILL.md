@@ -189,7 +189,7 @@ arbiter review, report. These invariants hold on every run:
 - Create each required worktree (via `mk:worktree`) before dispatch and pin the
   job's cwd to it.
 - Start independent jobs together only up to `concurrency` (and the internal-agent
-  limit in `parallel-execution-rules.md`).
+  limit in `.claude/skills/cook/references/parallel-execution-rules.md`).
 - Update `<run-dir>/state.json` on every job transition.
 - For CLI jobs, capture redacted command, bounded stdout/stderr, exit status,
   wall time, artifacts, and usage when reliably reported.

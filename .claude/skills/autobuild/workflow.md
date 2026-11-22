@@ -1,8 +1,13 @@
 # mk:autobuild — Workflow
 
-Seven steps, numbered 0–6, run in order: tier detection, plan, contract, generate, evaluate, iterate or ship, run report. Read one step file at a time and finish it before the next, because each step consumes the previous step's output.
+Seven steps, numbered 0–6, run in order: tier detection, plan, contract, generate, evaluate, iterate or ship, run report.
 
-Steps run as written. The step files name the fragile ones (the budget check, the ship question, the signed contract); everywhere else use judgment about how to reach the step's goal. A step that cannot meet its goal stops the run and goes to the report, not around the problem.
+## Step-File Contract
+
+- Load one step file at a time, read all of it before acting on it, and finish it before opening the next, because each step consumes the previous step's output.
+- Keep the step order; a step whose goal cannot be met stops the run and goes to the report.
+- Exact wording matters only at the fragile steps the step files name (budget check, ship question, signed contract); elsewhere reach the step's goal by judgment.
+- Persist what the next step needs in `run.md` frontmatter, so it survives a context reset.
 
 ## Run state
 

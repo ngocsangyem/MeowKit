@@ -35,6 +35,8 @@ dependency_edges:
     type: peer
   - id: mk:plan-creator
     type: peer
+  - id: mk:session-continuation
+    type: peer
   - id: mk:simplify
     type: peer
   - id: mk:verify

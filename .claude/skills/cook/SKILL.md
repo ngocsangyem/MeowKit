@@ -22,6 +22,8 @@ dependency_edges:
     type: peer
   - id: mk:evaluate
     type: peer
+  - id: mk:fix
+    type: peer
   - id: mk:investigate
     type: peer
   - id: mk:memory
@@ -29,6 +31,8 @@ dependency_edges:
   - id: mk:plan-creator
     type: peer
   - id: mk:review
+    type: peer
+  - id: mk:scale-routing
     type: peer
   - id: mk:scout
     type: peer
@@ -91,7 +95,7 @@ The full per-phase instructions are in `references/workflow-steps.md`. Open it a
 
 ## Verify Step (Mandatory)
 
-After `mk:simplify`, run `mk:verify`: build, lint, type-check, test and coverage. It scopes lint and tests to the changed files by default; pass `--full` only when a whole-project sweep is needed now, since ship time runs the complete check. A failing result goes back to the developer and `mk:verify` re-runs before Phase 4: a review of code that does not build wastes the reviewer.
+After `mk:simplify`, run `/mk:verify`: build, lint, type-check, test and coverage. It scopes lint and tests to the changed files by default; pass `--full` only when a whole-project sweep is needed now, since ship time runs the complete check. A failing result goes back to the developer and `mk:verify` re-runs before Phase 4: a review of code that does not build wastes the reviewer.
 
 ## After the review
 
