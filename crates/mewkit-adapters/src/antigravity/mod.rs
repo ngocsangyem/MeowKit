@@ -10,12 +10,15 @@
 //!   the always-on rules stay in the `AGENTS.md` block, so the safety text has
 //!   one copy;
 //! - `.agents/agents/<name>.md`, each kit agent with the tools and model
-//!   Antigravity takes (see `agents`).
+//!   Antigravity takes (see `agents`);
+//! - `.agents/hooks.json` and the scripts it runs in
+//!   `.agents/meowkit-antigravity/hooks`: the privacy guard and the ship check,
+//!   answering on stdout as the hooks page documents
+//!   (https://antigravity.google/docs/hooks, read 2026-11-22).
 //!
-//! No hook is installed: the runtime reads `.agents/hooks.json`, but a guard
-//! written from its documentation alone has not been seen to deny, so the
-//! emitter says "guards not installed" instead of shipping one that may never
-//! fire. The shared tree carries the guard script, which nothing runs here.
+//! The guards were built from that page alone and no live run has shown them
+//! deny, so the kit's coverage file marks them `unverified` and the install
+//! names each one in a notice instead of presenting it as protection.
 mod agents;
 pub mod rules;
 
@@ -29,8 +32,29 @@ const OVERLAY: &str = "kit/overlays/antigravity";
 /// The folder Antigravity loads agent definitions from.
 pub const AGENTS_DIR: &str = ".agents/agents";
 
-/// What an install of Antigravity says about its guards.
-pub const NO_GUARDS: &str = "guards not installed: Antigravity runs no privacy guard and no ship check from this kit, so nothing here refuses a read of a credential file or a failing commit";
+/// The hook file Antigravity reads in a project.
+pub const HOOK_FILE: &str = ".agents/hooks.json";
+/// The folder of the scripts the hook file runs. It is Antigravity's alone, so
+/// a Codex, Pi or OMP install beside it writes the same files as before.
+pub const HOOKS_DIR: &str = ".agents/meowkit-antigravity";
+/// How the notice about guards not yet seen to deny starts.
+pub const UNVERIFIED: &str = "guards unverified: ";
+
+/// What an install of Antigravity says about its guards: each one the kit's
+/// coverage file marks `unverified`, with the script that runs it.
+pub fn guard_notice(kit_dir: &std::path::Path) -> String {
+    let listed = crate::hook_coverage::read(kit_dir)
+        .map(|doc| crate::hook_coverage::unverified(&doc, Runtime::Antigravity.name()))
+        .unwrap_or_default();
+    let which = if listed.is_empty() {
+        format!("the privacy guard and the ship check in {HOOK_FILE}")
+    } else {
+        crate::hook_coverage::describe(&listed)
+    };
+    format!(
+        "{UNVERIFIED}{which}: installed from Antigravity's documentation, and no live run has shown them deny, so do not count on them to refuse a credential read or a failing commit yet"
+    )
+}
 
 /// Claude Code-only names that mean nothing to Antigravity.
 pub const DENIED: &[&str] = &[
@@ -58,7 +82,7 @@ impl Emitter for Antigravity {
     fn roots(&self, _scope: &Scope) -> Vec<RelPath> {
         agents_tree::ROOTS
             .iter()
-            .chain([rules::DIR, AGENTS_DIR].iter())
+            .chain([rules::DIR, AGENTS_DIR, HOOK_FILE, HOOKS_DIR].iter())
             .map(|r| RelPath::new(r).expect("static root"))
             .collect()
     }
@@ -82,7 +106,7 @@ impl Emitter for Antigravity {
                 dropped.join(", ")
             ));
         }
-        plan.notices.push(NO_GUARDS.into());
+        plan.notices.push(guard_notice(&req.kit.dir));
         plan.notices.extend(agents_tree::also_read(
             req,
             Runtime::Antigravity,

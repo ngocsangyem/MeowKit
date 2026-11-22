@@ -24,6 +24,7 @@ const NON_SOURCE_TREES = {
   codex: ['.codex', '.agents', '.meowkit'],
   cursor: ['.cursor', '.meowkit'],
   grok: ['.grok', '.meowkit'],
+  antigravity: ['.agents', '.meowkit'],
   // The tree Codex, Pi and OMP share; each of them may be the one installed.
   agents: ['.agents', '.codex', '.pi', '.omp', '.meowkit'],
 };
@@ -49,8 +50,16 @@ const nonSourceTrees = (runtime) => NON_SOURCE_TREES[runtime] || [];
  */
 const PATCH_TARGET = /^\*\*\*\s+(?:(?:Add|Update|Delete) File|Move to):\s+(.+?)\s*$/gim;
 
-/** Payload fields a runtime uses for a single target path. */
-const PATH_FIELDS = ['file_path', 'path', 'filePath', 'notebook_path', 'target_file'];
+/**
+ * Payload fields a runtime uses for a single target path. The capitalised names are the
+ * arguments of Antigravity's file tools (`view_file`, `write_to_file`, `replace_file_content`,
+ * `list_dir`, `find_by_name`, `grep_search`; https://antigravity.google/docs/hooks, "Supported
+ * tools", read 2026-11-22); no other runtime's payload carries them.
+ */
+const PATH_FIELDS = [
+  'file_path', 'path', 'filePath', 'notebook_path', 'target_file',
+  'AbsolutePath', 'TargetFile', 'DirectoryPath', 'SearchDirectory', 'SearchPath',
+];
 
 /** Payload fields that may carry a patch body. */
 const PATCH_FIELDS = ['command', 'patch', 'input'];

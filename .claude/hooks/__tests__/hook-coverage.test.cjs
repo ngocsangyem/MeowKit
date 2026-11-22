@@ -1,4 +1,4 @@
-// Every Claude Code hook behaviour says what it becomes on Codex and Cursor.
+// Every Claude Code hook behaviour says what it becomes on each other runtime.
 //
 // A handler added to handlers.json without a coverage row fails here, so the gap between
 // runtimes is written down when it opens rather than discovered later.
@@ -17,7 +17,7 @@ const handlersFile = JSON.parse(fs.readFileSync(path.join(HOOKS, 'handlers.json'
 const handlers = Array.isArray(handlersFile) ? handlersFile : handlersFile.handlers;
 const closure = JSON.parse(fs.readFileSync(path.join(HOOKS, 'core-closure.json'), 'utf8'));
 
-const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp'];
+const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp', 'antigravity'];
 const BUNDLE_ROOT = {
   codex: 'kit/overlays/codex/files',
   cursor: 'kit/overlays/cursor/files',
@@ -25,7 +25,30 @@ const BUNDLE_ROOT = {
   // Pi and OMP run the guard in the tree they share with Codex.
   pi: 'kit/overlays/agents/files',
   omp: 'kit/overlays/agents/files',
+  antigravity: 'kit/overlays/antigravity/files',
 };
+
+// Runtimes whose guards were written from documentation. A row there says `ported` only
+// with a record of the live run that showed it deny; until then it says `unverified`.
+const PROBE_REQUIRED = ['antigravity'];
+
+/** Each `runtime.behaviour` row that claims `ported` without a recorded denial. */
+function portedWithoutProbe(doc) {
+  const out = [];
+  for (const [name, row] of Object.entries(doc.safety || {})) {
+    for (const runtime of PROBE_REQUIRED) {
+      const entry = row[runtime];
+      if (!entry || entry.status !== 'ported') continue;
+      const probe = entry.probe;
+      const recorded = probe && typeof probe === 'object'
+        && probe.observed === 'deny'
+        && typeof probe.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(probe.date)
+        && typeof probe.by === 'string' && probe.by.trim();
+      if (!recorded) out.push(`${name}.${runtime}`);
+    }
+  }
+  return out;
+}
 
 test('every handler in handlers.json has exactly one coverage row', () => {
   const names = [...new Set(handlers.map((h) => h.toggleKey))].sort();
@@ -52,6 +75,30 @@ test('every shared behaviour is classified, and a ported one names a hook that e
       }
       const file = entry.where.split(' ')[0];
       assert.ok(fs.existsSync(path.join(ROOT, BUNDLE_ROOT[runtime], file)), `${name}.${runtime}: ${file} is missing`);
+    }
+  }
+});
+
+test('a guard written from documentation is ported only with a recorded denial', () => {
+  assert.deepEqual(portedWithoutProbe(coverage), []);
+});
+
+test('the probe rule refuses a ported row that has no probe record', () => {
+  const doc = structuredClone(coverage);
+  doc.safety.privacy.antigravity = { status: 'ported', where: doc.safety.privacy.antigravity.where };
+  assert.deepEqual(portedWithoutProbe(doc), ['privacy.antigravity']);
+  doc.safety.privacy.antigravity.probe = { date: '2026-11-22', observed: 'allow', by: 'maintainer' };
+  assert.deepEqual(portedWithoutProbe(doc), ['privacy.antigravity'], 'a probe that saw no denial is not one');
+  doc.safety.privacy.antigravity.probe.observed = 'deny';
+  assert.deepEqual(portedWithoutProbe(doc), []);
+});
+
+test('an unverified row says where its documentation came from', () => {
+  for (const [name, row] of Object.entries(coverage.safety)) {
+    for (const runtime of RUNTIMES) {
+      const entry = row[runtime];
+      if (entry.status !== 'unverified') continue;
+      assert.ok(entry.note && /https?:\/\//.test(entry.note), `${name}.${runtime} needs a note citing its source`);
     }
   }
 });

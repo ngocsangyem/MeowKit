@@ -91,6 +91,7 @@ mod substrate_aggregate;
 mod substrate_view;
 mod target_agents_tree;
 mod target_antigravity;
+mod target_antigravity_guards;
 mod target_codex;
 mod target_codex_agents;
 mod target_codex_config;

@@ -1,0 +1,30 @@
+{
+	"meowkit-privacy": {
+		"PreToolUse": [
+			{
+				"matcher": "*",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node .agents/meowkit-antigravity/hooks/privacy-block.cjs",
+						"timeout": 10
+					}
+				]
+			}
+		]
+	},
+	"meowkit-ship-check": {
+		"PreToolUse": [
+			{
+				"matcher": "run_command",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node .agents/meowkit-antigravity/hooks/pre-ship.cjs",
+						"timeout": 300
+					}
+				]
+			}
+		]
+	}
+}

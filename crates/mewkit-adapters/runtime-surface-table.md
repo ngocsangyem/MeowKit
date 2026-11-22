@@ -153,11 +153,12 @@ Checked: vendor pages (skills, rules, hooks, subagents) read 2026-11-22; not ins
 | always-on | `AGENTS.md` | yes |  |  | https://antigravity.google/docs/rules |
 | always-on | `GEMINI.md` |  |  |  | https://antigravity.google/docs/rules |
 | always-on | `.agents/rules` | yes |  |  | https://antigravity.google/docs/rules |
+| hooks | `.agents/hooks.json` | yes |  |  | https://antigravity.google/docs/hooks |
 
 - skills: The page says `.agent/skills` is kept for backward compatibility. It states no limit on description length or skill count, and says nothing of the same name in two folders.
 - agents: `model` takes `inherit`, `flash` or `pro`; `tools` takes the runtime's own tool names, and a name that does not match may make the agent hang (https://antigravity.google/docs/subagents, read 2026-11-22).
 - always-on: A file in `.agents/rules` without a valid `trigger` in its frontmatter is silently discarded; a rule file is cut at 24,000 bytes and the always-on rules together have 20,000 tokens (https://antigravity.google/docs/rules, read 2026-11-22). The kit keeps its always-on text in the `AGENTS.md` block and writes rule files only for text that loads on demand.
-- hooks: The kit installs no Antigravity hook, so no guard runs there. The runtime reads `.agents/hooks.json`; its `PreToolUse` takes a stdout `decision` and the default timeout is 30 s (https://antigravity.google/docs/hooks, read 2026-11-22).
+- hooks: The kit registers the privacy guard and the ship check there; both are marked unverified: built from the page, not yet seen to deny in a live run. `PreToolUse` takes a stdout `decision`, the default timeout is 30 s, and the page does not say what the host does with a hook that times out or exits without a decision (https://antigravity.google/docs/hooks, read 2026-11-22).
 
 ## Where the kit writes
 
@@ -171,7 +172,7 @@ Each emitter writes its runtime's own roots in every set, so a runtime has its c
 | grok | `.grok/skills` | none | `AGENTS.md` | `.grok/hooks` | `.grok/config.toml` |
 | pi | `.agents/skills` | none | `AGENTS.md` | `.pi/extensions` | `.pi/mcp.json` |
 | omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.omp/hooks` | `.omp/mcp.json` |
-| antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | none | none |
+| antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.agents/hooks.json` | none |
 | claude-code + codex | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.codex/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.codex/hooks.json` | `.mcp.json`, `.codex/config.toml` |
 | claude-code + cursor | `.claude/skills`, `.cursor/skills` | `.claude/agents`, `.cursor/agents` | `.claude/rules`, `.cursor/rules`, `AGENTS.md` | `.claude/settings.json`, `.cursor/hooks.json` | `.mcp.json`, `.cursor/mcp.json` |
 | codex + cursor | `.agents/skills`, `.cursor/skills` | `.codex/agents`, `.cursor/agents` | `AGENTS.md`, `.cursor/rules` | `.codex/hooks.json`, `.cursor/hooks.json` | `.codex/config.toml`, `.cursor/mcp.json` |
@@ -187,13 +188,13 @@ Each emitter writes its runtime's own roots in every set, so a runtime has its c
 | cursor + omp | `.cursor/skills`, `.agents/skills` | `.cursor/agents`, `.omp/agents` | `.cursor/rules`, `AGENTS.md` | `.cursor/hooks.json`, `.omp/hooks` | `.cursor/mcp.json` |
 | grok + omp | `.grok/skills`, `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.grok/hooks`, `.omp/hooks` | `.grok/config.toml`, `.omp/mcp.json` |
 | pi + omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.pi/extensions`, `.omp/hooks` | `.pi/mcp.json`, `.omp/mcp.json` |
-| claude-code + antigravity | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.agents/rules` | `.claude/settings.json` | `.mcp.json` |
-| codex + antigravity | `.agents/skills` | `.codex/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.codex/hooks.json` | `.codex/config.toml` |
-| cursor + antigravity | `.cursor/skills`, `.agents/skills` | `.cursor/agents`, `.agents/agents` | `.cursor/rules`, `AGENTS.md`, `.agents/rules` | `.cursor/hooks.json` | `.cursor/mcp.json` |
-| grok + antigravity | `.grok/skills`, `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.grok/hooks` | `.grok/config.toml` |
-| pi + antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.pi/extensions` | `.pi/mcp.json` |
-| omp + antigravity | `.agents/skills` | `.omp/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.omp/hooks` | `.omp/mcp.json` |
-| claude-code + codex + cursor + grok + pi + omp + antigravity | `.claude/skills`, `.agents/skills`, `.cursor/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.omp/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.cursor/rules`, `.agents/rules` | `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.grok/hooks`, `.pi/extensions`, `.omp/hooks` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
+| claude-code + antigravity | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.agents/rules` | `.claude/settings.json`, `.agents/hooks.json` | `.mcp.json` |
+| codex + antigravity | `.agents/skills` | `.codex/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.codex/hooks.json`, `.agents/hooks.json` | `.codex/config.toml` |
+| cursor + antigravity | `.cursor/skills`, `.agents/skills` | `.cursor/agents`, `.agents/agents` | `.cursor/rules`, `AGENTS.md`, `.agents/rules` | `.cursor/hooks.json`, `.agents/hooks.json` | `.cursor/mcp.json` |
+| grok + antigravity | `.grok/skills`, `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.grok/hooks`, `.agents/hooks.json` | `.grok/config.toml` |
+| pi + antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.pi/extensions`, `.agents/hooks.json` | `.pi/mcp.json` |
+| omp + antigravity | `.agents/skills` | `.omp/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.omp/hooks`, `.agents/hooks.json` | `.omp/mcp.json` |
+| claude-code + codex + cursor + grok + pi + omp + antigravity | `.claude/skills`, `.agents/skills`, `.cursor/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.omp/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.cursor/rules`, `.agents/rules` | `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.grok/hooks`, `.pi/extensions`, `.omp/hooks`, `.agents/hooks.json` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
 
 ## Double loads the kit's placement leaves
 

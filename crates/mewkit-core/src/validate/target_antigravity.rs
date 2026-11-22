@@ -45,7 +45,7 @@ pub fn check(dir: &Path) -> Vec<CheckResult> {
     let mut out = rows("Antigravity", dir);
     out.push(rules(dir));
     out.push(agents(dir));
-    out.push(guards(dir));
+    out.push(super::target_antigravity_guards::guards(dir));
     out
 }
 
@@ -181,23 +181,4 @@ fn agents(dir: &Path) -> CheckResult {
         );
     }
     row(name, Status::Pass, format!("{count} agents"))
-}
-
-/// The kit installs no Antigravity hook. A project whose `.agents/hooks.json`
-/// is the user's own is left alone; the row says what is and is not running.
-fn guards(dir: &Path) -> CheckResult {
-    let name = "Antigravity guards";
-    if dir.join(".agents/hooks.json").is_file() {
-        return row(
-            name,
-            Status::Warn,
-            "guards not installed by the kit; .agents/hooks.json is yours and is not checked here"
-                .into(),
-        );
-    }
-    row(
-        name,
-        Status::Warn,
-        "guards not installed: no privacy guard and no ship check run on Antigravity".into(),
-    )
 }

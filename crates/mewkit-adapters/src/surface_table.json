@@ -589,8 +589,14 @@
           "note": "A file in `.agents/rules` without a valid `trigger` in its frontmatter is silently discarded; a rule file is cut at 24,000 bytes and the always-on rules together have 20,000 tokens (https://antigravity.google/docs/rules, read 2026-11-22). The kit keeps its always-on text in the `AGENTS.md` block and writes rule files only for text that loads on demand."
         },
         "hooks": {
-          "roots": [],
-          "note": "The kit installs no Antigravity hook, so no guard runs there. The runtime reads `.agents/hooks.json`; its `PreToolUse` takes a stdout `decision` and the default timeout is 30 s (https://antigravity.google/docs/hooks, read 2026-11-22)."
+          "roots": [
+            {
+              "root": ".agents/hooks.json",
+              "write": true,
+              "source": "https://antigravity.google/docs/hooks"
+            }
+          ],
+          "note": "The kit registers the privacy guard and the ship check there; both are marked unverified: built from the page, not yet seen to deny in a live run. `PreToolUse` takes a stdout `decision`, the default timeout is 30 s, and the page does not say what the host does with a hook that times out or exits without a decision (https://antigravity.google/docs/hooks, read 2026-11-22)."
         }
       }
     }

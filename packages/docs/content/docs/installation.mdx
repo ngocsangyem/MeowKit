@@ -60,7 +60,7 @@ Without flags, `init` asks which runtimes to set up. The choices are Claude Code
 | `mewkit init --target grok` | Grok only (project scope) |
 | `mewkit init --target pi` | Pi only (project scope) |
 | `mewkit init --target omp` | OMP only (project scope) |
-| `mewkit init --target antigravity` | Antigravity only (project scope). Installs skills and the instruction block; no guard runs on it yet |
+| `mewkit init --target antigravity` | Antigravity only (project scope). Installs skills, the instruction block, rule files, agents and the two guards in `.agents/hooks.json`. Each guard is from documentation, unverified: no live run has shown it deny, and `init` and `doctor` say so |
 | `mewkit init --target all` | All seven runtimes at project scope. With `--global`, Claude Code, Codex and Cursor |
 | `mewkit init --profile core` | Claude Code: install a subset (`core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`) |
 | `mewkit init --yes` | Take every default and ask nothing |
