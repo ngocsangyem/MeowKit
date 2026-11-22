@@ -2124,7 +2124,7 @@
       "title": "mk:party",
       "description": "2-4 agent round-table on a trade-off. NOT for mk:brainstorming.",
       "sourcePath": "skills/party/SKILL.md",
-      "sourceHash": "d96ed5b12b68605e998fe77d908cc19329d9214162cfe38c4d007f139d73cf5d",
+      "sourceHash": "581a241b877ee98597e7a06bcfb9882c75e11d6cd7ef1e193994d44986c1b1bc",
       "aliases": [],
       "owner": "research",
       "phase": null,

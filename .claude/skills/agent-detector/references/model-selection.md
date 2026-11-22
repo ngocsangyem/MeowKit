@@ -13,11 +13,11 @@ tier_selection[3]{tier,pin,when_to_use,agents}:
 
 ## Complexity to Model
 
-The task-complexity tiers and their routing CSV levels are defined in `model-selection-rules.md` (Task Complexity Tiers). A task takes the tier its complexity names.
+The task-complexity tiers and their routing CSV levels are defined in `references/model-selection-rules.md` (Task Complexity Tiers). A task takes the tier its complexity names.
 
 ## Task Type to Model
 
-The task-type to tier table (including code review at COMPLEX) is the Routing Table in `model-selection-rules.md`. It is not restated here.
+The task-type to tier table (including code review at COMPLEX) is the Routing Table in `references/model-selection-rules.md`. It is not restated here.
 
 ## Agent Default Models
 

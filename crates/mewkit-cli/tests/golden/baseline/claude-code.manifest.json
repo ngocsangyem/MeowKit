@@ -381,6 +381,11 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/lib/always-on-rules.cjs",
+      "sha256": "0ece630255aa3a832de3fe59e8b4b8c559b8e7a2979f584ae68a8748a439b0c5",
+      "size": 2985
+    },
+    {
       "path": ".claude/hooks/lib/changed-files.cjs",
       "sha256": "205471efd3e43730de84f4da70b606ea7f24fa8f6a24187789ba84637f868309",
       "size": 2176
@@ -6136,6 +6141,11 @@
       "path": ".meowkit/cache/.claude/hooks/hook-coverage.json",
       "sha256": "17843419828dc1a2420b00f52837b9968d9c390efeda1234495ace179d034f92",
       "size": 5647
+    },
+    {
+      "path": ".meowkit/cache/.claude/hooks/lib/always-on-rules.cjs",
+      "sha256": "0ece630255aa3a832de3fe59e8b4b8c559b8e7a2979f584ae68a8748a439b0c5",
+      "size": 2985
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/approval-receipt.cjs",

@@ -91,7 +91,10 @@ fn positional_subverbs_are_read_from_help() {
         ]
     );
     assert_eq!(get("budget"), ["context"]);
-    assert_eq!(get("skill"), ["env"]);
+    assert_eq!(
+        get("skill"),
+        ["env", "status", "overlay", "fork", "rollback"]
+    );
     assert_eq!(get("doctor"), ["provenance"]);
     assert_eq!(get("trace"), ["score", "audit", "propose"]);
     assert_eq!(get("pack"), ["list", "add", "remove"]);

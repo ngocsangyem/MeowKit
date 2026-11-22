@@ -4,7 +4,7 @@ AI auto-detects task complexity. User doesn't need `:fast` or `:hard` variants.
 
 ## Complexity Levels
 
-The levels are the TRIVIAL, STANDARD and COMPLEX tiers defined in `model-selection-rules.md` (Task Complexity Tiers), with their size signals and approach.
+The levels are the TRIVIAL, STANDARD and COMPLEX tiers defined in `references/model-selection-rules.md` (Task Complexity Tiers), with their size signals and approach.
 
 ## Auto-Detection Criteria
 

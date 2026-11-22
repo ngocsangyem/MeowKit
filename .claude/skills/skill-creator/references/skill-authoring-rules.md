@@ -266,7 +266,7 @@ enforce this.
 skill to `.meowkit/telemetry/skill-rubric.json`. A skill passes a criterion when:
 
 - **Description:** it says what the skill does, when to use it (`when_to_use` or a "when"
-  clause) and when not to ("NOT for mk:other"); at most 1,024 characters, and at most 1,536
+  clause) and when not to ("NOT for mk:<other-skill>"); at most 1,024 characters, and at most 1,536
   with `when_to_use`.
 - **Entry:** `SKILL.md` is at most 5,000 estimated tokens (characters / 4).
 - **Dead refs:** no link, slash command or docs reference in the skill points at nothing.
