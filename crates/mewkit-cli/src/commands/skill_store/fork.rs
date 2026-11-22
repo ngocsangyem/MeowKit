@@ -84,22 +84,33 @@ pub fn run(place: &Place, name: Option<&str>, new_name: Option<&str>) -> Result<
 }
 
 /// SKILL.md with the frontmatter `name:` set to `new_name`; unchanged when it
-/// has no frontmatter or no name line.
+/// has no frontmatter or no name line. A file checked out with CRLF endings
+/// (git on Windows) keeps them, so the fork differs only in its name.
 fn renamed(bytes: &[u8], new_name: &str) -> Vec<u8> {
     let Ok(text) = std::str::from_utf8(bytes) else {
         return bytes.to_vec();
     };
-    let Some(rest) = text.strip_prefix("---\n") else {
+    let (open, rest) = if let Some(rest) = text.strip_prefix("---\r\n") {
+        ("---\r\n", rest)
+    } else if let Some(rest) = text.strip_prefix("---\n") {
+        ("---\n", rest)
+    } else {
         return bytes.to_vec();
     };
     let Some(end) = rest.find("\n---") else {
         return bytes.to_vec();
     };
-    let mut out = String::from("---\n");
+    let mut out = String::from(open);
     let mut done = false;
     for line in rest[..end].split_inclusive('\n') {
         if !done && line.starts_with("name:") {
-            let newline = if line.ends_with('\n') { "\n" } else { "" };
+            let newline = if line.ends_with("\r\n") {
+                "\r\n"
+            } else if line.ends_with('\n') {
+                "\n"
+            } else {
+                ""
+            };
             out.push_str(&format!("name: {new_name}{newline}"));
             done = true;
         } else {
@@ -118,5 +129,13 @@ mod tests {
     fn the_frontmatter_name_takes_the_new_name() {
         let out = renamed(b"---\nname: mk:fix\ndescription: x\n---\nbody\n", "my-fix");
         assert_eq!(out, b"---\nname: my-fix\ndescription: x\n---\nbody\n");
+        let crlf = renamed(
+            b"---\r\nname: mk:fix\r\ndescription: x\r\n---\r\nbody\r\n",
+            "my-fix",
+        );
+        assert_eq!(
+            crlf,
+            b"---\r\nname: my-fix\r\ndescription: x\r\n---\r\nbody\r\n"
+        );
     }
 }

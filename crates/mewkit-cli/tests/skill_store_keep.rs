@@ -27,7 +27,13 @@ fn a_fork_is_a_user_owned_copy_that_no_kit_change_reaches() {
     let out = env.mewkit(&["skill", "fork", "fix", "my-fix"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     let forked = read(&p, ".claude/skills/my-fix/SKILL.md");
-    assert!(forked.starts_with("---\nname: my-fix\n"), "{forked}");
+    // The kit's SKILL.md may be checked out with CRLF endings on Windows.
+    assert!(
+        forked
+            .replace("\r\n", "\n")
+            .starts_with("---\nname: my-fix\n"),
+        "{forked}"
+    );
     let fork = row(&status(&env), ".claude/skills/my-fix").clone();
     assert_eq!(fork["status"], "forked");
     assert_eq!(fork["forkOf"], SKILL);
