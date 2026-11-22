@@ -12,6 +12,7 @@ use super::docs_refs_rows::check_docs_refs_contract;
 use super::hooks::check_hooks_executable;
 use super::namespace::check_plugin_namespace;
 use super::operation_rows::{check_generic_core_tokens, check_operation_conformance};
+use super::overlay_hooks::check_hook_references;
 use super::ownership_rows::check_ownership;
 use super::packs::check_packs;
 use super::portability::check_portability;
@@ -132,6 +133,8 @@ pub fn build_default_checks(
         results.extend(check_routing_table_breadth(meowkit_dir));
         results.extend(check_capabilities_section(meowkit_dir));
         results.extend(check_capability_view_drift(meowkit_dir, project_root));
+        // A hook configuration naming a removed script stops that hook running.
+        results.extend(check_hook_references(project_root));
     }
 
     if portable {

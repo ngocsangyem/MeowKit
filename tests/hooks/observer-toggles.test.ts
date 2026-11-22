@@ -172,3 +172,45 @@ describe("each observer toggle removes its observer from the dispatcher's select
 		expect(run()).not.toContain("post-write-ran");
 	});
 });
+
+describe("a toggle for a handler that is no longer registered", () => {
+	const { resolveConfig } = require_(path.join(REPO_ROOT, ".claude/hooks/lib/read-config.cjs")) as {
+		resolveConfig: (o: object) => {
+			values: Record<string, unknown>;
+			errors: unknown[];
+			warnings: { code: string; key: string; message: string }[];
+		};
+	};
+	const options = (root: string) => ({ root, env: {}, home: "/nonexistent-home" });
+
+	it("warns, applies nothing for that key, and keeps every other toggle working", () => {
+		const root = project("hooks:\n  budget-tracker: false\n  removed-handler: false\n");
+		const resolved = resolveConfig(options(root));
+		expect(resolved.errors).toEqual([]);
+		expect(resolved.warnings).toHaveLength(1);
+		expect(resolved.warnings[0]).toMatchObject({ code: "unknown-hook-toggle", key: "hooks.removed-handler" });
+		expect(resolved.warnings[0].message).toMatch(/names no registered hook handler/);
+		expect(Object.hasOwn(resolved.values, "hooks.removed-handler")).toBe(false);
+		// A stale key used to reject the whole file, so budget-tracker ran again.
+		expect(selectedEverywhere(root).some((e) => e.toggleKey === "budget-tracker")).toBe(false);
+	});
+
+	it("still refuses a malformed key or a non-boolean value as an unknown key", () => {
+		for (const config of ["hooks:\n  Removed_Handler: false\n", 'hooks:\n  removed-handler: "off"\n']) {
+			const resolved = resolveConfig(options(project(config)));
+			expect(resolved.warnings).toEqual([]);
+			expect(resolved.errors).toHaveLength(1);
+		}
+	});
+
+	it("is named in the session-start config block", () => {
+		const loader = require_(path.join(REPO_ROOT, ".claude/hooks/handlers/project-context-loader.cjs")) as (
+			ctx: { root: string; session_id: string },
+			state: unknown,
+			env: Record<string, string>,
+		) => string;
+		const root = project("hooks:\n  removed-handler: false\n");
+		const out = loader({ root, session_id: "stale-toggle" }, undefined, {});
+		expect(out).toContain("hooks.removed-handler in the project config names no registered hook handler");
+	});
+});

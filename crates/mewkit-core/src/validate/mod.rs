@@ -62,6 +62,7 @@ mod namespace;
 mod namespace_scan;
 mod operation_rows;
 mod operations;
+mod overlay_hooks;
 mod ownership_rows;
 mod pack_files;
 mod pack_manifest;

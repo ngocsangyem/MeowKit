@@ -78,3 +78,33 @@ fn an_invalid_config_fails_with_the_readers_own_code() {
     // config reader's own, shared with the hook that parses the same file.
     assert!(row.detail.ends_with(']'), "{}", row.detail);
 }
+
+#[test]
+fn a_toggle_for_a_removed_handler_warns_and_names_the_key() {
+    let project = project();
+    fs::create_dir_all(project.path().join(".claude/hooks")).expect("create the hooks dir");
+    fs::write(
+        project.path().join(".claude/hooks/handlers.json"),
+        r#"{"handlers":[{"event":"Stop","handler":"./handlers/post-session.cjs","toggleKey":"post-session"}]}"#,
+    )
+    .expect("write the registry");
+    let meowkit = project.path().join(".meowkit");
+    fs::create_dir_all(&meowkit).expect("create the state dir");
+    fs::write(
+        meowkit.join("config.yaml"),
+        "hooks:\n  post-session: false\n  removed-handler: false\n",
+    )
+    .expect("write the config");
+    let row = check_config(&project.path().join(".claude"));
+    assert_eq!(row.status, Status::Warn, "{}", row.detail);
+    assert!(
+        row.detail.contains("hooks.removed-handler"),
+        "{}",
+        row.detail
+    );
+    assert!(
+        row.detail.contains("[unknown-hook-toggle]"),
+        "{}",
+        row.detail
+    );
+}

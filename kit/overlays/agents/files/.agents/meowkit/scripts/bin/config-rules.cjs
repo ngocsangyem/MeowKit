@@ -24,14 +24,19 @@ const SECRET_WORD = /keys|token|secret|password/i;
 /** POSIX `/etc/x` and Windows `C:\x`. A machine-specific path is not shareable. */
 const ABSOLUTE_PATH = /^(\/|[A-Za-z]:[\\/])/;
 
+/** The registry's toggle-key shape. */
+const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
 const reject = (code, key, message, fix) => ({ ok: false, error: { code, key, message, fix } });
 
 /**
- * `{ ok: true, values }` or `{ ok: false, error }` for an already-parsed flat
- * map. `scope` names where the file came from, so the message can say it.
+ * `{ ok: true, values, warnings }` or `{ ok: false, error }` for an
+ * already-parsed flat map. `scope` names where the file came from, so the
+ * message can say it. `values` leaves out the keys `warnings` names.
  */
 function applyRules(values, { root, scope = 'project config' } = {}) {
   const keys = knownKeys(root);
+  const warnings = [];
 
   for (const [key, value] of Object.entries(values)) {
     // The schema pointer is not a setting and has no rule to break.
@@ -75,6 +80,18 @@ function applyRules(values, { root, scope = 'project config' } = {}) {
           'remove the key; a safety check is not a preference',
         );
       }
+      // A toggle for a handler that is no longer registered is skipped and
+      // reported, not refused: refusing it would drop every other key in the
+      // file, so removing a handler would silently undo the user's other toggles.
+      if (!Object.hasOwn(keys, key) && KEBAB.test(name) && typeof value === 'boolean') {
+        warnings.push({
+          code: 'unknown-hook-toggle',
+          key,
+          message: `${key} in the ${scope} names no registered hook handler, so it switches nothing off`,
+          fix: `remove ${key}; the handler it named was removed or renamed`,
+        });
+        continue;
+      }
     }
 
     if (Object.hasOwn(STATE_ONLY_KEYS, key)) {
@@ -110,7 +127,9 @@ function applyRules(values, { root, scope = 'project config' } = {}) {
     }
   }
 
-  return { ok: true, values };
+  const skipped = new Set(warnings.map((w) => w.key));
+  const applied = Object.fromEntries(Object.entries(values).filter(([key]) => !skipped.has(key)));
+  return { ok: true, values: applied, warnings };
 }
 
 module.exports = { applyRules, SECRET_WORD, ABSOLUTE_PATH };

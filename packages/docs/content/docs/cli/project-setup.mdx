@@ -122,7 +122,7 @@ Without flags `doctor` changes nothing. It checks Node.js (the kit's hooks need 
 
 ### Rows about shared hosts and weakened checks
 
-With more than one runtime or toolkit installed, `doctor` also reports where they overlap. These rows are `ok` or `warn` and change no exit code, except `kit copies: unrecorded`, which fails.
+With more than one runtime or toolkit installed, `doctor` also reports where they overlap. These rows are `ok` or `warn` and change no exit code, except `kit copies: unrecorded` and a lost rule in `rules: always-on`, which fail.
 
 | Row | Reports |
 | --- | --- |
@@ -131,6 +131,7 @@ With more than one runtime or toolkit installed, `doctor` also reports where the
 | `coexistence: agent names`, `foreign hooks`, `instruction files`, `skill listing` | The same agent name at project and home scope, a hook this install does not own on an event it also uses, another always-on instruction source, or a combined skill listing large enough that a host may drop descriptions |
 | `checks: weakened` | An observer is switched off in a config file, `MEOWKIT_HOOK_PROFILE=fast` or the Cursor kill switch is set, or a host setting stops kit hooks from running. The privacy block and the ship check cannot be switched off by config |
 | `guards: integrity` | An installed guard file no longer matches the bytes recorded at install, or a hook registration names a file that is not there |
+| `rules: always-on` | Fails when one of the six always-on rule files of a Claude Code tree, or a rule file another runtime's install recorded, is missing or holds only whitespace. Warns when the project's session marker log claims the safety baseline is verified but the rule files no longer match the digest the marker recorded, or the marker came from an older hook that recorded no digest |
 
 The coexistence rows read names, sizes and hook executable names outside the project. They never read a file's body beyond its frontmatter, never read an environment value, and never follow a symlink inside a scanned tree. `doctor` reads files, not hosts: it cannot tell your host's version, whether Codex has trusted a changed hook, or whether a session started in a directory with no `.claude/`.
 
