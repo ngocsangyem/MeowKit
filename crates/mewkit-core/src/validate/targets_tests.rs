@@ -124,7 +124,7 @@ fn a_grok_tree_is_detected_by_its_hook_runtime_config_and_fails_what_is_missing(
 }
 
 #[test]
-fn an_antigravity_tree_is_a_kit_skill_and_says_its_guards_are_not_installed() {
+fn an_antigravity_tree_is_a_kit_skill_and_fails_when_its_guards_are_missing() {
     let dir = tempfile::tempdir().expect("a temp dir");
     std::fs::create_dir_all(dir.path().join(".agents/skills/mine")).expect("create a skill folder");
     assert!(
@@ -142,7 +142,7 @@ fn an_antigravity_tree_is_a_kit_skill_and_says_its_guards_are_not_installed() {
 
     let rows = check_target("antigravity", dir.path());
     let guards = rows.last().expect("a guards row");
-    assert_eq!(guards.status, Status::Warn);
+    assert_eq!(guards.status, Status::Fail);
     assert!(
         guards.detail.contains("guards not installed"),
         "{}",
@@ -150,6 +150,52 @@ fn an_antigravity_tree_is_a_kit_skill_and_says_its_guards_are_not_installed() {
     );
     // AGENTS.md and the guard script are not there.
     assert_eq!(rows[0].status, Status::Fail, "{rows:?}");
+}
+
+/// The guards are installed from Antigravity's documentation; a complete
+/// install still warns that none has been seen to deny.
+#[test]
+fn installed_antigravity_guards_warn_that_they_are_unverified() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    let write = |rel: &str, text: &str| {
+        let file = dir.path().join(rel);
+        std::fs::create_dir_all(file.parent().expect("a parent")).expect("create the folder");
+        std::fs::write(file, text).expect("write");
+    };
+    let hooks = ".agents/meowkit-antigravity/hooks";
+    write(&format!("{hooks}/privacy-block.cjs"), "");
+    write(&format!("{hooks}/pre-ship.cjs"), "");
+    write(
+        &format!("{hooks}/hook-runtime-config.json"),
+        r#"{ "schemaVersion": 1, "runtime": "antigravity" }"#,
+    );
+    let hook = |name: &str, matcher: &str, script: &str| {
+        format!(
+            r#""{name}": {{ "PreToolUse": [ {{ "matcher": "{matcher}", "hooks": [ {{ "type": "command", "command": "node {hooks}/{script}", "timeout": 10 }} ] }} ] }}"#
+        )
+    };
+    let both = format!(
+        "{{ {}, {} }}",
+        hook("p", "*", "privacy-block.cjs"),
+        hook("s", "run_command", "pre-ship.cjs")
+    );
+    write(".agents/hooks.json", &both);
+    let guards = |dir: &std::path::Path| {
+        check_target("antigravity", dir)
+            .into_iter()
+            .find(|row| row.name == "Antigravity guards")
+            .expect("a guards row")
+    };
+    let row = guards(dir.path());
+    assert_eq!(row.status, Status::Warn, "{}", row.detail);
+    assert!(row.detail.contains("unverified"), "{}", row.detail);
+
+    // A disabled ship check is not a registered one.
+    let off = both.replace(r#""s": {"#, r#""s": { "enabled": false,"#);
+    write(".agents/hooks.json", &off);
+    let row = guards(dir.path());
+    assert_eq!(row.status, Status::Fail, "{}", row.detail);
+    assert!(row.detail.contains("/pre-ship.cjs"), "{}", row.detail);
 }
 
 /// Antigravity silently discards a rule file with no valid `trigger`: the kit's

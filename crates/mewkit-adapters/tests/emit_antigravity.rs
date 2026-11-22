@@ -1,12 +1,15 @@
 //! The Antigravity emitter against this checkout's own kit: install, check the
 //! forms Antigravity documents (https://antigravity.google/docs/skills and
-//! /docs/rules, read 2026-11-22), strip back to the starting tree.
+//! /docs/rules and /docs/hooks, read 2026-11-22), strip back to the starting
+//! tree.
 mod support;
 
 use std::collections::BTreeMap;
 
 use mewkit_adapters::Emitter;
-use mewkit_adapters::antigravity::{Antigravity, NO_GUARDS, rules};
+use mewkit_adapters::antigravity::{
+    Antigravity, HOOK_FILE, HOOKS_DIR, UNVERIFIED, guard_notice, rules,
+};
 use mewkit_adapters::codex::Codex;
 use mewkit_adapters::contract::{EmitError, Op, Plan, Runtime, Scope};
 use mewkit_adapters::placement_resolver::resolve;
@@ -55,7 +58,7 @@ fn installs_beside_the_users_files_and_strips_back_byte_for_byte() {
 }
 
 #[test]
-fn skills_are_invoked_by_slash_and_no_hook_file_is_written() {
+fn skills_are_invoked_by_slash() {
     let kit = kit();
     let p = Project::new(Antigravity);
     let plan = Antigravity
@@ -65,13 +68,77 @@ fn skills_are_invoked_by_slash_and_no_hook_file_is_written() {
     let skill = std::str::from_utf8(files[".agents/skills/mk-cook/SKILL.md"]).unwrap();
     assert!(skill.starts_with("---\nname: \"mk-cook\"") || skill.starts_with("---\nname: mk-cook"));
     assert!(!skill.contains("$mk-") && !skill.contains("/skill:mk-"));
-    assert!(!files.contains_key(".agents/hooks.json"));
-    assert!(!files.keys().any(|path| path.starts_with(".agents/hooks/")));
-    assert!(
-        plan.notices.iter().any(|n| n == NO_GUARDS),
-        "{:?}",
-        plan.notices
+}
+
+/// https://antigravity.google/docs/hooks (read 2026-11-22): `.agents/hooks.json`
+/// maps hook names to events; each guard runs a script the install writes, and
+/// the install names both guards as not yet seen to deny.
+#[test]
+fn both_guards_are_registered_and_named_unverified() {
+    let kit = kit();
+    let p = Project::new(Antigravity);
+    let plan = Antigravity
+        .prepare(&request(&kit, &p.scope, &[], &[]))
+        .unwrap();
+    let files = written(&plan);
+    let doc: serde_json::Value = serde_json::from_slice(files[HOOK_FILE]).unwrap();
+    let mut scripts = Vec::new();
+    for (_, hook) in doc.as_object().unwrap() {
+        for group in hook["PreToolUse"].as_array().unwrap() {
+            for handler in group["hooks"].as_array().unwrap() {
+                assert!(handler["timeout"].is_u64(), "{handler}");
+                let script = handler["command"]
+                    .as_str()
+                    .unwrap()
+                    .split_whitespace()
+                    .nth(1)
+                    .unwrap();
+                assert!(files.contains_key(script), "{script} is not written");
+                assert!(script.starts_with(HOOKS_DIR), "{script}");
+                scripts.push(script.to_owned());
+            }
+        }
+    }
+    scripts.sort();
+    assert_eq!(
+        scripts,
+        [
+            ".agents/meowkit-antigravity/hooks/pre-ship.cjs",
+            ".agents/meowkit-antigravity/hooks/privacy-block.cjs"
+        ]
     );
+    // The scripts refuse to run under any other runtime's config.
+    let config =
+        std::str::from_utf8(files[".agents/meowkit-antigravity/hooks/hook-runtime-config.json"])
+            .unwrap();
+    assert!(config.contains("\"antigravity\""), "{config}");
+    let notice = plan
+        .notices
+        .iter()
+        .find(|n| n.starts_with(UNVERIFIED))
+        .unwrap_or_else(|| panic!("{:?}", plan.notices));
+    assert!(
+        notice.contains("privacy (.agents/meowkit-antigravity/hooks/privacy-block.cjs)"),
+        "{notice}"
+    );
+    assert!(
+        notice.contains("pre-ship (.agents/meowkit-antigravity/hooks/pre-ship.cjs)"),
+        "{notice}"
+    );
+    assert!(
+        !plan
+            .notices
+            .iter()
+            .any(|n| n.contains("guards not installed"))
+    );
+}
+
+#[test]
+fn a_kit_without_a_coverage_file_still_names_the_guards_unverified() {
+    let dir = tempfile::tempdir().unwrap();
+    let notice = guard_notice(dir.path());
+    assert!(notice.starts_with(UNVERIFIED), "{notice}");
+    assert!(notice.contains(HOOK_FILE), "{notice}");
 }
 
 #[test]

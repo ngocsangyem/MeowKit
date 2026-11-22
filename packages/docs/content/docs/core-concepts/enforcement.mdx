@@ -27,20 +27,22 @@ Push, merge and force-push are approved through your host's own permission promp
 
 An Enforced cell means a registered hook refuses the action. Advisory means an instruction asks for it and nothing checks. `.claude/hooks/hook-coverage.json` in the kit records what each safety behaviour becomes on each runtime.
 
-| Control | Claude Code | Codex | Cursor | Grok | Pi | OMP |
-|---|---|---|---|---|---|---|
-| Credential-file reads | Enforced on Read, Edit/Write and Bash | Enforced on Bash only | Enforced on file reads | Enforced on every tool | Enforced on every tool call | Enforced on every tool call |
-| Ship check | Enforced | Enforced | Enforced | Enforced on Bash | Enforced on shell commands | Enforced on shell commands |
-| Destructive shell commands | Advisory | Absent | Enforced | Absent | Absent | Absent |
-| MCP server allowlist | Absent | Absent | Enforced | Absent | Absent | Absent |
-| Writes to protected paths | Absent | Absent | Enforced | Absent | Absent | Absent |
-| Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
-| Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
-| Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent |
+| Control | Claude Code | Codex | Cursor | Grok | Pi | OMP | Antigravity |
+|---|---|---|---|---|---|---|---|
+| Credential-file reads | Enforced on Read, Edit/Write and Bash | Enforced on Bash only | Enforced on file reads | Enforced on every tool | Enforced on every tool call | Enforced on every tool call | Unverified on every tool (from documentation) |
+| Ship check | Enforced | Enforced | Enforced | Enforced on Bash | Enforced on shell commands | Enforced on shell commands | Unverified on `run_command` (from documentation) |
+| Destructive shell commands | Advisory | Absent | Enforced | Absent | Absent | Absent | Absent |
+| MCP server allowlist | Absent | Absent | Enforced | Absent | Absent | Absent | Absent |
+| Writes to protected paths | Absent | Absent | Enforced | Absent | Absent | Absent | Absent |
+| Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
+| Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
+| Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent | Absent |
 
 Cells that say Absent mean the host's own permissions are the only control. On Claude Code the `careful` and `freeze` skills block destructive commands only while the skill is active.
 
 Grok, Pi and OMP enforcement follows what each vendor documents and what the kit's code does. None of it has been run in a live Grok or Pi session, and for OMP only the skill listing was probed.
+
+Antigravity's two guards are installed as unverified: they were built from https://antigravity.google/docs/hooks (read 2026-11-22) and no live run has shown either one deny, so do not count on them yet. Each answers on stdout, denies on unreadable input or its own error, and the ship check asks (`force_ask`) when the checks reach no verdict. The page does not say what the host does with a hook that times out or whose `node` cannot start; either may let the call through. `mewkit init` and `mewkit doctor` name both guards as unverified.
 
 ### When installed hooks do not run
 
@@ -50,6 +52,7 @@ Grok, Pi and OMP enforcement follows what each vendor documents and what the kit
 - Grok runs project hooks only after `/hooks-trust`, or when it starts with `--trust`.
 - Pi loads `.pi/extensions/meowkit.ts` only in a project you have trusted with `/trust`.
 - OMP has no trust step.
+- Antigravity's hooks page names no trust step. The registrations run `node` with a path relative to the project root, which assumes the host starts hooks there; the page does not say.
 
 The credential guard does not see files attached with `@` in the prompt, because no tool call happens. On Claude Code and Cursor it also misses reads inside a subprocess such as `grep -r` or a build tool.
 

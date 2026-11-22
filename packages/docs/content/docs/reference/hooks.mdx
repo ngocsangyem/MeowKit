@@ -124,7 +124,7 @@ Hooks read their input as JSON on stdin, through `lib/parse-stdin.cjs`. The writ
 | `checkpoint-utils.cjs` | Reads and writes checkpoint files |
 | `core/*.cjs` | The decisions the guards share across runtimes: `privacy.cjs`, `pre-ship.cjs` and `completion-check.cjs` |
 
-Each `lib/core` module is a pure decision. It reads the project tree, never touches stdin, stdout or the exit code, and returns `{ exit, stdout, stderr }`, where exit 2 is a block. Claude Code's guards wrap these modules, and the Codex, Cursor, Grok, Pi and OMP hook code calls the same decisions, so a change reaches every runtime that carries them.
+Each `lib/core` module is a pure decision. It reads the project tree, never touches stdin, stdout or the exit code, and returns `{ exit, stdout, stderr }`, where exit 2 is a block. Claude Code's guards wrap these modules, and the Codex, Cursor, Grok, Pi, OMP and Antigravity hook code calls the same decisions, so a change reaches every runtime that carries them.
 
 ## State files
 
@@ -141,17 +141,17 @@ Each `lib/core` module is a pure decision. It reads the project tree, never touc
 
 ## Runtime parity
 
-The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi and OMP, and a test checks that each one appears there. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session.
+The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi, OMP and Antigravity, and a test checks that each one appears there. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session. The Antigravity entries carry the status `unverified`: the guard is installed and runs the shared decision, but it was built from the vendor's documentation (https://antigravity.google/docs/hooks, read 2026-11-22) and no live run has shown it deny. A test refuses an Antigravity row marked `ported` without a recorded probe that saw a denial, and `mewkit init` and `mewkit doctor` name every unverified guard.
 
-| Behavior | Claude Code | Codex | Cursor | Grok | Pi | OMP |
-| --- | --- | --- | --- | --- | --- | --- |
-| Privacy block | `privacy-block.cjs` | Ported, Bash only: Codex has no file-read hook, so the decision runs on the shell command and the paths it names | Ported: `privacy-read-gate.cjs` on `beforeReadFile` | Ported: `privacy-block.cjs` on PreToolUse, every tool | Ported: `guard.cjs` through the extension's `tool_call` | Ported: `guard.cjs` through the hook module's `tool_call` |
-| Ship check | `pre-ship.cjs` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: `pre-ship.cjs` on `beforeShellExecution` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: inside `guard.cjs`, on a shell command | Ported: inside `guard.cjs`, on a shell command |
-| Session context | `project-context-loader` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state | Not ported | Not ported | Not ported |
+| Behavior | Claude Code | Codex | Cursor | Grok | Pi | OMP | Antigravity |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Privacy block | `privacy-block.cjs` | Ported, Bash only: Codex has no file-read hook, so the decision runs on the shell command and the paths it names | Ported: `privacy-read-gate.cjs` on `beforeReadFile` | Ported: `privacy-block.cjs` on PreToolUse, every tool | Ported: `guard.cjs` through the extension's `tool_call` | Ported: `guard.cjs` through the hook module's `tool_call` | Unverified, from documentation: `privacy-block.cjs` on PreToolUse, every tool |
+| Ship check | `pre-ship.cjs` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: `pre-ship.cjs` on `beforeShellExecution` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: inside `guard.cjs`, on a shell command | Ported: inside `guard.cjs`, on a shell command | Unverified, from documentation: `pre-ship.cjs` on PreToolUse `run_command` |
+| Session context | `project-context-loader` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state | Not ported | Not ported | Not ported | Not ported |
 
 Of the 23 observers, `hook-coverage.json` ports or maps only these off Claude Code:
 
-| Observer | Codex | Cursor | Grok, Pi, OMP |
+| Observer | Codex | Cursor | Grok, Pi, OMP, Antigravity |
 | --- | --- | --- | --- |
 | `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
 | `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
