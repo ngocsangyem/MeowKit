@@ -39,6 +39,9 @@ pub struct PackManifest {
     /// row per pack is printed in that order.
     pub packs: Vec<(String, PackDef)>,
     pub profiles: Vec<(String, Vec<String>)>,
+    /// Skills the kit has withdrawn, by kit name. An install never lays one
+    /// down, even when it is selected. Absent in older manifests.
+    pub retired_skills: Vec<String>,
 }
 
 impl PackManifest {

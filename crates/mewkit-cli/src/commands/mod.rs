@@ -162,11 +162,12 @@ fn prepare_for(
         }
         ScopeKind::Global => None,
     };
+    let disabled = crate::skill_selection::disabled(place, kit, packs)?;
     Ok(e.prepare(&EmitRequest {
         kit,
         scope: &place.scope,
         packs,
-        disabled: &[],
+        disabled: &disabled,
         fresh: false,
         other_scope: other.as_ref(),
         placement: placement.as_ref(),
