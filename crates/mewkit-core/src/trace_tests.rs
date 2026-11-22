@@ -129,5 +129,8 @@ fn a_record_without_a_skill_never_counts_toward_a_skill_signal() {
     assert!(TraceSignal::TaskFailure.is_strong() && !TraceSignal::Retry.is_strong());
     assert_eq!(skill_signal(&json!({"signal": "task_failure"})), None);
     assert_eq!(skill_signal(&json!({"skill": "", "signal": "retry"})), None);
-    assert_eq!(skill_signal(&json!({"skill": "fix", "signal": "free text"})), None);
+    assert_eq!(
+        skill_signal(&json!({"skill": "fix", "signal": "free text"})),
+        None
+    );
 }
