@@ -1,20 +1,23 @@
 //! Every emitter, listed explicitly. No init-time registration.
 use crate::contract::{Emitter, Runtime};
+use crate::eval_pack::WithEvalPack;
 
 /// Runtimes whose emitter has not been written yet. Each emitter added to
 /// [`registry`] must be removed from here; the test below keeps the two
 /// lists covering every [`Runtime`] exactly once.
 pub const NOT_YET_EMITTED: &[Runtime] = &[];
 
+/// Every emitter installs the opt-in eval pack the same way, so each is
+/// wrapped once here rather than taught about it one by one.
 pub fn registry() -> &'static [&'static dyn Emitter] {
     &[
-        &crate::claude_code::ClaudeCode,
-        &crate::codex::Codex,
-        &crate::cursor::Cursor,
-        &crate::grok::Grok,
-        &crate::pi::Pi,
-        &crate::omp::Omp,
-        &crate::antigravity::Antigravity,
+        &WithEvalPack(crate::claude_code::ClaudeCode),
+        &WithEvalPack(crate::codex::Codex),
+        &WithEvalPack(crate::cursor::Cursor),
+        &WithEvalPack(crate::grok::Grok),
+        &WithEvalPack(crate::pi::Pi),
+        &WithEvalPack(crate::omp::Omp),
+        &WithEvalPack(crate::antigravity::Antigravity),
     ]
 }
 

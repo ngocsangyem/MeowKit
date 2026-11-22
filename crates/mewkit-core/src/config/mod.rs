@@ -37,7 +37,7 @@ pub mod shape_check;
 pub mod write_stub;
 pub mod yaml_grammar;
 
-pub use config_rules::{ConfigScope, RuleError, apply_rules};
+pub use config_rules::{ConfigScope, RuleError, RuleWarning, apply_rules, stale_hook_toggles};
 pub use config_values::{ConfigValue, ConfigValues};
 pub use json_schema::{config_json_schema, render_config_json_schema};
 pub use load_config::{

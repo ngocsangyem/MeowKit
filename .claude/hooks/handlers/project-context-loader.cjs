@@ -20,8 +20,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const R = require('../lib/session-context-report.cjs');
-const { configValue } = require('../lib/read-config.cjs');
+const { configValue, resolveConfig } = require('../lib/read-config.cjs');
 const { LEGACY_STATE_RELS, sessionStateDir, sessionStateFile } = require('../lib/meowkit-paths.cjs');
+const { markerDigests } = require('../lib/always-on-rules.cjs');
 const { isTddEnabled } = require('../lib/tdd-detect.cjs');
 
 const CONTEXT_FILE = 'docs/project-context.md';
@@ -97,6 +98,46 @@ function resetSessionState(root, sessionId) {
   return previous;
 }
 
+/** Host session identifiers are UUID-shaped; anything else could break the record. */
+const SAFE_SESSION_ID = /^[A-Za-z0-9_.-]+$/;
+
+/**
+ * Record what the rule files held when the host loaded them. The Stop handler
+ * writes the "verified" marker only while the files still match this, so a rule
+ * edited, emptied or deleted mid-session makes the next turn re-read instead of
+ * trusting a copy that is no longer on disk. Written on every session start,
+ * a resume and a compaction included, because each of those reloads the rules;
+ * the latest line for the session is the one that counts.
+ */
+function recordRuleBaseline(root, sessionId) {
+  if (process.env.MEOWKIT_SKIP_SAFETY_SENTINEL === 'off') return;
+  if (!sessionId || !SAFE_SESSION_ID.test(sessionId)) return;
+  const { rules, phaseZero } = markerDigests(root);
+  const ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+  const row = { session_id: sessionId, event: 'rules_loaded', rules_sha256: rules, phase_zero_sha256: phaseZero, ts };
+  try {
+    fs.appendFileSync(path.join(sessionStateDir(root), 'session-sentinels.jsonl'), `${JSON.stringify(row)}\n`);
+  } catch {
+    // No baseline means no marker this session: a re-read every turn, not a wrong skip.
+  }
+}
+
+/**
+ * A `hooks.<name>` key for a handler that is no longer registered does nothing,
+ * and the rest of its file still applies. Saying so here is the only place a
+ * session hears about it; the dispatcher stays silent so one stale key does not
+ * repeat on every event.
+ */
+function staleToggleRows(root) {
+  let warnings = [];
+  try {
+    warnings = resolveConfig({ root }).warnings || [];
+  } catch {
+    return [];
+  }
+  return warnings.map((w) => `- ⚠ ${w.message} — ${w.fix}`);
+}
+
 /** Where an answer came from, in the words a reader can act on. */
 const SOURCE_LABEL = {
   env: 'environment override',
@@ -139,6 +180,7 @@ function configBlock(env, root) {
     row('Loop detection', loop.value === false ? '**disabled**' : 'on', loop.level),
     row('Harness density', density.value === '' ? 'auto-detect' : `**${density.value}**`, density.level),
     row('Budget cap', capUsd > 0 ? `**$${capUsd}** per run` : 'none', cap.level),
+    ...staleToggleRows(root),
     '',
     '_Resolved per setting, highest level first: a supported environment override → `.meowkit/config.yaml` → `~/.meowkit/config.yaml` → the built-in default. Agent sees this block at session start only._',
   ];
@@ -166,6 +208,7 @@ module.exports = function projectContextLoader(ctx, _state, env = process.env) {
   const sessionId = ctx.session_id || '';
   const previous = resetSessionState(root, sessionId);
   const newSession = Boolean(sessionId) && sessionId !== previous;
+  recordRuleBaseline(root, sessionId);
   if (newSession) out.push(...configBlock(env, root));
   // Once per session, not once per event: a resume or a compaction re-runs this
   // handler, and a hint repeated every time is one a reader learns to skip.

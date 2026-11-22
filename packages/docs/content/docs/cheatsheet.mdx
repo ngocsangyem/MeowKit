@@ -187,7 +187,7 @@ Source of truth for the file's key surface: `crates/mewkit-core/schemas/config-v
 
 `hooks.<name>: false` disables one observer, and the default is `true`. `<name>` is the observer's file base name, for example `build-verify`, `loop-detection`, `pre-completion-check`, `tdd-flag-detector`, `learning-observer` or `budget-tracker`. The config schema lists 23 such keys.
 
-The guards `privacy-block` and `pre-ship` have no config key. An unknown key in `config.yaml` is a validation error, and the guards keep running.
+The guards `privacy-block` and `pre-ship` have no config key. An unknown key in `config.yaml` is a validation error, and the guards keep running. A `hooks.<name>` toggle for a handler that no longer exists only warns.
 
 ### Environment
 

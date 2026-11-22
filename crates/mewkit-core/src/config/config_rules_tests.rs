@@ -114,13 +114,41 @@ fn every_rejection_class_fires_its_own_rule() {
 }
 
 #[test]
-fn an_unregistered_observer_toggle_is_an_unknown_key() {
-    let values: ConfigValues = vec![("hooks.not-installed", ConfigValue::Bool(false))]
+fn an_unregistered_observer_toggle_warns_instead_of_rejecting_the_file() {
+    let values: ConfigValues = vec![
+        ("tdd", ConfigValue::Bool(true)),
+        ("hooks.not-installed", ConfigValue::Bool(false)),
+    ]
+    .into_iter()
+    .collect();
+    apply_rules(&values, &[], ConfigScope::ProjectConfig).expect("a stale toggle is not a failure");
+    let warnings = super::stale_hook_toggles(&values, &[], ConfigScope::ProjectConfig);
+    assert_eq!(warnings.len(), 1);
+    assert_eq!(warnings[0].code, "unknown-hook-toggle");
+    assert_eq!(warnings[0].key, "hooks.not-installed");
+    assert!(
+        warnings[0].message.contains("in the project config"),
+        "{}",
+        warnings[0].message
+    );
+}
+
+#[test]
+fn a_registered_toggle_is_not_stale_and_a_malformed_one_stays_an_unknown_key() {
+    let names = vec!["post-write".to_string()];
+    let ok: ConfigValues = vec![("hooks.post-write", ConfigValue::Bool(false))]
         .into_iter()
         .collect();
-    let error = apply_rules(&values, &[], ConfigScope::ProjectConfig).expect_err("no registry");
-    assert_eq!(error.code, "unknown-key");
-    assert_eq!(error.key, "hooks.not-installed");
+    assert!(super::stale_hook_toggles(&ok, &names, ConfigScope::ProjectConfig).is_empty());
+    // Not a boolean, or not a toggle-key shape: still refused as before.
+    for (key, value) in [
+        ("hooks.gone", ConfigValue::Str("off".into())),
+        ("hooks.Gone_Handler", ConfigValue::Bool(false)),
+    ] {
+        let values: ConfigValues = vec![(key, value)].into_iter().collect();
+        let error = apply_rules(&values, &names, ConfigScope::ProjectConfig).expect_err(key);
+        assert_eq!(error.code, "unknown-key", "{key}");
+    }
 }
 
 #[test]

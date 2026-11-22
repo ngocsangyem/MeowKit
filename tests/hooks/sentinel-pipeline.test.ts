@@ -43,13 +43,37 @@ function project(): string {
 		path.join(dir, ".claude/hooks/handlers/precompact-probe.cjs"),
 	);
 	fs.cpSync(path.join(REPO_ROOT, ".claude/hooks/lib"), path.join(dir, ".claude/hooks/lib"), { recursive: true });
+	// The files the marker vouches for: the reader re-checks them on every turn.
+	for (const rel of [...rulesLib.ALWAYS_ON_RULES, ...rulesLib.PHASE_ZERO_FILES]) {
+		fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true });
+		fs.writeFileSync(path.join(dir, rel), `# ${rel}\n`);
+	}
 	return dir;
 }
 
+const rulesLib = require_(path.join(REPO_ROOT, ".claude/hooks/lib/always-on-rules.cjs")) as {
+	ALWAYS_ON_RULES: string[];
+	PHASE_ZERO_FILES: string[];
+	markerDigests: (root: string) => { rules: string | null; phaseZero: string | null };
+};
+
 const append = (root: string, line: string) => fs.appendFileSync(path.join(root, LOG_REL), `${line}\n`);
 
-const writeVerified = (root: string, sid: string, safety: boolean, phaseZero: boolean, ts = "2026-05-16T00:00:00Z") =>
-	append(root, JSON.stringify({ session_id: sid, safety, phase_zero: phaseZero, ts }));
+/** A verification line as the Stop handler writes it: each flag with the digest it checked. */
+const writeVerified = (root: string, sid: string, safety: boolean, phaseZero: boolean, ts = "2026-05-16T00:00:00Z") => {
+	const { rules, phaseZero: phaseDigest } = rulesLib.markerDigests(root);
+	append(
+		root,
+		JSON.stringify({
+			session_id: sid,
+			safety,
+			...(safety ? { rules_sha256: rules } : {}),
+			phase_zero: phaseZero,
+			...(phaseZero ? { phase_zero_sha256: phaseDigest } : {}),
+			ts,
+		}),
+	);
+};
 
 const writeRearm = (root: string, sid: string, ts = "2026-05-16T00:00:00Z") =>
 	append(root, JSON.stringify({ session_id: sid, event: "precompact_rearm", ts }));
@@ -131,6 +155,28 @@ describe("the cached-skip marker is withheld whenever it cannot be trusted", () 
 		writeVerified(root, "sess-7", true, true);
 		const out = await read(root, "sess-7");
 		expect(out).toContain(SAFETY_MARKER);
+	});
+
+	it("emits nothing for a line that records no digest, as an older writer's did", async () => {
+		const root = project();
+		append(root, JSON.stringify({ session_id: "sess-12", safety: true, phase_zero: true, ts: "x" }));
+		expect(await read(root, "sess-12")).toBe("");
+	});
+
+	it("withholds the safety marker once a rule file changes, and keeps the phase-zero one", async () => {
+		const root = project();
+		writeVerified(root, "sess-13", true, true);
+		fs.writeFileSync(path.join(root, ".claude/rules/security-rules.md"), "edited\n");
+		const out = await read(root, "sess-13");
+		expect(out).not.toContain(SAFETY_MARKER);
+		expect(out).toContain(PHASE_MARKER);
+	});
+
+	it("withholds the safety marker once a rule file is deleted", async () => {
+		const root = project();
+		writeVerified(root, "sess-14", true, false);
+		fs.rmSync(path.join(root, ".claude/rules/injection-rules.md"));
+		expect(await read(root, "sess-14")).toBe("");
 	});
 
 	it("lets the latest line win for a repeated session id", async () => {

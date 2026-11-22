@@ -233,17 +233,37 @@ fn build_kit() -> PathBuf {
         .output()
         .unwrap();
     assert!(listed.status.success(), "git ls-files failed");
-    for path in String::from_utf8(listed.stdout)
-        .unwrap()
-        .split('\0')
-        .filter(|p| !p.is_empty())
-    {
-        if excludes.iter().any(|pat| glob(pat, path)) {
-            continue;
-        }
-        let dest = out.join(path);
+    let listed = String::from_utf8(listed.stdout).unwrap();
+    let paths: Vec<&str> = listed.split('\0').filter(|p| !p.is_empty()).collect();
+    let copy = |from: &str, to: &str| {
+        let dest = out.join(to);
         std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
-        std::fs::copy(repo.join(path), dest).unwrap();
+        std::fs::copy(repo.join(from), dest).unwrap();
+    };
+    for path in &paths {
+        if !excludes.iter().any(|pat| glob(pat, path)) {
+            copy(path, path);
+        }
+    }
+    // The opt-in file packs, at the archive paths `filePackFiles` in
+    // `scripts/kit-ship-set.cjs` gives them: `kit/packs/<name>/<path under from>`.
+    for (name, pack) in manifest["filePacks"].as_object().into_iter().flatten() {
+        let from = pack["from"].as_str().unwrap();
+        let include = pack["include"].as_str().unwrap();
+        let skip: Vec<&str> = pack["exclude"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .map(|p| p.as_str().unwrap())
+            .collect();
+        for path in &paths {
+            if let Some(rest) = path.strip_prefix(from)
+                && glob(include, path)
+                && !skip.iter().any(|pat| glob(pat, path))
+            {
+                copy(path, &format!("kit/packs/{name}/{rest}"));
+            }
+        }
     }
     out
 }

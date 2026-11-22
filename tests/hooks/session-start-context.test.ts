@@ -93,7 +93,16 @@ describe("session-start context injection", () => {
 		loader({ root, session_id: "fresh" }, undefined, env);
 
 		expect(fs.readFileSync(path.join(root, ".meowkit/state/edit-counts.json"), "utf8")).toBe("{}");
-		expect(fs.readFileSync(path.join(root, ".meowkit/state/session-sentinels.jsonl"), "utf8")).toBe("");
+		// The old session's lines are gone; what is left is this session's rule
+		// baseline, recorded after the reset. This project has no rule files, so
+		// the baseline records no digest and no marker can be written against it.
+		const sentinels = fs
+			.readFileSync(path.join(root, ".meowkit/state/session-sentinels.jsonl"), "utf8")
+			.trim()
+			.split("\n")
+			.map((line) => JSON.parse(line));
+		expect(sentinels).toHaveLength(1);
+		expect(sentinels[0]).toMatchObject({ session_id: "fresh", event: "rules_loaded", rules_sha256: null });
 		expect(fs.existsSync(path.join(root, ".meowkit/state/tdd-mode")), "test-first sentinel cleared").toBe(false);
 		// Cross-session coordination state and the attempt cap must survive, or the
 		// next session loses its plan and the completion loop loses its bound.

@@ -10,7 +10,9 @@
 //! and a guard file that no longer matches what was installed. Those rows are
 //! `ok` or `warn` and never `fail`, so they change no exit code. One row about
 //! shared trees does fail: a copy of a kit skill or agent that no install here
-//! recorded, under a second root an installed runtime reads.
+//! recorded, under a second root an installed runtime reads. So does the
+//! always-on rules row when a rule file is missing or empty; a session marker
+//! that no longer matches the rule files only warns.
 mod adopt;
 mod codex_trust;
 mod coexistence;
@@ -28,6 +30,7 @@ mod integrity;
 mod overlap;
 mod overlap_survey;
 mod provenance;
+mod rule_text;
 mod skill_listing;
 mod skill_store_check;
 mod toolchain;
@@ -144,6 +147,7 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
     checks.extend(skill_listing::checks(&scopes, &targets));
     checks.push(weakened::check(&scopes));
     checks.push(integrity::check(&scopes, &targets));
+    checks.push(rule_text::check(&scopes, &targets));
     checks.push(skill_store_check::check(&scopes));
     let root = extras::project_root();
     if args.providers {

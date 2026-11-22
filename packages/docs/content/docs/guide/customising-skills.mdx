@@ -80,6 +80,19 @@ copies the skill beside the original in every skills directory it is installed i
 
 Each is reported as `kept <path>: <reason>`. `--force` does not override any of these. When a removal is dropped, the files leave the ownership ledger and the skill is yours from then on (`status` shows `local`).
 
+## Upgrade merges a separated edit
+
+When you edit a kit skill file in place (no overlay) and the new kit changed the same file, `upgrade` merges the two when every one of these holds, and otherwise keeps your file as it is, reports it as `kept`, and exits 6:
+
+- the previous kit is in the project's kit cache (`.meowkit/cache/kits/`) and its version of the file hashes to what the ownership ledger recorded at install. An install from a local kit directory is never cached, and an offline upgrade cannot fetch a lost one, so those keep your file;
+- your edit and the kit's change are separated by at least one unchanged line that appears only once in each version, and do not overlap or touch;
+- neither edit touches the frontmatter or a gate line: a line containing `STOP`, `HARD`, `BLOCK`, `MUST` or `NEVER` (that case), or, in any case, a word starting with `gate`, `non-negotiable`, `must not`, `injection` or `untrusted`;
+- the skill has eval cases: an `eval/` folder for it from the eval pack (`.meowkit/eval/<skill>/eval/`), or inside the skill in a kit checkout.
+
+A skill merges as a whole: if one of its edited files cannot be merged, none of them is. The merged files and the kit's other new files for the skill are written in one journal, behind one backup, so a failure part way leaves the skill as it was. Each merged file is listed as `merged your edit with the kit's change`, each one refused as `not merged <path>: <reason>`, and a merged file does not make `upgrade` exit 6. The ledger keeps the kit's hash for the file, so it still counts as edited and the next upgrade merges again; the store records the new tree digest with the old one in the history, so `skill rollback` can undo the merge.
+
+The merged skill's eval is not started by `upgrade`: a live `mewkit eval run` needs a model, a cost ceiling, a run limit and the runtime's login. The summary says `eval of <skill> not run: <reason>`; run it by hand. Merging applies to project installs on Claude Code; on other runtimes and global installs an edited file is kept as before.
+
 ## Rollback
 
 ```bash

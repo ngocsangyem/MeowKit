@@ -59,6 +59,19 @@ pub enum ExecError {
     },
 }
 
+/// The result of merging a user's edit of a kit file with the kit's new
+/// version, to be written in place of the kit's bytes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MergedFile {
+    pub bytes: Vec<u8>,
+    /// SHA-256 of the file on disk the merge was computed from; any other
+    /// bytes found there at apply time and the merge is not used.
+    pub against: String,
+}
+
+/// Merged files by root-relative path.
+pub type Merges = HashMap<RelPath, MergedFile>;
+
 /// Apply `plan` to `scope`, updating `index` only if everything succeeded.
 /// `kit_hash` answers the SHA-256 of the bytes the kit installs at a path
 /// (`None`: not shipped): what the emitter writes, after any rewrite.
@@ -67,6 +80,20 @@ pub fn execute(
     scope: &Scope,
     index: &mut OwnershipIndex,
     kit_hash: &dyn Fn(&RelPath) -> Option<String>,
+    opts: ExecOptions,
+) -> Result<EmitReport, ExecError> {
+    execute_merging(plan, scope, index, kit_hash, &Merges::new(), opts)
+}
+
+/// As [`execute`], writing each file in `merges` instead of the kit's bytes
+/// for its `WriteFile` op, in the same journal as every other change, so a
+/// skill's merged and replaced files land together or not at all.
+pub fn execute_merging(
+    plan: &Plan,
+    scope: &Scope,
+    index: &mut OwnershipIndex,
+    kit_hash: &dyn Fn(&RelPath) -> Option<String>,
+    merges: &Merges,
     opts: ExecOptions,
 ) -> Result<EmitReport, ExecError> {
     let layout = Layout::new(&scope.root, scope.mounts.clone());
@@ -133,7 +160,14 @@ pub fn execute(
             Some(bytes) => bytes.clone(),
             None => read_opt(&layout.resolve(op.path()))?,
         };
-        let d = decide(op, current, &work, kit_hash, opts.force)?;
+        let d = decide(
+            op,
+            current,
+            &work,
+            kit_hash,
+            merges.get(op.path()),
+            opts.force,
+        )?;
         match &d.action {
             Action::Write { bytes, .. } => {
                 pending.insert(d.path.clone(), Some(bytes.clone()));

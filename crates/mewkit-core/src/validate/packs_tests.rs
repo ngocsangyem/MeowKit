@@ -153,3 +153,18 @@ fn an_inventory_with_no_edges_at_all_warns_that_the_closure_is_inert() {
         "{rows:#?}"
     );
 }
+
+#[test]
+fn a_file_pack_is_read_apart_from_the_skill_packs_and_no_profile_reaches_it() {
+    let dir = install(
+        r#"{"base":{"files":[],"globs":["skills/cook/**"]},
+            "packs":{"lifecycle-core":{"owners":["lifecycle"]}},
+            "filePacks":{"eval":{"from":".claude/skills/","include":".claude/skills/*/eval/*"}},
+            "profiles":{"full":["*"]}}"#,
+    );
+    let manifest = super::super::load_pack_manifest(&claude(dir.path())).expect("loads");
+    assert_eq!(manifest.file_packs, ["eval"]);
+    assert!(manifest.has_file_pack("eval") && !manifest.has_pack("eval"));
+    let (packs, _) = super::super::flatten_profile(&manifest, "full").expect("flattens");
+    assert!(!packs.iter().any(|p| p == "eval"), "{packs:?}");
+}

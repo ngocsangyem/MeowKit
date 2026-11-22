@@ -7,6 +7,7 @@ mod update_notice;
 use clap::Args;
 use mewkit_adapters::claude_code::plugin_manifest;
 use mewkit_adapters::contract::{OwnershipIndex, Runtime, ScopeKind, written_hashes};
+use mewkit_adapters::eval_pack;
 use mewkit_core::exec::ExecOptions;
 
 use self::choose::Delivery;
@@ -36,6 +37,7 @@ pub struct InitArgs {
     pub profile: Option<String>,
     /// Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted
     /// installs every skill; an empty value installs the default pack only.
+    /// `eval` (any runtime) also installs the eval cases to .meowkit/eval/.
     #[arg(long, value_name = "PACKS")]
     pub skill_packs: Option<String>,
     /// Claude Code only: `native` (the host's own directory) or `plugin` (the
@@ -129,7 +131,10 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     if profile.is_some() && !targets.contains(&Runtime::ClaudeCode) {
         eprintln!("note: --profile applies to claude-code only; ignored");
     }
-    let skill_packs = choose::skill_packs(args.skill_packs.as_deref());
+    // `eval` is not a skill pack: it adds the eval cases for every runtime this
+    // run installs, so it is taken out before any runtime reads the list.
+    let (skill_packs, eval_pack) =
+        eval_pack::split(&choose::skill_packs(args.skill_packs.as_deref()));
     let mut mcp_notes = Vec::new();
 
     // Codex, Pi, OMP and Antigravity write one `.agents/` tree between them, in wording
@@ -162,7 +167,11 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
             }
             _ => (skill_packs.clone(), false),
         };
-        let mut plan = prepare_among(&place, e, &kit, &packs, &targets)?;
+        let mut asked = packs.clone();
+        if eval_pack && !rejoining.contains(&runtime) {
+            asked.push(eval_pack::PACK.to_owned());
+        }
+        let mut plan = prepare_among(&place, e, &kit, &asked, &targets)?;
         if runtime == Runtime::ClaudeCode && delivery == Delivery::Plugin {
             plan.ops.push(plugin_manifest(&kit.version)?);
         }
@@ -242,6 +251,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
             plan,
             index,
             hashes,
+            merge_base: None,
         });
     }
     let outcomes = run_jobs(
