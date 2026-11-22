@@ -44,7 +44,7 @@ Most skills follow a plan-first practice: before significant work they check tha
 
 | Skill | Plan behavior | Skipped when |
 |---|---|---|
-| `mk:cook` | Writes a plan if there is none | A plan path is passed, or the quick profile runs |
+| `mk:cook` | Writes a plan if there is none | A plan path is passed, or the quick profile runs on a change of two files or fewer and about 30 minutes or less |
 | `mk:fix` | Plan when the fix touches more than 2 files | `--quick` |
 | `mk:ship` | Looks for a plan, suggests one for non-trivial changes | You choose to ship anyway |
 | `mk:review` | Reads the plan for context | A PR or pending diff is the context |

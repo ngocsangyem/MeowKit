@@ -59,7 +59,7 @@ On a non-trivial task, route to `mk:plan-creator` and agree the plan with the us
 
 ## When to Use
 
-**USE for:** New features, complex implementations, tasks >2 hours, multi-file changes, tasks requiring TDD.
+**USE for:** New features, complex implementations, tasks >30 min, multi-file changes, tasks requiring TDD.
 
 **DON'T use for:** Bug fixes → `mk:fix`, quick refactors → direct edit, config changes → direct edit, simple questions → just answer.
 

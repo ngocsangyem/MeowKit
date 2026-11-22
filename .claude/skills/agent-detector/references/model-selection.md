@@ -17,17 +17,7 @@ The task-complexity tiers and their routing CSV levels are defined in `model-sel
 
 ## Task Type to Model
 
-```toon
-task_tier[8]{task_type,tier,reason}:
-  Typo fix / config change,TRIVIAL,Minimal reasoning needed
-  Bug fix / feature add,STANDARD,Standard implementation
-  API endpoint / component,STANDARD,Standard implementation
-  Test writing,STANDARD,Requires code understanding
-  Code review,STANDARD,Pattern matching + analysis
-  Architecture design,COMPLEX,Complex trade-off analysis
-  Security audit,COMPLEX,Deep vulnerability analysis
-  Refactoring / migration,COMPLEX,Cross-cutting impact analysis
-```
+The task-type to tier table (including code review at COMPLEX) is the Routing Table in `model-selection-rules.md`. It is not restated here.
 
 ## Agent Default Models
 
