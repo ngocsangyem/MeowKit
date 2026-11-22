@@ -2,7 +2,9 @@
 use mewkit_core::validate::{BASE_PACK, resolve_packs};
 use serde_json::json;
 
-use super::{Context, PackArgs};
+use mewkit_adapters::eval_pack;
+
+use super::{Context, PackArgs, file_pack};
 use crate::failure::{Failure, OK};
 
 pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
@@ -22,13 +24,21 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
         })
         .collect();
 
+    // A file pack is listed only when the manifest declares one, after the
+    // skill packs: it is opt-in and never part of a profile.
+    let eval = file_pack::is_file_pack(ctx, eval_pack::PACK).then(|| file_pack::owned(ctx).len());
     if args.json {
-        let doc: Vec<_> = rows
+        let mut doc: Vec<_> = rows
             .iter()
             .map(|(pack, installed, members)| {
                 json!({"pack": pack, "installed": installed, "members": members})
             })
             .collect();
+        if let Some(n) = eval {
+            doc.push(
+                json!({"pack": eval_pack::PACK, "installed": n > 0, "members": n, "kind": "files"}),
+            );
+        }
         println!("{}", serde_json::to_string_pretty(&doc).unwrap_or_default());
         return Ok(OK);
     }
@@ -43,6 +53,18 @@ pub fn run(ctx: &Context, args: &PackArgs) -> Result<u8, Failure> {
             String::new()
         };
         println!("  [{mark}] {pack}{count}");
+    }
+    if let Some(n) = eval {
+        let mark = if n > 0 { "installed" } else { "opt-in" };
+        let count = if n > 0 {
+            format!(" ({n} files)")
+        } else {
+            String::new()
+        };
+        println!(
+            "  [{mark}] {}{count} — eval cases for `mewkit eval`, in .meowkit/eval/",
+            eval_pack::PACK
+        );
     }
     Ok(OK)
 }

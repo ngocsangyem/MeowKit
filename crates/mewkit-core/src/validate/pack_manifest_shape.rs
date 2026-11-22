@@ -80,5 +80,10 @@ pub(super) fn validate_manifest(parsed: &Value) -> Result<PackManifest, PackMani
         packs: flat_packs,
         profiles: flat_profiles,
         retired_skills: string_vec(root.get("retiredSkills")),
+        file_packs: root
+            .get("filePacks")
+            .and_then(Value::as_object)
+            .map(|packs| packs.keys().cloned().collect())
+            .unwrap_or_default(),
     })
 }

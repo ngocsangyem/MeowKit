@@ -5,6 +5,7 @@
 //! that stays, a file `settings.json` names, or a file the user edited.
 mod add;
 mod envelope;
+mod file_pack;
 mod list;
 mod remove;
 mod state;
@@ -82,6 +83,23 @@ pub fn run(args: &PackArgs) -> Result<u8, Failure> {
         manifest,
         installed,
     };
+    let file_packs = args
+        .packs
+        .iter()
+        .filter(|p| file_pack::is_file_pack(&ctx, p))
+        .count();
+    if sub != "list" && file_packs > 0 {
+        if file_packs != args.packs.len() {
+            eprintln!(
+                "The eval pack carries files, not skills: {sub} it on its own (`mewkit pack {sub} eval`)."
+            );
+            return Ok(FAILED);
+        }
+        return match sub {
+            "add" => file_pack::add(&ctx, args),
+            _ => file_pack::remove(&ctx, args),
+        };
+    }
     match sub {
         "list" => list::run(&ctx, args),
         "add" => add::run(&ctx, args),
