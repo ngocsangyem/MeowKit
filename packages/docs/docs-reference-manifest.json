@@ -1971,7 +1971,7 @@
       "title": "mk:loop",
       "description": "Iterates one metric in git trials. NOT for mk:evaluate.",
       "sourcePath": "skills/loop/SKILL.md",
-      "sourceHash": "ef5dbc2106507763919559e122c6d594c363b0369765e902ca824c243eb5badb",
+      "sourceHash": "e4378c62497ea6f0ac43e4ad113f99e165043319baf7e0ca6b4ebfca4fc3db45",
       "aliases": [],
       "owner": "memory",
       "phase": "on-demand",
