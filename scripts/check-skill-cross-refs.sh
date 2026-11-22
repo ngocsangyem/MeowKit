@@ -106,7 +106,7 @@ done < <(
 )
 
 # An installed tree of another runtime names its own paths (`.agents/skills/mk-x/…`, `.codex/…`,
-# `.cursor/…`, `.grok/…`, `.pi/…`, `.omp/…`). Each must exist in that tree: a path to a file the install does not write is
+# `.cursor/…`, `.grok/…`, `.pi/…`, `.omp/…`; Antigravity writes under `.agents/` only). Each must exist in that tree: a path to a file the install does not write is
 # a command that fails for the user. Exempt: files a user or a session creates at run time,
 # the example path the authoring rules warn against, and the audit rules the text marks as
 # kept in the kit's own repository.
@@ -115,7 +115,7 @@ shift || true
 if [ "$#" -gt 0 ]; then
   for tree in "$@"; do INSTALLED+=("$(basename "$tree")=$tree"); done
 elif [ -d kit/overlays ] && [ -f scripts/lib/installed-tree.cjs ]; then
-  for runtime in codex cursor grok pi omp; do
+  for runtime in codex cursor grok pi omp antigravity; do
     tree=$(node scripts/lib/installed-tree.cjs "$runtime") || { echo "ERROR: no installed $runtime tree to check" >&2; exit 1; }
     INSTALLED+=("$runtime=$tree")
     BUILT+=("$tree")

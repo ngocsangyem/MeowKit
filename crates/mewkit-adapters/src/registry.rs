@@ -4,7 +4,7 @@ use crate::contract::{Emitter, Runtime};
 /// Runtimes whose emitter has not been written yet. Each emitter added to
 /// [`registry`] must be removed from here; the test below keeps the two
 /// lists covering every [`Runtime`] exactly once.
-pub const NOT_YET_EMITTED: &[Runtime] = &[Runtime::Antigravity];
+pub const NOT_YET_EMITTED: &[Runtime] = &[];
 
 pub fn registry() -> &'static [&'static dyn Emitter] {
     &[
@@ -14,6 +14,7 @@ pub fn registry() -> &'static [&'static dyn Emitter] {
         &crate::grok::Grok,
         &crate::pi::Pi,
         &crate::omp::Omp,
+        &crate::antigravity::Antigravity,
     ]
 }
 

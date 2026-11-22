@@ -23,7 +23,7 @@ use crate::rebuild;
 
 #[derive(Args, Debug)]
 pub struct InitArgs {
-    /// Runtimes to install for: claude-code, codex, cursor, grok, pi, omp (comma-separated)
+    /// Runtimes to install for: claude-code, codex, cursor, grok, pi, omp, antigravity (comma-separated)
     /// or all. Omitted: Claude Code with --yes or in a project that has
     /// `.claude/`, otherwise a picker.
     #[arg(long, value_name = "TARGETS")]

@@ -39,6 +39,12 @@ pub const OMP: Spec = Spec {
     target: &target::OMP,
 };
 
+pub const ANTIGRAVITY: Spec = Spec {
+    runtime: "Antigravity",
+    overlay: OVERLAY,
+    target: &target::ANTIGRAVITY,
+};
+
 /// The runtimes whose emitters install this tree.
 pub const WRITERS: [Runtime; 4] = [
     Runtime::Codex,
@@ -61,6 +67,7 @@ pub fn spec(runtime: Runtime, placement: Option<&Placement>) -> &'static Spec {
         _ if is_shared(placement) => &SHARED,
         Runtime::Pi => &PI,
         Runtime::Omp => &OMP,
+        Runtime::Antigravity => &ANTIGRAVITY,
         _ => &SHARED,
     }
 }

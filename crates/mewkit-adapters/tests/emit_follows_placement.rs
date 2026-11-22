@@ -74,7 +74,7 @@ fn the_emitters_write_the_roots_the_resolver_names_in_every_set() {
     // set that agrees on those.
     let mut plans: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let sets = subsets();
-    assert_eq!(sets.len(), 63);
+    assert_eq!(sets.len(), 127);
     for set in sets {
         let placement = resolve(table(), &set);
         let shared = agents_tree::is_shared(Some(&placement));
