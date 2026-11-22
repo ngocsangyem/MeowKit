@@ -3,6 +3,7 @@
 //! binary leaves behind when it changes the ledger without the sidecar.
 mod support;
 
+#[cfg(unix)]
 use mewkit_core::skill_store::{read_tree, tree_digest};
 use support::kit::sha_tree;
 use support::skill_store::{SKILL, installed, ledger, row, sidecar, status};
