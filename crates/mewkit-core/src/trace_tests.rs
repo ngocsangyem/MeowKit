@@ -104,3 +104,30 @@ fn an_oversized_log_rotates_to_a_gzip_and_restarts_empty() {
         .collect();
     assert_eq!(rotated, vec!["trace-log.251111-222640.jsonl.gz"]);
 }
+
+#[test]
+fn skill_session_and_signal_appear_only_when_known_and_precede_data() {
+    let line = build(&fixed("x", Map::new()), 0).to_string();
+    for key in ["skill", "session_id", "signal"] {
+        assert!(!line.contains(key), "{line}");
+    }
+    let mut record = fixed("x", Map::new());
+    record.skill = Some("fix".into());
+    record.session_id = Some("sess-1".into());
+    record.signal = Some(TraceSignal::ExplicitReport);
+    let line = build(&record, 0).to_string();
+    assert!(
+        line.contains(r#""skill":"fix","session_id":"sess-1","signal":"explicit_report","data""#),
+        "{line}"
+    );
+}
+
+#[test]
+fn a_record_without_a_skill_never_counts_toward_a_skill_signal() {
+    let with = json!({"skill": "fix", "signal": "task_failure", "future_key": 1});
+    assert_eq!(skill_signal(&with), Some(("fix", TraceSignal::TaskFailure)));
+    assert!(TraceSignal::TaskFailure.is_strong() && !TraceSignal::Retry.is_strong());
+    assert_eq!(skill_signal(&json!({"signal": "task_failure"})), None);
+    assert_eq!(skill_signal(&json!({"skill": "", "signal": "retry"})), None);
+    assert_eq!(skill_signal(&json!({"skill": "fix", "signal": "free text"})), None);
+}

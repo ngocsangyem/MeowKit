@@ -93,3 +93,22 @@ fn the_shared_provenance_env_names_and_defaults_match_the_hook() {
         );
     }
 }
+
+/// Both writers emit the same closed set of signal tokens.
+#[test]
+fn the_signal_tokens_match_the_hook() {
+    let hook = hook_source();
+    for signal in mewkit_core::trace::TraceSignal::ALL {
+        assert!(
+            hook.contains(&js_quoted(signal.as_str())),
+            "{HOOK_WRITER} no longer lists the signal {:?}",
+            signal.as_str()
+        );
+    }
+    let strong = declared(&hook, "STRONG_SIGNALS").matches('\'').count() / 2;
+    let strong_in_rust = mewkit_core::trace::TraceSignal::ALL
+        .iter()
+        .filter(|s| s.is_strong())
+        .count();
+    assert_eq!(strong, strong_in_rust, "strong/weak split drifted");
+}

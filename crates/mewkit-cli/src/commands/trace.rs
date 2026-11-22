@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use clap::Args;
 use mewkit_core::js_value::js_number_text;
 use mewkit_core::time_utc::{now_millis, utc_date};
-use mewkit_core::trace::{TraceRecord, append_trace_record, trace_log_path};
+use mewkit_core::trace::{TraceRecord, TraceSignal, append_trace_record, trace_log_path};
 use mewkit_core::trace_analysis::{
     Proposal, audit_traces, parse_trace_log, propose_improvements, redact_friction_note,
     score_by_run, score_by_run_json, score_tier,
@@ -34,6 +34,9 @@ pub struct TraceArgs {
     /// Attribute the friction note to one responsibility.
     #[arg(long)]
     pub responsibility: Option<String>,
+    /// Attribute the friction note to one skill.
+    #[arg(long)]
+    pub skill: Option<String>,
     /// `propose`: append the items to the advisory backlog.
     #[arg(long)]
     pub commit: bool,
@@ -100,10 +103,15 @@ fn record_friction(project_root: &Path, args: &TraceArgs, note: &str) -> Result<
     if let Some(r) = responsibility {
         data.insert("responsibility".into(), r.into());
     }
+    // A named skill makes the note an explicit report for that skill; without
+    // one the record keeps the shape it always had.
+    let skill = args.skill.as_deref().filter(|s| !s.is_empty());
     let record = TraceRecord {
         event: "friction".into(),
         data,
         run_id: Some(args.id.clone().unwrap_or_default()),
+        skill: skill.map(str::to_string),
+        signal: skill.map(|_| TraceSignal::ExplicitReport),
         ..TraceRecord::default()
     };
     append_trace_record(project_root, &record).map_err(|e| Failure::failed(e.to_string()))?;
