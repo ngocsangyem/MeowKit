@@ -20,6 +20,8 @@ const ALLOWED: Record<string, string[]> = {
 		"MEOWKIT_PROJECT_DIR",
 		"CLAUDE_PROJECT_DIR",
 		"CURSOR_PROJECT_DIR",
+		// Where the ship check looks for npm and npx on Windows, so a missing tool reads as not found.
+		"PATH",
 		// Path of the CLI the store lint runs.
 		"MEOWKIT_CLI",
 		// Labels on the one `ship_check` trace record a run appends (lib/trace-log.cjs and the
