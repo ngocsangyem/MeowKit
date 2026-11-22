@@ -16,5 +16,5 @@ fn print_order_names_each_section_once() {
     headings.sort_unstable();
     headings.dedup();
     assert_eq!(headings.len(), listed, "a section is listed twice");
-    assert_eq!(listed, 15, "a section was added without a print position");
+    assert_eq!(listed, 16, "a section was added without a print position");
 }

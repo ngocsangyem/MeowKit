@@ -135,6 +135,30 @@ fn check_family(claude_dir: &Path, family: &Value, severity: Status) -> CheckRes
     CheckResult::new(row, severity, detail, Section::Workflow)
 }
 
+/// Every path the manifest names, canonical files and members, relative to
+/// `.claude/`. Empty when there is no readable manifest. Copies kept identical
+/// on purpose are not duplication to report elsewhere.
+pub(super) fn family_paths(claude_dir: &Path) -> Vec<String> {
+    let manifest = fs::read_to_string(claude_dir.join(MANIFEST_REL_PATH))
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok());
+    let Some(families) = manifest
+        .as_ref()
+        .and_then(|m| m.get("families"))
+        .and_then(Value::as_array)
+    else {
+        return Vec::new();
+    };
+    let mut paths = Vec::new();
+    for family in families {
+        if let Some(canonical) = family.get("canonical").and_then(Value::as_str) {
+            paths.push(canonical.to_string());
+        }
+        paths.extend(string_list(family.get("members")).unwrap_or_default());
+    }
+    paths
+}
+
 /// One row per family. An absent manifest is N/A, not a failure: a kit that
 /// declares no families has nothing to keep identical.
 pub fn check_shared_families(claude_dir: &Path, severity: Status) -> Vec<CheckResult> {
