@@ -31,7 +31,7 @@ Use it only for a COMPLEX task spanning 2+ domains; TRIVIAL and STANDARD tasks u
 | 3 Build | `architect` | `developer`, `tester` |
 | 4 Review | `architect` + `security` | `reviewer` |
 
-A teammate claims an unclaimed task, works it, marks it completed and tells the lead what it did. Use the host's task list and messaging tools for this (on Claude Code: `TaskList`, `TaskUpdate`, `SendMessage`). Where the host has none, run the same phases as sequential subagents.
+A teammate claims an unclaimed task, works it, marks it completed and tells the lead what it did. Use the host's task list and messaging tools for this. On Claude Code, those are `TaskList`, `TaskUpdate` and `SendMessage`. Where the host has none, run the same phases as sequential subagents.
 
 Each teammate's brief carries the goal, the files it owns, the acceptance criteria and the return shape, the same as any delegation (`.claude/skills/cook/references/orchestration-rules.md`). Do not use a team for small, sequential or same-file work.
 
