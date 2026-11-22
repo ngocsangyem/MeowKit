@@ -6,10 +6,6 @@
       "target": ".claude/skills/benchmark/references/dead-weight-audit-rules.md"
     },
     {
-      "file": ".claude/skills/agent-detector/references/after-detection.md",
-      "target": ".claude/agents/[agent-name"
-    },
-    {
       "file": ".claude/skills/autobuild/references/adaptive-density-matrix.md",
       "target": ".claude/skills/benchmark/references/dead-weight-audit-rules.md"
     },

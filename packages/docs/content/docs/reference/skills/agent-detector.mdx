@@ -14,63 +14,28 @@ description: "Runs at the start of every message to pick the task agent, complex
 
 {/* GENERATED:reference-facts END */}
 
-`mk:agent-detector` runs first on every user message. It loads the always-on rules, scores the task against the agents, picks a complexity tier and shows a detection banner. You do not call it. It is not user-invocable.
+`mk:agent-detector` runs once per task, when it starts or its scope changes. It picks the specialist agent, the complexity tier and any risk flags, and states them in one line. You do not call it. It is not user-invocable.
 
 ## When not to use it
 
-The skill has no manual entry point. To force a lighter path, add `--quick` or use a shorthand such as `/mk:fix --quick`. `mk:scale-routing` is the separate skill that maps domain keywords to a complexity tier.
+A question, a one-line edit or a follow-up inside the same task needs no detection. `mk:scale-routing` is the separate skill that maps domain keywords to a complexity level.
 
 ## What it does
 
-1. Safety baseline. Reads the six always-on rules in `.claude/rules/` (`meowkit-core`, `security-rules`, `injection-rules`, `core-behaviors`, `development-rules`, `agent-conduct`). If one is missing it stops and refuses to route.
-2. Project context. Reads `docs/project-context.md` first when it exists, and carries on without it when it does not.
-3. Phase-zero rules. Reads the phase contracts and the agent-routing, model-selection, scale-adaptive, risk-checklist and context-budget references. A missing one stops the run. The skill-domain-routing reference is advisory.
-4. Agile context. If a sprint-state contract exists, the active plan lists `jira_tickets`, `MEOW_JIRA_SITE_URL` is set, or the message contains a Jira key, it also reads three `agile-*.md` references and shows the sprint goal in the banner.
-5. Scoring. Reuses the cached result when the workflow is the same and the phase is above 1 (`.meowkit/cache/agent-detection-cache.json`). Otherwise it scores every agent across five layers.
-6. Tier and risk flags. Picks TRIVIAL, STANDARD or COMPLEX, and checks nine risk flags. A match on AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC or EXT_SYSTEM raises the tier to COMPLEX.
-7. Banner and hand-off. Shows the banner, loads the chosen agent's instructions from `.claude/agents/` and invokes the matching skill.
-
-## Scoring layers
-
-| Layer | Checks | Score |
-|---|---|---|
-| 0 | Task content, whatever the repo type | +50 to +60 |
-| 1 | Explicit technology mentions | +60 |
-| 2 | Intent keywords (fix, implement, test, design, audit) | +50 exact, +35 semantic |
-| 3 | Project context (package files, directories, config) | +40 |
-| 4 | Recent file patterns | +20 |
-
-Layer 0 can override the repo: a frontend task in a backend repo goes to the frontend-capable agent.
-
-| Score | Role |
-|---|---|
-| 80 and above | Primary |
-| 50 to 79 | Secondary |
-| 30 to 49 | Optional |
-| Below 30 | Not activated |
-
-The tester is secondary for implementation and bug fixes, primary for testing requests, and skipped for docs, design discussion and research.
-
-## Complexity
-
-The tiers are TRIVIAL, STANDARD and COMPLEX, mapped to the routing CSV levels in `model-selection-rules.md` (Task Complexity Tiers).
+1. Safety baseline. Reads the six always-on rules in `.claude/rules/` (`meowkit-core`, `security-rules`, `injection-rules`, `core-behaviors`, `development-rules`, `agent-conduct`) unless the session sentinel reports them verified. If one is missing it stops and refuses to route.
+2. Reads `docs/project-context.md` when it exists, then the phase contracts and the agent-routing, model-selection and risk-checklist references. If the task names a Jira key or a sprint contract exists, it also reads the three `agile-*.md` references.
+3. Picks the agent from the live roster in `.claude/agents/`. Jira and Confluence leaf agents are routed by their hub skills.
+4. Picks TRIVIAL, STANDARD or COMPLEX, using the `mk:scale-routing` result when there is one. A match on AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC or EXT_SYSTEM raises the tier to COMPLEX.
+5. Reports `Agent | Tier | Flags` and invokes the skill the task needs.
 
 Each agent runs on its own model pin. The tier decides which agent runs, not which model it uses. Pins are listed in `scripts/lib/model-pins.md`.
 
-## Team mode
-
-Team mode starts only when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, complexity is COMPLEX, at least two domains score 50 or more, and the task needs cross-domain work.
-
-## Response depth
-
-The skill sets verbosity quietly from your wording: "brief" gives 25%, "explain" 50%, "detailed" 75%, "exhaustive" 100%. With no signal it uses the tier (trivial 25%, standard 50%, complex 75%). Security, payment and architecture tasks start at 75%.
-
 ## Session cache for the rule loads
 
-On turns after the first, the `UserPromptSubmit` handler injects a marker (`## Safety baseline: verified (cached, session <id>)` and a matching phase-zero marker). When the marker is in context the skill skips the file reads. State is in `.meowkit/state/session-sentinels.jsonl`, reset at each new session. `MEOWKIT_SKIP_SAFETY_SENTINEL=off` turns the markers off, so every turn reads the files.
+On turns after the first, the `UserPromptSubmit` handler injects a marker (`## Safety baseline: verified (cached, session <id>)`). When the marker is in context the skill skips the file reads. State is in `.meowkit/state/session-sentinels.jsonl`, reset at each new session. `MEOWKIT_SKIP_SAFETY_SENTINEL=off` turns the markers off, so every turn reads the files.
 
 ## Gotchas
 
-- Short messages with domain keywords ("fix the auth token") can route to a heavy agent. Use `--quick` or `/mk:fix --quick`.
-- The cache does not notice a change of topic. After "actually, let's do X instead", check the banner, and if it is wrong, describe the new task in a fresh message.
-- For a task that spans two domains, name the main concern first ("Security task: add a check to the payment UI"). The tiebreaker is the first keyword match.
+- A short message with a domain keyword ("fix the auth token") can look like heavy work. The skill judges scope as well as keywords and states the tier so you can correct it.
+- A change of topic is a new task and is detected again.
+- For a task that spans two domains, name the main concern first ("Security task: add a check to the payment UI").

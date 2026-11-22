@@ -11,13 +11,14 @@ adaptation_notes: >
 # Claude Code Model-Selection Adapter
 
 These rules are the Claude Code adapter for model selection. Generic skills emit provider-neutral task tiers; this adapter maps those tiers to the models available in Claude Code.
-The orchestrator agent MUST declare the tier before any task begins.
+The orchestrator agent declares the tier before a task begins.
 
 ## Contents
 
 - [Routing Table](#routing-table)
 - [Task Complexity Tiers](#task-complexity-tiers)
 - [Agent `model:` Pins](#agent-model-pins)
+- [Detection output](#detection-output)
 - [Rules](#rules)
 
 ## Routing Table
@@ -59,18 +60,22 @@ An agent's `model:` frontmatter follows its tier in the table above. Pins are no
 
 A new agent takes the pin of its tier.
 
+## Detection output
+
+State the result in one line, for example `Agent: architect | Tier: COMPLEX | Flags: [DATA_MODEL]`. When delegating to the agent, leave the model unset so the agent's `model:` pin applies.
+
 ## Rules
 
 ### Rule 1: Declare before work
 
-ALWAYS print the model tier assignment before starting any task:
+Print the model tier assignment before starting a task:
 `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → using [model tier]`
 
 WHY: Explicit routing prevents overpaying for trivial work and underrouting security work.
 
 ### Rule 2: Escalate on security
 
-ALWAYS use COMPLEX tier for any task involving:
+Use the COMPLEX tier for any task involving:
 
 - Authentication or authorization logic
 - Payment processing
@@ -89,25 +94,17 @@ escalation regardless of CSV match.
 
 ### Rule 3: Never downgrade mid-task
 
-Once a task is assigned a tier, NEVER downgrade to a cheaper tier mid-task.
+Once a task is assigned a tier, do not downgrade to a cheaper tier mid-task.
 If the task turns out simpler than expected, complete it at the assigned tier.
 
 WHY: Mid-task downgrades lose reasoning context and create phase inconsistency.
 
 ### Rule 4: Domain Override
 
-When `mk:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
+When `mk:scale-routing` returns a domain match with `level=high`, the model tier is COMPLEX (best available) regardless of any other signal — including manual classification.
 
 WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `references/scale-adaptive-rules.md` and `.claude/skills/scale-routing/data/domain-complexity.csv`.
 
-### Rule 5: Harness Density Follows Tier
+### Rule 5: Autobuild density is not chosen here
 
-For `mk:autobuild` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
-
-**Auto-detection:** `handlers/model-detector.cjs` reads the `model` field from SessionStart stdin and writes tier + density to `.meowkit/state/detected-model.json`. `MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Detection cascade: (1) stdin `model` field, (2) `MEOWKIT_MODEL_HINT` env var, (3) default STANDARD/FULL.
-
-**Density override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
-
-**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. See also `references/scale-adaptive-rules.md` Rule 6.
-
-WHY: Dead-weight thesis — capable models need less scaffolding; forcing FULL can degrade output.
+`mk:autobuild` picks its own scaffolding density from the detected model. The decision matrix and the override live in `.claude/skills/autobuild/references/adaptive-density-matrix.md`; this file does not restate them.

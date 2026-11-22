@@ -69,9 +69,11 @@ Invoke `project-manager` with the resolved plan directory:
 
 ```
 Generate delivery status for plan at <plan-dir>.
+Take task counts from `mewkit plan status <plan-dir>`, not from counting checkboxes by hand.
 Write report to <plan-dir>/status-reports/{YYMMDD}-status.md
 (create the status-reports/ subdir if absent).
 Load template from ${CLAUDE_SKILL_DIR}/assets/pm-status-template.md.
+Return the report path and the headline.
 ```
 
 **Foreground invocation** — do not include "run in the background" in the prompt. The run waits
@@ -98,15 +100,15 @@ A user-invoked status run is always honored. The `MEOWKIT_PM_AUTO` environment v
 only the silent background fires described in
 `.claude/skills/cook/references/post-phase-delegation.md`; it never suppresses an explicit ask.
 
-## Notes
+Status is a report, never an approval. A green headline approves nothing.
 
-- The `project-manager` agent declares no background mode, so this runs in the foreground by
-  default and waits for the report path. A user who wants genuinely asynchronous behavior asks
-  that agent directly and says to run in the background.
-- `{YYMMDD}-status.md` means a same-day re-run overwrites (idempotent) while multi-day history
-  accumulates in the plan's `status-reports/` directory.
-- Reports travel with the plan: archiving a plan archives its reports.
-- Status is a report, never an approval. A green headline approves nothing.
+## Gotchas
+
+- Two or more active plans: ask which one; an unrelated plan's report reads as this plan's status.
+- The report is written into the plan directory (`status-reports/`), not the working directory, and archiving the plan archives its reports.
+- `{YYMMDD}-status.md` means a same-day re-run overwrites; earlier days accumulate in `status-reports/`.
+- The `project-manager` agent runs in the foreground here; a user who wants it in the background asks that agent directly.
+- No `mewkit` on the PATH: the agent reads the plan files for counts and says the counts are hand-derived.
 
 ## Related
 

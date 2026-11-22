@@ -16,32 +16,24 @@ description: "Internal skill that saves workflow state at a handoff and restores
 
 ## What it does
 
-`mk:session-continuation` saves the state of an unfinished workflow so a later session can pick it up. It is not user-invocable. It runs when the runtime reports that the context is nearly full, when you say "handoff", "save" or "pause", when you say "resume" with a workflow ID, or when a session ends with work incomplete.
+`mk:session-continuation` carries unfinished work across a context reset. It is not user-invocable. It applies when the runtime reports the context nearing its limit, or when you say "handoff", "save", "pause" or "resume". It adds no state file of its own: the plan files and the `mewkit` task records are the state.
 
 ## When not to use it
 
 To record a lesson for the team, use `mk:memory`. This skill stores progress, not knowledge.
 
-## Commands
+## Save
 
-```
-workflow:handoff           save state and print resume instructions
-workflow:resume AUTH-123   load state and continue from the last phase
-workflow:list              list saved workflows
-```
+1. Tick the plan checkboxes for finished work, then run `mewkit plan sync <plan-dir>`.
+2. If an active durable task exists, run `mewkit task-state update <id> --step "..." --next "..."`.
+3. Report what was saved and the next step. Done when `mewkit orient` returns that next step.
 
-## Where state lives
+## Resume
 
-Saved workflows are in `.meowkit/logs/workflows/`. The active plan is read from `.meowkit/state/active-plan.json` or found by scanning `tasks/plans/`. Nothing is carried between sessions in the environment.
-
-## Steps
-
-1. Detect the trigger: context limit, user command or session end.
-2. For a handoff, follow `references/handoff-flow.md` to save the state and write a summary.
-3. For a resume, follow `references/resume-and-state.md` to load the state, restore it and continue.
-4. For a list, show the workflows saved in `.meowkit/logs/workflows/`.
+Run `mewkit orient`, then read the plan it points to with `mewkit plan status <plan-dir>`. Check the result against the live files and git before acting.
 
 ## Gotchas
 
-- Saved state can name files that were renamed or deleted since. Check every path in a handoff before resuming.
-- Two sessions writing state at once corrupt the TOON file. Use file locking or session-scoped state files.
+- Saved state can name files that were renamed or deleted since. Check every path before resuming.
+- With several active plans, ask which to resume.
+- Without `mewkit` on the PATH, update the plan checkboxes by hand and note the next step in the plan.

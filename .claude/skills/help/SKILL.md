@@ -25,177 +25,94 @@ runtime: claude-code
 
 # Navigation Help
 
-Answers "What should I do next?" by scanning project state and mapping to the 7-phase pipeline.
+Answers "what should I do next?" from the state the project already holds, and names one
+step with up to two alternates, each citing the file or command it came from. Read-only:
+it reads state and never writes it.
 
-## How It Works
+Use it when the user asks what to do next or where to pick up. Not for what is done or
+blocked (backward-looking delivery status): that is `mk:status`.
 
-`mk:help` is the FORWARD-looking navigator (what to do next). Backward-looking delivery
-analysis stays with `/mk:status` (project-manager) — this skill never reproduces it.
+## How to answer
 
-Collect candidates from ALL scan sources below, then RANK them and emit the top 3 — do
-NOT stop at the first hit. The rank-1 candidate equals what the old "stop at first
-actionable hit" behavior would have returned (back-compat); ranks 2–3 are alternates with
-one-line rationale. This skill is read-only: it reads state, never writes it.
+Ask the project, do not re-derive its state by hand:
 
-### 1. Paused Step-File Workflows
-Check `.meowkit/state/*-progress.json` for any in-progress step-file workflow.
-- Found → "Resume [skill] at step [N]. Run `/mk:[skill]` to continue."
+1. `mewkit orient` -- durable task state: the active task, its step and its next action.
+   If it names a next action, that is the rank-1 candidate.
+2. `mewkit plan status <plan-dir>` -- checkbox progress for one plan under `tasks/plans/`.
+   Use its counts as the progress figure; do not count `- [x]` by hand.
+3. `tasks/reviews/*-verdict.json` -- the newest verdict. A verdict is blocked when
+   `decision` is `BLOCKED` (the enum is `PASS | PASS_WITH_RISK | BLOCKED`; `FAIL` exists only
+   per dimension in `dimensions[].verdict`). The `.md` verdict is the prose fallback.
+4. `git status` -- uncommitted changes, ignoring IDE noise.
 
-### 2. In-Progress Plans
-Check `tasks/plans/` for plan files without matching review verdicts.
-- Plan exists, no tests → "Plan agreed. Next: run tester agent (Phase 2 — RED)"
-- Plan exists, tests failing → "Tests failing. Next: run developer agent (Phase 3 — GREEN)"
-- Plan exists, tests passing, no review → "Tests green. Next: run reviewer agent (Phase 4 — Review)"
+Optional signals, read only if present: `.meowkit/state/checkpoints/checkpoint-latest.json`
+(`created_at`, `progress.plan_path`), `.meowkit/state/budget-state.json` (advisory cost and
+`warnings_emitted`), `.meowkit/state/detected-model.json` (the current-session tier; never take
+the tier from `budget-state.json`) and `docs/development-roadmap.md` (milestone). An absent
+file is normal at rest: skip silently and mention the skip only under `--verbose`.
 
-### 3. Pending Reviews
-Check `tasks/reviews/` for verdict files with WARN or action items.
-- WARN verdict → "Review has warnings. Read them and decide, or fix the findings."
-- FAIL verdict → "Review failed. Fix required changes, then re-run reviewer."
+Rank what you found: a blocked verdict or phase first (cite the failing dimension), then a
+plan phase in progress (cite the `plan status` counts), then an approved plan with nothing
+built, then the clean-state fallback. Fold a budget caution into the rank-1 rationale when
+`warnings_emitted > 0` or spend is at or above $30. For a task-type to skill mapping see
+`../agent-detector/references/lifecycle-routing.md`. CLI flags: `references/cli.md`.
 
-### 4. Uncommitted Changes
-Check `git status` for staged/unstaged changes.
-- Changes exist + review approved → "Ready to ship. Run `/mk:ship` (Phase 5)"
-- Changes exist, no review → "Changes detected but no review. Run reviewer first."
+## State to recommendation
 
-### 5. Clean State
-No plans, no reviews, no changes.
-- "Everything clean. Options: start a new task with planner, run `/mk:retro`, or ask me anything."
+| State | Phase | Recommendation |
+|---|---|---|
+| No plan | 0 to 1 | `/mk:plan-creator`, or describe the task |
+| Plan agreed, TDD on (`--tdd` or `MEOWKIT_TDD=1`) | 2 | tester agent: write failing tests (RED) |
+| Plan agreed, TDD off (default) | 3 | skip Phase 2; developer agent builds |
+| Tests failing | 3 | developer agent: implement to pass |
+| Build green, not simplified | 3.5 | `/mk:simplify` |
+| Simplified, not verified | 3.6 | `/mk:verify` |
+| Verified, no review | 4 | `/mk:review` |
+| Verdict `PASS` or `PASS_WITH_RISK` | 5 | `/mk:ship` |
+| Verdict `BLOCKED` | 4 | fix the named dimension, then `/mk:review` again |
+| Shipped | 6 | documenter agent, then `/mk:retro` |
+| Plan to stress-test, interview or archive | any | `/mk:plan-creator red-team`, `validate` or `archive` with the plan path |
+| Several plans or tasks in progress | any | ask which to focus on |
+| Nothing in flight | 0 | start a task, run `/mk:retro`, or ask |
 
-## Additional Scan Sources (read after sources 1–5)
+Phases run in order; skip only what the `mk:scale-routing` result or the user says to skip.
+`/mk:fix` is the short path for a small bug, typo or config tweak: the scope is the plan, and
+the diff is still reviewed before shipping. Security hooks and the ship check always run.
 
-ALL four may be absent at rest (e.g. `.meowkit/state/checkpoints/` does not exist until
-runtime). Absent file → skip silently; note the skip only under `--verbose`. Never error
-on a missing source.
+## Specialist skills (suggest when the domain matches)
 
-| # | Source | Fields to read | Absent-case |
-|---|--------|----------------|-------------|
-| 6 | `.meowkit/state/checkpoints/checkpoint-latest.json` | `state.model_tier`, `progress.plan_path`, `environment.{git_branch,working_dir_clean,uncommitted_changes}`, `budget.{estimated_spent_usd,turn_count}`, `created_at` | skip; no checkpoint context |
-| 7 | `.meowkit/state/budget-state.json` | `estimated_cost_usd`, `turn_count`, `warnings_emitted` (advisory only) | skip; no budget caution |
-| 8 | `.meowkit/state/detected-model.json` | `tier` (authoritative current-session tier) | skip; tier unknown |
-| 9 | `tasks/reviews/<slug>-verdict.json` | `decision`, `dimensions[].verdict`, `created_at`; `.md` is prose fallback | use git/plan scan only |
-| 10 | `docs/development-roadmap.md` (when present; Type-1 allowlisted) | current phase / milestone progress | skip; tag `(CF-C5)` if relied on |
-
-**Model tier:** source the current tier from `.meowkit/state/detected-model.json` (written
-fresh at SessionStart). Do not source `model_tier` from `budget-state.json` — it has no
-`created_at`/session marker and may carry a prior session's tier. Treat budget figures as
-advisory unless a current-session signal corroborates them.
-
-**Staleness:** if `checkpoint-latest.json` `created_at` is older than 24h, demote its
-evidence and note the staleness in the rationale.
-
-## Ranking Heuristic (deterministic, evidence-cited — no vibes ranking)
-
-Collect candidates from all sources, then rank:
-
-1. **Blocked phase or BLOCKED verdict** → rank-1 unblock/fix action. A review verdict is
-   blocked when `decision === "BLOCKED"` — the verdict enum is `PASS | PASS_WITH_RISK |
-   BLOCKED`; there is NO top-level `"FAIL"` value. `FAIL` exists only per-dimension in
-   `dimensions[].verdict`. Cite the failing dimension(s) in the rationale.
-2. **In-progress phase** (plan phase `status: in-progress`, or GFM `- [ ]` checkboxes
-   remaining) → continue action, rationale cites checkbox % (count `- [x]` vs `- [ ]`).
-3. **Approved plan, nothing built** → cook action.
-4. **Budget caution:** if `warnings_emitted > 0` OR spent ≥ $30, fold a budget caution into
-   the rank-1 rationale (does not by itself create a rank).
-5. **Clean state** → the existing fallback table (start a task / retro / ask).
-
-Each candidate's rationale cites the source file(s) it came from, so the user can check it.
-
-For skill suggestions based on task type, see `mk:agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
-
-## State-to-Recommendation Map
-
-> `mk:plan-creator` is the planning entrypoint, and its `red-team`, `validate` and `archive` subcommands are handled by that same skill — there is no separate dispatcher to route through.
-
-| State | Pipeline Phase | Recommendation |
-|-------|---------------|----------------|
-| No plan | Phase 0 → 1 | "Start with `/mk:plan-creator` or describe your task" |
-| Existing plan — stress-test | Standalone subcommand | "`/mk:plan-creator red-team {path}` — adversarial review of existing plan" |
-| Existing plan — interview | Standalone subcommand | "`/mk:plan-creator validate {path}` — critical question interview on existing plan" |
-| Completed/cancelled plans | Housekeeping | "`/mk:plan-creator archive` — archive completed or cancelled plans" |
-| Plan agreed, no tests | Phase 2 (TDD mode only) | "In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): run tester agent — write failing tests (RED phase). In default mode: skip Phase 2; run developer directly" |
-| Tests written, failing | Phase 3 | "Run developer agent — implement to pass tests (GREEN)" |
-| Tests passing, no review | Phase 4 | "Run `/mk:review` — adversarial code review" |
-| Review PASS/WARN | Phase 5 | "Run `/mk:ship` — commit, PR, deploy" |
-| Shipped | Phase 6 | "Run documenter — update docs, then `/mk:retro`" |
-| Paused workflow | Resume | "Resume [skill] at step [N]" |
-| Mixed state | Clarify | "Multiple items in progress. Which to focus on?" |
-
-## Specialist Skills (surface when domain matches)
-
-| Situation | Skill | When to suggest |
-|-----------|-------|----------------|
-| Operations, triage, case management, escalation protocols, billing workflows | `/mk:decision-framework` | User asks "how should we handle X cases" or is designing any case-routing system |
-| "Is everything green?", pre-review check, post-implementation validation | `/mk:verify` | After implementation completes, before review, or when user wants a quick health check |
-| API contract design or review — interface shape, error semantics, compatibility, pagination | `/mk:api-design-principles` | User is authoring or reviewing what an API promises, not how it runs |
-| Backend change end to end — handler, service, integration, webhook, job | `/mk:backend-development` | User is changing backend behavior and needs contract, data, and auth owners coordinated |
-| Schema, migration, query, index, or ORM data-access boundary | `/mk:database` | User is modelling, evolving, or querying data |
-| Infrastructure, containers, CI/CD, deployment safety, rollback | `/mk:devops` | User is changing how the system is built, configured, or delivered |
-
-## Fast Paths (surface these prominently)
-
-Not every task needs the full 7-phase pipeline. Mention these when relevant:
-
-| Situation | Fast Path | What it skips |
-|-----------|-----------|---------------|
-| Simple bug fix, typo, rename, config tweak | `/mk:fix` | the plan file — the scope is the plan |
-| Task flagged as `one-shot` by scale-routing | no plan file | the plan file — zero blast radius confirmed |
-| Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | pre-task-check, TDD check; the post-write scan and the ship check still run |
-
-**Quick fix?** Use `/mk:fix` — no separate plan file for simple changes.
-
-**Small config change?** Scale-routing may skip the plan file when blast radius is zero.
-
-**Hook profiles:** Set `MEOWKIT_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks; the ship check and the post-write scan still run).
-Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
+| Situation | Skill |
+|---|---|
+| Case routing, triage or escalation design | `/mk:decision-framework` |
+| "Is everything green?", pre-review health check | `/mk:verify` |
+| API contract design or review | `/mk:api-design-principles` |
+| Backend change across handler, service, job | `/mk:backend-development` |
+| Schema, migration, query | `/mk:database` |
+| Containers, CI/CD, deployment, rollback | `/mk:devops` |
 
 ## Gotchas
 
-- Multiple in-progress plans create ambiguity — ask user which to focus on, don't guess
-- `.meowkit/state/` files from previous sessions may be stale — check timestamps, warn if >24h old
-- Git status can be noisy (untracked IDE files) — focus on files in `src/`, `lib/`, `app/`, `tests/`
-- Don't recommend skipping phases — even if the user seems impatient, show the full path
-- Fast paths are not loopholes — still review the diff before shipping, and security hooks are NEVER skipped
-- `.meowkit/state/checkpoints/` does not exist until runtime — its absence is normal, not an error; skip silently
-- `budget-state.json` is missing at session start — treat budget figures as advisory; never source model tier from it (use `detected-model.json`)
-- Prefer the machine-readable `*-verdict.json` over the `.md` prose verdict; a verdict is blocked when `decision === "BLOCKED"` (never a top-level `"FAIL"`)
-- This is the forward-looking navigator — backward-looking delivery status stays with `/mk:status`; do not duplicate it here
+- Several in-progress plans are ambiguous: ask which to focus on; do not guess.
+- State from an earlier session may be stale: check timestamps and warn past 24 hours.
+- `.meowkit/state/checkpoints/` does not exist until runtime; its absence is not an error.
+- Prefer `*-verdict.json` over the `.md` verdict.
+- Fast paths are not loopholes: review the diff before shipping.
+- This is the forward-looking navigator; delivery status stays with `/mk:status`.
+- If `mewkit` is not on the PATH, fall back to reading `tasks/plans/` and `tasks/reviews/`
+  directly and say the answer is less certain.
 
-## Output Format
-
-The ranked next-steps are a JSON-compatible shape (documented here for downstream tooling),
-rendered as a concise human summary. This skill does NOT emit machine JSON itself — there is
-no scanner script; the shape documents what the ranking reasons about.
-
-```json
-{
-  "next_steps": [
-    {
-      "rank": 1,
-      "action": "/mk:cook tasks/plans/260610-x/plan.md",
-      "priority": "high",
-      "rationale": "Plan agreed, phase-02 in-progress at 3/7 checkboxes; budget $4.20 of $30",
-      "source": ["tasks/plans/260610-x/phase-02-*.md", ".meowkit/state/budget-state.json"]
-    }
-  ],
-  "progress": { "plan": "260610-x", "phases_done": 1, "phases_total": 6, "checkbox_pct": 43 }
-}
-```
-
-Human rendering (same headings as before — rank-1 is "Recommended Next Step"):
+## Output
 
 ```
 ## Status
+**Current phase:** [Phase N - Name]
+**State:** [one line]
 
-**Current phase:** [Phase N — Name]
-**State:** [brief description]
+### Recommended next step
+[action] -- [rationale, citing its source]
 
-### Recommended Next Step
-[rank-1 action] — [rationale]
-
-### Other Options
-- [rank-2 action] — [one-line rationale]
-- [rank-3 action] — [one-line rationale]
+### Other options
+- [action] -- [one-line rationale]
 ```
 
-If `--verbose` flag: also show full state scan results (plan files, review files, test
-status, git status) AND which additional sources (6–10) were present vs skipped.
+With `--verbose`, also list which optional signals were present and which were skipped.

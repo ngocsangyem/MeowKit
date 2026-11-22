@@ -1,6 +1,6 @@
 ---
 title: "mk:scale-routing"
-description: "Internal Phase 0 skill that maps task keywords to a complexity level, workflow intensity and execution tier."
+description: "Internal Phase 0 skill that maps task keywords to a complexity level and workflow intensity."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -19,7 +19,7 @@ description: "Internal Phase 0 skill that maps task keywords to a complexity lev
 
 `mk:scale-routing` classifies a task during Phase 0 (Orient) from domain keywords, so a change such as a fintech auth update is rated high complexity without a judgement call. The orchestrator invokes it. It is not user-invocable.
 
-It emits complexity, risk, workflow intensity and scaffolding density only. It selects no model and names no provider.
+It emits complexity and workflow intensity only. It selects no model and names no provider, and `mk:autobuild` chooses its own scaffolding density.
 
 ## When not to use it
 
@@ -27,13 +27,11 @@ To pick the task agent and tier at orient time, use `mk:agent-detector`. This sk
 
 ## How it classifies
 
-1. Match the task description against the keywords in `data/domain-complexity.csv`.
-2. Analyse the task content for its type and the files or modules it mentions (`references/multi-layer-detection.md`).
-3. Check project context: files present, directory structure, recent git changes.
-4. Score confidence per domain: HIGH at 70 or more, MEDIUM from 40 to 69, LOW below 40.
-5. Map the signals to a task type (`references/task-type-classification.md`).
-6. If `.meowkit/product-areas.yaml` exists, merge its area keywords and paths (`references/product-area-config.md`).
-7. With no match, return `unknown` and leave classification to the orchestrator.
+1. Match the task description against the keywords in `data/domain-complexity.csv`. A `low` match on a task that names one file returns at once.
+2. For an ambiguous or multi-domain match, read the task content, the project layout and recent git changes (`references/multi-layer-detection.md`) and give a confidence of HIGH, MEDIUM or LOW.
+3. Map the signals to a task type (`references/task-type-classification.md`).
+4. If `.meowkit/product-areas.yaml` exists, merge its area keywords and paths (`references/product-area-config.md`).
+5. With no match or LOW confidence, return `unknown` and leave classification to the orchestrator.
 
 ## Output
 
@@ -42,20 +40,12 @@ To pick the task agent and tier at orient time, use `mk:agent-detector`. This sk
 | `domain` | Matched domain, or `unknown` |
 | `level` | `low`, `medium`, `high` |
 | `workflow` | `one-shot`, `standard`, `enhanced`, `advanced` |
-| `execution_tier` | `minimal`, `standard`, `high-assurance` |
 | `task_type` | `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`, `review`, `intake` |
 | `suggested_skill` | `mk:fix`, `mk:cook`, `mk:cso`, `mk:review` or `mk:intake` |
 | `confidence` | `HIGH`, `MEDIUM`, `LOW` |
 | `product_area` | Area name, present only when the YAML file exists |
-| `autobuild_density` | `MINIMAL`, `FULL`, `LEAN` |
 
-| Level | Execution tier | Plan file |
-|---|---|---|
-| low | minimal | May be skipped for one-shot work |
-| medium | standard | Write it and agree it |
-| high | high-assurance | Write it and agree it, with full phases and security |
-
-`autobuild_density` is `MINIMAL` for low and `FULL` for medium and high. Setting `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides it, and the autobuild run report logs the override. `.claude/skills/autobuild/scripts/density-select.sh` prints the density token for scripts.
+The tier each level maps to is in `model-selection-rules.md` (Task Complexity Tiers).
 
 ## Extending
 
@@ -66,4 +56,3 @@ Add a row to `data/domain-complexity.csv`. Its columns are `domain`, `signals`, 
 - When several domains match, the highest complexity wins. The first matching signal names the domain.
 - Matching is case-insensitive. Generic signals such as `data` or `app` cause false positives.
 - A one-shot workflow needs both a CSV match and the orchestrator's confirmation that the blast radius is zero.
-- Density selection depends on `autobuild/scripts/density-select.sh`. Renaming or removing the autobuild skill breaks it.

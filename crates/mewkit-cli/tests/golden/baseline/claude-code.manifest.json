@@ -863,11 +863,6 @@
       "size": 9797
     },
     {
-      "path": ".claude/skills/agent-detector/references/after-detection.md",
-      "sha256": "9cb8e2f900d1babdfdc5e51de0b299255beb797f7976fb4441c9c0a170eeb44e",
-      "size": 2599
-    },
-    {
       "path": ".claude/skills/agent-detector/references/agent-routing.md",
       "sha256": "726eb02d5d0c37c1a3413896da37d982b81d41badf2d716e1050ea8bbb020aba",
       "size": 3851
@@ -888,24 +883,9 @@
       "size": 2289
     },
     {
-      "path": ".claude/skills/agent-detector/references/complexity-detection.md",
-      "sha256": "a1ad49dc8d89846d7a8f858d5c07fcfce5e91fcfed72286aecd3567dd5b1c609",
-      "size": 1221
-    },
-    {
       "path": ".claude/skills/agent-detector/references/context-budget-rules.md",
       "sha256": "b912e9fe0b87d154a8ad22047abf38bcdb774ffe1d32f14056928b1a01296ac2",
       "size": 3991
-    },
-    {
-      "path": ".claude/skills/agent-detector/references/detection-process.md",
-      "sha256": "31a20f0b5e4220845978911d1811c5c416d75dea087566acd09b5d2a3dca4620",
-      "size": 4405
-    },
-    {
-      "path": ".claude/skills/agent-detector/references/examples.md",
-      "sha256": "d6b92d740fd85432d2e7f31a64ee25653ff9b49242c99ab61517d5313fa5e3ff",
-      "size": 3568
     },
     {
       "path": ".claude/skills/agent-detector/references/lifecycle-routing.md",
@@ -918,16 +898,6 @@
       "size": 4929
     },
     {
-      "path": ".claude/skills/agent-detector/references/model-selection.md",
-      "sha256": "d6ee7fbd1d0cb6b256ca680c748e3fbfb5e2560a3194ec0bf865602652e92ac7",
-      "size": 2255
-    },
-    {
-      "path": ".claude/skills/agent-detector/references/multi-layer-detection.md",
-      "sha256": "75cdc7fc30fbe5ac806b3cb381879d803b68a38e1feae27981599a3574bcfc5b",
-      "size": 4436
-    },
-    {
       "path": ".claude/skills/agent-detector/references/risk-checklist.md",
       "sha256": "9b0a45521c1428ea2b56aa2c55f010057805bf4967749ae001820b3f732d73a9",
       "size": 3968
@@ -938,24 +908,9 @@
       "size": 2968
     },
     {
-      "path": ".claude/skills/agent-detector/references/scoring-and-thresholds.md",
-      "sha256": "4a266b7891d5ed3fb48e1af7daeddf39529210a0f59a749e8ca6c01dfe0ceb4e",
-      "size": 1502
-    },
-    {
       "path": ".claude/skills/agent-detector/references/skill-domain-routing.md",
       "sha256": "7edfb072e0f0a4a252390c71d9eb9a013abd27fa510b5fc0956c8a09e41488a9",
       "size": 3610
-    },
-    {
-      "path": ".claude/skills/agent-detector/references/team-mode.md",
-      "sha256": "f6b62293088db07710d8845fcb65fbc1ae0d1a2893e4a006510572a4041668c0",
-      "size": 2774
-    },
-    {
-      "path": ".claude/skills/agent-detector/references/token-budget-levels.md",
-      "sha256": "e5099c18a6ec2a155b71010a0459c16f57c3ebba8580979062e3d6a3c68bb398",
-      "size": 2705
     },
     {
       "path": ".claude/skills/angular/SKILL.md",
@@ -4647,16 +4602,6 @@
       "size": 2457
     },
     {
-      "path": ".claude/skills/session-continuation/references/handoff-flow.md",
-      "sha256": "502701d245dc256e248a97f47bdf4a5f8510f818cc6e4c248192973c5380734a",
-      "size": 1419
-    },
-    {
-      "path": ".claude/skills/session-continuation/references/resume-and-state.md",
-      "sha256": "e9b551c33d62f2044de58779ba4385ccbc3146ae505e246ab5d5f452178ada0e",
-      "size": 2028
-    },
-    {
       "path": ".claude/skills/ship/SKILL.md",
       "sha256": "c0934697a624606493fac765a87967a16489923464473052ac41e7a6b1dcf590",
       "size": 11736
@@ -6628,11 +6573,6 @@
       "size": 9797
     },
     {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/after-detection.md",
-      "sha256": "9cb8e2f900d1babdfdc5e51de0b299255beb797f7976fb4441c9c0a170eeb44e",
-      "size": 2599
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/agent-routing.md",
       "sha256": "726eb02d5d0c37c1a3413896da37d982b81d41badf2d716e1050ea8bbb020aba",
       "size": 3851
@@ -6653,24 +6593,9 @@
       "size": 2289
     },
     {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/complexity-detection.md",
-      "sha256": "a1ad49dc8d89846d7a8f858d5c07fcfce5e91fcfed72286aecd3567dd5b1c609",
-      "size": 1221
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/context-budget-rules.md",
       "sha256": "b912e9fe0b87d154a8ad22047abf38bcdb774ffe1d32f14056928b1a01296ac2",
       "size": 3991
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/detection-process.md",
-      "sha256": "31a20f0b5e4220845978911d1811c5c416d75dea087566acd09b5d2a3dca4620",
-      "size": 4405
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/examples.md",
-      "sha256": "d6b92d740fd85432d2e7f31a64ee25653ff9b49242c99ab61517d5313fa5e3ff",
-      "size": 3568
     },
     {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/lifecycle-routing.md",
@@ -6683,16 +6608,6 @@
       "size": 4929
     },
     {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/model-selection.md",
-      "sha256": "d6ee7fbd1d0cb6b256ca680c748e3fbfb5e2560a3194ec0bf865602652e92ac7",
-      "size": 2255
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/multi-layer-detection.md",
-      "sha256": "75cdc7fc30fbe5ac806b3cb381879d803b68a38e1feae27981599a3574bcfc5b",
-      "size": 4436
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/risk-checklist.md",
       "sha256": "9b0a45521c1428ea2b56aa2c55f010057805bf4967749ae001820b3f732d73a9",
       "size": 3968
@@ -6703,24 +6618,9 @@
       "size": 2968
     },
     {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/scoring-and-thresholds.md",
-      "sha256": "4a266b7891d5ed3fb48e1af7daeddf39529210a0f59a749e8ca6c01dfe0ceb4e",
-      "size": 1502
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/skill-domain-routing.md",
       "sha256": "7edfb072e0f0a4a252390c71d9eb9a013abd27fa510b5fc0956c8a09e41488a9",
       "size": 3610
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/team-mode.md",
-      "sha256": "f6b62293088db07710d8845fcb65fbc1ae0d1a2893e4a006510572a4041668c0",
-      "size": 2774
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/agent-detector/references/token-budget-levels.md",
-      "sha256": "e5099c18a6ec2a155b71010a0459c16f57c3ebba8580979062e3d6a3c68bb398",
-      "size": 2705
     },
     {
       "path": ".meowkit/cache/.claude/skills/angular/SKILL.md",
@@ -10391,16 +10291,6 @@
       "path": ".meowkit/cache/.claude/skills/session-continuation/SKILL.md",
       "sha256": "4f6a34b4aaf02d81fd8fcbbdb0f21cc3b06f00cd9ce3a0c9047d2aa8c947aafd",
       "size": 2457
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/session-continuation/references/handoff-flow.md",
-      "sha256": "502701d245dc256e248a97f47bdf4a5f8510f818cc6e4c248192973c5380734a",
-      "size": 1419
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/session-continuation/references/resume-and-state.md",
-      "sha256": "e9b551c33d62f2044de58779ba4385ccbc3146ae505e246ab5d5f452178ada0e",
-      "size": 2028
     },
     {
       "path": ".meowkit/cache/.claude/skills/ship/SKILL.md",

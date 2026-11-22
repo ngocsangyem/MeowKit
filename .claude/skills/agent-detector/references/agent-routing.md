@@ -26,6 +26,8 @@ applies_to: [Phase 0, all]
 | analyst         | Cost tracking, patterns                          | 0, 6      |
 | journal-writer  | Failure docs, root cause analysis                | 6         |
 | project-manager | Cross-workflow delivery tracking, status reports | on-demand |
+| advisor         | One recommendation after an interview (`mk:advise` only) | on-demand |
+| athena          | Strategy consult and checkpoint supervision (`--advice`) | on-demand |
 
 No two agents modify the same file type. Conflicts → escalate to human.
 
@@ -39,14 +41,14 @@ pattern-to-owner registry; the generated inventory is the consolidated view.
 
 ## Domain Integration Agents (routed by hub skills, NOT by orchestrator)
 
-The 21 domain integration agents below are NOT scored by `mk:agent-detector` and are NOT in the table above. They live behind their hub skill's routing layer; the hub picks the leaf based on intent + verb match.
+The domain integration agents below are NOT routed by `mk:agent-detector` and are NOT in the table above. They live behind their hub skill's routing layer; the hub picks the leaf based on intent + verb match.
 
-| Hub skill | Agent count | Agents | CLI backend |
-| --- | ---: | --- | --- |
-| `mk:jira` | 16 | jira-issue, jira-search, jira-lifecycle, jira-collaborate, jira-relationships, jira-time, jira-agile, jira-fields, jira-bulk, jira-jsm, jira-admin, jira-dev, jira-ops, jira-evaluator, jira-estimator, jira-analyst | `jira-as` |
-| `mk:confluence` | 5 | confluence-page, confluence-search, confluence-spec-analyst, confluence-bulk, confluence-collaborate | `confluence-as` |
+| Hub skill | Agents | CLI backend |
+| --- | --- | --- |
+| `mk:jira` | jira-issue, jira-search, jira-lifecycle, jira-collaborate, jira-relationships, jira-time, jira-agile, jira-fields, jira-bulk, jira-jsm, jira-admin, jira-dev, jira-ops, jira-evaluator, jira-estimator, jira-analyst | `jira-as` |
+| `mk:confluence` | confluence-page, confluence-search, confluence-spec-analyst, confluence-bulk, confluence-collaborate | `confluence-as` |
 
-**Routing flow:** `mk:agent-detector` (Phase 0) → if scale-routing CSV matches `jira` or `confluence` keywords, route to the hub skill → hub disambiguates and forks the leaf agent via the matching `mk:<domain>-<leaf>` skill. Orchestrator never invokes a domain agent directly.
+**Routing flow:** `mk:agent-detector` (Phase 0) → if the task names Jira or Confluence, route to the hub skill → hub disambiguates and forks the leaf agent via the matching `mk:<domain>-<leaf>` skill. Orchestrator never invokes a domain agent directly.
 
 **Why excluded:** Domain agents use hub-level routing and separate wrapper safety, so core orchestrator scoring stays focused.
 
@@ -54,5 +56,4 @@ The 21 domain integration agents below are NOT scored by `mk:agent-detector` and
 
 The intent → skill dispatch table is not needed to assign an agent or model tier, so
 it is loaded on demand rather than always-on. It lives in
-`references/skill-domain-routing.md` and is read once per
-session by `mk:agent-detector` at Step 0b (sentinel-cached).
+`references/skill-domain-routing.md`, which `mk:agent-detector` reads when it hands off.

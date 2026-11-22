@@ -24,123 +24,52 @@ requires_runtime: [python>=3.9]
 
 # Scale-Adaptive Routing
 
-Automatically classifies task complexity based on domain keywords.
+Classifies a task's complexity from domain keywords, so a fintech auth change is COMPLEX
+without a judgment call. Phase 0 sub-skill: the orchestrator runs it while tiering; users do
+not invoke it. The agent and risk-flag choice is `mk:agent-detector`.
 
-> Internal sub-skill of Phase 0 (Orient). Not user-invocable directly — invoked by the orchestrator during task classification.
+## How it works
 
-## Purpose
+1. **Fast exit.** Match the task description against `data/domain-complexity.csv`. If the match
+   is a `low` row and the task names one file, return it and stop.
+2. **Otherwise add evidence.** For an ambiguous or multi-domain match, read the task content,
+   the project layout and recent git changes (`references/multi-layer-detection.md`) and give
+   a confidence: HIGH, MEDIUM or LOW. Task content outranks repository type.
+3. **Classify the task type** as `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`,
+   `review` or `intake`, with a suggested skill (`references/task-type-classification.md`).
+4. **Product areas.** If `.meowkit/product-areas.yaml` exists, merge its keywords and paths
+   (`references/product-area-config.md`).
+5. **Return** `{domain, level, workflow, task_type, suggested_skill, confidence, product_area?}`.
+   No match, or LOW confidence: return `unknown` and defer to manual classification.
 
-Replace subjective orchestrator judgment with deterministic, auditable domain-based routing. A fintech auth change should auto-classify as COMPLEX without human intervention.
+The tier each `level` maps to, and the escalation rules, are in
+`.claude/skills/agent-detector/references/model-selection-rules.md`. This skill returns
+complexity, not a model. `mk:autobuild` chooses its own scaffolding density: see
+`.claude/skills/autobuild/references/adaptive-density-matrix.md`.
 
-## How It Works
-
-1. **Input:** User task description (string)
-2. **Layer 0:** Match keywords from `data/domain-complexity.csv`
-3. **Layer 1:** Analyze task content — classify type and extract mentioned files/modules (load `references/multi-layer-detection.md`)
-4. **Layer 2:** Check project context — files present, directory structure, recent git changes
-5. **Layer 3:** Score confidence per domain (HIGH ≥70, MEDIUM 40–69, LOW <40)
-6. **Classify task type** — map signals to one of: `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`, `review`, `intake` (load `references/task-type-classification.md`)
-7. **Optional:** Check `.meowkit/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
-8. **Output:** `{domain, level, workflow, execution_tier, task_type, suggested_skill, confidence, product_area?}`
-9. **Fallback:** No match → return `unknown`, defer to manual classification
-
-## CSV Schema
+## CSV schema
 
 | Column | Values | Purpose |
-|--------|--------|---------|
+|---|---|---|
 | domain | snake_case identifier | Domain name |
-| signals | comma-separated keywords | Match against task description |
-| level | low, medium, high | Complexity classification |
+| signals | comma-separated keywords | Matched against the task description |
+| level | low, medium, high | Complexity |
 | workflow | one-shot, standard, enhanced, advanced | Workflow intensity |
 | web_searches | comma-separated topics | Suggested research queries |
 
-## Routing Logic
-
-| Level | Execution Tier | Plan file | Workflow |
-|-------|-----------|-----------|---------|
-| low | minimal | May be skipped (one-shot) | Minimal |
-| medium | standard | Write it, agree it | Standard phases |
-| high | high-assurance | Write it, agree it | Full phases + security |
-
-The tier each `level` maps to is defined once in `.claude/skills/agent-detector/references/model-selection-rules.md` (Task Complexity Tiers). Do not restate it here.
-
-## Provider Boundary
-
-This skill emits only task complexity, risk, workflow intensity, and scaffolding density. It does not select a model or name a provider. The active harness resolves any provider-specific model policy after this routing result is produced.
-
-## Usage
-
-Called automatically by orchestrator at Phase 0. Not invoked directly by users.
-
-```
-Orchestrator Phase 0:
-  1. Run mk:scale-routing on task description
-  2. If match found → use returned level/workflow/execution_tier
-  3. If no match → fall back to manual classification
-```
-
-## Extending
-
-Users can add custom domains by editing `data/domain-complexity.csv`. Add a new row with domain keywords relevant to your project.
+A `one-shot` workflow may skip the plan file only when the CSV says so and the task has zero
+blast radius; the CSV alone is not enough. Teams extend routing by adding rows to the CSV.
 
 ## Gotchas
 
-- **Runtime dependency on `.claude/skills/autobuild/scripts/density-select.sh`** — if the autobuild workflow skill is removed or renamed, density selection breaks. The script is shared intentionally (single source of truth for density policy); treat it as load-bearing infrastructure, not a private harness internal.
-- Multiple domains can match a single task (e.g., "fintech dashboard" matches both fintech and internal_tools) — use the HIGHEST complexity match
-- CSV keyword matching is case-insensitive but signal order matters — first match wins for domain name
-- Adding too many low-signal keywords (e.g., "data", "app") creates false positives — keep signals specific to the domain
-- One-shot workflow bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation — CSV alone is not sufficient
+- Several domains can match ("fintech dashboard" hits fintech and internal_tools): use the highest level.
+- Matching is case-insensitive and the first match names the domain.
+- Low-signal keywords ("data", "app") cause false positives: keep signals specific.
+- Task content beats repository type: a login-button style fix in a backend repo is frontend work.
 
-## Output Schema (v2.0)
+## Files
 
-Base fields (v1.0):
-
-| Field | Values | Description |
-|---|---|---|
-| `domain` | snake_case string | Matched domain or `unknown` |
-| `level` | low, medium, high | Complexity classification |
-| `workflow` | one-shot, standard, enhanced, advanced | Workflow intensity |
-| `execution_tier` | minimal, standard, high-assurance | Provider-neutral execution intensity |
-
-New fields (v2.0):
-
-| Field | Values | Description |
-|---|---|---|
-| `task_type` | bug_fix, feature, refactor, security, devops, docs, review, intake | Classified task type |
-| `suggested_skill` | mk:fix, mk:cook, mk:cso, mk:review, mk:intake | Recommended skill for this task |
-| `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 scoring |
-| `product_area` | string | Area name from `.meowkit/product-areas.yaml` (omitted if no YAML) |
-
-New fields (v2.1 — Phase 5 of harness plan, 260408):
-
-| Field | Values | Description |
-|---|---|---|
-| `autobuild_density` | `MINIMAL`, `FULL`, `LEAN` | Recommended scaffolding density for `mk:autobuild` runs (see Adaptive Density Policy below) |
-
-### Harness Density Selection (v2.1)
-
-Used by `mk:autobuild` to choose how much scaffolding to apply per run. The decision rules:
-
-| `level` | neutral baseline | `autobuild_density` |
-|---|---|---|
-| low | none | `MINIMAL` |
-| medium | none | `FULL` |
-| high | none | `FULL` |
-
-**Override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL\|FULL\|LEAN` env var, when set, overrides the auto-detected value. The override is logged in the autobuild run report for audit.
-
-For scriptable density selection, callers may invoke `.claude/skills/autobuild/scripts/density-select.sh` which echoes only the density token to stdout.
-
-## Data File
-
-- `data/domain-complexity.csv` — Domain → complexity → workflow mapping
-
-## Reference Files
-
-- `references/multi-layer-detection.md` — 4-layer detection logic and confidence scoring
-- `references/task-type-classification.md` — 8 task types, signals, and suggested skills
-- `references/product-area-config.md` — Optional `.meowkit/product-areas.yaml` schema and loading rules
-
-## Cross-Skill Dependencies
-
-- `.claude/skills/autobuild/scripts/density-select.sh` — Echoes `autobuild_density` token to stdout; used by autobuild when scriptable density selection is needed
+- `data/domain-complexity.csv`: domain to complexity to workflow.
+- `references/multi-layer-detection.md`: the evidence layers and confidence.
+- `references/task-type-classification.md`: task types, signals and suggested skills.
+- `references/product-area-config.md`: the optional `.meowkit/product-areas.yaml` schema.

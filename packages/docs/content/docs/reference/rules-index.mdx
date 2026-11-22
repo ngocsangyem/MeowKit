@@ -90,7 +90,7 @@ Domain-complexity routing that drives Phase 0 classification and harness density
 | 3 | High complexity forces COMPLEX | `level=high` gives the COMPLEX tier |
 | 4 | One-shot workflow skips the plan | `workflow=one-shot` with zero blast radius needs no plan file |
 | 5 | Users can extend the CSV | `domain-complexity.csv` is user-editable |
-| 6 | Density emission | `mk:scale-routing` also emits `autobuild_density` |
+| 6 | Autobuild owns density | `mk:scale-routing` emits no density; `mk:autobuild` picks its own |
 | 7 | Auto-strict for high complexity | `level=high` during `/mk:cook` turns on `--strict` (full `mk:evaluate`) at Phase 4.5 unless you pass `--no-strict`. It fires only in `mk:cook`, not in `mk:fix`, `mk:autobuild` or standalone `mk:review` |
 
 ## model-selection-rules.md [#model-selection-rules]
