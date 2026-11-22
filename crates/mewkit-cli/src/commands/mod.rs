@@ -15,6 +15,7 @@ pub mod review;
 pub mod self_update;
 pub mod setup;
 pub mod skill;
+pub mod skill_store;
 pub mod task;
 pub mod task_state;
 pub mod trace;
@@ -212,6 +213,12 @@ pub fn run_jobs(
     json: bool,
 ) -> Result<Vec<Outcome>, Failure> {
     let mut outcomes = Vec::new();
+    let store = skill_store::lifecycle::before(place);
+    let refresh = |store: Option<&_>| {
+        if !opts.dry_run {
+            skill_store::lifecycle::after(place, store);
+        }
+    };
     for mut job in jobs {
         let hashes = std::mem::take(&mut job.hashes);
         let report = execute(
@@ -240,10 +247,12 @@ pub fn run_jobs(
                         "; the targets listed above were applied".into()
                     }
                 );
+                refresh(store.as_ref());
                 return Err(failure);
             }
         }
     }
+    refresh(store.as_ref());
     output::print(&outcomes, json);
     Ok(outcomes)
 }

@@ -578,17 +578,19 @@ Options:
 ## mewkit skill
 
 ```text
-Per-skill interpreter environments
+Per-skill environments and the skill store (status of installed skills)
 
 Usage: mewkit skill [OPTIONS] [SUBCOMMAND] [SKILL]
 
 Arguments:
-  [SUBCOMMAND]  `env`
-  [SKILL]       The skill whose environment to create or repair
+  [SUBCOMMAND]  `env` or `status`
+  [SKILL]       The skill to act on
 
 Options:
-      --list  List every skill that declares a runtime and the state of its environment
-  -h, --help  Print help
+      --list    List every skill that declares a runtime and the state of its environment
+      --global  Act on your home directory instead of this project (skill store verbs)
+      --json    Print one JSON document instead of text (skill store verbs)
+  -h, --help    Print help
 ```
 
 ## mewkit pack
