@@ -242,6 +242,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
             plan,
             index,
             hashes,
+            merge_base: None,
         });
     }
     let outcomes = run_jobs(

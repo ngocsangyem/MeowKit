@@ -2,7 +2,9 @@
 //!
 //! Targets and skill packs come from the ownership indexes. Files the new
 //! kit no longer ships are removed when their bytes still match what the
-//! old kit installed; that needs the old kit, read from the cache.
+//! old kit installed; that needs the old kit, read from the cache. The same
+//! old kit is the base for merging a skill file the user edited with the
+//! kit's change (see `skill_store::upgrade_merge`).
 use clap::Args;
 use mewkit_adapters::contract::written_hashes;
 use mewkit_core::exec::ExecOptions;
@@ -10,8 +12,8 @@ use mewkit_core::ownership::Origin;
 
 use super::upgrade_query::{self, Query};
 use super::{
-    Common, Job, depends_on, drop_retired, emitter_for, hashes_of, parse_targets, prepare,
-    run_jobs, stamp, unconfirmed_force,
+    Common, Job, depends_on, drop_retired, emitter_for, parse_targets, prepare, run_jobs,
+    skill_store, stamp, unconfirmed_force,
 };
 use crate::failure::{Failure, PENDING};
 use crate::kit_args::{KitArgs, installed_kit_or_fetch};
@@ -114,8 +116,14 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
         let packs = index.packs.clone();
         // An old kit that no longer plans cleanly is treated as missing: its
         // files are kept rather than the upgrade refused.
-        let old = installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
-            .and_then(|k| hashes_of(&place, e, &k, &packs).ok())
+        let old_plan = installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
+            .and_then(|k| prepare(&place, e, &k, &packs).ok());
+        let old = old_plan.as_ref().map(written_hashes).unwrap_or_default();
+        // The base an edited skill file is merged against: what the old kit
+        // wrote there, checked against the ledger before it is used.
+        let merge_base = old_plan
+            .as_ref()
+            .map(skill_store::upgrade_merge::base_bytes)
             .unwrap_or_default();
         let mut plan = prepare(&place, e, &kit, &packs)?;
         let new = written_hashes(&plan);
@@ -143,6 +151,7 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
             plan,
             index,
             hashes,
+            merge_base: Some(merge_base),
         });
     }
     let outcomes = run_jobs(

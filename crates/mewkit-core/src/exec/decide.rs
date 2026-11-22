@@ -7,7 +7,7 @@ use crate::merge::{hook_groups, json_entries, markdown_block, toml_table};
 use crate::ownership::{OwnershipIndex, Section};
 use crate::plan::{Format, Op};
 
-use super::ExecError;
+use super::{ExecError, MergedFile};
 
 pub(super) enum Action {
     Write {
@@ -42,6 +42,7 @@ pub(super) fn decide(
     current: Option<Vec<u8>>,
     index: &OwnershipIndex,
     kit_hash: &dyn Fn(&RelPath) -> Option<String>,
+    merged: Option<&MergedFile>,
     force: bool,
 ) -> Result<Decision, ExecError> {
     let path = op.path().clone();
@@ -55,6 +56,31 @@ pub(super) fn decide(
     let (action, record) = match op {
         Op::WriteFile { bytes, mode, .. } => {
             let record = Record::OwnFile(sha256_hex(bytes));
+            // A merge computed against exactly the bytes on disk replaces
+            // them; the ledger still records the kit's bytes, so the file
+            // keeps counting as edited and the next upgrade merges again.
+            let merge = merged.filter(|m| {
+                !force
+                    && current
+                        .as_deref()
+                        .is_some_and(|c| sha256_hex(c) == m.against)
+            });
+            if let Some(m) = merge {
+                let action = if current.as_deref() == Some(m.bytes.as_slice()) {
+                    Action::Unchanged
+                } else {
+                    Action::Write {
+                        bytes: m.bytes.clone(),
+                        mode: *mode,
+                    }
+                };
+                return Ok(Decision {
+                    path,
+                    action,
+                    record,
+                    replaced,
+                });
+            }
             let action = match (&current, owned) {
                 (None, _) => Action::Write {
                     bytes: bytes.clone(),
