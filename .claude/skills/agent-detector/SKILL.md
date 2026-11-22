@@ -27,9 +27,10 @@ default_enabled: true
 # Agent Detector
 
 Once per task, picks the specialist agent to own it, the complexity tier (TRIVIAL, STANDARD
-or COMPLEX) and any risk flags, and says so in one line. Use it when a task starts or its
-scope changes, not on every message: a question, a one-line edit or a follow-up inside the
-same task needs no detection. The domain-to-complexity CSV match is `mk:scale-routing`; this
+or COMPLEX) and any risk flags, and says so in one line. It is offered on every message;
+detect when a task starts or its scope changes, and otherwise reuse the result already given
+for the current task: a question, a one-line edit or a follow-up inside the same task needs
+no new detection. The domain-to-complexity CSV match is `mk:scale-routing`; this
 skill adds the agent and the horizontal risk flags.
 
 ## Workflow

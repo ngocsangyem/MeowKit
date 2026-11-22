@@ -54,7 +54,7 @@ It activates once, at session start, on complex-feature intent. If `/mk:cook` wa
 ## How a run goes
 
 1. Pick the lead agent and tier with `mk:agent-detector`. If the task is simple, say so and suggest the lighter route.
-2. On a non-trivial task, route to `mk:plan-creator` and agree the plan with the user before building; Phase 4 leaves a review verdict; read it before any explicit ship request. Shipping and reflection start only when the user asks, whatever `transition` says in the YAML for those phases.
+2. On a non-trivial task, route to `mk:plan-creator` and agree the plan with the user before building; Phase 4 leaves a review verdict; read it before any explicit ship request. Shipping and reflection start only when the user asks (`transition: explicit` in the YAML).
 3. Follow `workflow.yaml` phase by phase. Open `references/workflow-phases.md` for the rendered table and `.claude/skills/cook/references/phase-contracts.md` for what each phase expects and produces.
 4. A `fasttrack:` prefix, "just build it" or an Agent Teams request: open `references/fasttrack-and-teams.md`.
 5. After the Phase 4 verdict, a background `project-manager` report is optional; see `.claude/skills/cook/references/post-phase-delegation.md`.
