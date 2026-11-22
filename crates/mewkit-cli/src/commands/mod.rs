@@ -213,7 +213,7 @@ pub fn run_jobs(
     json: bool,
 ) -> Result<Vec<Outcome>, Failure> {
     let mut outcomes = Vec::new();
-    let store = skill_store::lifecycle::before(place);
+    let mut store = skill_store::lifecycle::before(place);
     let refresh = |store: Option<&_>| {
         if !opts.dry_run {
             skill_store::lifecycle::after(place, store);
@@ -221,6 +221,7 @@ pub fn run_jobs(
     };
     for mut job in jobs {
         let hashes = std::mem::take(&mut job.hashes);
+        let kept = skill_store::lifecycle::keep(store.as_mut(), &mut job.plan, &mut job.index);
         let report = execute(
             &job.plan,
             &place.exec_scope(job.e),
@@ -229,11 +230,14 @@ pub fn run_jobs(
             opts,
         );
         match report {
-            Ok(report) => outcomes.push(Outcome {
-                runtime: job.e.target(),
-                scope: place.label(),
-                report,
-            }),
+            Ok(mut report) => {
+                report.preserved.extend(kept);
+                outcomes.push(Outcome {
+                    runtime: job.e.target(),
+                    scope: place.label(),
+                    report,
+                });
+            }
             Err(err) => {
                 output::print(&outcomes, json);
                 let mut failure = Failure::from(err);
