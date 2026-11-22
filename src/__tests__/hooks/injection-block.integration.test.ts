@@ -8,7 +8,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { runConfiguredHook } from "./support/hook-runner.js";
 import { scaffold, SETTINGS, type HarnessProject } from "./_scaffold.js";
 
-const INJECTION_MARKER = "MeowKit injection scan flagged this Bash command";
+const INJECTION_MARKER = "Injection scan flagged this Bash command";
 
 function modelContext(stdout: string): string {
 	if (!stdout.trim().startsWith("{")) return "";

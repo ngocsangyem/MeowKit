@@ -17,6 +17,18 @@ fn functional(line: &str, at: usize) -> bool {
     let end = at + BRAND.len();
     let before = at.checked_sub(1).map(|i| bytes[i]);
     let after = bytes.get(end).copied();
+    // A URL: the whitespace-delimited token holding the occurrence.
+    let start = line[..at].rfind(char::is_whitespace).map_or(0, |i| i + 1);
+    let stop = line[end..]
+        .find(char::is_whitespace)
+        .map_or(line.len(), |i| end + i);
+    if line[start..stop].contains("://") {
+        return true;
+    }
+    // Paths and identifiers are lowercase; `MeowKit-managed` is prose.
+    if &line[at..end] != BRAND {
+        return false;
+    }
     // `.meowkit`, `/meowkit`, `-meowkit`; `meowkit-core.md`, `meowkit/`,
     // `meowkit.ts`.
     if matches!(before, Some(b'.' | b'/' | b'-')) || matches!(after, Some(b'-' | b'/')) {
@@ -34,15 +46,10 @@ fn functional(line: &str, at: usize) -> bool {
         (before, after),
         (Some(b'"'), Some(b'"')) | (Some(b'\''), Some(b'\''))
     );
-    if &line[at..end] == BRAND && quoted {
+    if quoted {
         return true;
     }
-    // A URL: the whitespace-delimited token holding the occurrence.
-    let start = line[..at].rfind(char::is_whitespace).map_or(0, |i| i + 1);
-    let stop = line[end..]
-        .find(char::is_whitespace)
-        .map_or(line.len(), |i| end + i);
-    line[start..stop].contains("://")
+    false
 }
 
 /// Every prose occurrence of the brand in `text`, as `line: text`.

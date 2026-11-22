@@ -14,7 +14,7 @@ const root = projectRoot();
 const ledgerExists = existsSync(join(root, ".meowkit", "state", "cursor-ledger.json"));
 
 const lines = [
-	"MeowKit-managed Cursor project.",
+	"Kit-managed Cursor project.",
 	"State, telemetry, and locks live under .meowkit/ (never .cursor/).",
 	ledgerExists
 		? "Reconciliation ledger present at .meowkit/state/cursor-ledger.json."

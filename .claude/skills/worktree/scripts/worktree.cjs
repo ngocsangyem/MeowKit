@@ -86,7 +86,7 @@ const noPrefixIndex = args.indexOf('--no-prefix');
 const noPrefix = noPrefixIndex > -1;
 if (noPrefixIndex > -1) args.splice(noPrefixIndex, 1);
 
-// --orchestrated: parallel agent worktree mode (MeowKit-specific)
+// --orchestrated: parallel agent worktree mode (kit-specific)
 const orchestratedIndex = args.indexOf('--orchestrated');
 const orchestrated = orchestratedIndex > -1;
 if (orchestratedIndex > -1) args.splice(orchestratedIndex, 1);
