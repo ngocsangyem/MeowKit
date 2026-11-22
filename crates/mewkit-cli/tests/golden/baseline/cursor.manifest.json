@@ -234,6 +234,11 @@
       "size": 9546
     },
     {
+      "path": ".cursor/hooks/lib/core/plan-state-sync.cjs",
+      "sha256": "d2d2ab8418cc471188b119892c125aa1c8ee357fe128095213bad8f972268b66",
+      "size": 12959
+    },
+    {
       "path": ".cursor/hooks/lib/core/pre-ship.cjs",
       "sha256": "3ab13e63c652264eca6193794b51fe62f7847821b2f67c00a9acef495998c9b7",
       "size": 1960
