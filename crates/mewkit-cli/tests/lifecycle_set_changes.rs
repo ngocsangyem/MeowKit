@@ -10,7 +10,15 @@ use support::kit::sha_tree;
 use support::temp_home::TempHome;
 use support::{code, text};
 
-const RUNTIMES: [&str; 6] = ["claude-code", "codex", "cursor", "grok", "pi", "omp"];
+const RUNTIMES: [&str; 7] = [
+    "claude-code",
+    "codex",
+    "cursor",
+    "grok",
+    "pi",
+    "omp",
+    "antigravity",
+];
 
 /// Records the launcher's absolute path, so it differs between two projects.
 const DESCRIPTOR: &str = ".claude/runtime.json";
@@ -100,6 +108,11 @@ fn omp_leaves_a_fresh_install_of_each_other_runtime() {
 }
 
 #[test]
+fn antigravity_leaves_a_fresh_install_of_each_other_runtime() {
+    leaving_after_each_other_runtime_joins("antigravity");
+}
+
+#[test]
 fn the_full_set_taken_down_one_runtime_at_a_time_matches_a_fresh_install_each_time() {
     let env = TempHome::new();
     for runtime in RUNTIMES {
@@ -113,7 +126,7 @@ fn the_full_set_taken_down_one_runtime_at_a_time_matches_a_fresh_install_each_ti
     let built = kit_files(&env);
     assert!(
         built == all,
-        "six added one at a time differ from six at once at {:?}",
+        "seven added one at a time differ from seven at once at {:?}",
         differing(&built, &all)
     );
     let mut remaining: Vec<&str> = RUNTIMES.to_vec();

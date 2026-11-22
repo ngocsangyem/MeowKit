@@ -1,4 +1,4 @@
-//! Pi, OMP and Codex on the `.agents/` tree they share, against this
+//! Pi, OMP, Codex and Antigravity on the `.agents/` tree they share, against this
 //! checkout's own kit.
 mod support;
 
@@ -154,4 +154,21 @@ fn neither_installs_into_the_home_directory() {
             .unwrap_err();
         assert!(matches!(err, EmitError::Unsupported { .. }), "{err}");
     }
+}
+
+#[test]
+fn a_fourth_writer_makes_a_pair_write_the_shared_wording() {
+    let kit = kit();
+    let p = Project::new(Pi);
+    // Pi alone says "/skill:mk-"; beside any other writer, including
+    // Antigravity, it writes the wording every reader can follow.
+    let alone = plan_among(&Pi, &kit, &p.scope, &[Runtime::Pi]);
+    assert!(text(&written(&alone), ".agents/skills/mk-cook/SKILL.md").contains("/skill:mk-"));
+    for other in [Runtime::Codex, Runtime::Omp, Runtime::Antigravity] {
+        let plan = plan_among(&Pi, &kit, &p.scope, &[Runtime::Pi, other]);
+        let files = written(&plan);
+        let skill = text(&files, ".agents/skills/mk-cook/SKILL.md");
+        assert!(!skill.contains("/skill:mk-"), "{other:?}");
+    }
+    assert!(agents_tree::WRITERS.contains(&Runtime::Antigravity));
 }

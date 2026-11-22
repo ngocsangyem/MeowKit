@@ -187,3 +187,13 @@ pub const OMP: Target = Target {
     host_word: "omp",
     ..SHARED
 };
+
+/// Antigravity as the only reader of `.agents/skills`.
+pub const ANTIGRAVITY: Target = Target {
+    // "Type `/<skill-name>` in the message box to explicitly invoke a skill":
+    // https://antigravity.google/docs/skills (read 2026-11-22)
+    invocation: Invocation::Sigil("/"),
+    host_name: "Antigravity",
+    host_word: "antigravity",
+    ..SHARED
+};

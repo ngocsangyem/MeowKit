@@ -127,7 +127,7 @@ describe("always-on budget ceilings", () => {
 		const root = buildTree({ rulesBytes: 1000, skills: 3, skillDescriptionBytes: 100 });
 		const { status, out } = run(root);
 		expect(status).toBe(0);
-		for (const runtime of ["claude-code", "codex", "cursor", "grok", "pi", "omp"]) {
+		for (const runtime of ["claude-code", "codex", "cursor", "grok", "pi", "omp", "antigravity"]) {
 			expect(out).toMatch(new RegExp(`^\\s+${runtime}\\s+\\d+ B\\s+~\\d+ tokens \\(est\\.\\)`, "m"));
 		}
 		expect(out).toContain("200K: budget ~2000 tokens; 1M: budget ~10000 tokens");

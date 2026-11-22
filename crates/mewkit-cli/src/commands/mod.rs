@@ -284,8 +284,8 @@ pub fn drop_retired(
 }
 
 /// The runtimes among `installed` whose files depend on `changing` being here
-/// or not, `changing` itself left out. Codex, Pi and OMP write one `.agents/`
-/// tree in wording that depends on which of them are installed, and OMP
+/// or not, `changing` itself left out. Codex, Pi, OMP and Antigravity write one
+/// `.agents/` tree in wording that depends on which of them are installed, and OMP
 /// switches off its import of `.claude/` only beside Claude Code.
 pub fn depends_on(changing: &[Runtime], installed: &[Runtime], scope: ScopeKind) -> Vec<Runtime> {
     let sharers = mewkit_adapters::agents_tree::WRITERS;

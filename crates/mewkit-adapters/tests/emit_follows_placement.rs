@@ -1,5 +1,5 @@
 //! What each emitter writes, against what the placement resolver says the kit
-//! writes, for every set of runtimes a project can hold. The resolver's lists
+//! writes, for every set of runtimes with an emitter a project can hold. The resolver's lists
 //! of double loads are only as true as this agreement.
 mod support;
 
@@ -7,13 +7,13 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use mewkit_adapters::contract::{Op, Runtime, Scope};
 use mewkit_adapters::placement_resolver::{Dialect, Placement, resolve};
-use mewkit_adapters::registry::emitter;
+use mewkit_adapters::registry::{emitted, emitter};
 use mewkit_adapters::surface_table::{Kind, table};
 use mewkit_adapters::{EmitRequest, agents_tree};
 use support::{kit, request};
 
 fn subsets() -> Vec<Vec<Runtime>> {
-    let all = Runtime::ALL;
+    let all = emitted();
     (1u32..(1 << all.len()))
         .map(|mask| {
             all.iter()
@@ -74,7 +74,7 @@ fn the_emitters_write_the_roots_the_resolver_names_in_every_set() {
     // set that agrees on those.
     let mut plans: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let sets = subsets();
-    assert_eq!(sets.len(), 63);
+    assert_eq!(sets.len(), 127);
     for set in sets {
         let placement = resolve(table(), &set);
         let shared = agents_tree::is_shared(Some(&placement));

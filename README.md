@@ -194,7 +194,7 @@ meowkit/
 │   └── settings.json
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
 ├── crates/                   The mewkit CLI (Rust): mewkit-cli, mewkit-core, mewkit-adapters
-├── kit/overlays/             What one runtime needs and cannot be derived: codex, cursor, grok, pi, omp, shared
+├── kit/overlays/             What one runtime needs and cannot be derived: codex, cursor, grok, pi, omp, antigravity, shared
 ├── packages/
 │   ├── docs/                 Documentation site (docs.meowkit.dev, Fumadocs)
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)

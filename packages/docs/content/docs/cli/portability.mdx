@@ -1,9 +1,9 @@
 ---
 title: "Portability"
-description: "Install MeowKit for Codex, Cursor, Grok, Pi or OMP, keep those installs current, and see what each tool supports."
+description: "Install MeowKit for Codex, Cursor, Grok, Pi, OMP or Antigravity, keep those installs current, and see what each tool supports."
 ---
 
-MeowKit is authored once, in `.claude/`. Codex, Cursor, Grok, Pi and OMP each get the files they read, projected from that tree plus a small overlay for the runtime's hooks and config. You install a runtime with `mewkit init --target`.
+MeowKit is authored once, in `.claude/`. Codex, Cursor, Grok, Pi, OMP and Antigravity each get the files they read, projected from that tree plus a small overlay for the runtime's hooks and config. You install a runtime with `mewkit init --target`.
 
 ## Install for another runtime
 
@@ -13,6 +13,7 @@ mewkit init --target cursor
 mewkit init --target grok
 mewkit init --target pi
 mewkit init --target omp
+mewkit init --target antigravity
 ```
 
 `--target` skips the picker and installs the runtimes you name, as a comma-separated list or `all`. Each install writes the runtime's skills, agents, always-on text and hooks, plus `AGENTS.md` where the runtime reads it.
@@ -24,10 +25,11 @@ mewkit init --target omp
 | Grok | Skills under `.grok/skills/`, the hook file `.grok/hooks/meowkit.json` with its helpers under `.grok/meowkit/`, and `AGENTS.md` |
 | Pi | Skills under `.agents/skills/`, one extension `.pi/extensions/meowkit.ts`, and `AGENTS.md` |
 | OMP | Skills under `.agents/skills/`, agents as `.omp/agents/*.md`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md` |
+| Antigravity | Skills under `.agents/skills/`, agents as `.agents/agents/*.md`, the on-demand rule files `.agents/rules/meowkit-*.md`, and `AGENTS.md`. No hook is installed: guards not installed, so no privacy guard and no ship check run on it |
 
-Codex, Pi and OMP read the same `.agents/skills/` folder. When more than one of them is installed, they share one copy of the skills there, written in runtime-neutral text. Installed alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi and OMP as `/skill:mk-x`. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/crates/mewkit-adapters/runtime-surface-table.md) lists where each combination of runtimes writes.
+Codex, Pi, OMP and Antigravity read the same `.agents/skills/` folder. When more than one of them is installed, they share one copy of the skills there, written in runtime-neutral text. Installed alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi OMP as `/skill:mk-x`, and Antigravity as `/mk-x`. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/crates/mewkit-adapters/runtime-surface-table.md) lists where each combination of runtimes writes.
 
-Grok, Pi and OMP install into a project only; `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. `--skill-packs <packs>` limits which skills the non-Claude runtimes get. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`, and a repository with a git remote also needs `--allow-cloud-mcp`.
+Grok, Pi, OMP and Antigravity install into a project only; `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. `--skill-packs <packs>` limits which skills the non-Claude runtimes get. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`, and a repository with a git remote also needs `--allow-cloud-mcp`.
 
 `--dry-run` prints what would be written without writing it.
 
@@ -45,7 +47,7 @@ mewkit init --target cursor    # or: mewkit init --target codex
 
 ## Check an install
 
-`mewkit validate --target <codex|cursor|grok|pi|omp> [dir]` checks a generated install without changing it. See [validate](/cli/project-setup#validate).
+`mewkit validate --target <codex|cursor|grok|pi|omp|antigravity> [dir]` checks a generated install without changing it. See [validate](/cli/project-setup#validate).
 
 With more than one runtime installed, `mewkit doctor` reports two rows about overlap. `coexistence: cross-runtime load` warns when a runtime loads the kit from more than one root in the project, because it also reads another runtime's folders (Cursor also reads `.claude/` and `.agents/skills`). `kit copies: unrecorded` fails when a copy of a kit skill or agent that no install recorded sits under a second root a runtime reads, and names the copy to delete. [doctor](/cli/project-setup#doctor) has the full list of rows.
 
@@ -64,6 +66,7 @@ The table shows what each runtime's install writes.
 | Grok | no | yes | `AGENTS.md` | yes | no |
 | Pi | no | yes | `AGENTS.md` | yes | no |
 | OMP | yes | yes | `AGENTS.md` | yes | no |
+| Antigravity | yes | yes | `AGENTS.md` and `.agents/rules/` | no | no |
 
 Notes:
 
@@ -71,6 +74,7 @@ Notes:
 - Codex and Cursor agents pin a model id by tier. OMP agents carry no `model`. [Agent Models](/guide/agent-models) lists the pins and how to change one.
 - Grok documents no file format for agents, so the kit writes none. Pi has no subagents, so it has no agents either.
 - Grok and Pi load project hooks only after the project is trusted: `/hooks-trust` or a start with `--trust` for Grok, `/trust` for Pi. OMP has no trust step. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces. The Grok, Pi and OMP entries have not yet been run in a live session.
+- Antigravity is known from its documentation only: nothing was run on it. Each artifact below is marked from documentation, not probed. Skills (`.agents/skills/`, https://antigravity.google/docs/skills), the instruction file and rule files (`AGENTS.md` and `.agents/rules/`, https://antigravity.google/docs/rules) and agents (`.agents/agents/`, https://antigravity.google/docs/subagents) are documented paths; the pages name no project trust step. A rule file needs a `trigger` or Antigravity silently discards it, so the kit writes only two on-demand rule files and keeps its always-on text in the `AGENTS.md` block; `mewkit validate --target antigravity` checks each rule's `trigger` and the 24,000-byte cut. Agents get the runtime's own tool names and a `model` of `inherit`, `flash` or `pro` by tier; which models `flash` and `pro` are is not stated on the page. It reads `.agents/hooks.json` for hooks (https://antigravity.google/docs/hooks), and the kit installs none, so `mewkit init` and `mewkit doctor` say "guards not installed".
 
 ## providers
 

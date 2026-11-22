@@ -14,7 +14,7 @@ const path = require('node:path');
 const { excludeMatcher, shipSetExclusions, shipSetFiles } = require('../kit-ship-set.cjs');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp'];
+const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp', 'antigravity'];
 const trees = new Map();
 
 /** Newest modification time under `dir`, in ms. */

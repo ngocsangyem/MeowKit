@@ -11,7 +11,7 @@ use super::result::CheckResult;
 
 /// Registered profiles, in the npm CLI's registration order — the order
 /// `Known targets:` lists them in.
-pub const TARGET_PROFILES: [&str; 5] = ["codex", "cursor", "grok", "pi", "omp"];
+pub const TARGET_PROFILES: [&str; 6] = ["codex", "cursor", "grok", "pi", "omp", "antigravity"];
 
 pub fn is_target_profile(provider: &str) -> bool {
     TARGET_PROFILES.contains(&provider)
@@ -26,6 +26,7 @@ pub fn detects_target(provider: &str, dir: &Path) -> bool {
         "grok" => super::target_grok::detects(dir),
         "pi" => super::target_pi::detects(dir),
         "omp" => super::target_omp::detects(dir),
+        "antigravity" => super::target_antigravity::detects(dir),
         _ => false,
     }
 }
@@ -38,6 +39,7 @@ pub fn check_target(provider: &str, dir: &Path) -> Vec<CheckResult> {
         "grok" => super::target_grok::check(dir),
         "pi" => super::target_pi::check(dir),
         "omp" => super::target_omp::check(dir),
+        "antigravity" => super::target_antigravity::check(dir),
         _ => Vec::new(),
     }
 }

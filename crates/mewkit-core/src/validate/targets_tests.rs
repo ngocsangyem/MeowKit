@@ -122,3 +122,121 @@ fn a_grok_tree_is_detected_by_its_hook_runtime_config_and_fails_what_is_missing(
         rows[1].detail
     );
 }
+
+#[test]
+fn an_antigravity_tree_is_a_kit_skill_and_says_its_guards_are_not_installed() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    std::fs::create_dir_all(dir.path().join(".agents/skills/mine")).expect("create a skill folder");
+    assert!(
+        !detects_target("antigravity", dir.path()),
+        "a skill the user made is not an install"
+    );
+    let skill = dir.path().join(".agents/skills/mk-cook");
+    std::fs::create_dir_all(&skill).expect("create a kit skill folder");
+    std::fs::write(
+        skill.join("SKILL.md"),
+        "---\nname: \"mk-cook\"\ndescription: \"Builds.\"\n---\n",
+    )
+    .expect("write the skill");
+    assert!(detects_target("antigravity", dir.path()));
+
+    let rows = check_target("antigravity", dir.path());
+    let guards = rows.last().expect("a guards row");
+    assert_eq!(guards.status, Status::Warn);
+    assert!(
+        guards.detail.contains("guards not installed"),
+        "{}",
+        guards.detail
+    );
+    // AGENTS.md and the guard script are not there.
+    assert_eq!(rows[0].status, Status::Fail, "{rows:?}");
+}
+
+/// Antigravity silently discards a rule file with no valid `trigger`: the kit's
+/// own rule files are judged, the user's are not.
+#[test]
+fn an_antigravity_rule_without_a_trigger_or_over_the_cut_fails_its_row() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    let write = |rel: &str, text: &str| {
+        let file = dir.path().join(rel);
+        std::fs::create_dir_all(file.parent().expect("a parent")).expect("create the folder");
+        std::fs::write(file, text).expect("write");
+    };
+    let rule_row = |dir: &std::path::Path| {
+        check_target("antigravity", dir)
+            .into_iter()
+            .find(|row| row.name.contains("rule files"))
+            .expect("a rule row")
+    };
+    write(".agents/rules/mine.md", "no frontmatter at all\n");
+    assert_eq!(rule_row(dir.path()).status, Status::Fail, "no kit rule yet");
+
+    write(
+        ".agents/rules/meowkit-a.md",
+        "---\ndescription: d\n---\nBody\n",
+    );
+    let found = rule_row(dir.path());
+    assert_eq!(found.status, Status::Fail);
+    assert!(found.detail.contains("no `trigger`"), "{}", found.detail);
+
+    write(
+        ".agents/rules/meowkit-a.md",
+        "---\ntrigger: sometimes\n---\nBody\n",
+    );
+    assert!(rule_row(dir.path()).detail.contains("is not one of"));
+
+    write(
+        ".agents/rules/meowkit-a.md",
+        "---\ntrigger: model_decision\n---\nBody\n",
+    );
+    assert!(rule_row(dir.path()).detail.contains("no `description`"));
+
+    let ok = "---\ntrigger: model_decision\ndescription: When shipping.\n---\nBody\n";
+    write(".agents/rules/meowkit-a.md", ok);
+    assert_eq!(rule_row(dir.path()).status, Status::Pass);
+
+    write(
+        ".agents/rules/meowkit-a.md",
+        &format!("{ok}{}", "x".repeat(24_000)),
+    );
+    let found = rule_row(dir.path());
+    assert_eq!(found.status, Status::Fail);
+    assert!(found.detail.contains("24000-byte cut"), "{}", found.detail);
+}
+
+#[test]
+fn an_antigravity_agent_needs_a_known_model_and_known_tools() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    let write = |rel: &str, text: &str| {
+        let file = dir.path().join(rel);
+        std::fs::create_dir_all(file.parent().expect("a parent")).expect("create the folder");
+        std::fs::write(file, text).expect("write");
+    };
+    let agent_row = |dir: &std::path::Path| {
+        check_target("antigravity", dir)
+            .into_iter()
+            .find(|row| row.name.contains("agents have"))
+            .expect("an agent row")
+    };
+    write(
+        ".agents/meowkit/agents/a.md",
+        "---\nname: a\ndescription: d\n---\n",
+    );
+    assert!(agent_row(dir.path()).detail.contains("not installed"));
+    let agent = |model: &str, tools: &str| {
+        format!("---\nname: a\ndescription: \"d\"\ntools: [{tools}]\nmodel: {model}\n---\nBody\n")
+    };
+    write(".agents/agents/a.md", &agent("gpt", "view_file"));
+    assert!(agent_row(dir.path()).detail.contains("is not one of"));
+    write(".agents/agents/a.md", &agent("pro", "view_file, Bash"));
+    assert!(
+        agent_row(dir.path())
+            .detail
+            .contains("`Bash` is not an Antigravity tool")
+    );
+    write(
+        ".agents/agents/a.md",
+        &agent("pro", "view_file, run_command"),
+    );
+    assert_eq!(agent_row(dir.path()).status, Status::Pass);
+}

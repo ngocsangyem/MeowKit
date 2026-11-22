@@ -24,7 +24,7 @@ Chosen 2026-11-15.
 
 Grok has no column: its documentation names no model per tier and no agent file format
 (https://docs.x.ai/build/features/subagents, read 2026-11-19), so the agent prompts installed
-for Grok carry no `model`. Pi has no subagents. OMP agents are written without `model`, which
+for Grok carry no `model`. Pi has no subagents. Antigravity takes `inherit`, `flash` or `pro` as an agent's `model` and names no model behind them (https://antigravity.google/docs/subagents, read 2026-11-22), so its agents map by tier size: `haiku` to `flash`, `sonnet` to `inherit`, `opus` and `fable` to `pro`; the mapping is in `crates/mewkit-adapters/src/antigravity/agents.rs`, and the table below has no Antigravity rows because an authored agent's `model` is always a Claude Code tier. OMP agents are written without `model`, which
 OMP treats as optional (`src/discovery/helpers.ts`, 18.13.3), so they run on the session's model.
 
 On Codex, Enterprise and Edu admins must enable `gpt-6-luna` before it can run.
