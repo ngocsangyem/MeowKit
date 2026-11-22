@@ -2651,7 +2651,7 @@
       "title": "mk:stitch",
       "description": "Generates a UI design via Stitch AI. NOT for mk:figma.",
       "sourcePath": "skills/stitch/SKILL.md",
-      "sourceHash": "31255820481e1e7f92e59bc61547824b9f981a5ba51c3fb18f380e42c4267061",
+      "sourceHash": "58276198ce7f3ec4485a5d08bbdc77c6234ea1298e2c75c7a55a517fa881cf64",
       "aliases": [],
       "owner": "utility",
       "phase": "on-demand",
