@@ -19,16 +19,18 @@ pub enum Runtime {
     Grok,
     Pi,
     Omp,
+    Antigravity,
 }
 
 impl Runtime {
-    pub const ALL: [Runtime; 6] = [
+    pub const ALL: [Runtime; 7] = [
         Runtime::ClaudeCode,
         Runtime::Codex,
         Runtime::Cursor,
         Runtime::Grok,
         Runtime::Pi,
         Runtime::Omp,
+        Runtime::Antigravity,
     ];
 
     /// The `--target` name.
@@ -40,6 +42,7 @@ impl Runtime {
             Runtime::Grok => "grok",
             Runtime::Pi => "pi",
             Runtime::Omp => "omp",
+            Runtime::Antigravity => "antigravity",
         }
     }
 

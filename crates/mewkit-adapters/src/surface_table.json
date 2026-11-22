@@ -537,6 +537,62 @@
           "note": "Servers are keyed by name; the provider with the higher priority wins (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/mcp.ts:112)."
         }
       }
+    },
+    {
+      "name": "antigravity",
+      "checked": "vendor pages (skills, rules, hooks, subagents) read 2026-11-22; not installed, nothing probed",
+      "kinds": {
+        "skills": {
+          "own": true,
+          "roots": [
+            {
+              "root": ".agents/skills",
+              "write": true,
+              "source": "https://antigravity.google/docs/skills"
+            },
+            {
+              "root": ".agent/skills",
+              "source": "https://antigravity.google/docs/skills"
+            }
+          ],
+          "note": "The page says `.agent/skills` is kept for backward compatibility. It states no limit on description length or skill count, and says nothing of the same name in two folders."
+        },
+        "agents": {
+          "own": true,
+          "roots": [
+            {
+              "root": ".agents/agents",
+              "write": true,
+              "source": "https://antigravity.google/docs/subagents"
+            }
+          ],
+          "note": "`model` takes `inherit`, `flash` or `pro`; `tools` takes the runtime's own tool names, and a name that does not match may make the agent hang (https://antigravity.google/docs/subagents, read 2026-11-22)."
+        },
+        "always-on": {
+          "own": true,
+          "roots": [
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "https://antigravity.google/docs/rules"
+            },
+            {
+              "root": "GEMINI.md",
+              "source": "https://antigravity.google/docs/rules"
+            },
+            {
+              "root": ".agents/rules",
+              "write": true,
+              "source": "https://antigravity.google/docs/rules"
+            }
+          ],
+          "note": "A file in `.agents/rules` without a valid `trigger` in its frontmatter is silently discarded; a rule file is cut at 24,000 bytes and the always-on rules together have 20,000 tokens (https://antigravity.google/docs/rules, read 2026-11-22). The kit keeps its always-on text in the `AGENTS.md` block and writes rule files only for text that loads on demand."
+        },
+        "hooks": {
+          "roots": [],
+          "note": "The kit installs no Antigravity hook, so no guard runs there. The runtime reads `.agents/hooks.json`; its `PreToolUse` takes a stdout `decision` and the default timeout is 30 s (https://antigravity.google/docs/hooks, read 2026-11-22)."
+        }
+      }
     }
   ]
 }

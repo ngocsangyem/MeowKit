@@ -1,8 +1,8 @@
-//! The `.agents/` tree that Codex, Pi and OMP share: skills in
+//! The `.agents/` tree that Codex, Pi, OMP and Antigravity share: skills in
 //! `.agents/skills`, and in `.agents/meowkit/` the files that skill text names
 //! by path (helper scripts, rubrics, agent prompts) and the guard script.
 //!
-//! Each of the three installs the same bytes there, so one install's files
+//! Each of the four installs the same bytes there, so one install's files
 //! are another's, and a file leaves with the last of them.
 use crate::agents_block::{self, AGENTS_MD};
 use crate::contract::{EmitError, EmitRequest, Op, Plan, Runtime};
@@ -12,7 +12,7 @@ use crate::projected_kit::{ProjectedKit, Spec};
 use crate::projection::target;
 use crate::surface_table::Kind;
 
-/// The root the three runtimes read skills from.
+/// The root the four runtimes read skills from.
 pub const SKILLS_ROOT: &str = ".agents/skills";
 /// The folder for kit files none of them loads itself.
 pub const KIT_DIR: &str = ".agents/meowkit";
@@ -40,7 +40,12 @@ pub const OMP: Spec = Spec {
 };
 
 /// The runtimes whose emitters install this tree.
-pub const WRITERS: [Runtime; 3] = [Runtime::Codex, Runtime::Pi, Runtime::Omp];
+pub const WRITERS: [Runtime; 4] = [
+    Runtime::Codex,
+    Runtime::Pi,
+    Runtime::Omp,
+    Runtime::Antigravity,
+];
 
 /// Whether more than one of the runtimes that install the tree is in the set,
 /// which is when its text has to suit them all. A runtime that only reads the

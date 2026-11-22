@@ -89,6 +89,12 @@ pub fn trees(runtime: Runtime, scope: ScopeKind) -> Trees {
             rules: ".omp/rules",
             instructions: "AGENTS.md",
         },
+        Runtime::Antigravity => Trees {
+            agents: ".agents/agents",
+            skills: ".agents/skills",
+            rules: ".agents/rules",
+            instructions: "AGENTS.md",
+        },
     }
 }
 

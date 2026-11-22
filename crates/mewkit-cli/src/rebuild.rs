@@ -106,7 +106,7 @@ pub fn source_kit(
 
 /// How many paths `plan` writes that hold other bytes today and that no
 /// runtime installed here records. A path another runtime's install wrote
-/// (Codex, Pi and OMP share a skills root) is accounted for.
+/// (Codex, Pi, OMP and Antigravity share a skills root) is accounted for.
 pub fn collisions(place: &Place, plan: &Plan) -> usize {
     let recorded: BTreeSet<String> = place
         .installed()

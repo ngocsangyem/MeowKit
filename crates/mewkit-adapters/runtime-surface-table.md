@@ -141,6 +141,24 @@ Checked: source read and probed 2026-11-17, OMP 18.13.3.
 - hooks: Also runs modules under `.claude/hooks/{pre,post}` and `.codex/hooks` (@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude.ts:383, codex.ts:406), so kit hook scripts stay outside those folders.
 - mcp: An item found under several of these roots loads from the first listed. Servers are keyed by name; the provider with the higher priority wins (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/mcp.ts:112).
 
+### antigravity
+
+Checked: vendor pages (skills, rules, hooks, subagents) read 2026-11-22; not installed, nothing probed.
+
+| Kind | Root | Kit writes | Unsure | Switch | Source |
+|---|---|---|---|---|---|
+| skills | `.agents/skills` | yes |  |  | https://antigravity.google/docs/skills |
+| skills | `.agent/skills` |  |  |  | https://antigravity.google/docs/skills |
+| agents | `.agents/agents` | yes |  |  | https://antigravity.google/docs/subagents |
+| always-on | `AGENTS.md` | yes |  |  | https://antigravity.google/docs/rules |
+| always-on | `GEMINI.md` |  |  |  | https://antigravity.google/docs/rules |
+| always-on | `.agents/rules` | yes |  |  | https://antigravity.google/docs/rules |
+
+- skills: The page says `.agent/skills` is kept for backward compatibility. It states no limit on description length or skill count, and says nothing of the same name in two folders.
+- agents: `model` takes `inherit`, `flash` or `pro`; `tools` takes the runtime's own tool names, and a name that does not match may make the agent hang (https://antigravity.google/docs/subagents, read 2026-11-22).
+- always-on: A file in `.agents/rules` without a valid `trigger` in its frontmatter is silently discarded; a rule file is cut at 24,000 bytes and the always-on rules together have 20,000 tokens (https://antigravity.google/docs/rules, read 2026-11-22). The kit keeps its always-on text in the `AGENTS.md` block and writes rule files only for text that loads on demand.
+- hooks: The kit installs no Antigravity hook, so no guard runs there. The runtime reads `.agents/hooks.json`; its `PreToolUse` takes a stdout `decision` and the default timeout is 30 s (https://antigravity.google/docs/hooks, read 2026-11-22).
+
 ## Where the kit writes
 
 Each emitter writes its runtime's own roots in every set, so a runtime has its copy whatever else is installed; a test runs every emitter for all 63 sets and holds this table to what they write. Where a choice is left, the resolver keeps the combination with, in order: the fewest certain double loads, the fewest runtimes reading another runtime's wording, the fewest possible double loads, the fewest roots. A runtime always gets its own hook file, never only an import its user can switch off, because with the switch off it would run no guard and say nothing. The MCP column is where each runtime reads servers from: no emitter installs one, and `mewkit setup` writes `.mcp.json`. One runtime, each pair, and all six:
@@ -153,6 +171,7 @@ Each emitter writes its runtime's own roots in every set, so a runtime has its c
 | grok | `.grok/skills` | none | `AGENTS.md` | `.grok/hooks` | `.grok/config.toml` |
 | pi | `.agents/skills` | none | `AGENTS.md` | `.pi/extensions` | `.pi/mcp.json` |
 | omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.omp/hooks` | `.omp/mcp.json` |
+| antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | none | none |
 | claude-code + codex | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.codex/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.codex/hooks.json` | `.mcp.json`, `.codex/config.toml` |
 | claude-code + cursor | `.claude/skills`, `.cursor/skills` | `.claude/agents`, `.cursor/agents` | `.claude/rules`, `.cursor/rules`, `AGENTS.md` | `.claude/settings.json`, `.cursor/hooks.json` | `.mcp.json`, `.cursor/mcp.json` |
 | codex + cursor | `.agents/skills`, `.cursor/skills` | `.codex/agents`, `.cursor/agents` | `AGENTS.md`, `.cursor/rules` | `.codex/hooks.json`, `.cursor/hooks.json` | `.codex/config.toml`, `.cursor/mcp.json` |
@@ -168,7 +187,13 @@ Each emitter writes its runtime's own roots in every set, so a runtime has its c
 | cursor + omp | `.cursor/skills`, `.agents/skills` | `.cursor/agents`, `.omp/agents` | `.cursor/rules`, `AGENTS.md` | `.cursor/hooks.json`, `.omp/hooks` | `.cursor/mcp.json` |
 | grok + omp | `.grok/skills`, `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.grok/hooks`, `.omp/hooks` | `.grok/config.toml`, `.omp/mcp.json` |
 | pi + omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.pi/extensions`, `.omp/hooks` | `.pi/mcp.json`, `.omp/mcp.json` |
-| claude-code + codex + cursor + grok + pi + omp | `.claude/skills`, `.agents/skills`, `.cursor/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.omp/agents` | `.claude/rules`, `AGENTS.md`, `.cursor/rules` | `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.grok/hooks`, `.pi/extensions`, `.omp/hooks` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
+| claude-code + antigravity | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.agents/rules` | `.claude/settings.json` | `.mcp.json` |
+| codex + antigravity | `.agents/skills` | `.codex/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.codex/hooks.json` | `.codex/config.toml` |
+| cursor + antigravity | `.cursor/skills`, `.agents/skills` | `.cursor/agents`, `.agents/agents` | `.cursor/rules`, `AGENTS.md`, `.agents/rules` | `.cursor/hooks.json` | `.cursor/mcp.json` |
+| grok + antigravity | `.grok/skills`, `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.grok/hooks` | `.grok/config.toml` |
+| pi + antigravity | `.agents/skills` | `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.pi/extensions` | `.pi/mcp.json` |
+| omp + antigravity | `.agents/skills` | `.omp/agents`, `.agents/agents` | `AGENTS.md`, `.agents/rules` | `.omp/hooks` | `.omp/mcp.json` |
+| claude-code + codex + cursor + grok + pi + omp + antigravity | `.claude/skills`, `.agents/skills`, `.cursor/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.omp/agents`, `.agents/agents` | `.claude/rules`, `AGENTS.md`, `.cursor/rules`, `.agents/rules` | `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.grok/hooks`, `.pi/extensions`, `.omp/hooks` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
 
 ## Double loads the kit's placement leaves
 
@@ -176,10 +201,11 @@ The runtime loads the content from two roots the kit writes in these sets. `mewk
 
 | Kind | Runtime | Also loads | Smallest sets | User setting that stops it |
 |---|---|---|---|---|
-| skills | cursor | `.agents/skills` | codex + cursor; cursor + pi; cursor + omp | none documented |
+| skills | cursor | `.agents/skills` | codex + cursor; cursor + pi; cursor + omp; cursor + antigravity | none documented |
 | skills | cursor | `.claude/skills` | claude-code + cursor | none documented |
 | always-on | grok | `.claude/rules` | claude-code + grok | `GROK_CLAUDE_RULES_ENABLED=false` |
 | always-on | grok | `.cursor/rules` | cursor + grok | `GROK_CURSOR_RULES_ENABLED=false` |
+| always-on | omp | `.agents/rules` | omp + antigravity | none documented |
 | hooks | cursor | `.claude/settings.json` | claude-code + cursor | Cursor Settings > Agents > Third-Party Imports: "Include Third-Party Plugins, Skills, and Other Configs" off |
 | hooks | grok | `.claude/settings.json` | claude-code + grok | `GROK_CLAUDE_HOOKS_ENABLED=false` |
 | hooks | grok | `.cursor/hooks.json` | cursor + grok | `GROK_CURSOR_HOOKS_ENABLED=false` |
@@ -193,4 +219,4 @@ The runtime may load a second copy from the root; the reason is in the last colu
 |---|---|---|---|---|
 | skills | grok | `.claude/skills` | claude-code + grok | the vendor page says these are read and names no path; not run in a live session yet |
 | skills | grok | `.cursor/skills` | cursor + grok | the vendor page says these are read and names no path; not run in a live session yet |
-| always-on | claude-code | `AGENTS.md` | claude-code + codex; claude-code + cursor; claude-code + grok; claude-code + pi; claude-code + omp | read only when no CLAUDE.md or CLAUDE.local.md is in the working directory or above (default mode, from 2.1.277) |
+| always-on | claude-code | `AGENTS.md` | claude-code + codex; claude-code + cursor; claude-code + grok; claude-code + pi; claude-code + omp; claude-code + antigravity | read only when no CLAUDE.md or CLAUDE.local.md is in the working directory or above (default mode, from 2.1.277) |
