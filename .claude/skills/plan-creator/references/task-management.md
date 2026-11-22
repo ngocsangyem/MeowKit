@@ -85,16 +85,20 @@ N=0 / M=0 is PASS (no-op): zero phases legitimately means zero tasks; only misma
 New session → read plan.md → check `[ ]` items → re-hydrate unchecked items as tasks.
 Already `[x]` items → skip.
 
+Archived plans under `tasks/plans/archive/` are out of bounds for reading: the shipped code is the source of truth for what was built, not an old plan.
+
 ## Sync-Back (on completion)
 1. Mark session tasks complete
 2. Update phase files: `[ ]` → `[x]` for completed items
-3. Update plan.md status table
-4. If every non-abandoned phase todo is checked and at least one todo exists, archive the plan with `mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the directory to `tasks/plans/archive/{plan-name}/`)
+3. Run `mewkit plan sync {plan-dir}` — it rewrites every derived status (phase frontmatter, `**Status:**` lines, the plan.md Phases table and status, `.plan-state.json`) from those checkboxes
+4. If sync prints `plan complete`, archive the plan with `mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the directory to `tasks/plans/archive/{plan-name}/`)
 5. Project-manager agent sweeps all phase files
 
 ## Sync-Back Protocol (Executed by Cook's Finalize Step)
 
-After implementation completes, cook's finalize step MUST run sync-back per the **Algorithm** below.
+After implementation completes, cook's finalize step MUST run sync-back: tick the boxes, then run `mewkit plan sync {plan-dir}`, which applies the **Algorithm** below. `mewkit plan sync {plan-dir} --check` prints the drift without writing and exits 1 when there is any; `mewkit plan status` names the drift too.
+
+Fallback: if the installed binary lacks `plan sync` (it prints an unrecognized-subcommand error), apply the Algorithm by hand to each phase file, the plan.md Phases table and status, and `.plan-state.json`.
 
 ### Algorithm (formal)
 
@@ -103,43 +107,52 @@ For each phase file (ascending phase number):
 ```
 todos = parse_checkboxes(file.body, section="## Todo List")
 current_status = file.frontmatter.status
-
-# Terminal states: never overwrite
-if current_status in ("failed", "abandoned"):
-    continue
-
 total = len(todos)
 checked = sum(1 for t in todos if t.checked)
 
-if total == 0 or checked == 0:
+if total > 0:
+    plan_state.phases[file.stem].tasks_completed = checked   # facts: written even for
+    plan_state.phases[file.stem].tasks_total = total         # a human-set phase
+
+# Human-set states, or nothing to derive from: keep the status
+if current_status in ("failed", "abandoned", "active") or total == 0:
+    continue
+
+if checked == 0:
     new_status = "pending"
 elif checked < total:
     new_status = "in_progress"
 else:
     new_status = "completed"
 
-if new_status != current_status:
-    write_frontmatter(file, status=new_status)
-    regenerate_overview_mirror(file)  # **Status:**, **Priority:**, **Effort:**, **Depends on:**
+write_if_different(file.frontmatter.status, new_status)
+write_if_different(file.overview["**Status:**"], new_status)    # whole value replaced
+write_if_different(plan_md.phases_table[row linking file].status, new_status)  # whole cell
+write_if_different(plan_state.phases[file.stem].status, new_status)
+
+# plan.md status: never changed when failed, abandoned, cancelled or archived
+plan_md.status = "completed"   if every non-abandoned phase is completed
+                 "in-progress" elif any phase is past pending
+                 unchanged     otherwise
 ```
 
+A value that already says the derived status (ignoring case, quotes and a parenthesised note) is left exactly as written; one that differs is replaced whole, in the style it used (`In progress` beside capitals, else `in_progress`).
+
 **Invariants:**
-- `status: completed` requires `total > 0 AND checked == total`. Empty todo lists never auto-promote.
-- `failed` and `abandoned` are terminal — only a human edit moves out.
+- Sync writes derived fields only; it never ticks or unticks a checkbox, never archives and never moves a file. The checkboxes are the single author.
+- Only boxes inside `## Todo List` count. `status: completed` requires `total > 0 AND checked == total`. A phase with no todos keeps its status.
+- `failed`, `abandoned` and `active` are human-set — only a human edit moves out. Sync produces `pending`, `in_progress`, or `completed`.
 - Auto-archive never waits for `mk:ship`; completed task checkboxes are the source of truth for plan completion.
-- `active` is HUMAN-ONLY — sync-back never writes `active`. The algorithm produces `pending`, `in_progress`, or `completed`. If a human marks a phase `active`, sync-back may demote it to `pending` when no todos are checked. (Use `in_progress` instead — it survives sync-back as long as at least one todo is checked.)
-- Frontmatter is source of truth. The Overview block (`**Status:** ...`) is regenerated from frontmatter on every sync-back, NOT vice versa.
-- Idempotent: re-running sync-back on an unchanged file produces zero diff.
+- Checkboxes are the source of truth; frontmatter, the Overview `**Status:**` line, the Phases table and `.plan-state.json` are regenerated from them, NOT vice versa.
+- Idempotent: re-running sync-back on an unchanged plan produces zero diff.
 
 ### Procedure (operational)
 
-1. Read `{plan_dir}/.plan-state.json`
-2. For each phase file: apply the algorithm above to derive `new_status` and rewrite frontmatter
-3. Regenerate the Overview mirror lines from frontmatter values
-4. Update plan.md Phases table status column from checkpoint
-5. Run the completion lifecycle check: if all task checkboxes across non-abandoned phase files are checked, archive the plan with `mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the entire plan directory to `tasks/plans/archive/{plan-name}/`)
-6. project-manager subagent sweeps all phase-XX files for cross-file consistency
-7. Git commit captures state transition
+1. Tick the completed items' boxes in the phase files
+2. Run `mewkit plan sync {plan-dir}` (fallback: apply the algorithm above by hand)
+3. Run the completion lifecycle check: if sync printed `plan complete` (every box across non-abandoned phase files is checked), archive the plan with `mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the entire plan directory to `tasks/plans/archive/{plan-name}/`)
+4. project-manager subagent sweeps all phase-XX files for cross-file consistency
+5. Git commit captures state transition
 
 ### Anti-patterns
 
@@ -154,7 +167,7 @@ if new_status != current_status:
 **Cross-Session Resume (canonical source):**
 New session → read plan.md / phase-file `[ ]` checkboxes (and the phase frontmatter `status`, which the Sync-Back Algorithm derives from those checkboxes) → skip completed phases → re-hydrate only unchecked/pending phases as tasks. This matches `## Cross-Session Resume` above — there is ONE canonical resume source.
 
-`.plan-state.json` is a DERIVED convenience cache, NOT the authority: a consumer MAY read it to skip a scan, but MUST recompute from the checkboxes on any disagreement (checkboxes/frontmatter win). It is written at hydration and regenerated at the final sync-back — never hand-mutated mid-run.
+`.plan-state.json` is a DERIVED convenience cache, NOT the authority: a consumer MAY read it to skip a scan, but MUST recompute from the checkboxes on any disagreement (checkboxes/frontmatter win). It is written at hydration and rewritten only by `mewkit plan sync` — never hand-mutated.
 
 ## Status Producer/Consumer Matrix
 
@@ -170,7 +183,7 @@ The phase status enum has 7 values. Each has a documented producer (who writes i
 | `abandoned` | HUMAN edit only — terminal state | cook re-hydration (skip phase); archive workflow | task-management.md "Invariants" |
 | `unknown` | parser cascade fallback — emitted only when `status:` is absent or unrecognized; never written from frontmatter | validator | internal sentinel |
 
-> `.plan-state.json` is deliberately absent from this matrix: its `status` / `tasks_completed` fields are DERIVED from the phase-file checkboxes (the authoritative producers above), written at hydration and regenerated at the final sync-back. Treat it as a regenerable cache, not a status producer — never hand-mutate it mid-run.
+> `.plan-state.json` is deliberately absent from this matrix: its `status` / `tasks_completed` fields are DERIVED from the phase-file checkboxes (the authoritative producers above), written at hydration and rewritten by `mewkit plan sync`. Treat it as a regenerable cache, not a status producer — never hand-mutate it mid-run.
 
 ## Cook Handoff
 Once the plan is agreed: output cook command with absolute path:

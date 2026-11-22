@@ -20,6 +20,7 @@
 // (one that could mutate state) MUST return `deny` (which IS enforced for
 // `preToolUse`); only a tool confidently known to be read-only may `allow`.
 "use strict";
+const { isArchivedPlanPath } = require("./core/privacy.cjs");
 
 function extractTargetPath(payload) {
 	const input = payload && typeof payload.tool_input === "object" && payload.tool_input ? payload.tool_input : {};
@@ -62,7 +63,17 @@ const MATCHERS = [
 		id: "read-only-query",
 		pattern: /^(?:read|search|grep|glob|list|find|view)/i,
 		failClosed: false,
-		decide: () => ({ permission: "allow", reason: "read-only query tool" }),
+		// File reads go through beforeReadFile; a search or listing aimed inside the archived
+		// plans is refused here, so an archived plan stays out of context either way.
+		decide: (payload) => {
+			const input = payload && typeof payload.tool_input === "object" && payload.tool_input ? payload.tool_input : {};
+			const named = ["path", "file_path", "filePath", "target_directory", "directory"].map((key) => input[key]);
+			const target = named.find((value) => typeof value === "string" && isArchivedPlanPath(value));
+			if (target) {
+				return { permission: "deny", reason: `'${target}' is an archived plan. Archived plans are kept out of context; the shipped code is the source of truth.` };
+			}
+			return { permission: "allow", reason: "read-only query tool" };
+		},
 	},
 	{
 		id: "unclassified-other",

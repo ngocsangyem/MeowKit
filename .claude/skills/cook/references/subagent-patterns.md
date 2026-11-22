@@ -132,7 +132,7 @@ delegate a subagent (agent="shipper", prompt="Run full pre-ship pipeline: pre-sh
 Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
 ```
-delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path]: tick the completed todos, then run `mewkit plan sync [plan-dir]` (if the binary lacks `plan sync`, apply the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md by hand). Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
 ```
 
 **Scope (planner sync-back):** pass plan-file path, completed-task list, sync-back algorithm reference. Do NOT pass code diffs, reviewer output, full session.

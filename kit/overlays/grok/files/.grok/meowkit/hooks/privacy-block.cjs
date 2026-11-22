@@ -36,6 +36,6 @@ const commandPaths = command
 	.split(/[\s'"`=(><|;&@:,]+/)
 	.filter((word) => word && !/^-/.test(word) && (/[./~]/.test(word) || /^id_(?:rsa|ed25519|ecdsa|dsa)$/i.test(word)));
 
-const result = decidePrivacy({ paths: [...targetPaths(input), ...pathValues(input), ...commandPaths], command });
+const result = decidePrivacy({ paths: [...targetPaths(input), ...pathValues(input), ...commandPaths], command, toolName: typeof payload.toolName === "string" ? payload.toolName : "" });
 if (result.exit === 2) deny(denyReason(result, "grok"));
 process.exit(0);

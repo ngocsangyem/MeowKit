@@ -20,6 +20,7 @@
     { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "post-session" },
     { "event": "Stop", "handler": "./handlers/control-probe.cjs", "toggleKey": "control-probe" },
     { "event": "Stop", "handler": "./handlers/pre-completion-check.cjs", "toggleKey": "pre-completion-check" },
+    { "event": "Stop", "handler": "./handlers/plan-state-sync.cjs", "toggleKey": "plan-state-sync" },
 
     { "event": "SessionStart", "handler": "./handlers/model-detector.cjs", "toggleKey": "model-detector" },
     { "event": "SessionStart", "handler": "./handlers/orientation-ritual.cjs", "toggleKey": "orientation-ritual" },

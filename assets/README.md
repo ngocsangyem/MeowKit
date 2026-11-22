@@ -10,7 +10,7 @@ Design tokens, type, the logo masters and preview pages for the MeowKit product 
 
 **MeowKit** installs a `.claude/` directory that Claude Code reads at the start of a session. It runs a 7-phase workflow (Orient → Plan → Test → Build → Review → Ship → Reflect) with two hard gates, TDD opt-in, layered security scanning and cross-session memory. It ships as an npm CLI (`npx mewkit init`) plus a documentation site at [docs.meowkit.dev](https://docs.meowkit.dev/).
 
-Numbers for copy that references scale, from the root `README.md`: **129 skills · 42 agents · 7 rules · 27 hook scripts · 4-layer+ security**.
+Numbers for copy that references scale, from the root `README.md`: **129 skills · 42 agents · 7 rules · 28 hook scripts · 4-layer+ security**.
 
 ---
 

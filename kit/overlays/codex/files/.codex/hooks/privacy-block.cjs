@@ -42,6 +42,7 @@ const commandPaths = command
 	.split(/[\s'"`=(><|;&@:,]+/)
 	.filter((word) => word && !/^-/.test(word) && (/[./~]/.test(word) || /^id_(?:rsa|ed25519|ecdsa|dsa)$/i.test(word)));
 
-const result = decidePrivacy({ paths: [...targetPaths(toolInput), ...commandPaths], command });
+const toolName = typeof input.tool_name === "string" ? input.tool_name : "";
+const result = decidePrivacy({ paths: [...targetPaths(toolInput), ...commandPaths], command, toolName });
 if (result.exit === 2) deny(denyReason(result, "codex"));
 process.exit(0);

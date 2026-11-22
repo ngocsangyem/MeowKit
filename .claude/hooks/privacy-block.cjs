@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 'use strict';
-// privacy-block.cjs — refuse reads of sensitive files and obviously unsafe web
-// fetches.
+// privacy-block.cjs — refuse reads of sensitive files, obviously unsafe web
+// fetches, and reads of archived plans (Edit and Write into the archive pass).
 //
-// Matches Read, Edit, Write and Bash. Exit 2 is the only blocking value: exit 1
+// Matches Read, Grep, Glob, Edit, Write and Bash. Exit 2 is the only blocking value: exit 1
 // is advisory and the tool call proceeds, which is useless for policy
 // enforcement. The same asymmetry makes a crash dangerous, so the handlers
 // below are installed before any library is required and are written inline —
@@ -35,7 +35,7 @@ process.on('unhandledRejection', failClosed);
 
 const { readHookInput } = require('./lib/parse-stdin.cjs');
 const { enterGuardRoot } = require('./lib/project-root.cjs');
-const { decidePrivacy } = require('./lib/core/privacy.cjs');
+const { decidePrivacy, isArchivedPlanPath } = require('./lib/core/privacy.cjs');
 
 const emit = (lines) => { if (lines.length) process.stderr.write(`${lines.join('\n')}\n`); };
 
@@ -61,7 +61,13 @@ async function main() {
   // argv is the back-compatible fallback for a registration that still passes
   // the target as a positional argument.
   const filePath = input.filePath || process.argv[2] || '';
-  const result = decidePrivacy({ paths: [filePath], command: input.command });
+  // Grep and Glob name a directory to search as `path`; a Glob pattern can name the archive
+  // itself (`tasks/plans/archive/**`), and only then is it judged, because a pattern such as
+  // `**/*.pem` is a search, not a read of a credential file.
+  const toolInput = input.data && typeof input.data.tool_input === 'object' && input.data.tool_input ? input.data.tool_input : {};
+  const searchPath = typeof toolInput.path === 'string' ? toolInput.path : '';
+  const pattern = input.toolName === 'Glob' && typeof toolInput.pattern === 'string' && isArchivedPlanPath(toolInput.pattern) ? toolInput.pattern : '';
+  const result = decidePrivacy({ paths: [filePath, searchPath, pattern], command: input.command, toolName: input.toolName });
   emit(result.stderr);
   process.exit(result.exit);
 }

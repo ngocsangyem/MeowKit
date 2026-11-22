@@ -41,6 +41,7 @@ const commandPaths = command
 	.split(/[\s'"`=(><|;&@:,]+/)
 	.filter((word) => word && !/^-/.test(word) && (/[./~]/.test(word) || /^id_(?:rsa|ed25519|ecdsa|dsa)$/i.test(word)));
 
-const result = decidePrivacy({ paths: [...targetPaths(input), ...pathValues(input), ...commandPaths], command });
+const toolName = payload.toolCall && typeof payload.toolCall.name === "string" ? payload.toolCall.name : "";
+const result = decidePrivacy({ paths: [...targetPaths(input), ...pathValues(input), ...commandPaths], command, toolName });
 if (result.exit === 2) deny(denyReason(result, "antigravity"));
 allow();

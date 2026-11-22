@@ -60,7 +60,7 @@ enum Command {
     SelfUpdate(SelfUpdateArgs),
     /// Resume orientation from durable task state; reads records only.
     Orient(OrientArgs),
-    /// Inspect or archive a plan under tasks/plans/.
+    /// Inspect, sync or archive a plan under tasks/plans/.
     Plan(PlanArgs),
     /// Append a lint-checked entry to the team-memory store (entry on stdin).
     Note(NoteArgs),

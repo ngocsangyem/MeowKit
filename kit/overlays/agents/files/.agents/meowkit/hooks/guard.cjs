@@ -63,7 +63,8 @@ const commandPaths = command
 const named = targetPaths(input);
 const parts = named.flatMap((value) => (value.includes(":") ? value.split(":").filter(Boolean) : []));
 
-const privacy = decidePrivacy({ paths: [...named, ...parts, ...commandPaths], command });
+const toolName = typeof call.toolName === "string" ? call.toolName : "";
+const privacy = decidePrivacy({ paths: [...named, ...parts, ...commandPaths], command, toolName });
 if (privacy.exit === 2) answer(true, denyReason(privacy, RUNTIME));
 
 if (command) {

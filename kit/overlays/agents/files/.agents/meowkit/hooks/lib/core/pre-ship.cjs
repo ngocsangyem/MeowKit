@@ -16,8 +16,9 @@
 // one that looks like it tries is named in the output as refused.
 //
 // Each ship decision appends one `ship_check` trace record with the outcome and cause and never
-// the command text. Apart from that and the checks it runs it has no stdin, stdout or exit code
-// of its own. Result: `{ exit, stdout, stderr, outcome, cause }`; only exit 2 blocks.
+// the command text. Apart from that, the checks it runs and one advisory line when a changed
+// plan's state lags its checkboxes (lib/core/plan-state-sync.cjs, read-only here), it has no
+// stdin, stdout or exit code of its own. Result: `{ exit, stdout, stderr, outcome, cause }`; only exit 2 blocks.
 
 const { lintMemoryStore } = require('../memory-store-lint.cjs');
 const { runPreShipChecks } = require('../preship-checks.cjs');
@@ -25,6 +26,7 @@ const { parseShipCommand } = require('../ship-command.cjs');
 const { changedFiles } = require('../changed-files.cjs');
 const { runOnce } = require('../ship-run-once.cjs');
 const { appendTrace } = require('../trace-log.cjs');
+const { syncChangedPlans, driftLine } = require('./plan-state-sync.cjs');
 
 /** A hook registration gives the ship check 300 s; the checks stop well before. */
 const DEADLINE_MS = 270_000;
@@ -72,6 +74,19 @@ function runChecks(root, ship, env, deadlineMs) {
   return { ...checks, stdout: [...lint.stdout, ...checks.stdout], stderr: [...lint.stderr, ...checks.stderr] };
 }
 
+/**
+ * One advisory line when a changed plan's derived state lags its checkboxes, or it is complete
+ * and waiting to be archived. Read-only: the runtimes without a Stop hook have no other point
+ * where this is noticed, and the ship check is the one hook all of them run. Never throws.
+ */
+function planDrift(root) {
+  try {
+    return driftLine(syncChangedPlans(root, { write: false }));
+  } catch {
+    return '';
+  }
+}
+
 /** @param {{ root: string, command: string, env: object, deadlineMs?: number }} input */
 function decidePreShip({ root, command, env, deadlineMs = DEADLINE_MS }) {
   let ship = null;
@@ -87,6 +102,9 @@ function decidePreShip({ root, command, env, deadlineMs = DEADLINE_MS }) {
   if (refused.length) {
     result = { ...result, stdout: [...refused, ...result.stdout], stderr: result.exit === 0 ? result.stderr : [...result.stderr, ...refused] };
   }
+  // Advisory only: the line joins stdout and nothing else about the result changes.
+  const drift = ship ? planDrift(root) : '';
+  if (drift) result = { ...result, stdout: [drift, ...result.stdout] };
   recordShipCheck(root, { outcome: result.outcome, cause: result.cause, action: ship && ship.kind }, env);
   return result;
 }

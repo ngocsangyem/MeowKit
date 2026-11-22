@@ -5,7 +5,7 @@ sourceOfTruth: ".claude/settings.json"
 lastVerified: "2026-11-20"
 ---
 
-The kit ships 27 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 23 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
+The kit ships 28 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 24 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
 
 ## Two kinds of hook
 
@@ -49,6 +49,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 | `post-session` | Stop | Records cost and trace data to `.meowkit/telemetry/` |
 | `control-probe` | Stop | Logs a known-good fire, to tell an event the host does not support from a broken logger |
 | `pre-completion-check` | Stop | Opt-in. See below |
+| `plan-state-sync` | Stop | Always on. Brings changed plans' derived state (phase status, Overview line, plan.md table and status, `.plan-state.json`) up to date with their checkboxes and prints one line when it changed something or a plan is ready for `mewkit plan archive`. Never blocks |
 | `model-detector` | SessionStart | Writes the detected model tier and density to `.meowkit/state/detected-model.json` and prints one status line |
 | `orientation-ritual` | SessionStart | On resume, clear or compact, runs `mewkit orient --no-record` and injects the result. When the CLI is unavailable it falls back to the last checkpoint and labels it as a fallback |
 | `project-context-loader` | SessionStart | Injects the project context and resets per-session state |
@@ -149,11 +150,12 @@ The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-covera
 | Ship check | `pre-ship.cjs` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: `pre-ship.cjs` on `beforeShellExecution` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: inside `guard.cjs`, on a shell command | Ported: inside `guard.cjs`, on a shell command | Unverified, from documentation: `pre-ship.cjs` on PreToolUse `run_command` |
 | Session context | `project-context-loader` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state | Not ported | Not ported | Not ported | Not ported |
 
-Of the 23 observers, `hook-coverage.json` ports or maps only these off Claude Code:
+Of the 24 observers, `hook-coverage.json` ports or maps only these off Claude Code:
 
 | Observer | Codex | Cursor | Grok, Pi, OMP, Antigravity |
 | --- | --- | --- | --- |
 | `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
+| `plan-state-sync` | Ported: `completion-check.cjs` on Stop, line as `systemMessage` | Ported: `stop-followup.cjs`, line on stderr | Equivalent: the ship check prints the drift line, read-only |
 | `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
 | `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported |
 | `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported |

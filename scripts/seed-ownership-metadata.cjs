@@ -85,6 +85,7 @@ const HOOK_GOVERNANCE = {
   "budget-tracker":        { criticality: "medium",   responsibility: "entropy-auditing" },
   "auto-checkpoint":       { criticality: "medium",   responsibility: "task-state" },
   "checkpoint-writer":     { criticality: "medium",   responsibility: "task-state" },
+  "plan-state-sync":       { criticality: "medium",   responsibility: "task-state" },
 };
 
 // Known runtime-only dirs that should be skipped (no SKILL.md expected)
@@ -109,7 +110,7 @@ function deriveOwner(name) {
   if (/^(sprint-contract|story-sizer|breakdown)/.test(name)) return "lifecycle";
   if (/^(typescript|angular|vue|react-patterns|frontend-design|ui-design-system|figma|database|clean-code|development|multimodal|cso|vulnerability-scanner)/.test(name)) return "utility";
   // Hooks by pattern
-  if (/^(pre-implement|pre-ship|pre-completion-check|verification-evidence|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
+  if (/^(pre-implement|pre-ship|pre-completion-check|plan-state-sync|verification-evidence|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
   if (/^(append-trace|learning-observer|post-session|posttoolfailure-probe|precompact-probe|pre-task-check|control-probe)/.test(name)) return "observability";
   // Agents by role
   if (/^(orchestrator|planner|developer|architect|brainstormer|project-manager|story-sizer)/.test(name)) return "lifecycle";

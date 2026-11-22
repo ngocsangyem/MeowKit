@@ -1,6 +1,6 @@
 ---
 title: "Planning and Tasks"
-description: "Create task files, check and archive plans, see where work stands, and record the checkpoints of a supervised run."
+description: "Create task files, check, sync and archive plans, see where work stands, and record the checkpoints of a supervised run."
 ---
 
 These commands cover plans, task files and the durable task record. To find out where the current task stands and what comes next, run `mewkit orient`.
@@ -31,17 +31,27 @@ A task file is a Markdown document with frontmatter (goal, scope, constraints, a
 
 ## plan
 
-`status` and `check` read plans and change nothing. `archive` writes.
+`status` and `check` read plans and change nothing. `sync` and `archive` write.
 
 ```bash
 mewkit plan status <plan-dir>       # checkbox progress across plan.md and the phase files
 mewkit plan check <phase-file>      # required-section report for one phase
 mewkit plan check --structural <plan.md-or-dir>   # plan.md and every sibling phase file against the full template
+mewkit plan sync <plan-dir>         # rewrite derived statuses from the checkboxes
+mewkit plan sync <plan-dir> --check # print the drift, write nothing, exit 1 if there is any
 mewkit plan archive <plan-dir>      # mark completed and move to tasks/plans/archive/
 mewkit plan archive <plan-dir> --dry-run
 ```
 
 `status` and `check` take `--json`. The plan-creator skill runs `plan check --structural` before you agree a plan.
+
+The boxes in each phase's `## Todo List` are the one thing you author. `plan sync` derives everything else from them and never ticks or unticks a box:
+
+- Each phase gets `pending` when no todo is ticked, `in_progress` when some are, and `completed` when all are. A phase marked `failed`, `abandoned` or `active` keeps its status, and so does a phase with no todos.
+- It rewrites the phase frontmatter `status:`, the phase's `**Status:**` Overview line, the Status cell of the plan.md Phases table row for the phase, and `phases[<phase>]` in `.plan-state.json`. A value that already says the right status is left as written; one that differs is replaced whole, note included. The `tasks_completed` and `tasks_total` counts are updated for every phase with todos, a kept one too. Every other key and line stays as it was, line endings included.
+- The `plan.md` frontmatter `status:` becomes `in-progress` once any phase is past pending and `completed` when every phase that is not abandoned is complete. A plan marked `failed`, `abandoned`, `cancelled` or `archived` keeps its status.
+
+On Claude Code, Codex and Cursor the stop hook applies the same rule to plans that changed, so a plan usually stays in sync without the command. A second run reports `already in sync`. When every phase is complete, sync prints the `plan archive` command to run next; it never archives or moves anything itself. `--json` prints `{"plan", "dir", "changes": [{"file", "field", "from", "to"}], "complete"}`. `plan status` adds one line naming `plan sync` when the derived state is behind the checkboxes; its `--json` output does not change.
 
 `plan archive` finishes a plan in three steps:
 

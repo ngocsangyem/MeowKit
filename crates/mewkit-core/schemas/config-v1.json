@@ -114,6 +114,9 @@
 				"orientation-ritual": {
 					"type": "boolean"
 				},
+				"plan-state-sync": {
+					"type": "boolean"
+				},
 				"post-session": {
 					"type": "boolean"
 				},

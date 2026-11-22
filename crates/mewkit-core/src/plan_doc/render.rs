@@ -1,4 +1,4 @@
-//! The human output of `plan status` and `plan check`.
+//! The human output of `plan status`, `plan check` and `plan sync`.
 //!
 //! Colour is the one thing deliberately NOT ported: the npm CLI dims and
 //! colours through picocolors, which emits nothing when stdout is not a
@@ -8,6 +8,7 @@
 use std::path::Path;
 
 use super::parser::{PhaseChecklist, PhaseFile, PlanSummary, REQUIRED_PHASE_SECTIONS};
+use super::sync::SyncReport;
 
 /// The ratio as a whole percent, or an em dash when there is nothing to divide.
 fn pct(c: &PhaseChecklist) -> String {
@@ -133,6 +134,38 @@ pub fn render_check(phase: &PhaseFile, file: &str) -> String {
             "  A phase file must be executable from a cold read — see documentation-management.md."
                 .to_string(),
         );
+    }
+    out.join("\n")
+}
+
+/// The `plan sync` report: one line per changed value, or "already in sync",
+/// and the archive hint once every box is ticked.
+pub fn render_sync(report: &SyncReport, check: bool) -> String {
+    let mut out = Vec::new();
+    if report.changes.is_empty() {
+        out.push(format!("plan sync: {} already in sync", report.plan));
+    } else {
+        let mode = if check {
+            " (check: nothing written)"
+        } else {
+            ""
+        };
+        out.push(format!("plan sync: {}{mode}", report.plan));
+        for c in &report.changes {
+            // A frontmatter status reads as the file itself changing state.
+            let field = if c.field == "status" {
+                String::new()
+            } else {
+                format!(" {}", c.field)
+            };
+            out.push(format!("  {}{field}: {} → {}", c.file, c.from, c.to));
+        }
+    }
+    if report.complete {
+        out.push(format!(
+            "plan complete: run `mewkit plan archive {}`",
+            report.dir
+        ));
     }
     out.join("\n")
 }

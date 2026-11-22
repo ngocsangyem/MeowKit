@@ -22,7 +22,8 @@ use crate::task_store::{
 
 const COMPLETED: &str = "completed";
 
-static FIRST_BLOCK: LazyLock<Regex> =
+/// The first frontmatter block; `plan sync` reads its `status:` through it too.
+pub(super) static FIRST_BLOCK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^---\r?\n([\s\S]*?)\r?\n---").expect("static fence pattern"));
 static STATUS_IN_BLOCK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?m)^status:").expect("static status-key pattern"));
