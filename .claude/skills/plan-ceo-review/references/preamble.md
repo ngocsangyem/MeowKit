@@ -1,10 +1,8 @@
 # Preamble (run first)
 
+Run this block once at the start of the skill. It prints the facts later steps rely on and appends one line to the local skill-usage log that `mk:retro` reads.
+
 ```bash
-mkdir -p .meowkit/state/sessions
-touch .meowkit/state/sessions/"$PPID"
-_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _PROACTIVE=$(.claude/hooks/lib/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
@@ -12,65 +10,16 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/hooks/lib/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
-echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/hooks/lib/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
-_TEL_START=$(date +%s)
-_SESSION_ID="$$-$(date +%s)"
-echo "TELEMETRY: ${_TEL:-off}"
-echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p .meowkit/telemetry
 echo '{"skill":"SKILL_NAME","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
-# zsh-compatible: use find instead of glob to avoid NOMATCH error
 ```
 
-Before running the block, replace `SKILL_NAME` with the `name:` from the loading skill's SKILL.md frontmatter, without the `mk:` prefix.
+Before running it, replace `SKILL_NAME` with the `name:` from the loading skill's frontmatter, without the `mk:` prefix.
 
-If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke
-them when the user explicitly asks. The user opted out of proactive suggestions.
+How to use the output:
 
-If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "This workflow follows the **Boil the Lake** principle — always do the complete
-thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
-Then offer to open the essay in their default browser:
+- `BRANCH` is the current branch. When you tell the user which branch you are on, use this value, not a branch named earlier in the conversation, because the conversation may be stale.
+- `PROACTIVE: false` means the user opted out of skill suggestions: invoke other skills only when the user asks.
+- `REPO_MODE` says who owns problems you notice outside the change: `solo` (offer to fix them), `collaborative` or `unknown` (mention them and let the user decide, since they may belong to someone else).
 
-```bash
-open https://garryslist.org/posts/boil-the-ocean
-touch .meowkit/state/.completeness-intro-seen
-```
-
-Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
-
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
-ask the user about telemetry. Ask the user:
-
-> Help improve this workflow! Community mode shares usage data (which skills you use, how long
-> they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
-> No code, file paths, or repo names are ever sent.
-> Change anytime with `.claude/hooks/lib/workflow-config set telemetry off`.
-
-Options:
-- A) Help improve the workflow! (recommended)
-- B) No thanks
-
-If A: run `.claude/hooks/lib/workflow-config set telemetry community`
-
-If B: ask a follow-up user question:
-
-> How about anonymous mode? We just learn that *someone* used this workflow — no unique ID,
-> no way to connect sessions. Just a counter that helps us know if anyone's out there.
-
-Options:
-- A) Sure, anonymous is fine
-- B) No thanks, fully off
-
-If B→A: run `.claude/hooks/lib/workflow-config set telemetry anonymous`
-If B→B: run `.claude/hooks/lib/workflow-config set telemetry off`
-
-Always run:
-```bash
-touch .meowkit/state/.telemetry-prompted
-```
-
-This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
+The usage log stays on this machine; nothing in this block sends data anywhere.

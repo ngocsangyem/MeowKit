@@ -161,7 +161,7 @@ After pipeline completes, output this summary:
 
 ## References
 
-- `references/preamble.md` — Session init, upgrade check, lake intro, telemetry prompt
+- `references/preamble.md` — Branch, proactive flag and repo mode; local skill-usage log line
 - `references/preamble-ship.md` — User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Plan Status Footer
 - `references/pre-flight.md` — Base branch detection (Step 0), pre-flight checks (Step 1), Review Readiness Dashboard
 - `references/distribution-pipeline.md` — Distribution pipeline check (Step 1.5)

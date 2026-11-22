@@ -30,10 +30,7 @@ Read the office-hours skill file from disk using the Read tool:
 Follow it inline, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
 - User question format
-- Completeness Principle — Boil the Lake
-- Search Before Building
 - Completion Status Protocol
-- Telemetry (run last)
 
 If the Read fails (file not found), say:
 "Could not load /mk:office-hours — proceeding with standard review."

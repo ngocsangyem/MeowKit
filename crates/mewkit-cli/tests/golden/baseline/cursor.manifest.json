@@ -1799,11 +1799,6 @@
       "size": 708
     },
     {
-      "path": ".cursor/skills/mk-document-release/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
-    },
-    {
       "path": ".cursor/skills/mk-document-release/references/completion-and-telemetry.md",
       "sha256": "3cbe04153255c1e1c66ec589449ff6ae9085609ae119e7c621f3e88173a764c7",
       "size": 3482
@@ -4108,11 +4103,6 @@
       "path": ".cursor/skills/mk-retro/references/compare-mode.md",
       "sha256": "c028f7351b25ef6f4db56fd181156decb75a719a3714e4fb00fdc946119b2922",
       "size": 845
-    },
-    {
-      "path": ".cursor/skills/mk-retro/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
     },
     {
       "path": ".cursor/skills/mk-retro/references/completion-status-protocol.md",

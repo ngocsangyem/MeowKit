@@ -134,9 +134,9 @@ See also reference files for supplementary checks: [preamble](references/preambl
 
 | File                                                                       | Contents                                                                                                                                                                                      |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [references/preamble.md](references/preamble.md)                           | Session setup, upgrade check, lake intro, telemetry prompt |
+| [references/preamble.md](references/preamble.md)                           | Branch, proactive flag and repo mode; local skill-usage log line |
 | [references/preamble-review.md](references/preamble-review.md)             | Memory read, write and sensitive-data boundary, loaded with the preamble |
-| [references/shared-protocols.md](references/shared-protocols.md)           | User question format, completeness principle, repo ownership mode, search-before-building, completion status, telemetry, plan status footer |
+| [references/shared-protocols.md](references/shared-protocols.md)           | User question format, completion status, escalation |
 | [references/scope-drift-detection.md](references/scope-drift-detection.md) | Plan file discovery, actionable item extraction, cross-reference against diff, scope creep and missing requirements detection                                                                 |
 | [references/two-pass-review.md](references/two-pass-review.md)             | Two-pass checklist application (critical then informational), enum completeness, search-before-recommending                                                                                   |
 | [references/design-review.md](references/design-review.md)                 | Frontend-conditional design review, design checklist application, design voice                                                                                                                 |

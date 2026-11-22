@@ -1917,11 +1917,6 @@
       "size": 708
     },
     {
-      "path": ".claude/skills/document-release/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
-    },
-    {
       "path": ".claude/skills/document-release/references/completion-and-telemetry.md",
       "sha256": "c3729cc5539afaa7012a427375f61fe588d208346f31cf5d896d1701053b3e8d",
       "size": 3494
@@ -4200,11 +4195,6 @@
       "path": ".claude/skills/retro/references/compare-mode.md",
       "sha256": "c028f7351b25ef6f4db56fd181156decb75a719a3714e4fb00fdc946119b2922",
       "size": 845
-    },
-    {
-      "path": ".claude/skills/retro/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
     },
     {
       "path": ".claude/skills/retro/references/completion-status-protocol.md",
@@ -7692,11 +7682,6 @@
       "size": 708
     },
     {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/document-release/references/completion-and-telemetry.md",
       "sha256": "c3729cc5539afaa7012a427375f61fe588d208346f31cf5d896d1701053b3e8d",
       "size": 3494
@@ -9971,11 +9956,6 @@
       "path": ".meowkit/cache/.claude/skills/retro/references/compare-mode.md",
       "sha256": "c028f7351b25ef6f4db56fd181156decb75a719a3714e4fb00fdc946119b2922",
       "size": 845
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/completeness-principle.md",
-      "sha256": "7764bf4848c389eeda6b0d7bb571e7c700b04b4c311f6622a872681a407fcf08",
-      "size": 2018
     },
     {
       "path": ".meowkit/cache/.claude/skills/retro/references/completion-status-protocol.md",

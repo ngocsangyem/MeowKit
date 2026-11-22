@@ -28,6 +28,25 @@
       ]
     },
     {
+      "name": "base-branch-detection",
+      "canonical": "skills/document-release/references/base-branch-detection.md",
+      "members": [
+        "skills/plan-ceo-review/references/base-branch-detection.md"
+      ]
+    },
+    {
+      "name": "backend-routing",
+      "canonical": "skills/backend-development/SKILL.md",
+      "sections": [
+        "backend-routing"
+      ],
+      "members": [
+        "skills/api-design-principles/SKILL.md",
+        "skills/database/SKILL.md",
+        "skills/devops/SKILL.md"
+      ]
+    },
+    {
       "name": "executor-core",
       "canonical": "agents/jira-issue.md",
       "sections": [
