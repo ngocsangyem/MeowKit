@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Task router for every incoming request. Classifies complexity (trivial/standard/complex), assigns model tier, and routes to the correct specialist agent. Use this agent at the start of every task. It never writes code — only makes routing decisions.
+description: Task router. Use it when a request's specialist agent or model tier is unclear. Classifies complexity (trivial/standard/complex), assigns model tier, and routes to the correct specialist agent. It never writes code — only makes routing decisions.
 tools: Read, Grep, Glob, Task, AskUserQuestion
 model: sonnet
 owner: lifecycle
