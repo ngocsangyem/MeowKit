@@ -97,5 +97,6 @@
     "security": ["core", "security-audit"],
     "research": ["core", "research"],
     "full": ["*"]
-  }
+  },
+  "retiredSkills": []
 }

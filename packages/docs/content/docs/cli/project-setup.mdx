@@ -33,6 +33,12 @@ Grok, Pi and OMP install at project scope only, so `--global` covers Claude Code
 
 For Claude Code at project scope, `init` also writes the committed launcher `.meowkit/bin/mewkit` and the `.claude/runtime.json` that points the hooks at it ([how hooks reach mewkit](/cli#how-hooks-reach-mewkit)). In the MeowKit source repository itself, `init` refuses unless you pass `--allow-kit-source`, because `.claude/` there is the kit's authored source.
 
+### Opt-in and retired skills
+
+A skill whose `SKILL.md` sets `install_default: false` is left out of an install unless it is selected. It counts as selected when it is named in `.meowkit/state/skill-selection.json` (`.mewkit/state/skill-selection.json` for `--global`), when it is inside a pack chosen with `--profile` or `--skill-packs`, or when it is installed here already. A full install picks no pack, so it does not select an opt-in skill. A skill the kit lists in `retiredSkills` in `.meowkit/pack-manifest.json` is never installed, even when selected, and `upgrade` removes it.
+
+The selection file is machine-local and stays out of git. To select a skill by hand, add its name: `{"version": 1, "skills": ["ghpm"]}`. The first `upgrade` of an install made before selections existed writes the file with every installed skill, so a smaller default later reaches fresh installs only. `upgrade`, `init` and `uninstall` never remove an installed skill for being opt-in.
+
 ### Taking over an npm install
 
 If the retired npm `mewkit` CLI installed a runtime in this project, `init --target <runtime>` adopts it. The npm CLI's install record becomes the starting ownership index and kit files are refreshed. Files the kit no longer ships are removed when they still match what the record says was installed, and files you edited are kept. Adoption works at project scope only, and only when you ask for it with `init`. `upgrade` never adopts: on a runtime with an npm install record and no ownership index, it names the `init` command to run. [Moving from the npm CLI](/migration/from-npx-mewkit) walks through it.
