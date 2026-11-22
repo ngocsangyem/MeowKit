@@ -42,6 +42,9 @@ export default defineConfig({
 			// Eval fixtures are sample projects the eval runner copies; their tests
 			// belong to those projects and run under `node --test`, not here.
 			".claude/skills/*/eval/fixtures/**",
+			// Cargo output: integration tests leave scratch kit copies under target/tmp,
+			// whose skill and eval-pack tests are data, not this package's suites.
+			"target/**",
 		],
 	},
 });
