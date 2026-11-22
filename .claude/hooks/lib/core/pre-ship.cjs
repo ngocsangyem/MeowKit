@@ -59,7 +59,7 @@ function recordShipCheck(root, { outcome, cause, action }, env = process.env) {
     const data = { outcome };
     if (cause) data.cause = cause;
     if (action) data.action = action;
-    appendTrace({ root, event: 'ship_check', payload: JSON.stringify(data), env });
+    appendTrace({ root, event: 'ship_check', signal: 'ship_check_result', payload: JSON.stringify(data), env });
   } catch {
     // A dropped record is reported nowhere; the decision stands either way.
   }

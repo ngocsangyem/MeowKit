@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Map, Value};
 
+use crate::budget::cost_log::resolve_current_session_id;
 use crate::memory::scrub_secrets;
 use crate::sidecar_lock::{SidecarLock, SidecarLockError};
 use crate::state_paths::{StateClass, resolve_state_dir};
@@ -31,6 +32,62 @@ pub fn trace_lock_path(project_root: &Path) -> PathBuf {
     resolve_state_dir(project_root, StateClass::Telemetry).join(TRACE_LOCK_NAME)
 }
 
+/// What a record says about how a skill fared. A closed set, written as a
+/// fixed token and never as free text, so a reader can count occurrences
+/// without parsing prose. The hook writer carries the same tokens.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TraceSignal {
+    // Strong: the outcome was stated, not inferred.
+    DeniedToolCall,
+    UserInterruption,
+    TaskFailure,
+    ExplicitReport,
+    ShipCheckResult,
+    // Weak: noise that is common and often harmless.
+    ToolError,
+    Retry,
+    AdvisoryHook,
+}
+
+impl TraceSignal {
+    pub const ALL: [TraceSignal; 8] = [
+        Self::DeniedToolCall,
+        Self::UserInterruption,
+        Self::TaskFailure,
+        Self::ExplicitReport,
+        Self::ShipCheckResult,
+        Self::ToolError,
+        Self::Retry,
+        Self::AdvisoryHook,
+    ];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::DeniedToolCall => "denied_tool_call",
+            Self::UserInterruption => "user_interruption",
+            Self::TaskFailure => "task_failure",
+            Self::ExplicitReport => "explicit_report",
+            Self::ShipCheckResult => "ship_check_result",
+            Self::ToolError => "tool_error",
+            Self::Retry => "retry",
+            Self::AdvisoryHook => "advisory_hook",
+        }
+    }
+
+    pub fn is_strong(self) -> bool {
+        !matches!(self, Self::ToolError | Self::Retry | Self::AdvisoryHook)
+    }
+}
+
+/// The signal a stored record contributes to a skill, or `None`. A record with
+/// no skill key never counts toward any skill, and an unknown token is ignored.
+pub fn skill_signal(record: &Value) -> Option<(&str, TraceSignal)> {
+    let skill = record.get("skill")?.as_str().filter(|s| !s.is_empty())?;
+    let token = record.get("signal")?.as_str()?;
+    let signal = TraceSignal::ALL.into_iter().find(|s| s.as_str() == token)?;
+    Some((skill, signal))
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum TraceError {
     #[error("{0}")]
@@ -41,7 +98,7 @@ pub enum TraceError {
 
 /// One record to append. The provenance fields fall back to the environment,
 /// the way the TypeScript writer reads `MEOWKIT_RUN_ID` and its siblings.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TraceRecord {
     pub event: String,
     pub data: Map<String, Value>,
@@ -49,6 +106,12 @@ pub struct TraceRecord {
     /// reaching into `data`.
     pub task_id: Option<String>,
     pub plan_path: Option<String>,
+    /// The skill that was active, only when it is known for certain.
+    pub skill: Option<String>,
+    /// The host session; falls back to `HOOK_SESSION_ID`, then the session
+    /// marker. Absent when none of them names one.
+    pub session_id: Option<String>,
+    pub signal: Option<TraceSignal>,
     pub run_id: Option<String>,
     pub model: Option<String>,
     pub density: Option<String>,
@@ -96,10 +159,15 @@ fn build(record: &TraceRecord, millis: i64) -> Value {
     for (key, value) in [
         ("task_id", &record.task_id),
         ("plan_path", &record.plan_path),
+        ("skill", &record.skill),
+        ("session_id", &record.session_id),
     ] {
         if let Some(text) = value.as_deref().filter(|t| !t.is_empty()) {
             out.insert(key.into(), scrub_secrets(text).into());
         }
+    }
+    if let Some(signal) = record.signal {
+        out.insert("signal".into(), signal.as_str().into());
     }
     out.insert(
         "data".into(),
@@ -129,7 +197,12 @@ fn scrub_deep(value: &Value) -> Value {
 /// Append one record under the shared sidecar lock, rotating an oversized log.
 pub fn append_trace_record(project_root: &Path, record: &TraceRecord) -> Result<(), TraceError> {
     let millis = record.now_millis.unwrap_or_else(now_millis);
-    let line = build(record, millis).to_string();
+    let hook_session = std::env::var("HOOK_SESSION_ID").ok();
+    let mut resolved = record.clone();
+    if resolved.session_id.is_none() {
+        resolved.session_id = resolve_current_session_id(project_root, hook_session.as_deref());
+    }
+    let line = build(&resolved, millis).to_string();
     let lock_path = trace_lock_path(project_root);
     if let Some(dir) = lock_path.parent() {
         std::fs::create_dir_all(dir)?;

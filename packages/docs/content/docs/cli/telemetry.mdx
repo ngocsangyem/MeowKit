@@ -52,10 +52,10 @@ Without `--profile` it reports every profile. `--fail-over N` exits non-zero whe
 mewkit trace audit            # orphaned, stale, unverified and repeated-friction signals
 mewkit trace propose          # group friction seen at least twice into advisory backlog items
 mewkit trace score            # entropy score
-mewkit trace --friction "<note>" [--responsibility <r>] [--id <run-id>]
+mewkit trace --friction "<note>" [--responsibility <r>] [--id <run-id>] [--skill <name>]
 ```
 
-`propose --commit` appends the proposed items to the advisory backlog. `--id` filters `score` to one run and attributes a `--friction` note to a run. `--json` prints JSON.
+`propose --commit` appends the proposed items to the advisory backlog. `--id` filters `score` to one run and attributes a `--friction` note to a run. `--skill` attributes it to one skill and marks it an explicit report. `--json` prints JSON.
 
 ## eval
 
@@ -69,6 +69,7 @@ mewkit eval compare <base.json> <new.json> [--json]
 
 - Each run happens in a fresh copy of the case's fixture with the kit archive installed by `mewkit init`, never in your project. Use a release `meowkit-release.zip`, or build one from a checkout to measure your own changes. For a paired case, the "skill off" side deletes every installed copy of the skill under test.
 - The runtime gets an empty config home and only the environment it needs: `PATH`, locale, and its own login variable (`CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` for Claude Code, `CODEX_API_KEY` or `OPENAI_API_KEY` for Codex). No login file is copied.
+- `--runtime` takes `claude-code` (the default) or `codex`. Cursor, Grok, Pi, OMP and Antigravity have no eval runner yet, so their trigger rates are not measured.
 - `--model`, `--max-cost-usd`, `--max-runs` and `--kit-archive` are required to run cases. The cost ceiling is shared by every eval run in the project at the same time.
 - A run that times out, is rate-limited or ends without a result is retried twice and then recorded as an error, kept out of every rate. A report is incomplete when errors pass 5% of runs, when a case ran other than planned, or when a case was skipped.
 - `compare` refuses incomplete reports and reports that differ in runtime, model, case set or case list, and exits 1.

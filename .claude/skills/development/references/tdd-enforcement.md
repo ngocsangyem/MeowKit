@@ -6,7 +6,7 @@
 
 ## When to Use
 
-In TDD mode, invoke this skill for ALL feature development and bug fixes. The only exceptions are: documentation-only changes, config-only changes, and pure refactors with existing test coverage.
+In TDD mode, invoke this skill for ALL feature development and bug fixes. The one exemption is the MICRO-TASK, defined in `.claude/skills/cook/references/tdd-rules.md` (rule 1b); production-facing code is never exempt. When in doubt, require TDD.
 
 In default mode (TDD off), this skill is irrelevant — there is no RED phase. Tests are still recommended for production-quality work; opt into strict mode via `--tdd` or `export MEOWKIT_TDD=1`.
 

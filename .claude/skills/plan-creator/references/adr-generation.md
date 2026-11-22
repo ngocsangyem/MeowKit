@@ -12,15 +12,15 @@ Invoke this skill when:
 
 ## ADR Template
 
-File location: `docs/architecture/NNNN-title.md` where `NNNN` is a zero-padded sequence number.
+File location: `docs/architecture/adr/YYMMDD-decision.md`. `YYMMDD` is the date and `decision` a short kebab-case slug; the stem is the ADR's identifier.
 
 ```markdown
-# NNNN. Title of Decision
+# Title of Decision
 
 **Status:** proposed | accepted | deprecated | superseded
 **Date:** YYYY-MM-DD
-**Supersedes:** [NNNN if applicable]
-**Superseded by:** [NNNN if applicable]
+**Supersedes:** [YYMMDD-decision if applicable]
+**Superseded by:** [YYMMDD-decision if applicable]
 
 ## Context
 
@@ -55,26 +55,16 @@ State the decision clearly in one or two sentences. Then elaborate:
 - [What could go wrong and how we mitigate it]
 
 ## Related ADRs
-- [NNNN — title (relationship: extends/supersedes/depends-on)]
+- [YYMMDD-decision — title (relationship: extends/supersedes/depends-on)]
 ```
 
-## Finding the Next Sequence Number
+## Naming
 
-1. List all files in `docs/architecture/`.
-2. Extract the numeric prefix from each filename.
-3. Take the highest number and add 1.
-4. If no ADRs exist yet, start at `0001`.
-
-```bash
-# Find next ADR number
-last=$(ls docs/architecture/*.md 2>/dev/null | sort -t/ -k3 -n | tail -1 | grep -oP '\d{4}' | head -1)
-next=$(printf "%04d" $(( ${last:-0} + 1 )))
-echo "Next ADR: $next"
-```
+Name the file with today's date and a slug: `date +%y%m%d` gives the `YYMMDD` prefix. If a file with that name exists, make the slug more specific. No sequence number is kept.
 
 ## Linking ADRs
 
-- When a new ADR supersedes an old one: update the old ADR's status to `superseded` and add `Superseded by: NNNN` to its frontmatter. Add `Supersedes: NNNN` to the new ADR.
+- When a new ADR supersedes an old one: update the old ADR's status to `superseded` and add `Superseded by: YYMMDD-decision` to its frontmatter. Add `Supersedes: YYMMDD-decision` to the new ADR.
 - When ADRs are related but not superseding: add entries to the `Related ADRs` section in both documents with the relationship type (`extends`, `depends-on`, `related-to`).
 
 ## Steps to Execute

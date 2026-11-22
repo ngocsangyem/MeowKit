@@ -61,7 +61,7 @@ Implementation entry adapter. `.claude/skills/workflow-orchestrator/workflow.yam
 
 Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with the plan and the review verdict walked through with the user). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
 
-Quick runs do not create a plan, report, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
+Quick runs skip research and create no report, memory entry, or ship action by default. They skip the plan only for a task that is not non-trivial (2 files or fewer and about 30 minutes or less, per `.claude/rules/meowkit-core.md`); a non-trivial task keeps its agreed plan even with `--fast`. They also stop if a risk flag or changed contract requires the standard profile.
 
 **Modifier flags** (layer on any mode): `--verify` [LIGHT] (light browser/artifact check) | `--strict` [HEAVY] (full evaluator pass) | `--no-strict` (suppress auto-strict)
 
@@ -108,7 +108,7 @@ Plan contains TDD sections but cook is not in TDD mode. Re-run with --tdd to enf
 Write the plan and agree it with the user before writing implementation code — a wrong plan costs more than the conversation. No hook blocks the edit; the practice is the control.
 In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): write failing tests before implementation, so the tests define the spec rather than describe the result.
 In default mode: Phase 2 is optional; the developer may implement directly per the agreed plan.
-`--fast` skips research but still writes a plan and, in TDD mode, TDD-flavored tests.
+`--fast` skips research but still writes a plan for a non-trivial task (more than 2 files or about 30 minutes) and, in TDD mode, TDD-flavored tests.
 Skipping the plan: reasonable when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Note what was skipped and why in the run summary; otherwise say why the plan is still worth writing.
 
 Before starting work, read `references/failure-catalog.md` for common implementation failure modes and rationalizations, including the cook-specific TDD one (cross-linked to `## Gotchas` below). Generic implementation-phase rationalizations live in the Anti-Rationalization section of `.claude/rules/core-behaviors.md` — read before any non-trivial implementation step.

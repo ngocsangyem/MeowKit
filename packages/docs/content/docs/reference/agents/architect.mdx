@@ -26,7 +26,7 @@ It is used in Phase 1 for tasks that touch database schema, new service boundari
 ## What it does
 
 - Evaluates trade-offs from evidence, with reasoning and consequences for every recommendation.
-- Writes ADRs to `docs/architecture/adr/YYMMDD-title.md` with Status, Context, Decision and Consequences, numbered `NNNN` sequentially.
+- Writes ADRs to `docs/architecture/adr/YYMMDD-decision.md` with Status, Context, Decision and Consequences, identified by the file name stem (no sequence number).
 - Reviews plan files for architectural soundness and flags pattern violations. It documents new patterns a change introduces.
 - When several valid architectures exist, records all of them in the ADR with their trade-offs.
 - Appends one entry to `.meowkit/memory/decisions.md` with `mewkit note decisions`, only when the reason behind the decision cannot be derived from the code, git history, plan or ADR. It never appends with a bare edit, and prints one line if the write fails.

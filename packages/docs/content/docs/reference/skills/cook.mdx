@@ -47,7 +47,7 @@ description: "Implements one feature, fix, refactor or existing plan through the
 | `--strict` | Full evaluator pass after review. An evaluator FAIL routes back to Phase 3. Supersedes `--verify`. Scale-routing can trigger it, and `--no-strict` suppresses that |
 | `--advice` | Supervision by the [athena](/reference/agents/athena) agent, up to 5 calls, approves nothing |
 
-A path to `plan.md` or `phase-*.md` runs in code mode. The words "fast" or "quick", "trust me" or "auto", "3 or more features" or "parallel", and "no test" pick the matching mode. Profiles are `quick`, `standard`, `release` (standard plus an explicit `mk:ship` request) and `high-assurance` (`--tdd --strict`). A quick run creates no plan, report or ship action, and moves to the standard profile if a risk flag or changed contract appears.
+A path to `plan.md` or `phase-*.md` runs in code mode. The words "fast" or "quick", "trust me" or "auto", "3 or more features" or "parallel", and "no test" pick the matching mode. Profiles are `quick`, `standard`, `release` (standard plus an explicit `mk:ship` request) and `high-assurance` (`--tdd --strict`). A quick run skips research and creates no report or ship action. It skips the plan only when the change is two files or fewer and about 30 minutes or less; a larger change keeps its plan. It moves to the standard profile if a risk flag or changed contract appears.
 
 | Mode | Research | Tests |
 |---|---|---|

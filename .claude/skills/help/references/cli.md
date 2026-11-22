@@ -476,6 +476,7 @@ Options:
       --id <ID>                          Run id: filters `score`, attributes `--friction`
       --friction <FRICTION>              Record a friction note instead of reading the log
       --responsibility <RESPONSIBILITY>  Attribute the friction note to one responsibility
+      --skill <SKILL>                    Attribute the friction note to one skill
       --commit                           `propose`: append the items to the advisory backlog
       --json                             Print JSON instead of text
   -h, --help                             Print help
