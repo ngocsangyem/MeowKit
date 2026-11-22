@@ -22,6 +22,7 @@ All modes share these phases with mode-specific variations.
 - [Phase 5: Ship (explicit request only)](#phase-5-ship-explicit-request-only)
 - [Phase 6: Reflect (on explicit close request)](#phase-6-reflect-on-explicit-close-request)
 - [Workflow Evidence Index (traceability only)](#workflow-evidence-index-traceability-only)
+- [Lifecycle Diagram](#lifecycle-diagram)
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
@@ -375,6 +376,41 @@ does this. Treat a superseded record as describing code that no longer exists: r
 the normal checks and record the fresh output at the current revision. Absent revision
 fields mean revision 1 with nothing superseded, so an index written before this
 mechanism still reads correctly.
+
+## Lifecycle Diagram
+
+A convenience rendering of the lifecycle. `.claude/skills/workflow-orchestrator/workflow.yaml` is the machine-readable authority; this Mermaid diagram is the human-facing render.
+
+```mermaid
+flowchart TD
+    A[Phase 0: Orient] --> B{Has plan?}
+    B -->|Yes| D[Load Plan]
+    B -->|No| SP[Present scout summary to user]
+    SP --> C[Phase 1: Research + Plan]
+    C --> RQ{5 dims captured?}
+    RQ -->|No| C
+    RQ -->|Yes| PP[Present plan to user]
+    PP -->|agreed| D
+    PP -->|changes asked for| C
+    D --> E[Phase 2: Test - RED if --tdd, optional otherwise]
+    E --> F[Phase 3: Build GREEN]
+    F --> S[mk:simplify — MANDATORY]
+    S --> V[mk:verify — MANDATORY]
+    V --> G2[Phase 4: Review]
+    G2 -->|verdict PASS| BV{--verify or --strict?}
+    BV -->|"--verify"| P45A["Phase 4.5 --verify advisory"]
+    BV -->|"--strict"| P45B["Phase 4.5 --strict blocking"]
+    BV -->|neither| SR[Report completion]
+    P45A --> SR
+    P45B --> BG{evaluator FAIL?}
+    BG -->|no| SR
+    BG -->|yes| F
+    G2 -->|verdict FAIL| F
+    SR --> STOP[Stop and await user direction]
+    STOP -->|explicit ship request| H[Phase 5: Ship]
+    STOP -->|explicit close request| I[Phase 6: Reflect]
+    H --> I
+```
 
 ## Mode Flow Summary
 

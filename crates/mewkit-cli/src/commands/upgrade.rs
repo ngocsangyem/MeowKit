@@ -104,6 +104,9 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
     for n in &kit.notices {
         eprintln!("note: {n}");
     }
+    // Read before anything changes, so a malformed selection stops the
+    // upgrade with nothing done.
+    crate::skill_selection::load(&place)?;
     let mut jobs = Vec::new();
     for runtime in targets {
         let e = emitter_for(runtime)?;
@@ -153,6 +156,11 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
     )?;
     if unconfirmed {
         return Ok(PENDING);
+    }
+    if !dry_run && let Err(e) = crate::skill_selection::record_installed(&place, &kit) {
+        // What is installed already counts as selected, so a lost write
+        // removes nothing on a later run; it only goes unrecorded.
+        eprintln!("note: skill selection not recorded: {}", e.message);
     }
     Ok(output::exit_code(&outcomes, dry_run))
 }

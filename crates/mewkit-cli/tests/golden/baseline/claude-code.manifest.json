@@ -3544,9 +3544,19 @@
       "size": 1477
     },
     {
+      "path": ".claude/skills/plan-creator/references/file-index.md",
+      "sha256": "4af66165078831101f15173d7728b7df304b980fbf62fa0bd374bc58d6964cb2",
+      "size": 6053
+    },
+    {
       "path": ".claude/skills/plan-creator/references/gotchas.md",
       "sha256": "31503f64b8b94366233cb0c6259805ed80ab914fcb9402f125a527f360d623a2",
       "size": 2847
+    },
+    {
+      "path": ".claude/skills/plan-creator/references/modes-and-flags.md",
+      "sha256": "892449acffe6895b5e252d88d78520af5323bfeac48a61ec11a79ba54a800f8d",
+      "size": 1815
     },
     {
       "path": ".claude/skills/plan-creator/references/ops-metrics-design.md",
@@ -9305,6 +9315,11 @@
       "size": 1477
     },
     {
+      "path": ".meowkit/cache/.claude/skills/plan-creator/references/file-index.md",
+      "sha256": "4af66165078831101f15173d7728b7df304b980fbf62fa0bd374bc58d6964cb2",
+      "size": 6053
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/gate-1-approval.md",
       "sha256": "85bcb627fc580f78b5060ae59f0fd27e817b4eb67edbb7039ebfd8081f326beb",
       "size": 3517
@@ -9313,6 +9328,11 @@
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/gotchas.md",
       "sha256": "31503f64b8b94366233cb0c6259805ed80ab914fcb9402f125a527f360d623a2",
       "size": 2847
+    },
+    {
+      "path": ".meowkit/cache/.claude/skills/plan-creator/references/modes-and-flags.md",
+      "sha256": "892449acffe6895b5e252d88d78520af5323bfeac48a61ec11a79ba54a800f8d",
+      "size": 1815
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/ops-metrics-design.md",

@@ -170,6 +170,10 @@
       "type": "boolean",
       "description": "Optional (advisory tool-contract). Whether the skill is enabled without external configuration. External-service skills default to false (fail-closed until required env vars are present). true requires a verified external-service-free path."
     },
+    "install_default": {
+      "type": "boolean",
+      "description": "Optional. Whether a default install lays the skill down. Absent means true. false installs the skill only when it is selected: named in the machine-local skill selection, or inside a pack the install chose. Independent of default_enabled, which is the runtime soft gate for external services."
+    },
     "stable_output_contract": {
       "type": "boolean",
       "description": "Optional (advisory tool-contract). true when the skill returns stable machine-readable IDs / output for created or bound runtime resources, per the Tool Contract Rule."

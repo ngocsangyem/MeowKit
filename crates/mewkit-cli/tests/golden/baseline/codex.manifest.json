@@ -2884,9 +2884,19 @@
       "size": 1477
     },
     {
+      "path": ".agents/skills/mk-plan-creator/references/file-index.md",
+      "sha256": "4ec20bc2ee2dc5f03a605f2622b02f34bdb50c5e318d7d3a0e2ece0a09940288",
+      "size": 6084
+    },
+    {
       "path": ".agents/skills/mk-plan-creator/references/gotchas.md",
       "sha256": "05664a8508ac7a3c5843d8d2856e202a20359da3c647fdb1af2393421b0559f4",
       "size": 2859
+    },
+    {
+      "path": ".agents/skills/mk-plan-creator/references/modes-and-flags.md",
+      "sha256": "b9411f2d2e14b97b1828159df2feead93fc39589f48d89ba4501d74442099380",
+      "size": 1815
     },
     {
       "path": ".agents/skills/mk-plan-creator/references/ops-metrics-design.md",

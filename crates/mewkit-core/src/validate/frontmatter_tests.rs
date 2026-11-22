@@ -152,3 +152,18 @@ fn an_external_service_entrypoint_is_advised_to_declare_itself() {
         report.warnings
     );
 }
+
+#[test]
+fn install_default_must_be_a_boolean() {
+    let with = |value: &str| {
+        valid("ghpm").replacen("\nname:", &format!("\ninstall_default: {value}\nname:"), 1)
+    };
+    let dir = project(&[("ghpm", &with("false"))]);
+    assert!(errors(dir.path()).is_empty(), "{:?}", errors(dir.path()));
+    let dir = project(&[("ghpm", &with("\"no\""))]);
+    let found = errors(dir.path());
+    assert!(
+        found.iter().any(|e| e.contains("install_default")),
+        "{found:?}"
+    );
+}

@@ -70,6 +70,17 @@ impl Place {
         self.rel(&format!("{dir}/{}.json", runtime.name()))
     }
 
+    /// This machine's skill selection: under the state directory, which the
+    /// project's `.meowkit/.gitignore` keeps out of version control.
+    pub fn selection_file(&self) -> PathBuf {
+        let tail = if self.state == ".meowkit" {
+            "state/skill-selection.json"
+        } else {
+            "skill-selection.json"
+        };
+        self.rel(tail).under(&self.scope.root)
+    }
+
     pub fn cache_dir(&self) -> PathBuf {
         self.rel("cache/kits").under(&self.scope.root)
     }

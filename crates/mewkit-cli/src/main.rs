@@ -13,6 +13,7 @@ mod output;
 mod place;
 mod prompt;
 mod rebuild;
+mod skill_selection;
 
 use std::process::ExitCode;
 

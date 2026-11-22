@@ -22,11 +22,11 @@ Phase 0 Orient → Phase 1 Plan → Phase 2 Test (RED if --tdd, else optional)
 **Phase 3 substeps (mandatory):** after Build GREEN, `mk:simplify` runs first, then `mk:verify` (unified build+lint+test+coverage). Both are mandatory before Phase 4.
 **Phase 3 autobuild contract substep:** in autobuild runs the developer reads the signed `tasks/contracts/*-{slug}-sprint-*.md` before source edits (LEAN density skips the contract; no hook checks it). See `.claude/skills/cook/references/harness-rules.md` Rule 3.
 
-**IMPORTANT:** Before a task in the memory read set (see Memory below), run one grep: `grep -rilE "kw1|kw2|kw3" .meowkit/memory/`; read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
-**IMPORTANT:** Activate only skills needed for the current task domain; declare model tier (TRIVIAL · STANDARD · COMPLEX) before every task.
-**IMPORTANT:** Non-trivial task (>2 files OR >30 min) = write the plan and agree it with the user before any code; for architectural trade-offs use `/mk:party`.
-**IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation per `.claude/skills/cook/references/parallel-execution-rules.md`).
-**IMPORTANT:** For green-field product builds prefer `/mk:autobuild` over `/mk:cook` — adaptive density (MINIMAL/FULL/LEAN) per model tier.
+Before a task in the memory read set (see Memory below), run one grep: `grep -rilE "kw1|kw2|kw3" .meowkit/memory/`, and read `.claude/rules/core-behaviors.md` (6 behaviors); both apply in all modes.
+Activate only the skills the current task domain needs, and declare the model tier (TRIVIAL · STANDARD · COMPLEX) before each task.
+For a non-trivial task (more than 2 files or 30 minutes), write the plan and agree it with the user before any code; for architectural trade-offs use `/mk:party`.
+COMPLEX tasks with independent subtasks may run in parallel (max 3 agents, worktree isolation per `.claude/skills/cook/references/parallel-execution-rules.md`).
+For green-field product builds prefer `/mk:autobuild` over `/mk:cook`: it adapts density (MINIMAL/FULL/LEAN) to the model tier.
 
 ## Ship Check
 
@@ -66,10 +66,10 @@ Task file requires before Phase 3:
 
 - [ ] Goal (one sentence, outcome-focused)
 - [ ] Acceptance criteria (binary pass/fail only)
-- [ ] Constraints (what must NOT change)
+- [ ] Constraints (what must not change)
 - [ ] Scope (in / out of scope)
 
-ALWAYS read task file before touching code. Agree the plan before Phase 3. NEVER mark done without all criteria checked.
+Read the task file before touching code, agree the plan before Phase 3, and mark a task done only when every criterion is checked.
 
 ## Memory
 
@@ -87,8 +87,8 @@ Trace friction is not memory: record it with `mewkit trace --friction "<note>"` 
 
 Keep all project docs in `docs/` and update them as the codebase evolves.
 
-**IMPORTANT:** After shipping features, run `mk:document-release` to update docs.
-**IMPORTANT:** For new projects without docs, run `mk:docs-init` to generate initial docs from codebase analysis.
+After shipping features, run `mk:document-release` to update docs.
+For a new project without docs, run `mk:docs-init` to generate initial docs from codebase analysis.
 
 Key docs to maintain:
 
