@@ -6,8 +6,6 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use super::sandbox::copy_tree;
-
 /// Fixture folder whose contents land in the project only after the initial
 /// commit, so a `gitInit` case can start with uncommitted changes.
 pub const UNCOMMITTED_DIR: &str = ".eval-uncommitted";
@@ -59,8 +57,26 @@ pub fn git_init(root: &Path) -> io::Result<()> {
     result?;
     let pending = root.join(UNCOMMITTED_DIR);
     if pending.is_dir() {
-        copy_tree(&pending, root)?;
+        overlay(&pending, root)?;
         fs::remove_dir_all(&pending)?;
+    }
+    Ok(())
+}
+
+/// Write every file under `src` over `dest` with fresh bytes. A copy can keep
+/// the source's modification time (it does on Windows), and a pending edit of
+/// the same size with an older time than the index then looks unchanged to
+/// `git status` and `git diff`.
+fn overlay(src: &Path, dest: &Path) -> io::Result<()> {
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let to = dest.join(entry.file_name());
+        if entry.file_type()?.is_dir() {
+            fs::create_dir_all(&to)?;
+            overlay(&entry.path(), &to)?;
+        } else {
+            fs::write(&to, fs::read(entry.path())?)?;
+        }
     }
     Ok(())
 }

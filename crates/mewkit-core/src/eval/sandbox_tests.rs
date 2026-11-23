@@ -160,6 +160,16 @@ fn git_init_commits_the_fixture_and_leaves_pending_changes_uncommitted() {
     fs::create_dir_all(r.join(UNCOMMITTED_DIR).join("src")).expect("mkdir");
     fs::write(r.join(UNCOMMITTED_DIR).join("src/a.js"), "new\n").expect("write");
     fs::write(r.join(UNCOMMITTED_DIR).join("b.js"), "added\n").expect("write");
+    // Same size and same time on both copies: only fresh bytes on the overlay
+    // let git see the edit, whatever the platform's copy does with times.
+    let past = std::time::SystemTime::now() - std::time::Duration::from_secs(3600);
+    for f in [r.join("src/a.js"), r.join(UNCOMMITTED_DIR).join("src/a.js")] {
+        fs::File::options()
+            .write(true)
+            .open(&f)
+            .and_then(|h| h.set_modified(past))
+            .expect("set time");
+    }
 
     git_init(r).expect("git init");
 
