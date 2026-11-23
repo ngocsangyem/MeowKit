@@ -19,7 +19,6 @@ You are the Expert UI/UX Designer — you create production-ready UI designs tha
 2. **Load design skills** in this order:
    - `mk:ui-design-system` — styles, palettes, WCAG standards, quality checklist
    - `mk:frontend-design` — design replication, anti-AI-slop enforcement
-   - `mk:react-patterns` or `mk:vue` or `mk:angular` — framework-specific patterns (match project stack)
    - `mk:multimodal` — image generation (Imagen 4) and visual analysis (Gemini)
    - `mk:agent-browser` — screenshots for visual QA and responsive testing
 3. **Research** trending design patterns for the project's domain (spawn researcher subagents if needed).
@@ -62,7 +61,7 @@ Load before any design work:
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Plan file from `tasks/plans/` — what's being designed
 - `docs/design-guidelines.md` — existing design system (if it exists)
-- Project stack detection — React, Vue, or vanilla (determines which framework skill to load)
+- Project stack detection — React, Vue, or vanilla (determines which framework conventions apply)
 
 ## Workflow Integration
 

@@ -1,39 +1,23 @@
 ---
 title: "Frontend Development"
-description: "Build frontend features with the Vue, TypeScript and UI/UX skills."
+description: "Build frontend features with the TypeScript and UI/UX skills."
 ---
 
-Three skills carry the frontend conventions, and each activates on the files or task it covers.
+Two skills carry the frontend conventions, and each activates on the files or task it covers. For framework conventions (Vue, React, Angular and others), install the framework's own official agent skill: it tracks the framework's releases.
 
 **Best for:** UI features, component development, styling
 **Time estimate:** 15 to 60 minutes
-**Skills used:** [mk:vue](/reference/skills/vue), [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)
+**Skills used:** [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)
 **Agents involved:** developer, tester, reviewer
 
 ## Which skill activates
 
 | Skill | Activates on | Covers |
 |---|---|---|
-| `mk:vue` | `.vue` files, Composition API, Pinia | `<script setup lang="ts">`, Pinia, routing, forms |
 | `mk:typescript` | `.ts`, `.tsx`, `.js`, `.jsx` files and type errors | Strict null handling, type guards, type-safety fixes |
 | `mk:frontend-design` | Design and styling tasks | Typography, color, layout, accessibility, the anti-slop checklist |
 
 The skills apply these as defaults. Where the repository already has a convention, that one wins.
-
-## Vue components
-
-With `mk:vue`, the defaults are:
-
-| Default | Detail |
-|---|---|
-| `<script setup lang="ts">` only | No Options API and no `defineComponent()` wrapper |
-| `type` over `interface` | For object and prop shapes |
-| `ref()` for primitives | `reactive()` only for complex objects, `computed()` for derived state |
-| `storeToRefs()` | Required when destructuring Pinia state; methods are destructured directly |
-| No `v-html` with user content | It is an XSS vector, and `security-rules.md` blocks it |
-| PascalCase components, kebab-case files | `UserProfile` in `user-profile.vue`; composables are `useX` |
-| Named exports | Composables use `export default` |
-| Tailwind classes | No manual CSS and no hard-coded colors |
 
 ## TypeScript
 

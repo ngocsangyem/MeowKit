@@ -108,7 +108,7 @@ function deriveOwner(name) {
   if (/^(trace-analyze|append-trace|learning-observer|post-session|posttoolfailure-probe|precompact-probe|pre-task-check)/.test(name)) return "observability";
   if (/^(portability|skill-creator|skill-template-secure|api-design|scale-routing)/.test(name)) return "portability";
   if (/^(sprint-contract|story-sizer|breakdown)/.test(name)) return "lifecycle";
-  if (/^(typescript|angular|vue|react-patterns|frontend-design|ui-design-system|figma|database|clean-code|development|multimodal|cso|vulnerability-scanner)/.test(name)) return "utility";
+  if (/^(typescript|frontend-design|ui-design-system|figma|database|clean-code|development|multimodal|cso|vulnerability-scanner)/.test(name)) return "utility";
   // Hooks by pattern
   if (/^(pre-implement|pre-ship|pre-completion-check|plan-state-sync|verification-evidence|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
   if (/^(append-trace|learning-observer|post-session|posttoolfailure-probe|precompact-probe|pre-task-check|control-probe)/.test(name)) return "observability";

@@ -30,7 +30,7 @@ Production-grade UI/UX design with anti-AI-slop enforcement. Covers aesthetics, 
 
 **Explicit:** `/mk:frontend-design [concern]`
 
-**Do NOT invoke for:** Vue patterns (use mk:vue), TypeScript (use mk:typescript), backend code, API integration
+**Do NOT invoke for:** TypeScript (use mk:typescript), backend code, API integration
 
 ## Workflow Integration
 

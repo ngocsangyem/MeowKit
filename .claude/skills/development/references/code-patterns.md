@@ -10,10 +10,6 @@
   - [Pattern: Guard Usage](#pattern-guard-usage)
   - [Pattern: Pipe Validation](#pattern-pipe-validation)
   - [Pattern: DTO with Validation](#pattern-dto-with-validation)
-- [Vue 3 Patterns](#vue-3-patterns)
-  - [Pattern: Composition API with Script Setup](#pattern-composition-api-with-script-setup)
-  - [Pattern: Pinia Store](#pattern-pinia-store)
-  - [Pattern: Composables](#pattern-composables)
 - [Swift Patterns](#swift-patterns)
   - [Pattern: MVVM Architecture](#pattern-mvvm-architecture)
   - [Pattern: Combine / Async-Await](#pattern-combine-async-await)
@@ -86,55 +82,6 @@ export class CreateFeatureDto {
 ```
 
 **Anti-pattern:** Unvalidated objects as input.
-
----
-
-## Vue 3 Patterns
-
-Why these: script-setup components, Pinia stores and composables keep state and logic out of templates, so they can be reused and tested without mounting a component.
-
-### Pattern: Composition API with Script Setup
-
-**When to use:** Every Vue component.
-
-```vue
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-const count = ref(0)
-const doubled = computed(() => count.value * 2)
-</script>
-```
-
-**Anti-pattern:** Using Options API in new code. Mixing Options API and Composition API in the same component.
-
-### Pattern: Pinia Store
-
-**When to use:** Shared state that multiple components need access to.
-
-```typescript
-export const useFeatureStore = defineStore('feature', () => {
-  const items = ref<Feature[]>([])
-  const activeItem = computed(() => items.value.find(i => i.active))
-  async function fetchItems() { /* ... */ }
-  return { items, activeItem, fetchItems }
-})
-```
-
-**Anti-pattern:** Using Vuex in new code. Storing local-only state in Pinia (use component `ref` instead).
-
-### Pattern: Composables
-
-**When to use:** Reusable stateful logic shared across components.
-
-```typescript
-export function useDebounce<T>(value: Ref<T>, delay: number): Ref<T> {
-  const debounced = ref(value.value) as Ref<T>
-  // debounce logic
-  return debounced
-}
-```
-
-**Anti-pattern:** Duplicating reactive logic across components. Creating composables for non-reusable logic.
 
 ---
 

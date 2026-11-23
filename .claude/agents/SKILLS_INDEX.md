@@ -84,15 +84,10 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 #### Language/Framework Skills (Phase 3)
 
 ```toon
-[8]{skill,owner,type,architecture}
+[3]{skill,owner,type,architecture}
 `mk:typescript`|developer|development|monolithic
-`mk:vue`|developer|development|monolithic
-`mk:vue-best-practices`|developer|development|monolithic (invoke-only deep Vue best-practices review + ordered authoring workflow; read-only Read/Grep/Glob; complements mk:vue)
-`mk:angular`|developer|development|monolithic
-`mk:react-patterns`|developer|development|monolithic
 `mk:frontend-design`|developer|development|monolithic
 `mk:ui-design-system`|developer|development|monolithic
-`mk:vue-testing-best-practices`|tester|testing|monolithic (invoke-only Vue test-design advisor + test-code reviewer; read-only Read/Grep/Glob; complements mk:vue-best-practices)
 ```
 
 ### Integration / On-Demand
@@ -241,7 +236,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**127**
+**Total**|**122**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

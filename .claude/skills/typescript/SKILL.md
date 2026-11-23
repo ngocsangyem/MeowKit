@@ -1,6 +1,6 @@
 ---
 name: mk:typescript
-description: "TypeScript authoring and type fixes. NOT for mk:react-patterns."
+description: "TypeScript authoring and type fixes. NOT for mk:frontend-design."
 source: aura-frog
 original_skills:
   - typescript-expert
@@ -38,7 +38,7 @@ Strict TypeScript patterns for type safety, null handling, and modern best pract
 
 **Explicit:** `/mk:typescript [concern]`
 
-**Do NOT invoke for:** Vue-specific patterns (use mk:vue), visual design (use mk:frontend-design)
+**Do NOT invoke for:** visual design (use mk:frontend-design)
 
 ## Workflow Integration
 
