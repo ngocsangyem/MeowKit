@@ -96,11 +96,23 @@ BASE_ZIP=$(build_kit "$BASE_REF")
 NEW_ZIP=$(build_kit "$NEW_REF")
 
 run_suite() {
-  local model=$1 zip=$2 log
+  local model=$1 zip=$2 log report sha
+  # `eval run` refuses an archive it cannot verify.
+  sha=$(shasum -a 256 "$zip" | cut -d' ' -f1)
   log=$("$MEWKIT" eval run --suite "$SUITE" --model "$model" \
-    --kit-archive "$zip" --max-cost-usd "$MAX_COST" --max-runs "$MAX_RUNS" \
+    --kit-archive "$zip" --kit-sha256 "$sha" --max-cost-usd "$MAX_COST" --max-runs "$MAX_RUNS" \
     --max-turns 30 --timeout-secs 900 | tee /dev/stderr)
-  echo "$log" | sed -n 's/^Report: \(.*\) (complete: .*)$/\1/p' | tail -1
+  report=$(echo "$log" | sed -n 's/^Report: \(.*\) (complete: .*)$/\1/p' | tail -1)
+  # A report with no runs means every case was skipped (a kit install failure,
+  # say): stop here rather than go on to the next kit and model.
+  python3 - "$report" <<'PY' || exit 1
+import json, sys
+r = json.load(open(sys.argv[1], encoding="utf-8"))
+if not r["totals"]["runs"]:
+    reasons = sorted({s["reason"] for s in r.get("skipped", [])})
+    sys.exit("No case ran; skipped because: " + "; ".join(reasons))
+PY
+  echo "$report"
 }
 
 mkdir -p tasks/reports
