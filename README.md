@@ -9,7 +9,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi and OMP</strong><br>
-  127 skills &middot; 42 agents &middot; 6 rules &middot; 28 hook scripts
+  121 skills &middot; 42 agents &middot; 6 rules &middot; 28 hook scripts
 </p>
 
 <p align="center">
@@ -188,7 +188,7 @@ Hooks look for the binary on your PATH first. A project that still has the npm C
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
-│   ├── skills/               127 skills (mk: namespace) — 126 ship; benchmark is maintainer-only
+│   ├── skills/               121 skills (mk: namespace) — 121 ship; benchmark is maintainer-only
 │   ├── rules/                6 enforcement rules (always-on)
 │   ├── hooks/                28 hook scripts (dispatch, pre-ship, privacy-block, append-trace + 24 handlers) and their libraries
 │   ├── statusline.cjs

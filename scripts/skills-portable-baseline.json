@@ -86,14 +86,6 @@
       "target": ".claude/skills/skill-creator/scripts/check-skill-cross-refs.sh"
     },
     {
-      "file": ".claude/skills/vue-best-practices/references/async-components.md",
-      "target": ".claude/skills/vue-best-practices/references/reactivity-performance.md"
-    },
-    {
-      "file": ".claude/skills/vue-best-practices/references/perf-v-once-v-memo.md",
-      "target": ".claude/skills/vue-best-practices/references/reactivity-performance.md"
-    },
-    {
       "file": ".claude/skills/web-to-markdown/SKILL.md",
       "target": ".claude/skills/web-to-markdown/tests/test_smoke_real_urls.py"
     },

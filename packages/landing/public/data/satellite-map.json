@@ -3,16 +3,123 @@
   "meta": {
     "name": "meowkit",
     "tagline": "How meowkit skills, agents, and hooks orbit each other",
-    "date": "2026-11-22"
+    "date": "2026-11-23"
   },
   "stats": {
-    "skills": 127,
+    "skills": 121,
     "agents": 42,
     "commands": 0,
-    "hooks": 27,
-    "edges": 723
+    "hooks": 28,
+    "edges": 672
   },
   "planets": [
+    {
+      "id": "jira",
+      "label": "mk:jira",
+      "kind": "skill",
+      "sub": "Jira routing hub to the mk:jira leaf.",
+      "detail": "Jira routing hub to the mk:jira leaf.",
+      "sourceRef": ".claude/skills/jira/SKILL.md",
+      "group": "atlassian",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "jira-issue",
+          "label": "mk:jira-issue",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "confluence"
+          ],
+          "detail": "mk:jira leaf: create, read, update, delete one issue.",
+          "sourceRef": ".claude/skills/jira-issue/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "planning-engine",
+          "label": "mk:planning-engine",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "confluence"
+          ],
+          "detail": "Scores ticket complexity against the codebase.",
+          "sourceRef": ".claude/skills/planning-engine/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "ship",
+          "label": "mk:ship",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "help",
+            "loop"
+          ],
+          "detail": "Ships reviewed code: commit, push, PR, release.",
+          "sourceRef": ".claude/skills/ship/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "jira-collaborate",
+          "label": "mk:jira-collaborate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake"
+          ],
+          "detail": "mk:jira leaf: comments, watchers.",
+          "sourceRef": ".claude/skills/jira-collaborate/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-estimator",
+          "label": "mk:jira-estimator",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "mk:jira leaf: points for one ticket.",
+          "sourceRef": ".claude/skills/jira-estimator/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-agile",
+          "label": "mk:jira-agile",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "mk:jira leaf: epics, sprints, backlog.",
+          "sourceRef": ".claude/skills/jira-agile/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-bulk",
+          "label": "mk:jira-bulk",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "mk:jira leaf: 10+ issues, dry-run first.",
+          "sourceRef": ".claude/skills/jira-bulk/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-evaluator",
+          "label": "mk:jira-evaluator",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "mk:jira leaf: scores a ticket's complexity.",
+          "sourceRef": ".claude/skills/jira-evaluator/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        }
+      ]
+    },
     {
       "id": "cook",
       "label": "mk:cook",
@@ -127,125 +234,17 @@
           "criticality": "high"
         },
         {
-          "id": "developer",
-          "label": "developer",
-          "kind": "agent",
-          "edge": "spawns",
-          "sharedWith": [
-            "party",
-            "fix"
-          ],
-          "detail": "Implementation agent that writes production code following approved plans.",
-          "sourceRef": ".claude/agents/developer.md",
-          "group": "lifecycle-core",
-          "criticality": "high"
-        }
-      ]
-    },
-    {
-      "id": "jira",
-      "label": "mk:jira",
-      "kind": "skill",
-      "sub": "Jira routing hub to the mk:jira leaf.",
-      "detail": "Jira routing hub to the mk:jira leaf.",
-      "sourceRef": ".claude/skills/jira/SKILL.md",
-      "group": "atlassian",
-      "criticality": "medium",
-      "satellites": [
-        {
-          "id": "jira-issue",
-          "label": "mk:jira-issue",
+          "id": "evaluate",
+          "label": "mk:evaluate",
           "kind": "skill",
           "edge": "calls",
           "sharedWith": [
-            "intake",
-            "confluence"
-          ],
-          "detail": "mk:jira leaf: create, read, update, delete one issue.",
-          "sourceRef": ".claude/skills/jira-issue/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
-          "id": "planning-engine",
-          "label": "mk:planning-engine",
-          "kind": "skill",
-          "edge": "calls",
-          "sharedWith": [
-            "confluence"
-          ],
-          "detail": "Scores ticket complexity against the codebase.",
-          "sourceRef": ".claude/skills/planning-engine/SKILL.md",
-          "group": "lifecycle-core",
-          "criticality": "medium"
-        },
-        {
-          "id": "ship",
-          "label": "mk:ship",
-          "kind": "skill",
-          "edge": "calls",
-          "sharedWith": [
-            "cook",
-            "help",
             "loop"
           ],
-          "detail": "Ships reviewed code: commit, push, PR, release.",
-          "sourceRef": ".claude/skills/ship/SKILL.md",
-          "group": "lifecycle-core",
+          "detail": "Drives a running build, records evidence.",
+          "sourceRef": ".claude/skills/evaluate/SKILL.md",
+          "group": "testing",
           "criticality": "high"
-        },
-        {
-          "id": "jira-collaborate",
-          "label": "mk:jira-collaborate",
-          "kind": "skill",
-          "edge": "calls",
-          "sharedWith": [
-            "intake"
-          ],
-          "detail": "mk:jira leaf: comments, watchers.",
-          "sourceRef": ".claude/skills/jira-collaborate/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
-          "id": "jira-estimator",
-          "label": "mk:jira-estimator",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "mk:jira leaf: points for one ticket.",
-          "sourceRef": ".claude/skills/jira-estimator/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
-          "id": "jira-agile",
-          "label": "mk:jira-agile",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "mk:jira leaf: epics, sprints, backlog.",
-          "sourceRef": ".claude/skills/jira-agile/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
-          "id": "jira-bulk",
-          "label": "mk:jira-bulk",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "mk:jira leaf: 10+ issues, dry-run first.",
-          "sourceRef": ".claude/skills/jira-bulk/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
-        },
-        {
-          "id": "jira-evaluator",
-          "label": "mk:jira-evaluator",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "mk:jira leaf: scores a ticket's complexity.",
-          "sourceRef": ".claude/skills/jira-evaluator/SKILL.md",
-          "group": "atlassian",
-          "criticality": "medium"
         }
       ]
     },
@@ -296,24 +295,14 @@
           "kind": "skill",
           "edge": "calls",
           "sharedWith": [
-            "cook",
             "jira",
+            "cook",
             "loop"
           ],
           "detail": "Ships reviewed code: commit, push, PR, release.",
           "sourceRef": ".claude/skills/ship/SKILL.md",
           "group": "lifecycle-core",
           "criticality": "high"
-        },
-        {
-          "id": "agent-detector",
-          "label": "mk:agent-detector",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "Picks task agent and complexity tier.",
-          "sourceRef": ".claude/skills/agent-detector/SKILL.md",
-          "group": "lifecycle-core",
-          "criticality": "medium"
         },
         {
           "id": "verify",
@@ -352,6 +341,16 @@
           "edge": "calls",
           "detail": "Schema, migration, query work.",
           "sourceRef": ".claude/skills/database/SKILL.md",
+          "group": "portability",
+          "criticality": "high"
+        },
+        {
+          "id": "devops",
+          "label": "mk:devops",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Containers, IaC, CI/CD, rollback.",
+          "sourceRef": ".claude/skills/devops/SKILL.md",
           "group": "portability",
           "criticality": "high"
         }
@@ -452,16 +451,6 @@
           "criticality": "medium"
         },
         {
-          "id": "scale-routing",
-          "label": "mk:scale-routing",
-          "kind": "skill",
-          "edge": "calls",
-          "detail": "Maps task keywords to a complexity tier.",
-          "sourceRef": ".claude/skills/scale-routing/SKILL.md",
-          "group": "portability",
-          "criticality": "medium"
-        },
-        {
           "id": "cso",
           "label": "mk:cso",
           "kind": "skill",
@@ -473,6 +462,16 @@
           "sourceRef": ".claude/skills/cso/SKILL.md",
           "group": "security-audit",
           "criticality": "high"
+        },
+        {
+          "id": "figma",
+          "label": "mk:figma",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Figma MCP gateway: designs, tokens.",
+          "sourceRef": ".claude/skills/figma/SKILL.md",
+          "group": "utility",
+          "criticality": "medium"
         }
       ]
     },
@@ -503,28 +502,14 @@
           "criticality": "medium"
         },
         {
-          "id": "developer",
-          "label": "developer",
+          "id": "orchestrator",
+          "label": "orchestrator",
           "kind": "agent",
           "edge": "spawns",
-          "sharedWith": [
-            "cook",
-            "fix"
-          ],
-          "detail": "Implementation agent that writes production code following approved plans.",
-          "sourceRef": ".claude/agents/developer.md",
+          "detail": "Task router.",
+          "sourceRef": ".claude/agents/orchestrator.md",
           "group": "lifecycle-core",
-          "criticality": "high"
-        },
-        {
-          "id": "ui-ux-designer",
-          "label": "ui-ux-designer",
-          "kind": "agent",
-          "edge": "spawns",
-          "detail": "Use when frontend work requires UI/UX design decisions — component design, design systems, wireframes, visual review, accessibility audits, or responsive layout.",
-          "sourceRef": ".claude/agents/ui-ux-designer.md",
-          "group": "docs",
-          "criticality": "medium"
+          "criticality": "critical"
         },
         {
           "id": "cso",
@@ -540,14 +525,17 @@
           "criticality": "high"
         },
         {
-          "id": "orchestrator",
-          "label": "orchestrator",
+          "id": "developer",
+          "label": "developer",
           "kind": "agent",
           "edge": "spawns",
-          "detail": "Task router.",
-          "sourceRef": ".claude/agents/orchestrator.md",
+          "sharedWith": [
+            "fix"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": ".claude/agents/developer.md",
           "group": "lifecycle-core",
-          "criticality": "critical"
+          "criticality": "high"
         },
         {
           "id": "reviewer",
@@ -560,6 +548,16 @@
           "criticality": "high"
         },
         {
+          "id": "ui-ux-designer",
+          "label": "ui-ux-designer",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Use when frontend work requires UI/UX design decisions — component design, design systems, wireframes, visual review, accessibility audits, or responsive layout.",
+          "sourceRef": ".claude/agents/ui-ux-designer.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
           "id": "team-config",
           "label": "mk:team-config",
           "kind": "skill",
@@ -570,16 +568,13 @@
           "criticality": "medium"
         },
         {
-          "id": "researcher",
-          "label": "researcher",
-          "kind": "agent",
-          "edge": "spawns",
-          "sharedWith": [
-            "chom"
-          ],
-          "detail": "Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions.",
-          "sourceRef": ".claude/agents/researcher.md",
-          "group": "research",
+          "id": "retro",
+          "label": "mk:retro",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Engineering retrospective from commits.",
+          "sourceRef": ".claude/skills/retro/SKILL.md",
+          "group": "docs",
           "criticality": "medium"
         }
       ]
@@ -672,20 +667,6 @@
           "criticality": "high"
         },
         {
-          "id": "developer",
-          "label": "developer",
-          "kind": "agent",
-          "edge": "spawns",
-          "sharedWith": [
-            "cook",
-            "party"
-          ],
-          "detail": "Implementation agent that writes production code following approved plans.",
-          "sourceRef": ".claude/agents/developer.md",
-          "group": "lifecycle-core",
-          "criticality": "high"
-        },
-        {
           "id": "project-manager",
           "label": "project-manager",
           "kind": "agent",
@@ -694,6 +675,19 @@
           "sourceRef": ".claude/agents/project-manager.md",
           "group": "lifecycle-core",
           "criticality": "medium"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "party"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": ".claude/agents/developer.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
         },
         {
           "id": "docs-finder",
@@ -754,8 +748,8 @@
           "kind": "skill",
           "edge": "calls",
           "sharedWith": [
-            "cook",
             "jira",
+            "cook",
             "help"
           ],
           "detail": "Ships reviewed code: commit, push, PR, release.",
@@ -828,6 +822,9 @@
           "label": "mk:evaluate",
           "kind": "skill",
           "edge": "calls",
+          "sharedWith": [
+            "cook"
+          ],
           "detail": "Drives a running build, records evidence.",
           "sourceRef": ".claude/skills/evaluate/SKILL.md",
           "group": "testing",
@@ -928,25 +925,22 @@
           "criticality": "medium"
         },
         {
-          "id": "researcher",
-          "label": "researcher",
-          "kind": "agent",
-          "edge": "spawns",
-          "sharedWith": [
-            "party"
-          ],
-          "detail": "Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions.",
-          "sourceRef": ".claude/agents/researcher.md",
-          "group": "research",
-          "criticality": "medium"
-        },
-        {
           "id": "sequential-thinking",
           "label": "mk:sequential-thinking",
           "kind": "skill",
           "edge": "calls",
           "detail": "Step-by-step hypothesis reasoning.",
           "sourceRef": ".claude/skills/sequential-thinking/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "researcher",
+          "label": "researcher",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions.",
+          "sourceRef": ".claude/agents/researcher.md",
           "group": "research",
           "criticality": "medium"
         }
@@ -1156,6 +1150,10 @@
       "to": "cook"
     },
     {
+      "from": "cook",
+      "to": "fix"
+    },
+    {
       "from": "fix",
       "to": "cook"
     },
@@ -1172,19 +1170,15 @@
       "to": "jira"
     },
     {
-      "from": "intake",
-      "to": "cook"
-    },
-    {
       "from": "jira",
       "to": "confluence"
     },
     {
-      "from": "confluence",
+      "from": "intake",
       "to": "cook"
     },
     {
-      "from": "help",
+      "from": "confluence",
       "to": "cook"
     },
     {
@@ -1213,26 +1207,26 @@
     }
   ],
   "belt": {
-    "count": 140,
+    "count": 134,
     "byKind": {
-      "skills": 77,
+      "skills": 70,
       "agents": 36,
       "commands": 0,
-      "hooks": 27
+      "hooks": 28
     },
     "sample": [
-      "vue",
-      "frontend-design",
       "jira-analyst",
       "jira-lifecycle",
       "jira-search",
-      "vue-testing-best-practices",
+      "agent-detector",
       "jira-fields",
       "jira-relationships",
       "sprint-contract",
       "story-sizer",
-      "vue-best-practices",
-      "docs-init"
+      "docs-init",
+      "improve-codebase-architecture",
+      "jira-jsm",
+      "preview"
     ]
   }
 }

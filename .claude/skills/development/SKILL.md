@@ -17,13 +17,13 @@ runtime: claude-code
 
 # Development
 
-Write feature code in the supported stacks (NestJS, Vue 3, Swift) to the project's conventions, without running a plan-driven pipeline. Use it for coding outside a pipeline, or when the `developer` agent needs the stack patterns. For a plan-driven build with review and verification use `mk:cook`.
+Write feature code in the supported stacks (NestJS, Swift) to the project's conventions, without running a plan-driven pipeline. Use it for coding outside a pipeline, or when the `developer` agent needs the stack patterns. For a plan-driven build with review and verification use `mk:cook`.
 
 Done means the code compiles or type-checks, the project's existing tests pass, and nothing outside the task changed.
 
 | Open | When |
 | --- | --- |
-| `references/code-patterns.md` | writing or reviewing NestJS, Vue or Swift code |
+| `references/code-patterns.md` | writing or reviewing NestJS or Swift code |
 | `references/tdd-enforcement.md` | you want test-first work; it points to the opt-in rules in `mk:cook` |
 
 TDD is opt-in (`--tdd` or `MEOWKIT_TDD=1`); without it, write tests the way the project already does.

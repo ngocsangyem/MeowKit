@@ -47,7 +47,7 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - **Skill store.** `mewkit skill status` lists each installed skill as `kit`, `overlaid`, `forked`, `local` or `unverified`, with its digests. Install, upgrade and uninstall keep forked, local, unverified and overlaid skills whole and report them as `kept`; a kept skill does not make `upgrade` exit 6.
 - **Overlay and rollback.** `mewkit skill overlay` stores your version of chosen kit files outside the kit's trees; an overlay from a clone places only after this machine approves it. `mewkit skill rollback` restores any recorded digest of a skill.
 - **Upgrade merge.** On Claude Code, `upgrade` merges an edit made in place to a project skill with the kit's change when the two edits are separated, the skill has eval cases and the cached previous kit matches the ledger. Otherwise the file is kept and `upgrade` exits 6, as before.
-- **Eval harness.** Each run uses a fresh copy of the case's fixture with the kit installed from `--kit-archive`, an empty runtime home and a shared cost ceiling. The baseline suite has 108 cases: 80 trigger, 16 paired and 12 parachute. The `toolInputMatches` assertion checks what a tool was called with, such as the `Goal:` line of a subagent brief.
+- **Eval harness.** Each run uses a fresh copy of the case's fixture with the kit installed from `--kit-archive`, an empty runtime home and a shared cost ceiling. The baseline suite has 104 cases: 76 trigger, 16 paired and 12 parachute. The `toolInputMatches` assertion checks what a tool was called with, such as the `Goal:` line of a subagent brief.
 - **Antigravity target.** Skills, agents, two rule files and the instruction block are built from the vendor's documentation (read 2026-11-22). Nothing was probed live.
 - **Skill descriptions on every runtime.** The description written for runtimes without a `when_to_use` field now carries it as "Use when: ...", so their routing sees the trigger text.
 - **Delegation brief check.** The `delegation-brief-check` observer notes to the model when a subagent brief has no `Goal:` or `Return:` label. It never blocks. Switch it with `hooks.delegation-brief-check: false`.
@@ -74,6 +74,8 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 
 - The `mk:ship` reference `adversarial-review.md`, which nothing read. Adversarial review belongs to `mk:review`.
 - The trace events `build_verify_result` and `loop_warning` are no longer documented: nothing writes them.
+- The framework and language skills `mk:angular`, `mk:react-patterns`, `mk:vue`, `mk:vue-best-practices`, `mk:vue-testing-best-practices` and `mk:typescript`. Releases outdated them quickly, and each framework and language now ships its own official agent skill; install that one instead. They also leave the `development` skill pack.
+- The Vue 3 section of `mk:development`'s `code-patterns.md`. The skill keeps its NestJS and Swift patterns.
 - The opt-in eval pack. Releases carry no eval cases or fixtures, `--skill-packs eval` and `mewkit pack add eval` are refused as unknown packs, and `mewkit eval run` reads cases only from a MeowKit checkout. `upgrade` and `uninstall` remove an installed `.meowkit/eval/`, keeping any file edited since install.
 
 ### Bug Fixes
@@ -94,6 +96,7 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - Antigravity's guards are unverified. Check them on a live run before you rely on them.
 - The first `upgrade` of an install made before skill selections existed writes `.meowkit/state/skill-selection.json` with every installed skill. A smaller default later reaches fresh installs only.
 - A `hooks.<name>` key for a handler that a release removed now warns instead of failing the config. Delete the key when you see the warning.
+- `upgrade` removes the files of the six removed skills, keeping any file you edited since install; a skill folder with an edited file stays with only that file. Without the old kit in the cache, offline, every file is kept and `upgrade` says so. Until you upgrade, an install keeps its copies. `mewkit` 0.1.1 removes them the same way.
 - An older `mewkit` that changes the ownership ledger marks the affected skills `unverified` in the skill store. `mewkit skill rollback <name>` settles one.
 
 ## 3.0.1 (2026-11-21)

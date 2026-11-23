@@ -141,7 +141,7 @@ fn the_kits_baseline_suite_loads() {
     let o = mewkit(&repo, &["eval", "run", "--suite", "baseline", "--dry-run"]);
     let out = text(&o);
     assert!(o.status.success(), "{out}");
-    assert!(out.contains("108 cases, 396 runs"), "{out}");
+    assert!(out.contains("104 cases, 384 runs"), "{out}");
     let skills = repo.join(".claude/skills");
     for skill in ["cook", "fix", "investigate", "plan-creator"] {
         let fx = skills.join(skill).join("eval/fixtures");

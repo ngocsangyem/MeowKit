@@ -39,7 +39,6 @@
 			"description": "Coding-domain helpers (languages, frameworks, architecture, merge conflicts, skill authoring) layered on top of the core lifecycle.",
 			"dependsOn": ["core"],
 			"skills": [
-				"mk-angular",
 				"mk-api-design-principles",
 				"mk-arch",
 				"mk-autobuild",
@@ -52,15 +51,10 @@
 				"mk-devops",
 				"mk-improve-codebase-architecture",
 				"mk-planning-engine",
-				"mk-react-patterns",
 				"mk-resolving-merge-conflicts",
 				"mk-skill-creator",
 				"mk-skill-template-secure",
-				"mk-sprint-contract",
-				"mk-typescript",
-				"mk-vue",
-				"mk-vue-best-practices",
-				"mk-vue-testing-best-practices"
+				"mk-sprint-contract"
 			]
 		},
 		"review": {

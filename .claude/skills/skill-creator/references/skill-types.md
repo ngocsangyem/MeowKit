@@ -9,7 +9,7 @@ Classify your skill before writing it. Each type has different requirements.
 | Data | Database, migrations, ETL | (none yet) | Schema refs, migration scripts |
 | Business Process | Multi-step workflows, approval chains | mk:cook, mk:ship, mk:workflow-orchestrator | Phase refs, state tracking |
 | Scaffolding | Generate templates, boilerplate | mk:skill-creator, mk:plan-creator | assets/ with templates |
-| Code Quality | Linting, formatting, style | mk:clean-code, mk:typescript | Rules refs, auto-fix scripts |
+| Code Quality | Linting, formatting, style | mk:clean-code, mk:lint-and-validate | Rules refs, auto-fix scripts |
 | CI/CD | Build, deploy, release | mk:ship | Pipeline refs, env config |
 | Runbooks | Operational procedures, incident response | mk:investigate, mk:careful | Step-by-step with escape hatches |
 | Infrastructure | Cloud, containers, networking | (none yet) | Provider-specific refs, IaC patterns |
