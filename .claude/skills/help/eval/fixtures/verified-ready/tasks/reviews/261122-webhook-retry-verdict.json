@@ -1,0 +1,13 @@
+{
+  "decision": "PASS",
+  "dimensions": [
+    {
+      "name": "correctness",
+      "verdict": "PASS"
+    },
+    {
+      "name": "error-handling",
+      "verdict": "PASS"
+    }
+  ]
+}

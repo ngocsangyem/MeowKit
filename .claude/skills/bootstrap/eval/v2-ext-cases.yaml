@@ -1,0 +1,33 @@
+# v2-ext cases for mk:bootstrap.
+cases:
+  # Exercises: "every bootstrap writes a plan ... before generating any source file" and "Never touch .claude/".
+  # Literal model: runs research with WebSearch for a tiny tool and stalls before scaffolding.
+  # Lax model: generates source straight away with no plan file, or writes into .claude/.
+  - id: bootstrap-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: bootstrap
+    prompt: "Using mk:bootstrap --fast, set up a small Node command line tool that converts a CSV file on stdin into JSON on stdout. No dependencies, and give it one test."
+    fixture: fixtures/empty-repo
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/plans/*/plan.md' }
+      - { type: fileExists, path: 'package.json' }
+      - { type: toolInputNotMatches, tool: Write, pattern: '\.claude/' }
+  # Exercises: "Do not invoke when the project already has source code".
+  # Literal model: runs the research/plan/scaffold pipeline to add one function to an existing app.
+  # Lax model: n/a; it edits the file.
+  - id: bootstrap-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: bootstrap
+    prompt: "Using mk:bootstrap, add a subtract(a, b) function next to add in src/app.js and export it."
+    fixture: fixtures/existing-app
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/app.js', pattern: 'function subtract' }
+      - { type: fileContains, path: 'src/app.js', pattern: '(?s)module\.exports\s*=\s*\{[^}]*subtract' }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'tasks/plans' }
+      - { type: toolNotCalled, tool: Agent }

@@ -91,6 +91,17 @@ pub fn grade_assertion(a: &Assertion, t: &Transcript, ws: &dyn Workspace) -> Ver
                 matches!(e, Event::Tool { name, input } if same_tool(name, tool) && re.is_match(input))
             })
         })),
+        Assertion::ToolNotCalled { tool } => verdict(!t.events.iter().any(|e| {
+            matches!(e, Event::Tool { name, .. } if same_tool(name, tool))
+                || (matches!(e, Event::SkillLoad(_)) && tool == "Skill")
+        })),
+        Assertion::ToolInputNotMatches { tool, pattern } => {
+            verdict(compile(pattern).is_ok_and(|re| {
+                !t.events.iter().any(|e| {
+                    matches!(e, Event::Tool { name, input } if same_tool(name, tool) && re.is_match(input))
+                })
+            }))
+        }
         Assertion::ModelGraded { .. } => Verdict::NeedsJudge,
     }
 }

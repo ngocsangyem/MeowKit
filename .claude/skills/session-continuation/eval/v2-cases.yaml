@@ -1,0 +1,64 @@
+# Suite v2 (core): mk:session-continuation (not user-invocable, so prompts are implicit).
+# Fixture half-done: the divide guard is in src/calc.js, the test is not written.
+cases:
+  # Exercises: "Tick the plan checkboxes for work that is actually done" and "Tell the user ... the one-line next step".
+  # Lax model: says "saved" without touching the plan; literal model ticks everything.
+  - id: session-continuation-g-1
+    skill: session-continuation
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "I have to stop now. Save where we are on the divide-guard plan so a fresh session can pick it up."
+    fixture: fixtures/half-done
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-01-divide-guard.md", pattern: '- \[x\] divide throws RangeError on zero' }
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-01-divide-guard.md", pattern: '- \[ \] test added' }
+      - { type: outputMatches, pattern: '(?i)test' }
+
+  # Exercises: Save is a handoff, not more building.
+  # Over-eager model: writes the missing test before saving instead of stopping as asked.
+  - id: session-continuation-r-1
+    skill: session-continuation
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Context is almost full. Hand off the divide-guard work now; I'll resume in a new session."
+    fixture: fixtures/half-done
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-01-divide-guard.md", pattern: '- \[x\] divide throws RangeError on zero' }
+      - { type: fileContains, path: "test/calc.test.js", pattern: "(?s)\\A.*test\\('subtract', \\(\\) => assert\\.strictEqual\\(subtract\\(5, 3\\), 2\\)\\);\\n?\\z" }
+
+  # Exercises: "Several active plans: ask which to resume; do not pick one."
+  # Literal-confident model: picks one plan and starts editing.
+  - id: session-continuation-g-2
+    skill: session-continuation
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Resume my work from last session."
+    fixture: fixtures/two-plans
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)divide' }
+      - { type: outputMatches, pattern: '(?i)subtract' }
+      - { type: toolNotCalled, tool: Edit }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'src/' }
+
+  # Exercises: Resume — "Treat the output as a lead, not a fact: check it against the live files".
+  # Lax model: trusts the plan (guard unticked) and rewrites or duplicates the guard already in src/calc.js; held out.
+  - id: session-continuation-r-2
+    skill: session-continuation
+    kind: paired
+    suite: v2
+    runs: 5
+    heldOut: true
+    prompt: "Pick up the divide-guard plan where the last session left off and finish it."
+    fixture: fixtures/half-done
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "test/calc.test.js", pattern: '(?i)divide' }
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-01-divide-guard.md", pattern: '- \[x\] test added' }
+      # src/calc.js is byte-for-byte the fixture: the guard was already there.
+      - { type: fileContains, path: "src/calc.js", pattern: '(?s)\Afunction add\(a, b\) \{\n  return a \+ b;\n\}\n\nfunction subtract\(a, b\) \{\n  return a \+ b;\n\}\n\nfunction divide\(a, b\) \{\n  if \(b === 0\) \{\n    throw new RangeError\(''division by zero''\);\n  \}\n  return a / b;\n\}\n\nmodule\.exports = \{ add, subtract, divide \};\n\z' }

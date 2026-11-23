@@ -1,0 +1,33 @@
+# v2-ext cases for mk:api-design-principles.
+cases:
+  # Exercises: "Discover the existing contract before proposing a new one ... Never invent a convention".
+  # Literal model: writes a generic REST design (offset paging, its own error shape, page size 20).
+  # Lax model: designs from habit and never opens docs/api.md.
+  - id: api-design-principles-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: api-design-principles
+    prompt: "Using mk:api-design-principles, design the contract for a new `GET /orders` list endpoint (orders belong to a user). Write the decision to docs/orders-contract.md."
+    fixture: fixtures/existing-api
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'docs/orders-contract.md', pattern: '(?i)cursor' }
+      - { type: fileContains, path: 'docs/orders-contract.md', pattern: '(?i)"?code"?.{0,40}"?message"?' }
+      - { type: fileContains, path: 'docs/orders-contract.md', pattern: '/v1/' }
+      - { type: fileContains, path: 'docs/orders-contract.md', pattern: '(?i)(401|403|404|not found|forbidden)' }
+  # Exercises: "Additive is safe ... Ship it without a version bump."
+  # Literal model: opens a full contract review and proposes /v2 or a deprecation window for one optional field.
+  # Lax model: n/a.
+  - id: api-design-principles-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: api-design-principles
+    prompt: "Using mk:api-design-principles: I want to add an optional `nickname` string to the GET /v1/users/:id response. Do I need a new API version? Answer briefly."
+    fixture: fixtures/existing-api
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(additive|backward.compatible|non-breaking|safe)' }
+      - { type: outputNotMatches, pattern: '(?i)(you (do|will) need|must|should) (to )?(bump|introduce|create|add) (a )?(new )?(v2|version)' }
+      - { type: toolNotCalled, tool: Edit }

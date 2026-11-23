@@ -1,0 +1,31 @@
+# v2-ext cases for mk:scale-routing (user-invocable: false, so prompts are implicit and graded on text).
+cases:
+  # Exercises: "Several domains can match ('fintech dashboard' hits fintech and internal_tools): use the highest level."
+  # Literal model: stops at the first CSV match (internal_tools = low) and calls the work light.
+  # Lax model: judges from "it is just a widget" and says medium.
+  - id: scale-routing-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: scale-routing
+    prompt: "We want to add a fintech dashboard widget that shows the total of customer payments per day. Before anyone starts, how much process should this get: how complex is it? Answer with the complexity level, no code needed."
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)\b(high|complex)\b' }
+      - { type: outputNotMatches, pattern: '(?i)(level|complexity|tier)\W{0,12}(low|trivial)\b' }
+  # Exercises: "Fast exit ... If the match is a low row and the task names one file, return it and stop."
+  # Literal model: reads the multi-layer references, git log and project layout for a one-word edit.
+  # Lax model: n/a; the over-application is the detour.
+  - id: scale-routing-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: scale-routing
+    prompt: "In docs/guide.md change the heading 'Getting startd' to 'Getting started'. Also tell me in a line how complex this task is."
+    fixture: fixtures/docs-typo
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'docs/guide.md', pattern: 'Getting started' }
+      - { type: outputMatches, pattern: '(?i)(low|trivial|simple)' }
+      - { type: toolInputNotMatches, tool: Read, pattern: 'multi-layer-detection|task-type-classification|product-area' }
+      - { type: toolNotCalled, tool: Agent }

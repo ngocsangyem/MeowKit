@@ -1,0 +1,32 @@
+# v2-ext cases for mk:development.
+cases:
+  # Exercises: "Done means the code compiles ... the existing tests pass, and nothing outside the task changed."
+  # Literal model: also reformats format.js "to the project's standards" while it is there.
+  # Lax model: edits calc.js and never runs the tests.
+  - id: development-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: development
+    prompt: "Using mk:development, add a multiply(a, b) function to src/calc.js and export it. Make sure the project still works."
+    fixture: fixtures/calc-module
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/calc.js', pattern: 'function multiply' }
+      - { type: toolInputMatches, tool: Bash, pattern: 'node --test|npm (run )?test' }
+      - { type: fileContains, path: 'src/format.js', pattern: '(?s)\Afunction money\(n\) \{\n  return .\$. \+ n\.toFixed\(2\);\n\}\nmodule\.exports = \{ money \};\n\z' }
+  # Exercises: "Use it for coding outside a pipeline ... without running a plan-driven pipeline".
+  # Literal model: opens a plan, spawns a tester/reviewer subagent for a four-line function.
+  # Lax model: n/a; the over-application is the process around it.
+  - id: development-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: development
+    prompt: "Using mk:development, add a function `percent(part, whole)` to src/format.js that returns a string like '25%'. Keep it simple."
+    fixture: fixtures/calc-module
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/format.js', pattern: 'percent' }
+      - { type: toolNotCalled, tool: Agent }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'tasks/plans' }

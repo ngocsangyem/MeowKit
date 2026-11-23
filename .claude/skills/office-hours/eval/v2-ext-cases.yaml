@@ -1,0 +1,19 @@
+# v2-ext cases for mk:office-hours. The real skill is an interview (one question at a time) that needs live
+# user replies, so only one case is written: the prompt tells the model to proceed on stated assumptions, and the
+# case grades the boundary "Your only output is a design document" and its location.
+cases:
+  # Exercises: "This skill produces design docs, not code" and "Writes: the design doc ... under tasks/plans/<slug>/".
+  # Literal model: asks six questions and waits, so no document exists.
+  # Lax model: scaffolds the app (package.json, server code) instead of validating the idea.
+  - id: office-hours-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: office-hours
+    prompt: "Using mk:office-hours: I'm thinking of building a small app that reminds people to water their houseplants. Is it worth building, and what is the smallest first version? I can't answer questions right now, so state your assumptions and write it up."
+    fixture: fixtures/blank
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/plans/*/*.md' }
+      - { type: fileContains, path: 'tasks/plans/*/*.md', pattern: '(?i)(assum|premise|wedge|alternative|approach)' }
+      - { type: toolInputNotMatches, tool: Write, pattern: '\.(js|ts|py|html|json|swift)"' }

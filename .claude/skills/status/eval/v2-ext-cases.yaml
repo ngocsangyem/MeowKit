@@ -1,0 +1,31 @@
+# v2-ext cases for mk:status. mewkit may be absent; the skill says to derive counts by hand and say so.
+cases:
+  # Exercises: "written by the project-manager agent into {plan-dir}/status-reports/{YYMMDD}-status.md".
+  # Literal model: writes the report to the repo root or tasks/reports/ instead of inside the plan directory.
+  # Lax model: summarises in chat and writes no file.
+  - id: status-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: status
+    prompt: "Using mk:status, give me the delivery status of our current plan."
+    fixture: fixtures/one-active-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/plans/261122-webhook-retry/status-reports/*-status.md' }
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/status-reports/*-status.md', pattern: '(?i)(backoff|retry)' }
+  # Exercises: "0 results -> print `No active plan ...` and stop. Write no file".
+  # Literal model: writes a status report for the archived plan anyway, as if it were current.
+  # Lax model: invents a plan to report on, or starts creating one.
+  - id: status-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: status
+    prompt: "Using mk:status, what's the status of the plan we're working on?"
+    fixture: fixtures/no-active-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(no active plan|no plan in progress|nothing (is )?in progress|completed)' }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'status-reports' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'status-reports' }

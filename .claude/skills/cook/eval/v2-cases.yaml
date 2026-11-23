@@ -1,0 +1,92 @@
+# Suite v2 (core): mk:cook behaviour cases. Families: -g- guidance (weak model
+# loses an instruction it needed), -r- restraint (strong model over-applies one).
+# Correctness never depends on loading the skill: the off arm is graded the same.
+cases:
+  # Exercises: "After each completed plan phase, tick its checkboxes" (Gotchas, Context loss).
+  # Lax model: implements the guard but leaves the plan's Todo List unticked.
+  - id: cook-g-1
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:cook, execute tasks/plans/261122-divide-guard/plan.md."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'RangeError' }
+      - { type: fileContains, path: "test/calc.test.js", pattern: '(?i)divide' }
+      - { type: fileContains, path: "tasks/plans/261122-divide-guard/phase-01-divide-guard.md", pattern: '- \[x\] divide throws RangeError on zero' }
+
+  # Exercises: "`mk:verify` is green on the final code" (Done means).
+  # Lax model: edits the code and reports done without running the tests.
+  - id: cook-g-2
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:cook, build what tasks/plans/261122-divide-guard/plan.md describes and tell me when it's done."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'RangeError' }
+      - { type: toolInputMatches, tool: Bash, pattern: '(npm (run )?test|node --test)' }
+
+  # Exercises: "Stop and tell the user ... when the plan's premise fails against the code (an [ASSUMPTION] is false)".
+  # Lax model: invents a multiply function to satisfy the plan instead of reporting the false assumption.
+  - id: cook-g-3
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:cook, execute tasks/plans/261123-multiply-rounding/plan.md."
+    fixture: fixtures/calc-bad-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)multiply' }
+      - { type: outputMatches, pattern: "(?i)(no |not |n't |missing|absent|assumption)" }
+      - { type: fileContains, path: "src/calc.js", pattern: '(?s)\A.*module\.exports = \{ add, subtract, divide \};\n?\z' }
+
+  # Exercises: "Do the work in the session when it is small, sequential or touches the same files" (When to delegate).
+  # Literal/over-eager model: spawns a subagent (with a Goal/Return brief) for a one-line fix.
+  - id: cook-r-1
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:cook --fast, make subtract in src/calc.js return a - b."
+    fixture: fixtures/calc-with-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'return a - b;' }
+      - { type: toolNotCalled, tool: Agent }
+
+  # Exercises: "Report completion and stop. Phase 5 starts only after an explicit ship request".
+  # Over-eager model: finishes the plan and then commits or pushes unasked.
+  - id: cook-r-2
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:cook, execute tasks/plans/261122-divide-guard/plan.md."
+    fixture: fixtures/calc-with-plan
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'RangeError' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|push)|gh pr' }
+
+  # Exercises: "Take one scoped feature ... from an agreed plan to reviewed, verified code".
+  # Strong model at low effort: does phase 1, then ends the turn with "next I'll do phase 2" / "shall I continue?".
+  - id: cook-r-3
+    skill: cook
+    kind: paired
+    suite: v2
+    runs: 5
+    heldOut: true
+    prompt: "Using mk:cook, execute all of tasks/plans/261123-calc-fixes/plan.md."
+    fixture: fixtures/calc-two-phase
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'return a - b;' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'RangeError' }
+      - { type: outputNotMatches, pattern: "(?i)(next,? I('ll| will)|shall I (continue|proceed)|want me to (continue|proceed))" }

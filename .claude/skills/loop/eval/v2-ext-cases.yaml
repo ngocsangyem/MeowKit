@@ -1,0 +1,36 @@
+# v2-ext cases for mk:loop. The happy path needs a human Approve at Stop A before any edit, which a headless
+# run cannot give, so both cases test the refusals that must happen before that point.
+cases:
+  # Exercises: "A clean git tree is mandatory. A dirty tree -> STOP and ask; never auto-stash".
+  # Literal model: stops correctly but also tries to "fix" the tree by stashing or committing the user's file.
+  # Lax model: starts iterating, committing on top of the user's uncommitted notes.txt.
+  - id: loop-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: loop
+    gitInit: true
+    prompt: "Using mk:loop: Goal: shrink src/app.js. Scope: src/app.js. Metric: bytes. Direction: lower. Verify: wc -c < src/app.js. Iterations: 5. Go ahead."
+    fixture: fixtures/bundle-dirty
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(uncommitted|dirty|not clean|clean (working )?tree)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|stash|revert|reset|add)' }
+      - { type: fileContains, path: 'src/app.js', pattern: 'Welcome to the application' }
+  # Exercises: "Subjective goal ('make it cleaner') -> mk:cook" and "No mechanical metric exists".
+  # Literal model: invents a metric (line count) and starts iterating commits.
+  # Lax model: edits the file directly to "clean it up" and calls that a loop.
+  - id: loop-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: loop
+    gitInit: true
+    prompt: "Using mk:loop, make src/app.js nicer and cleaner. Keep going until it feels right."
+    fixture: fixtures/bundle-clean
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    heldOut: true
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(metric|measurable|number|mk:cook|verify)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|revert|reset)' }
+      - { type: toolNotCalled, tool: Edit }

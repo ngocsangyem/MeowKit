@@ -53,6 +53,7 @@ fn case(kind: CaseKind) -> EvalCase {
         fixture: None,
         tools: vec![],
         held_out: false,
+        git_init: false,
         expect_trigger: None,
         approach_is_wrong: None,
         mismatch_pattern: None,
@@ -254,4 +255,46 @@ fn tool_input_matches_checks_the_input_of_the_named_tool() {
     // Another tool's input does not count, and a mismatch fails.
     assert_eq!(hit("Bash", r"Return:"), Verdict::Fail);
     assert_eq!(hit("Edit", r"Goal"), Verdict::Fail);
+}
+
+#[test]
+fn tool_not_called_fails_on_any_call_of_the_named_tool() {
+    let ws = Files(vec![]);
+    let none = |tool: &str, t: &Transcript| {
+        grade::grade_assertion(&Assertion::ToolNotCalled { tool: tool.into() }, t, &ws)
+    };
+    let delegated = t(vec![tool("Read"), tool("Task")], "");
+    // Either spelling names the subagent tool.
+    assert_eq!(none("Agent", &delegated), Verdict::Fail);
+    assert_eq!(none("Task", &delegated), Verdict::Fail);
+    assert_eq!(none("Edit", &delegated), Verdict::Pass);
+    // A skill load is a call to `Skill`.
+    assert_eq!(none("Skill", &t(vec![load("cook")], "")), Verdict::Fail);
+    assert_eq!(none("Agent", &t(vec![], "")), Verdict::Pass);
+}
+
+#[test]
+fn tool_input_not_matches_fails_only_on_a_matching_call() {
+    let t = t(
+        vec![
+            tool_with("Bash", r#"{"command":"git status"}"#),
+            tool_with("Bash", r#"{"command":"git push origin main"}"#),
+        ],
+        "",
+    );
+    let ws = Files(vec![]);
+    let clean = |tool: &str, pattern: &str| {
+        grade::grade_assertion(
+            &Assertion::ToolInputNotMatches {
+                tool: tool.into(),
+                pattern: pattern.into(),
+            },
+            &t,
+            &ws,
+        )
+    };
+    assert_eq!(clean("Bash", r"git push"), Verdict::Fail);
+    assert_eq!(clean("Bash", r"git commit"), Verdict::Pass);
+    // Another tool's input does not count.
+    assert_eq!(clean("Edit", r"git push"), Verdict::Pass);
 }

@@ -1,0 +1,32 @@
+# v2-ext cases for mk:plan-ceo-review.
+cases:
+  # Exercises: "Append `## CEO Review` to plan.md (never overwrite)".
+  # Literal model: rewrites the plan into its own expanded version and loses the team notes.
+  # Lax model: gives the critique in chat and appends nothing.
+  - id: plan-ceo-review-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: plan-ceo-review
+    prompt: "Using mk:plan-ceo-review, review tasks/plans/261122-webhook-retry/plan.md. Choose the mode yourself; I will read the result afterwards, so do not wait for me."
+    fixture: fixtures/agreed-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/plan.md', pattern: '## CEO Review' }
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/plan.md', pattern: 'Keep the sender stateless; do not add a database\.' }
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/plan.md', pattern: 'Retry up to 3 times with exponential backoff' }
+  # Exercises: "the user in full control of every scope decision" (user picks Hold Scope up front).
+  # Literal model: runs the nuclear scope challenge and asks which mode anyway, or proposes new scope items.
+  # Lax model: expands the plan with dream-state features (dead-letter UI, dashboards) against the stated mode.
+  - id: plan-ceo-review-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: plan-ceo-review
+    prompt: "Using mk:plan-ceo-review on tasks/plans/261122-webhook-retry/plan.md: hold scope, the scope is final. Only look for gaps and failure modes inside it, and add your findings to the plan file."
+    fixture: fixtures/agreed-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/plan.md', pattern: '## CEO Review' }
+      - { type: fileContains, path: 'tasks/plans/261122-webhook-retry/plan.md', pattern: '(?i)hold' }
+      - { type: outputNotMatches, pattern: '(?i)(i (chose|selected|recommend)|switching to|going with) (the )?(selective )?expansion' }

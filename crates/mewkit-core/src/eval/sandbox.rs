@@ -12,6 +12,8 @@ use std::path::{Path, PathBuf};
 
 use super::transcript::Runtime;
 
+pub use super::sandbox_git::{UNCOMMITTED_DIR, git_init, write_git_identity};
+
 /// Passed through from the parent when set: process basics.
 const BASE_VARS: [&str; 5] = ["PATH", "LANG", "LC_ALL", "TERM", "TMPDIR"];
 

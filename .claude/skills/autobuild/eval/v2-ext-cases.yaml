@@ -1,0 +1,34 @@
+# v2-ext cases for mk:autobuild.
+# Note: a full autobuild run (plan, contract, generate, evaluate) may not finish inside ~30 turns; g-1 only asks
+# for the audit trail, which the skill says is written even for failed or escalated runs.
+cases:
+  # Exercises: "Every run writes a report at tasks/autobuild-runs/YYMMDD-HHMM-{slug}/run.md".
+  # Literal model: runs every step and runs out of turns before writing the report.
+  # Lax model: just writes todo.js and never creates a run report.
+  - id: autobuild-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: autobuild
+    prompt: "Using mk:autobuild, build the todo tool described in SPEC.md from scratch. I will not be around, so run it to the end on your own."
+    fixture: fixtures/todo-spec
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/autobuild-runs/*/run.md' }
+      - { type: fileExists, path: 'todo.js' }
+  # Exercises: "Do not use it for a single feature, bug fix or refactor (`mk:cook`)".
+  # Literal model: starts a product-level plan, contract and evaluator subagent for a three-line flag.
+  # Lax model: n/a; it just edits the file.
+  - id: autobuild-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: autobuild
+    prompt: "Using mk:autobuild, add a `--version` flag to cli.js that prints 1.0.0 and exits."
+    fixture: fixtures/cli-one-line
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'cli.js', pattern: '--version' }
+      - { type: fileContains, path: 'cli.js', pattern: '1\.0\.0' }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'autobuild-runs' }
+      - { type: toolNotCalled, tool: Agent }

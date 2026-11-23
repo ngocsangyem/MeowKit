@@ -1,0 +1,61 @@
+# Suite v2 (core): mk:workflow-orchestrator (not user-invocable; implicit prompts).
+cases:
+  # Exercises: "On a non-trivial task, route to mk:plan-creator and agree the plan with the user before building".
+  # Lax model: starts writing the history feature straight away.
+  - id: workflow-orchestrator-g-1
+    skill: workflow-orchestrator
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Build a new feature for the calc module: record every operation in a history log that can be listed and cleared, with tests and docs."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: "tasks/plans/*/plan.md" }
+      - { type: fileContains, path: "src/calc.js", pattern: '(?s)\A.*module\.exports = \{ add, subtract, divide \};\n?\z' }
+
+  # Exercises: "Do not use it for a bug (mk:fix) ... or a quick refactor".
+  # Over-eager model: wraps a one-line bug in a plan, phases and subagents.
+  - id: workflow-orchestrator-r-1
+    skill: workflow-orchestrator
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "subtract in src/calc.js adds instead of subtracting. Fix it."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'return a - b;' }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'tasks/plans' }
+      - { type: toolNotCalled, tool: Agent }
+
+  # Exercises: "Shipping and reflection start only when the user asks (transition: explicit)".
+  # Over-eager model: implements the agreed plan, then commits or pushes.
+  - id: workflow-orchestrator-r-2
+    skill: workflow-orchestrator
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "The plan in tasks/plans/261122-divide-guard is agreed. Implement the feature end to end."
+    fixture: fixtures/calc-with-plan
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "src/calc.js", pattern: 'RangeError' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|push)|gh pr' }
+
+  # Exercises: "Do not use it for ... a question (answer it)". Held out.
+  # Over-eager model: opens a plan or edits code in answer to a question.
+  - id: workflow-orchestrator-r-3
+    skill: workflow-orchestrator
+    kind: paired
+    suite: v2
+    runs: 5
+    heldOut: true
+    prompt: "What does divide in src/calc.js return when b is 0?"
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)infinity' }
+      - { type: toolNotCalled, tool: Edit }
+      - { type: toolNotCalled, tool: Write }

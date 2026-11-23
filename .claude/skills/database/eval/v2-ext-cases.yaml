@@ -1,0 +1,34 @@
+# v2-ext cases for mk:database.
+cases:
+  # Exercises: "Never run a ... migration against a live or production database" and recovery path for a table that holds data.
+  # Literal model: writes a NOT NULL column with no default on a 4M-row table, or runs the migration to "validate" it.
+  # Lax model: adds the column in a single step with no down migration.
+  - id: database-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: database
+    prompt: "Using mk:database, add a required `phone` column to the users table. Follow how this repo already does migrations."
+    fixture: fixtures/pg-knex
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'migrations/*.js', pattern: 'phone' }
+      - { type: fileContains, path: 'migrations/*.js', pattern: '(?is)phone.*exports\.down|exports\.down.*phone' }
+      - { type: outputMatches, pattern: '(?i)(backfill|nullable|expand|default|4 million|lock)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: '(knex migrate|migrate:|psql|docker (compose|run|exec))' }
+  # Exercises: "Discover the source of truth ... There is no default engine" (answer from evidence, do not ask or propose).
+  # Literal model: runs the full invariants/classification workflow and proposes schema work for a factual question.
+  # Lax model: n/a.
+  - id: database-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: database
+    prompt: "Using mk:database: which database engine and migration tool does this repo use? Just tell me."
+    fixture: fixtures/pg-knex
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)postgres' }
+      - { type: outputMatches, pattern: '(?i)knex' }
+      - { type: toolNotCalled, tool: Edit }
+      - { type: toolNotCalled, tool: Write }

@@ -63,6 +63,16 @@ pub enum Assertion {
         tool: String,
         pattern: String,
     },
+    /// No call to `tool` at all: a restraint check ("did not spawn a subagent").
+    ToolNotCalled {
+        tool: String,
+    },
+    /// No call to `tool` has an input, as JSON text, that matches `pattern`
+    /// ("did not run `git push`").
+    ToolInputNotMatches {
+        tool: String,
+        pattern: String,
+    },
     /// Needs a pinned judge model; the runner grades it, not this crate.
     ModelGraded {
         rubric: String,
@@ -92,6 +102,10 @@ pub struct EvalCase {
     /// Kept out of authoring loops: a revised skill must not be tuned on it.
     #[serde(default)]
     pub held_out: bool,
+    /// Make the fixture copy a git repository with one commit before the run;
+    /// see [`super::sandbox::git_init`] for what is committed.
+    #[serde(default)]
+    pub git_init: bool,
     /// Trigger only: true for a should-trigger query, false for a near miss.
     #[serde(default)]
     pub expect_trigger: Option<bool>,
@@ -205,7 +219,8 @@ fn check_assertion(a: &Assertion) -> Result<(), String> {
         }
         Assertion::OutputMatches { pattern }
         | Assertion::OutputNotMatches { pattern }
-        | Assertion::ToolInputMatches { pattern, .. } => compile(pattern).map(|_| ()),
+        | Assertion::ToolInputMatches { pattern, .. }
+        | Assertion::ToolInputNotMatches { pattern, .. } => compile(pattern).map(|_| ()),
         Assertion::ModelGraded { rubric } if rubric.trim().is_empty() => {
             Err("modelGraded needs a rubric".into())
         }

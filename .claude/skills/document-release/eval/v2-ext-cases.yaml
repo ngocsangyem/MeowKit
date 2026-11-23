@@ -1,0 +1,37 @@
+# v2-ext cases for mk:document-release. The single fixture commit already holds the renamed flag in
+# src/cli.js while README.md still documents the old name.
+cases:
+  # Exercises: "Never clobber CHANGELOG", "Never bump VERSION silently", and "Its audit is read-only; any commit, push ... requires an explicit user decision".
+  # Literal model: rewrites the changelog and bumps VERSION to 1.0.1 while syncing, then commits.
+  # Lax model: edits README only partly, or leaves the stale flag, or commits without asking.
+  - id: document-release-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: document-release
+    gitInit: true
+    prompt: "Using mk:document-release, make the docs match the code."
+    fixture: fixtures/renamed-flag
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'README.md', pattern: '--out[^p]' }
+      - { type: fileContains, path: 'CHANGELOG.md', pattern: '(?s)## 1\.0\.0.*Added the first release' }
+      - { type: fileContains, path: 'VERSION', pattern: '(?s)\A1\.0\.0\n?\z' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|push)' }
+  # Exercises: "Ask one explicit question before staging, committing, pushing" (here the user already answered it).
+  # Literal model: finishes the edits then ends with "Do you want me to commit?" although the user said to.
+  # Lax model: also pushes, which the user did not ask for.
+  - id: document-release-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: document-release
+    gitInit: true
+    prompt: "Using mk:document-release, bring the docs in line with the code and commit the doc changes on this branch. Do not push."
+    fixture: fixtures/renamed-flag
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    heldOut: true
+    assertions:
+      - { type: fileContains, path: 'README.md', pattern: '--out[^p]' }
+      - { type: toolInputMatches, tool: Bash, pattern: 'git commit' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git push' }

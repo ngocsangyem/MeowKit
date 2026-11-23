@@ -29,6 +29,7 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - `mewkit plan sync <dir> [--check] [--json]` derives phase status, the Overview line, the plan.md table and `.plan-state.json` from the Todo List checkboxes. It never ticks a box or archives.
 - `mewkit skill status`, `skill overlay`, `skill fork` and `skill rollback`. See [Customising and Upgrading Skills](/guide/customising-skills).
 - `mewkit eval run` and `mewkit eval compare`. See [Cost and Telemetry](/cli/telemetry#eval).
+- Eval cases gain `toolNotCalled` and `toolInputNotMatches` assertions and a `gitInit` option that starts a run in a one-commit git repository. A `v2` suite (core lifecycle skills) and a `v2-ext` suite (the other rewritten skills) test both lost guidance and over-applied instructions.
 
 ### CLI
 

@@ -16,6 +16,7 @@ pub mod report;
 mod report_check;
 pub mod runner;
 pub mod sandbox;
+mod sandbox_git;
 pub mod transcript;
 
 pub use case::{Assertion, CaseError, CaseKind, EvalCase};
