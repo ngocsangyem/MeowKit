@@ -42,10 +42,6 @@ pub struct PackManifest {
     /// Skills the kit has withdrawn, by kit name. An install never lays one
     /// down, even when it is selected. Absent in older manifests.
     pub retired_skills: Vec<String>,
-    /// Opt-in packs that carry files to a kit-owned folder rather than
-    /// selecting skills, by name (`filePacks`). Kept out of `packs` so no
-    /// profile, `*` or older binary ever selects one. Absent in older manifests.
-    pub file_packs: Vec<String>,
 }
 
 impl PackManifest {
@@ -58,10 +54,6 @@ impl PackManifest {
 
     pub fn has_pack(&self, name: &str) -> bool {
         self.pack(name).is_some()
-    }
-
-    pub fn has_file_pack(&self, name: &str) -> bool {
-        self.file_packs.iter().any(|p| p == name)
     }
 
     pub fn profile(&self, name: &str) -> Option<&Vec<String>> {

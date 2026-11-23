@@ -21,7 +21,7 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 
 - Plan state follows the checkboxes. On Claude Code, Codex and Cursor the stop hook brings a changed plan up to date, `mewkit plan sync` does it on demand, and the ship check reminds you to archive a finished plan on every runtime.
 - Skills you customise survive upgrades. `mewkit skill overlay`, `fork` and `rollback` keep your version of a kit skill, and a separated edit to a Claude Code skill with eval cases merges with the kit's change.
-- The eval harness measures a skill. `mewkit eval run` and `mewkit eval compare` drive Claude Code or Codex over the kit's cases, which ship as an opt-in pack.
+- The eval harness measures a skill. `mewkit eval run` and `mewkit eval compare` drive Claude Code or Codex over the kit's cases in a checkout of the MeowKit repository.
 - Antigravity is a seventh target. Its guards are installed as unverified.
 
 ### New Commands
@@ -33,7 +33,6 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 ### CLI
 
 - `mewkit init --target antigravity` installs skills under `.agents/skills`, the instruction block in `AGENTS.md`, two on-demand rule files, the agents, and the privacy guard and ship check in `.agents/hooks.json`. `init` and `doctor` name the guards as unverified. `mewkit validate --target antigravity` checks the install.
-- `mewkit init --skill-packs eval` and `mewkit pack add eval` install the eval pack to `.meowkit/eval/`. No default install, profile or `all` includes it.
 - `mewkit doctor` adds a `skill listing: <runtime>` row per installed runtime, against that runtime's documented budget, and a `skill store` row. `rules: always-on` fails when an always-on rule file is missing or blank.
 - `mewkit validate` fails on dead skill file paths and links, unknown slash commands, drifted shared-family files, agents without the A1 status block, and hook registrations that point at a missing file. `--skill-rubric` scores each skill on six mechanical criteria and writes a report; it never fails.
 - `mewkit trace --friction --skill <name>` attributes a note to one skill.
@@ -74,6 +73,7 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 
 - The `mk:ship` reference `adversarial-review.md`, which nothing read. Adversarial review belongs to `mk:review`.
 - The trace events `build_verify_result` and `loop_warning` are no longer documented: nothing writes them.
+- The opt-in eval pack. Releases carry no eval cases or fixtures, `--skill-packs eval` and `mewkit pack add eval` are refused as unknown packs, and `mewkit eval run` reads cases only from a MeowKit checkout. `upgrade` and `uninstall` remove an installed `.meowkit/eval/`, keeping any file edited since install.
 
 ### Bug Fixes
 

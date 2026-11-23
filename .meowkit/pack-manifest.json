@@ -89,14 +89,6 @@
       ]
     }
   },
-  "filePacks": {
-    "eval": {
-      "description": "Eval cases and their fixtures, read by `mewkit eval`. Opt-in; installs to .meowkit/eval/, never into a skills folder.",
-      "from": ".claude/skills/",
-      "include": ".claude/skills/*/eval/*",
-      "exclude": ["*.pyc", "*/__pycache__/*", "*/.pytest_cache/*"]
-    }
-  },
   "profiles": {
     "core": ["base", "lifecycle-core", "memory", "utility"],
     "developer": ["core", "testing", "git", "docs"],

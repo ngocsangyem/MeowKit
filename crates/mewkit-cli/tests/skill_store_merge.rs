@@ -76,7 +76,7 @@ fn setup(cases: bool) -> Setup {
     if cases {
         write(
             &p,
-            ".meowkit/eval/fix/eval/trigger-cases.yaml",
+            ".claude/skills/fix/eval/trigger-cases.yaml",
             "cases: []\n",
         );
     }
