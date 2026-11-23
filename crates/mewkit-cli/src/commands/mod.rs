@@ -29,9 +29,9 @@ use std::collections::BTreeMap;
 
 use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
-use mewkit_adapters::eval_pack;
 use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::registry::emitted;
+use mewkit_adapters::retired_eval_pack;
 use mewkit_adapters::surface_table::table;
 use mewkit_adapters::{EmitRequest, Emitter, ScopeKind, emitter};
 use mewkit_core::exec::{ExecOptions, Merges, execute_merging};
@@ -164,9 +164,7 @@ fn prepare_for(
         }
         ScopeKind::Global => None,
     };
-    let mine = place.index(e.target()).ok().flatten();
-    let packs = &eval_pack::keep_installed(packs, mine.as_ref());
-    let disabled = crate::skill_selection::disabled(place, kit, &eval_pack::split(packs).0)?;
+    let disabled = crate::skill_selection::disabled(place, kit, packs)?;
     Ok(e.prepare(&EmitRequest {
         kit,
         scope: &place.scope,
@@ -227,7 +225,12 @@ pub fn run_jobs(
         }
     };
     for mut job in jobs {
-        let hashes = std::mem::take(&mut job.hashes);
+        let mut hashes = std::mem::take(&mut job.hashes);
+        // No kit plans the retired eval pack's files, so their own record
+        // corroborates removing them; a file edited since is still kept.
+        for (path, hash) in retired_eval_pack::recorded_hashes(&job.index) {
+            hashes.entry(path).or_insert(hash);
+        }
         let kept = skill_store::lifecycle::keep(store.as_mut(), &mut job.plan, &mut job.index);
         // Planned after `keep`, so a skill the store keeps is never merged;
         // `--force` replaces edited files, so nothing is merged under it.

@@ -94,7 +94,7 @@ Install the kit into this project, or your home with --global
 |---|---|
 | `--target` `<TARGETS>` | Runtimes to install for: claude-code, codex, cursor, grok, pi, omp, antigravity (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker |
 | `--profile` `<PROFILE>` | Claude Code: install a subset (core, developer, product, atlassian, security, research, or full). Re-running with a narrower profile removes what the narrower profile no longer includes, unless you edited it |
-| `--skill-packs` `<PACKS>` | Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only. `eval` (any runtime) also installs the eval cases to .meowkit/eval/ |
+| `--skill-packs` `<PACKS>` | Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only |
 | `--delivery` `<SHAPE>` | Claude Code only: `native` (the host's own directory) or `plugin` (the same content plus a plugin manifest) |
 | `--mcp-profiles` `<NAMES>` | Cursor: MCP profile names, or `all`, to merge into .cursor/mcp.json. Without it no MCP config is written |
 | `--allow-cloud-mcp` | Cursor: second opt-in for applying an MCP profile to a project that has a git remote (Cursor Cloud Agents run no local MCP hooks) |
@@ -420,7 +420,7 @@ Run a case suite in disposable sandboxes and write a report
 | `--model` `<MODEL>` | Pinned model version, recorded in the report (required unless --dry-run) |
 | `--max-cost-usd` `<MAX_COST_USD>` | Stop before total spend across concurrent eval runs here passes this many USD (required unless --dry-run) |
 | `--max-runs` `<MAX_RUNS>` | Stop after this many runs (required unless --dry-run) |
-| `--case-root` `<CASE_ROOT>` | Folder holding `<skill>/eval/*.yaml` cases; defaults to the installed eval pack (`.meowkit/eval`), else this project's `.claude/skills` |
+| `--case-root` `<CASE_ROOT>` | Folder holding `<skill>/eval/*.yaml` cases; defaults to this project's `.claude/skills` (cases live only in a kit checkout) |
 | `--trust-cases` | Accept a --case-root outside this project's `.claude/skills` (its cases run model turns) |
 | `--case` `<CASES>` | Only these case ids (repeatable) |
 | `--kit-archive` `<KIT_ARCHIVE>` | Kit archive installed into every sandbox (required unless --dry-run); a release `meowkit-release.zip`, or one built from a checkout |

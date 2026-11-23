@@ -117,9 +117,7 @@ fn merge_skill(
     for (path, theirs, ours) in files {
         let refuse = |why: &str| (path.clone(), why.to_owned());
         if !(inputs.has_cases)(name) {
-            return Err(refuse(
-                "the skill has no eval cases (install the eval pack)",
-            ));
+            return Err(refuse("the skill has no eval cases"));
         }
         let base = (inputs.base)(path.as_str())
             .ok_or_else(|| refuse("the previous kit is not in the cache"))?;

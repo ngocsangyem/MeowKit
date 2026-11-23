@@ -191,45 +191,6 @@ function shipSetFiles(projectRoot, isExcluded) {
 	return files;
 }
 
-/**
- * Where a release carries the opt-in file packs: outside `.claude/` and every
- * overlay, so a binary that predates them, which installs `.claude/` whole and
- * reads overlays by name, never lays one down.
- */
-const FILE_PACKS_ROOT = "kit/packs";
-
-/**
- * The files of each opt-in file pack (`filePacks` in the pack manifest), as
- * `{ from, to }`: `from` is the repo-relative source, `to` the archive path
- * `kit/packs/<name>/<path under the pack's "from">`.
- *
- * The source stays where it is authored (the eval cases beside their skills)
- * and `base.exclude` keeps it out of `.claude/` in the archive; this is the only
- * route by which it ships. Only git-tracked files are carried, for the same
- * reason as the ship set. `base.exclude` is not applied: a pack's fixtures are
- * small projects whose `*.test.*` files are part of the case.
- */
-function filePackFiles(projectRoot) {
-	const manifest = JSON.parse(fs.readFileSync(path.join(projectRoot, PACK_MANIFEST_REL), "utf8"));
-	const packs = (manifest && manifest.filePacks) || {};
-	const tracked = trackedFiles(projectRoot);
-	const out = [];
-	for (const [name, pack] of Object.entries(packs)) {
-		if (!/^[a-z][a-z0-9-]*$/.test(name)) throw new Error(`filePacks: bad pack name ${JSON.stringify(name)}`);
-		const from = String(pack.from || "");
-		if (!from.endsWith("/") || from.startsWith("/") || from.split("/").includes("..")) {
-			throw new Error(`filePacks.${name}.from must be a repo-relative folder ending in "/"`);
-		}
-		const included = excludeMatcher([String(pack.include || "")]);
-		const excluded = excludeMatcher((pack.exclude || []).map(String));
-		for (const rel of [...tracked].sort()) {
-			if (!rel.startsWith(from) || !included(rel) || excluded(rel)) continue;
-			out.push({ from: rel, to: `${FILE_PACKS_ROOT}/${name}/${rel.slice(from.length)}` });
-		}
-	}
-	return out;
-}
-
 /** Patterns rendered as the `-x <pattern>` argument pairs the zip build passes. */
 function zipExcludeArgs(patterns) {
 	return patterns.flatMap((pattern) => ["-x", pattern]);
@@ -241,9 +202,7 @@ module.exports = {
 	CURSOR_OVERLAY,
 	CRITICAL_TARGETS,
 	KIT_MEOWKIT_FILES,
-	FILE_PACKS_ROOT,
 	excludeMatcher,
-	filePackFiles,
 	shipSetExclusions,
 	shipSetFiles,
 	zipExcludeArgs,
