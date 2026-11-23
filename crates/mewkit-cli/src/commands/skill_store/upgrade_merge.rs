@@ -15,10 +15,6 @@ use mewkit_core::skill_store::guarded_merge::{self, Inputs, Planned};
 
 use crate::place::Place;
 
-/// Where the opt-in eval pack puts each skill's cases (`<dir>/<skill>/eval/`),
-/// root-relative. Matches the folder `mewkit pack add eval` installs.
-pub const EVAL_PACK_DIR: &str = ".meowkit/eval";
-
 /// The previous kit's bytes for every skill file it wrote, from its plan.
 pub fn base_bytes(old: &Plan) -> BTreeMap<String, Vec<u8>> {
     old.ops
@@ -53,18 +49,14 @@ pub fn plan(
     })
 }
 
-/// Whether the skill `name` has eval cases here: an `eval/` folder for it in
-/// the installed eval pack, or beside the skill in a kit checkout.
+/// Whether the skill `name` has eval cases here: an `eval/` folder beside the
+/// skill, where a kit checkout keeps them. No install carries the kit's cases.
 pub fn has_eval_cases(root: &Path, name: &str) -> bool {
     if name.is_empty() || name.contains(['/', '\\']) || name.starts_with('.') {
         return false;
     }
-    [
-        root.join(EVAL_PACK_DIR).join(name).join("eval"),
-        root.join(".claude/skills").join(name).join("eval"),
-    ]
-    .iter()
-    .any(|dir| std::fs::symlink_metadata(dir).is_ok_and(|m| m.is_dir()))
+    let dir = root.join(".claude/skills").join(name).join("eval");
+    std::fs::symlink_metadata(dir).is_ok_and(|m| m.is_dir())
 }
 
 /// Why the merged skill's eval did not run. A live run needs a model, a cost

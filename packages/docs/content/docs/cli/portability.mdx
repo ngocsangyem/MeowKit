@@ -105,6 +105,4 @@ mewkit pack add <pack>... [--yes] [--dry-run]
 mewkit pack remove <pack>...
 ```
 
-`eval` is a pack of its own kind: it carries the kit's eval cases to `.meowkit/eval/` instead of selecting skills, is never part of a profile, and is added or removed on its own (`mewkit pack add eval`). `pack list` shows it as `opt-in` until it is installed. See [the eval pack](/cli/project-setup#the-eval-pack).
-
 `--dry-run` prints the plan and writes and deletes nothing, and `--yes` skips the confirmation before deleting. `pack` takes the same kit-source flags as `init` (`--kit-version`, `--beta`, `--offline`, `--kit-archive`, `--kit-sha256`, `--allow-unverified-kit`).

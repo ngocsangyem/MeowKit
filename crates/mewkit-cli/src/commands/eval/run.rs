@@ -11,8 +11,6 @@ use mewkit_core::eval::{
 };
 use mewkit_core::time_utc::now_millis;
 
-use mewkit_adapters::eval_pack::INSTALL_DIR;
-
 use super::RunArgs;
 use super::arm::{self, Ctx};
 use super::case_source;
@@ -49,7 +47,7 @@ pub fn run(a: &RunArgs) -> Result<u8, Failure> {
     let cwd = std::env::current_dir()?;
     let project = cwd
         .ancestors()
-        .find(|d| d.join(".claude").is_dir() || d.join(INSTALL_DIR).is_dir())
+        .find(|d| d.join(".claude").is_dir())
         .map(Path::to_path_buf)
         .unwrap_or(cwd.clone());
     let case_root = case_source::resolve(&project, a.case_root.as_deref(), a.trust_cases)?;

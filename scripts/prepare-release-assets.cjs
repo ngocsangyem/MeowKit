@@ -9,13 +9,11 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const os = require("os");
 const { execSync, spawnSync } = require("child_process");
 const {
   ARCHIVE_TARGETS,
   CRITICAL_TARGETS,
   excludeMatcher,
-  filePackFiles,
   shipSetExclusions,
   shipSetFiles,
 } = require("./kit-ship-set.cjs");
@@ -91,26 +89,6 @@ try {
     throw new Error(`zip exited with status ${zipResult.status}`);
   }
 
-  // Opt-in file packs ship under kit/packs/ rather than where they are authored,
-  // so they are staged at their archive paths and appended from there.
-  const packFiles = filePackFiles(projectRoot);
-  if (packFiles.length > 0) {
-    const staging = fs.mkdtempSync(path.join(os.tmpdir(), "meowkit-packs-"));
-    try {
-      for (const { from, to } of packFiles) {
-        fs.mkdirSync(path.dirname(path.join(staging, to)), { recursive: true });
-        fs.copyFileSync(path.join(projectRoot, from), path.join(staging, to));
-      }
-      const packZip = spawnSync("zip", [archivePath, "-@"], {
-        cwd: staging,
-        input: `${packFiles.map((f) => f.to).join("\n")}\n`,
-        stdio: ["pipe", "inherit", "inherit"],
-      });
-      if (packZip.status !== 0) throw new Error(`zip (file packs) exited with status ${packZip.status}`);
-    } finally {
-      fs.rmSync(staging, { recursive: true, force: true });
-    }
-  }
   console.log(`Prepared ${archivePath}`);
 
   // `sha256sum -c` format, so a user can verify a download with standard tools.

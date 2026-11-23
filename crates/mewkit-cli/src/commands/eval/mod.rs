@@ -48,7 +48,7 @@ pub struct RunArgs {
     /// Stop after this many runs (required unless --dry-run).
     #[arg(long)]
     pub max_runs: Option<u32>,
-    /// Folder holding `<skill>/eval/*.yaml` cases; defaults to the installed eval pack (`.meowkit/eval`), else this project's `.claude/skills`.
+    /// Folder holding `<skill>/eval/*.yaml` cases; defaults to this project's `.claude/skills` (cases live only in a kit checkout).
     #[arg(long)]
     pub case_root: Option<PathBuf>,
     /// Accept a --case-root outside this project's `.claude/skills` (its cases run model turns).
