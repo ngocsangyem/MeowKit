@@ -128,3 +128,21 @@ fn id_must_be_lowercase_slug() {
             .contains("id")
     );
 }
+
+#[test]
+fn negative_tool_assertions_and_git_init_parse() {
+    let c = valid(
+        "id: q\nskill: cook\nkind: paired\nprompt: x\ngitInit: true\nassertions:\n  - { type: toolNotCalled, tool: Agent }\n  - { type: toolInputNotMatches, tool: Bash, pattern: 'git push' }\n",
+    );
+    assert!(c.git_init);
+    assert_eq!(c.assertions.len(), 2);
+    assert!(!valid(TRIGGER).git_init, "gitInit defaults to off");
+}
+
+#[test]
+fn bad_tool_input_not_matches_pattern_is_refused() {
+    let reason = invalid(
+        "id: q\nskill: cook\nkind: paired\nprompt: x\nassertions:\n  - { type: toolInputNotMatches, tool: Bash, pattern: '(' }\n",
+    );
+    assert!(reason.contains("does not compile"), "{reason}");
+}

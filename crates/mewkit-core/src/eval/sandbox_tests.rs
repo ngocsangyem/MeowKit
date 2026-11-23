@@ -149,3 +149,43 @@ fn dir_workspace_matches_star_segments_and_reads_contents() {
     assert!(read("tasks/plans/*/missing.md").is_empty());
     assert!(read("tasks/*").is_empty(), "folders are not files");
 }
+
+#[test]
+fn git_init_commits_the_fixture_and_leaves_pending_changes_uncommitted() {
+    use std::process::Command;
+    let root = tempfile::tempdir().expect("tmp");
+    let r = root.path();
+    fs::create_dir_all(r.join("src")).expect("mkdir");
+    fs::write(r.join("src/a.js"), "old\n").expect("write");
+    fs::create_dir_all(r.join(UNCOMMITTED_DIR).join("src")).expect("mkdir");
+    fs::write(r.join(UNCOMMITTED_DIR).join("src/a.js"), "new\n").expect("write");
+    fs::write(r.join(UNCOMMITTED_DIR).join("b.js"), "added\n").expect("write");
+
+    git_init(r).expect("git init");
+
+    let git = |args: &[&str]| {
+        let out = Command::new("git")
+            .args(args)
+            .current_dir(r)
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .output()
+            .expect("git");
+        String::from_utf8_lossy(&out.stdout).into_owned()
+    };
+    assert_eq!(git(&["rev-list", "--count", "HEAD"]).trim(), "1");
+    assert_eq!(git(&["show", "HEAD:src/a.js"]), "old\n");
+    let status = git(&["status", "--porcelain"]);
+    assert!(status.contains(" M src/a.js"), "{status}");
+    assert!(status.contains("?? b.js"), "{status}");
+    assert!(!r.join(UNCOMMITTED_DIR).exists());
+    assert!(!r.join(".git-eval-config").exists());
+    assert_eq!(git(&["branch", "--show-current"]).trim(), "main");
+}
+
+#[test]
+fn git_identity_is_written_into_the_run_home() {
+    let home = tempfile::tempdir().expect("tmp");
+    write_git_identity(home.path()).expect("write");
+    let text = fs::read_to_string(home.path().join(".gitconfig")).expect("read");
+    assert!(text.contains("email = eval@example.invalid"));
+}

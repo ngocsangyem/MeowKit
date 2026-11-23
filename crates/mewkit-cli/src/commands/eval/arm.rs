@@ -2,7 +2,8 @@
 //!
 //! The template is the case's fixture with the kit installed by this binary's
 //! own `init`; for the "off" arm, every installed copy of the skill under test
-//! is then deleted. Each run copies the template into a fresh folder, so runs
+//! is then deleted; a `gitInit` case then becomes a repository with one
+//! commit. Each run copies the template into a fresh folder, so runs
 //! never see each other's edits.
 
 use std::path::{Path, PathBuf};
@@ -10,7 +11,9 @@ use std::process::Command;
 use std::time::Duration;
 
 use mewkit_core::eval::runner::{self, MAX_ATTEMPTS, RunSpec, backoff};
-use mewkit_core::eval::sandbox::{DirWorkspace, child_env, copy_tree, remove_skill};
+use mewkit_core::eval::sandbox::{
+    DirWorkspace, child_env, copy_tree, git_init, remove_skill, write_git_identity,
+};
 use mewkit_core::eval::{
     Arm, LoadedCase, RunOutcome, RunResult, Runtime, Verdict, grade_run, normalize_skill, parse,
 };
@@ -77,6 +80,9 @@ pub fn prepare(
             ));
         }
     }
+    if lc.case.git_init {
+        git_init(&root).map_err(|e| format!("git init: {e}"))?;
+    }
     Ok(Template { _dir: dir, root })
 }
 
@@ -92,6 +98,9 @@ fn attempt(
     copy_tree(&t.root, &project).map_err(|e| e.to_string())?;
     let home = work.path().join("home");
     std::fs::create_dir_all(&home).map_err(|e| e.to_string())?;
+    if lc.case.git_init {
+        write_git_identity(&home).map_err(|e| e.to_string())?;
+    }
     let env = child_env(ctx.parent_env.iter().cloned(), ctx.runtime, &home);
     let (program, args) = runner::command_line(&RunSpec {
         runtime: ctx.runtime,
