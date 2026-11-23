@@ -1,36 +1,22 @@
 ---
 title: "Frontend Development"
-description: "Build frontend features with the TypeScript and UI/UX skills."
+description: "Build frontend features with the UI/UX skill."
 ---
 
-Two skills carry the frontend conventions, and each activates on the files or task it covers. For framework conventions (Vue, React, Angular and others), install the framework's own official agent skill: it tracks the framework's releases.
+`mk:frontend-design` carries the frontend design conventions and activates on design and styling tasks. For language and framework conventions (TypeScript, Vue, React, Angular and others), install the project's own official agent skill: it tracks the releases.
 
 **Best for:** UI features, component development, styling
 **Time estimate:** 15 to 60 minutes
-**Skills used:** [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)
+**Skills used:** [mk:frontend-design](/reference/skills/frontend-design)
 **Agents involved:** developer, tester, reviewer
 
-## Which skill activates
+## What activates it
 
 | Skill | Activates on | Covers |
 |---|---|---|
-| `mk:typescript` | `.ts`, `.tsx`, `.js`, `.jsx` files and type errors | Strict null handling, type guards, type-safety fixes |
 | `mk:frontend-design` | Design and styling tasks | Typography, color, layout, accessibility, the anti-slop checklist |
 
-The skills apply these as defaults. Where the repository already has a convention, that one wins.
-
-## TypeScript
-
-With `mk:typescript`:
-
-| Rule | Example |
-|---|---|
-| No `any` | Use `unknown` with type guards |
-| No type assertions | Narrow with a guard instead of `as` |
-| No implicit truthiness for null checks | `user !== null`, not `if (user)` |
-| Type-only imports | `import type { User } from './types'` |
-| Named exports over default | `export const X` |
-| Discriminated unions | `{ ok: true; data: T } \| { ok: false; error: string }` |
+The skill applies these as defaults. Where the repository already has a convention, that one wins.
 
 ## Design quality
 

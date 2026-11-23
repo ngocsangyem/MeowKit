@@ -175,7 +175,7 @@ fn packs_select_the_default_pack_and_its_dependencies() {
             &kit,
             &p.scope,
             &["development".into()],
-            &["mk-typescript".into()],
+            &["mk-chom".into()],
         ))
         .unwrap();
     let skills: BTreeSet<&str> = written(&plan)
@@ -187,7 +187,7 @@ fn packs_select_the_default_pack_and_its_dependencies() {
         .collect();
     assert!(skills.contains("mk-cook"), "core pack is always in");
     assert!(skills.contains("mk-database"), "named pack is in");
-    assert!(!skills.contains("mk-typescript"), "disabled skill is out");
+    assert!(!skills.contains("mk-chom"), "disabled skill is out");
     assert!(!skills.contains("mk-jira"), "other packs stay out");
     let all = Codex.prepare(&request(&kit, &p.scope, &[], &[])).unwrap();
     assert!(written(&all).count() > written(&plan).count());

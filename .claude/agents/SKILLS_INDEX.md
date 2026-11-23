@@ -81,11 +81,10 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 `mk:html-video`|developer|development|monolithic
 ```
 
-#### Language/Framework Skills (Phase 3)
+#### Frontend Skills (Phase 3)
 
 ```toon
-[3]{skill,owner,type,architecture}
-`mk:typescript`|developer|development|monolithic
+[2]{skill,owner,type,architecture}
 `mk:frontend-design`|developer|development|monolithic
 `mk:ui-design-system`|developer|development|monolithic
 ```
@@ -236,7 +235,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**122**
+**Total**|**121**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

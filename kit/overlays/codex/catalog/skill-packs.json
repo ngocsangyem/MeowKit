@@ -55,8 +55,7 @@
 				"mk-resolving-merge-conflicts",
 				"mk-skill-creator",
 				"mk-skill-template-secure",
-				"mk-sprint-contract",
-				"mk-typescript"
+				"mk-sprint-contract"
 			]
 		},
 		"review": {

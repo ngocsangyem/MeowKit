@@ -5124,21 +5124,6 @@
       "size": 4721
     },
     {
-      "path": ".claude/skills/typescript/SKILL.md",
-      "sha256": "8eefd647da62e1e5f93dabe6c84949cbc750a8fdc6974c481bc621cbee1a90f7",
-      "size": 6069
-    },
-    {
-      "path": ".claude/skills/typescript/references/review-checklist.md",
-      "sha256": "1432b28c7dca44715e3ff1104f13c04d4925bdcc6cb2f102028261e6d5d2e7ec",
-      "size": 3452
-    },
-    {
-      "path": ".claude/skills/typescript/references/strict-patterns.md",
-      "sha256": "fdbae46128a7b94dce436d419bd5720531993da7300d9231cd782a693dafcc18",
-      "size": 3132
-    },
-    {
       "path": ".claude/skills/ui-design-system/SKILL.md",
       "sha256": "5ad0222caffcea5f641484dd1d645acee0822c237cd34741c8b9af3a8eb0437f",
       "size": 3409
@@ -10452,21 +10437,6 @@
       "path": ".meowkit/cache/.claude/skills/trace-analyze/workflow.md",
       "sha256": "686b73deabeef672bcd9ec5832f38e2068ffefc5d1483c39077fd7cea81b06af",
       "size": 4721
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/typescript/SKILL.md",
-      "sha256": "8eefd647da62e1e5f93dabe6c84949cbc750a8fdc6974c481bc621cbee1a90f7",
-      "size": 6069
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/typescript/references/review-checklist.md",
-      "sha256": "1432b28c7dca44715e3ff1104f13c04d4925bdcc6cb2f102028261e6d5d2e7ec",
-      "size": 3452
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/typescript/references/strict-patterns.md",
-      "sha256": "fdbae46128a7b94dce436d419bd5720531993da7300d9231cd782a693dafcc18",
-      "size": 3132
     },
     {
       "path": ".meowkit/cache/.claude/skills/ui-design-system/SKILL.md",

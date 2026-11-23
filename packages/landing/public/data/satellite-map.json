@@ -6,11 +6,11 @@
     "date": "2026-11-23"
   },
   "stats": {
-    "skills": 122,
+    "skills": 121,
     "agents": 42,
     "commands": 0,
     "hooks": 28,
-    "edges": 675
+    "edges": 672
   },
   "planets": [
     {
@@ -502,19 +502,6 @@
           "criticality": "medium"
         },
         {
-          "id": "developer",
-          "label": "developer",
-          "kind": "agent",
-          "edge": "spawns",
-          "sharedWith": [
-            "fix"
-          ],
-          "detail": "Implementation agent that writes production code following approved plans.",
-          "sourceRef": ".claude/agents/developer.md",
-          "group": "lifecycle-core",
-          "criticality": "high"
-        },
-        {
           "id": "orchestrator",
           "label": "orchestrator",
           "kind": "agent",
@@ -535,6 +522,19 @@
           "detail": "Security audit: secrets, deps, OWASP.",
           "sourceRef": ".claude/skills/cso/SKILL.md",
           "group": "security-audit",
+          "criticality": "high"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "fix"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": ".claude/agents/developer.md",
+          "group": "lifecycle-core",
           "criticality": "high"
         },
         {
@@ -667,6 +667,16 @@
           "criticality": "high"
         },
         {
+          "id": "project-manager",
+          "label": "project-manager",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Cross-workflow delivery tracker.",
+          "sourceRef": ".claude/agents/project-manager.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
           "id": "developer",
           "label": "developer",
           "kind": "agent",
@@ -678,16 +688,6 @@
           "sourceRef": ".claude/agents/developer.md",
           "group": "lifecycle-core",
           "criticality": "high"
-        },
-        {
-          "id": "project-manager",
-          "label": "project-manager",
-          "kind": "agent",
-          "edge": "spawns",
-          "detail": "Cross-workflow delivery tracker.",
-          "sourceRef": ".claude/agents/project-manager.md",
-          "group": "lifecycle-core",
-          "criticality": "medium"
         },
         {
           "id": "docs-finder",
@@ -1207,9 +1207,9 @@
     }
   ],
   "belt": {
-    "count": 135,
+    "count": 134,
     "byKind": {
-      "skills": 71,
+      "skills": 70,
       "agents": 36,
       "commands": 0,
       "hooks": 28
@@ -1219,14 +1219,14 @@
       "jira-lifecycle",
       "jira-search",
       "agent-detector",
-      "frontend-design",
       "jira-fields",
       "jira-relationships",
       "sprint-contract",
       "story-sizer",
       "docs-init",
       "improve-codebase-architecture",
-      "jira-jsm"
+      "jira-jsm",
+      "preview"
     ]
   }
 }

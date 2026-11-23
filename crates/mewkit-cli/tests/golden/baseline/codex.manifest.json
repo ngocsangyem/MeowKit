@@ -4458,21 +4458,6 @@
       "size": 4139
     },
     {
-      "path": ".agents/skills/mk-typescript/SKILL.md",
-      "sha256": "9797086f5e58ddb118effe77c2bc962d1caef153f6ba06bd90171a5d33a01c15",
-      "size": 5735
-    },
-    {
-      "path": ".agents/skills/mk-typescript/references/review-checklist.md",
-      "sha256": "1432b28c7dca44715e3ff1104f13c04d4925bdcc6cb2f102028261e6d5d2e7ec",
-      "size": 3452
-    },
-    {
-      "path": ".agents/skills/mk-typescript/references/strict-patterns.md",
-      "sha256": "fdbae46128a7b94dce436d419bd5720531993da7300d9231cd782a693dafcc18",
-      "size": 3132
-    },
-    {
       "path": ".agents/skills/mk-ui-design-system/SKILL.md",
       "sha256": "f740261fa4c9b62206f7d87a9d781d50ffe22cd7e1a09031e1ef8d346e557615",
       "size": 3093
