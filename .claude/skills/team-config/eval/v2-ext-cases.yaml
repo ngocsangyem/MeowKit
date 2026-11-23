@@ -1,0 +1,36 @@
+# v2-ext cases for mk:team-config (user-invocable: false, so prompts are implicit). Worktree and agent
+# start-up are not graded: they depend on git state and on subagents the headless run may not have.
+cases:
+  # Exercises: "If two tasks share a file, restructure the split or handle the shared file in a sequential pre-step".
+  # Literal model: writes a queue with two tasks and starts both agents despite the shared file.
+  # Lax model: skips the queue and starts agents with prose briefs, or never notices the overlap.
+  - id: team-config-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: team-config
+    gitInit: true
+    prompt: "The plan in tasks/plans/261122-error-codes/plan.md is agreed. Set up the parallel work for its two tasks so two agents can start; just do the setup and the hand-off, do not implement the tasks yourself."
+    fixture: fixtures/overlap-plan
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: '.meowkit/state/task-queue.json' }
+      - { type: outputMatches, pattern: '(?i)(overlap|shared file|sequential|pre-step|before (both|the) agents)' }
+      - { type: toolInputNotMatches, tool: Edit, pattern: 'src/api/' }
+  # Exercises: "For small, single-file or sequential work, do not use it: one agent is cheaper and faster."
+  # Literal model: writes a one-task queue and a worktree for a one-line change.
+  # Lax model: n/a; it just edits.
+  - id: team-config-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: team-config
+    gitInit: true
+    prompt: "Make a() in src/util.js return 2 instead of 1, and use whatever parallel setup the project provides for this."
+    fixture: fixtures/single-file
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/util.js', pattern: 'return 2' }
+      - { type: toolNotCalled, tool: Agent }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'task-queue' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'worktree' }

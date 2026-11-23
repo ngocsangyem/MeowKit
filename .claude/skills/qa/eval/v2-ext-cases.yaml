@@ -1,0 +1,19 @@
+# v2-ext cases for mk:qa. The skill's loop is a real browser against a live URL (screenshots, console, clicks),
+# which a headless eval run cannot supply, so one case covers the step that runs before any browser work.
+cases:
+  # Exercises: "Clean working tree required. If dirty, ask the user to offer commit/stash/abort before proceeding."
+  # Literal model: stops correctly but runs `git stash` itself to get a clean tree.
+  # Lax model: starts browser testing and "fixes" bugs with atomic commits on top of the user's uncommitted edit.
+  - id: qa-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: qa
+    gitInit: true
+    prompt: "Using mk:qa, test the shop page in this repo and fix whatever is broken."
+    fixture: fixtures/dirty-tree
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(uncommitted|dirty|not clean|clean (working )?tree|stash|commit)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (stash|commit|checkout|reset|add)' }
+      - { type: fileContains, path: 'index.html', pattern: 'Buy now' }

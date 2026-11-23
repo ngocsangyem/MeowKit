@@ -1,0 +1,32 @@
+# v2-ext cases for mk:backend-development.
+cases:
+  # Exercises: "A webhook or consumer that is retried at least once will be delivered twice. Make the handler tolerate the repeat".
+  # Literal model: writes a retry queue or a database table for dedupe, naming infrastructure the repo lacks.
+  # Lax model: leaves the handler adding the amount on every delivery.
+  - id: backend-development-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: backend-development
+    prompt: "Using mk:backend-development, the provider sometimes sends the same invoice.paid event more than once. Make src/webhooks/invoice.js safe for that. Events carry an `id`."
+    fixture: fixtures/webhook-service
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/webhooks/invoice.js', pattern: '(?i)(event\.id|processed|seen|idempot|duplicate)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: '(npm (i|install)|redis|docker)' }
+  # Exercises: "A change with no contract delta must not open a contract discussion."
+  # Literal model: invokes mk:api-design-principles or writes a contract note for an internal rename.
+  # Lax model: n/a.
+  - id: backend-development-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: backend-development
+    prompt: "Using mk:backend-development, rename the internal helper fmt in src/money.js to formatCents and fix its caller."
+    fixture: fixtures/webhook-service
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/money.js', pattern: 'formatCents' }
+      - { type: fileContains, path: 'src/report.js', pattern: 'formatCents' }
+      - { type: toolInputNotMatches, tool: Skill, pattern: 'api-design|database|devops' }
+      - { type: toolNotCalled, tool: Agent }

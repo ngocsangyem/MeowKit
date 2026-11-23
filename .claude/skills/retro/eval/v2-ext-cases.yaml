@@ -1,0 +1,35 @@
+# v2-ext cases for mk:retro. gitInit gives one commit, so the retro window holds a single commit; that is
+# enough to test the artifact location and the memory-write restraint.
+cases:
+  # Exercises: "save snapshot to tasks/reports/retros/".
+  # Literal model: spends all turns on global/compare modes and per-person analysis, never saving the snapshot.
+  # Lax model: prints a narrative in chat and writes no file.
+  - id: retro-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: retro
+    gitInit: true
+    prompt: "Using mk:retro 7d, run the weekly engineering retrospective for this repo."
+    fixture: fixtures/week-repo
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/reports/retros/*' }
+      - { type: outputMatches, pattern: '(?i)(commit|ship|retro)' }
+  # Exercises: "append ONE entry ... only when the lesson is non-derivable from the code, the diff, or git log".
+  # Literal model: appends an entry to gotchas.md because the skill says it writes memory.
+  # Lax model: n/a.
+  - id: retro-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: retro
+    gitInit: true
+    prompt: "Using mk:retro 7d, summarise what we shipped this week."
+    fixture: fixtures/week-repo
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(commit|ship|shipped)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'mewkit note' }
+      - { type: toolInputNotMatches, tool: Edit, pattern: '\.meowkit/memory' }
+      - { type: toolInputNotMatches, tool: Write, pattern: '\.meowkit/memory' }

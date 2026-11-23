@@ -1,0 +1,33 @@
+# v2-ext cases for mk:agent-detector (user-invocable: false, so prompts are implicit).
+cases:
+  # Exercises: "Any of AUTH, AUTHZ, DATA_MODEL ... makes the tier COMPLEX" and the one-line report.
+  # Literal model: reads every rule file, then reports a tier but forgets the one-line `Agent | Tier | Flags` form.
+  # Lax model: does the edit with no routing line at all, or calls an auth change small because the diff is small.
+  - id: agent-detector-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: agent-detector
+    prompt: "In src/auth.js the password-reset tokens never expire. Make them stop working 15 minutes after they are issued, and keep the existing test passing."
+    fixture: fixtures/auth-reset
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/auth.js', pattern: '(?i)(15\s*\*\s*60|900000|15\s*min)' }
+      - { type: outputMatches, pattern: '(?i)Agent:\s*\S+.*Tier:\s*COMPLEX' }
+      - { type: outputMatches, pattern: '(?i)Flags:.*AUTH' }
+  # Exercises: "A short message with a domain keyword ... scores as heavy work even when the change is one line".
+  # Literal model: sees "auth" and "token", declares COMPLEX, spawns a planner/architect for a comment typo.
+  # Lax model: n/a (either arm may skip the line); the restraint is the tier and the delegation.
+  - id: agent-detector-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: agent-detector
+    prompt: "The comment at the top of src/auth.js says 'tken' instead of 'token'. Fix that one word."
+    fixture: fixtures/auth-typo
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    heldOut: true
+    assertions:
+      - { type: fileContains, path: 'src/auth.js', pattern: '(?i)Password reset token store' }
+      - { type: outputNotMatches, pattern: '(?i)Tier:\s*COMPLEX' }
+      - { type: toolNotCalled, tool: Agent }

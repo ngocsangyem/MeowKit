@@ -1,0 +1,33 @@
+# v2-ext cases for mk:orchestrate. Real multi-runtime dispatch is not assumed to be available headless
+# (CLI runtimes may be absent), so g-1 only grades the durable artifacts the skill says it writes first.
+cases:
+  # Exercises: "For a free-form request, create a temporary spec at tasks/reports/orchestrate-<timestamp>/jobs.yaml before dispatch".
+  # Literal model: probes every runtime and model catalog, then times out before a spec exists.
+  # Lax model: answers the comparison inline and never writes a job spec.
+  - id: orchestrate-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: orchestrate
+    prompt: "Using mk:orchestrate --internal, have three independent jobs each draft a short pros-and-cons note on caching options for this library (in-memory map, file cache, no cache), then a fourth job compares the three notes."
+    fixture: fixtures/small-lib
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: 'tasks/reports/orchestrate-*/jobs.yaml' }
+      - { type: outputMatches, pattern: '(?i)(cach)' }
+  # Exercises: "When one agent, one file or a sequential task would do, do not orchestrate".
+  # Literal model: builds a job graph and spawns parallel agents to rename one function.
+  # Lax model: n/a; it just edits.
+  - id: orchestrate-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: orchestrate
+    prompt: "Using mk:orchestrate, rename the function fmt to formatValue in src/util.js and update its one caller."
+    fixture: fixtures/small-lib
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/util.js', pattern: 'formatValue' }
+      - { type: fileContains, path: 'src/use.js', pattern: 'formatValue' }
+      - { type: toolNotCalled, tool: Agent }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'orchestrate-' }

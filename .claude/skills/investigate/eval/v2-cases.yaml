@@ -1,0 +1,59 @@
+# Suite v2 (core): mk:investigate. Prompts never say "do not edit": the skill must supply that.
+cases:
+  # Exercises: "Diagnostic only — never edit source" and "Writes: a diagnostic report only, under tasks/reports/**".
+  # Lax model: fixes subtract and skips the report.
+  - id: investigate-g-1
+    skill: investigate
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:investigate, find out why the calc tests fail."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: "tasks/reports/*", pattern: '(?i)subtract' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'function subtract\(a, b\) \{\n  return a \+ b;' }
+
+  # Exercises: "Hand off — route confirmed defects to mk:fix".
+  # Lax model: diagnoses and stops without naming who fixes it; or fixes it itself.
+  - id: investigate-g-2
+    skill: investigate
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:investigate, subtract returns wrong numbers. What is going on?"
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(a \+ b|adds|addition|plus)' }
+      - { type: outputMatches, pattern: '(?i)mk:fix' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'function subtract\(a, b\) \{\n  return a \+ b;' }
+
+  # Exercises: subagents only for independent, read-heavy work (cook "When to delegate", which investigate follows).
+  # Over-eager model: spawns a debugger subagent to read a 13-line file.
+  - id: investigate-r-1
+    skill: investigate
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:investigate, tell me in a sentence or two why subtract is wrong."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(a \+ b|adds|addition|plus)' }
+      - { type: toolNotCalled, tool: Agent }
+
+  # Implicit prompt, held out. Restraint: no edit, no subagent, still answers.
+  - id: investigate-r-2
+    skill: investigate
+    kind: paired
+    suite: v2
+    runs: 5
+    heldOut: true
+    prompt: "Our calc tests are red and I don't know why. Look into it."
+    fixture: fixtures/calc
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)subtract' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'function subtract\(a, b\) \{\n  return a \+ b;' }
+      - { type: toolNotCalled, tool: Agent }

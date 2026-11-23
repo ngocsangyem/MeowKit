@@ -1,0 +1,33 @@
+# v2-ext cases for mk:task-queue.
+cases:
+  # Exercises: the JSON entry format: "id, description, owner, status, ownership, worktree, blocked_by".
+  # Literal model: also spawns the two agents and starts the work, not just the queue.
+  # Lax model: invents its own format (tasks.md, a different JSON shape) or lists ownership in prose.
+  - id: task-queue-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: task-queue
+    prompt: "Using mk:task-queue, I will hand the API work under src/api and the UI work under src/ui to two separate agents next. Record who owns which files for them, and make the UI task wait for the API task."
+    fixture: fixtures/two-areas
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: '.meowkit/state/task-queue.json', pattern: '"ownership"' }
+      - { type: fileContains, path: '.meowkit/state/task-queue.json', pattern: 'src/api' }
+      - { type: fileContains, path: '.meowkit/state/task-queue.json', pattern: '"blocked_by"\s*:\s*\[\s*1\s*\]' }
+      - { type: fileContains, path: '.meowkit/state/task-queue.json', pattern: '"status"\s*:\s*"pending"' }
+  # Exercises: "For one agent or sequential work you do not need it."
+  # Literal model: creates a queue file with one task, then claims it for itself.
+  # Lax model: n/a; it just edits.
+  - id: task-queue-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: task-queue
+    prompt: "Using mk:task-queue, track this job and then do it: rename the function foo to double in src/helper.js."
+    fixture: fixtures/one-file
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileContains, path: 'src/helper.js', pattern: 'function double' }
+      - { type: toolInputNotMatches, tool: Write, pattern: 'task-queue' }
+      - { type: toolNotCalled, tool: Agent }

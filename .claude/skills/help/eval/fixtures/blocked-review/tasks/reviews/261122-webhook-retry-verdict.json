@@ -1,0 +1,14 @@
+{
+  "decision": "BLOCKED",
+  "dimensions": [
+    {
+      "name": "correctness",
+      "verdict": "PASS"
+    },
+    {
+      "name": "error-handling",
+      "verdict": "FAIL",
+      "note": "retry loop swallows the final error"
+    }
+  ]
+}

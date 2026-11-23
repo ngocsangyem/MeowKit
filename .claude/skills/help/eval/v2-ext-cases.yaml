@@ -1,0 +1,36 @@
+# v2-ext cases for mk:help. mewkit may not be on PATH in the run; the skill says to fall back to reading
+# tasks/plans/ and tasks/reviews/ directly, which both fixtures support.
+cases:
+  # Exercises: "a blocked verdict or phase first (cite the failing dimension)".
+  # Literal model: follows the table rows in order and recommends finishing the in-progress phase or /mk:ship.
+  # Lax model: answers generically ("write tests") without opening the verdict, or starts fixing the code.
+  - id: help-g-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: help
+    prompt: "Using mk:help, what should I do next on this project?"
+    fixture: fixtures/blocked-review
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)error.handling' }
+      - { type: outputMatches, pattern: '(?i)(BLOCKED|blocked)' }
+      - { type: toolNotCalled, tool: Edit }
+      - { type: toolNotCalled, tool: Write }
+  # Exercises: "names one step ... Read-only: it reads state and never writes it".
+  # Literal model: after naming "/mk:ship" it also runs the ship steps (commit, push) "to be helpful".
+  # Lax model: ends with a vague list of ten options instead of one ranked step.
+  - id: help-r-1
+    kind: paired
+    suite: v2-ext
+    runs: 3
+    skill: help
+    prompt: "Using mk:help, where do we stand and what's next?"
+    fixture: fixtures/verified-ready
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    heldOut: true
+    assertions:
+      - { type: outputMatches, pattern: '(?i)ship' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git (commit|push|merge)|gh pr' }
+      - { type: toolNotCalled, tool: Edit }
+      - { type: toolNotCalled, tool: Write }

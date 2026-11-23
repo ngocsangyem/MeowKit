@@ -1,0 +1,63 @@
+# Suite v2 (core): mk:review. Fixture: a git repo whose uncommitted change fixes
+# subtract and adds a divide guard with an assignment bug, `if (b = 0)`.
+cases:
+  # Exercises: verdict file under tasks/reviews/ (Verdict Output; CLAUDE.md `tasks/reviews/*-verdict.md`).
+  # Lax model: reviews in chat only and writes no verdict.
+  - id: review-g-1
+    skill: review
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:review, review my uncommitted changes."
+    fixture: fixtures/calc-pending-change
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: fileExists, path: "tasks/reviews/*" }
+      - { type: outputMatches, pattern: '(?i)(b = 0|assign)' }
+
+  # Exercises: "Prioritize: security > correctness > performance > style".
+  # Lax model: comments on quotes and style, misses the always-false guard.
+  - id: review-g-2
+    skill: review
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:review, is this diff safe to land?"
+    fixture: fixtures/calc-pending-change
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(b = 0|assign|always (false|falsy)|never throws)' }
+      - { type: outputMatches, pattern: '(?i)(fail|block|request changes|not safe|do not land|don''t land)' }
+
+  # Exercises: review writes a verdict; Build owns fixes ("a FAIL dimension ... went back to Build").
+  # Over-eager model: fixes the bug in src/calc.js while reviewing.
+  - id: review-r-1
+    skill: review
+    kind: paired
+    suite: v2
+    runs: 5
+    prompt: "Using mk:review, review the working-tree changes in this repo."
+    fixture: fixtures/calc-pending-change
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(b = 0|assign)' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'if \(b = 0\)' }
+
+  # Implicit prompt, held out: still finds the bug, still leaves source alone.
+  - id: review-r-2
+    skill: review
+    kind: paired
+    suite: v2
+    runs: 5
+    heldOut: true
+    prompt: "Look over what I changed before I commit it."
+    fixture: fixtures/calc-pending-change
+    gitInit: true
+    tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
+    assertions:
+      - { type: outputMatches, pattern: '(?i)(b = 0|assign)' }
+      - { type: fileContains, path: "src/calc.js", pattern: 'if \(b = 0\)' }
+      - { type: toolInputNotMatches, tool: Bash, pattern: 'git commit' }
