@@ -1444,7 +1444,7 @@
       "title": "mk:fix",
       "description": "Root-cause fixes for bugs, lint, CI. NOT for mk:investigate.",
       "sourcePath": "skills/fix/SKILL.md",
-      "sourceHash": "0411318c52572966dc056d3b8cc6042ae0926d59cfa9e7a32448d453c3f87ac7",
+      "sourceHash": "994c2e20740f717c2d8f46aef06e29fb425d5c6c7f2b00c04740bacc7207767d",
       "aliases": [],
       "owner": "lifecycle",
       "phase": null,
