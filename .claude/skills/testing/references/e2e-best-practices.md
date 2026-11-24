@@ -87,7 +87,7 @@ Use POM for: login, navigation, form submission, and any flow used in 3+ tests.
 
 | Metric | Target | Alert Threshold |
 |---|---|---|
-| Critical journey coverage | 100% | Any gap blocks ship |
-| Overall E2E pass rate | >95% | <90% blocks ship |
+| Critical journey coverage | 100% | Any gap needs a decision before shipping |
+| Overall E2E pass rate | >95% | <90% needs triage before shipping |
 | Flaky test rate | <5% of suite | >10% requires triage sprint |
 | CI suite duration | <10 minutes | >15 min requires parallelization |

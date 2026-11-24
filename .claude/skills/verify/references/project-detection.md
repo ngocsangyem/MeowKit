@@ -82,6 +82,18 @@ Check marker files in this priority order. Stop at the first match.
 If multiple markers exist (e.g., a Python project with a `package.json` for frontend tooling),
 use the marker that matches the PRIMARY language of the codebase. When ambiguous, ask the user.
 
+## Commands per language
+
+| Marker File      | Language | Build                    | Lint                       | Type-check                            | Test                | Coverage                            |
+| ---------------- | -------- | ------------------------ | -------------------------- | ------------------------------------- | ------------------- | ----------------------------------- |
+| `package.json`   | JS/TS    | `npm run build`          | `npm run lint`             | `npm run typecheck` or `tsc --noEmit` | `npm test`          | `.nycrc` or `jest.config` threshold |
+| `pyproject.toml` | Python   | `python -m build`        | `ruff check .` or `flake8` | `mypy .`                              | `pytest`            | `pyproject.toml` coverage threshold |
+| `go.mod`         | Go       | `go build ./...`         | `golangci-lint run`        | (built-in to build)                   | `go test ./...`     | coverage report                     |
+| `Gemfile`        | Ruby     | `bundle exec rake build` | `rubocop`                  | (N/A)                                 | `bundle exec rspec` | `.simplecov`                        |
+| `Cargo.toml`     | Rust     | `cargo build`            | `cargo clippy`             | (built-in to build)                   | `cargo test`        | `cargo tarpaulin`                   |
+
+With no marker file, ask the user for the build and test commands.
+
 ---
 
 ## JS/TS Sub-Type Detection

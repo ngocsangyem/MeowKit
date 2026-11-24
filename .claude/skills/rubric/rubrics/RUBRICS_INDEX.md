@@ -28,7 +28,7 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft (CLI has no visual surface; craft folded into ux-usability) | CLI binaries, npm CLIs, shell utilities |
 | `fullstack-product` | All 7 rubrics, ux-usability weighted 3x higher | — | End-to-end product builds (UI + backend + persistence) |
 
-> **Pruning rationale (260408):** `frontend-app` was pruned from 7→4 rubrics per the necessity audit (`tasks/reports/red-team-260408-1117-rubric-necessity-audit.md`). The 3 excluded rubrics overlap existing toolkit layers (review 5-dim verdict, security-rules, qa health-score). Each retained rubric closes a verified gap the rest of the ecosystem doesn't catch.
+> `frontend-app` loads four rubrics. The three excluded ones overlap `mk:review`, the security rules and the `mk:qa` health score; each retained rubric covers something those layers do not.
 
 ## Schema
 
@@ -41,9 +41,11 @@ All rubrics conform to `schema.md`. Validator: `scripts/validate-rubric.sh`.
 3. Optionally register in a composition preset (re-validate weight sum after)
 4. Add a row to this index
 
-See `meowkit/references/calibration-guide.md` for anchor-example rules.
+See `references/calibration-guide.md` for anchor-example rules.
 
 ## Hard-Fail Semantics
+
+The scoring model and the hard-fail rule are owned by `.claude/skills/evaluate/step-04-grade-and-verdict.md`; this section only defines the threshold values.
 
 `hard_fail_threshold` defines which verdict level triggers an overall sprint FAIL:
 
@@ -82,7 +84,5 @@ Rubrics use SemVer in their frontmatter. Bump `version`:
 
 ## References
 
-- Phase 2 plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-02-graded-evaluation-rubric-library.md`
-- Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `mk:evaluate` skill at `.claude/skills/evaluate/`
-- Registers `rubrics/` in `meowkit-rules.md` canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
-- Calibration: `meowkit/references/calibration-guide.md`
+- The `evaluator` agent at `.claude/agents/evaluator.md` and the `mk:evaluate` skill at `.claude/skills/evaluate/` consume this library.
+- Calibration: `references/calibration-guide.md`

@@ -4,38 +4,26 @@ Technical details of how `mk:freeze` enforces directory boundaries.
 
 ## Path Resolution
 
-When the user provides a directory path, it is resolved to an absolute path before storing:
-
-```bash
-FREEZE_DIR=$(cd "<user-provided-path>" 2>/dev/null && pwd)
-FREEZE_DIR="${FREEZE_DIR%/}/"   # Ensure trailing slash
-```
-
-The trailing `/` is critical: it prevents `/src` from matching `/src-old` or `/src-backup`.
-Without the trailing slash, a prefix check would produce false matches on sibling directories.
+`scripts/set-freeze.cjs` resolves the user's path to an absolute, symlink-free directory and requires that it exists. The saved value ends in `/`, so `/src` cannot match `/src-old` or `/src-backup`. A path that does not resolve to an existing directory is an error and leaves the saved boundary alone; the filesystem root is refused.
 
 ## State File
 
-The resolved freeze path is persisted to a state file:
+The resolved path is persisted to:
 
 ```
 ${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt
 ```
 
-The hook script reads this file on every Edit and Write invocation. The state persists for
-the entire session — the user does not need to re-specify the path on each invocation.
+The hook reads it on every Edit and Write call. The file stays until it is cleared (`scripts/set-freeze.cjs --clear`) or overwritten by a new `/mk:freeze`; it does not expire with the session.
 
 ## Hook Enforcement
 
-The `check-freeze.cjs` script runs as a pre-write guard on both edit and write operations,
-invoked by this project's configured hooks when present.
+`check-freeze.cjs` is registered by this skill as a `PreToolUse` hook on Edit and Write, and runs on each call:
 
-On each invocation:
-1. Read `file_path` from the tool input JSON
-2. Read the freeze boundary from `freeze-dir.txt`
-3. Check if `file_path` starts with the freeze directory string
-4. If yes → allow (`permissionDecision: "allow"`)
-5. If no → deny (`permissionDecision: "deny"`) with a message stating the boundary
+1. Read `file_path` from the tool input.
+2. Read the boundary from `freeze-dir.txt`; with no boundary, or no file path, allow.
+3. If the path is the boundary or inside it, allow (the hook prints `{}`).
+4. Otherwise deny, with a message naming the boundary.
 
 ## Symlink Handling
 
@@ -60,7 +48,8 @@ edits, but deliberate bash commands can still touch any file.
 
 ## Deactivation
 
-Freeze is session-scoped. It deactivates when:
-- The conversation ends or a new session starts
-- A new freeze is set with a different path (overwrites state file)
-- The user manually deletes the state file at `${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`
+The boundary is removed when:
+- `scripts/set-freeze.cjs --clear` runs, or the state file is deleted by hand
+- a new `/mk:freeze` sets a different path (it overwrites the state file)
+
+A new session does not clear it.

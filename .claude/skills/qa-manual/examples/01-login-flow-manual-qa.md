@@ -21,21 +21,17 @@ Spec extract from plan:
 ```
 Step 1: mk:playwright-cli goto https://app.example.com/login
 Step 2: mk:playwright-cli snapshot → finds @e1 [textbox "Email"]
-Step 3: ⚠️ Authentication required at: https://app.example.com/login
+Step 3: Authentication required at: https://app.example.com/login
 
-  mk:qa-manual needs credentials to continue.
-  Please provide:
-  - Email: ___________
-  - Password: ___________
-  Type 'skip' to skip this flow or 'abort' to stop testing.
+  Please sign in yourself in the browser window, or give me a saved auth state file.
+  Reply 'done' when signed in, 'skip' to skip this flow, or 'abort' to stop testing.
 
-User enters: user@example.com / ••••••••
+User signs in in the browser and replies: done
 
-Step 4: mk:playwright-cli fill e1 "user@example.com"
-Step 5: mk:playwright-cli fill e2 [password]
-Step 6: mk:playwright-cli click e3 (Sign In button)
-Step 7: mk:playwright-cli snapshot → verify dashboard content
-Step 8: mk:agent-browser screenshot /tmp/dashboard-after-login.png
+Step 4: mk:playwright-cli snapshot → confirm the session is signed in
+Step 5: mk:playwright-cli click e3 (Dashboard link)
+Step 6: mk:playwright-cli snapshot → verify dashboard content
+Step 7: mk:agent-browser screenshot /tmp/dashboard-after-login.png
 ```
 
 ## Output

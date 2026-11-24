@@ -94,7 +94,5 @@ gh run view <run-id> --log > /tmp/ci-logs.txt
 ## Integration with Code-Level Debugging
 
 When investigation narrows to specific code:
-- Switch to `systematic-debugging.md` for the code-level fix
-- Use `root-cause-tracing.md` if error is deep in call stack
-- Apply `defense-in-depth.md` after fixing
-- Always finish with `verification.md`
+- Use `root-cause-tracing.md` if the error is deep in the call stack.
+- Hand the confirmed cause to `mk:fix`; its `.claude/skills/fix/references/prevention-gate.md` covers defense in depth and verification.

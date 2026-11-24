@@ -34,7 +34,7 @@ Per `calibration-guide.md`:
 
 **WHY:** Balanced examples force discrimination and reduce positive bias.
 
-## Rule 5: Position Bias — Alternate Anchor Order
+## Rule 5: Position Bias — Randomize Anchor Order
 
 When adding anchor examples to a rubric, alternate PASS/FAIL by example number (Example 1 — PASS, Example 2 — FAIL, Example 3 — PASS, Example 4 — FAIL).
 
@@ -42,7 +42,7 @@ When adding anchor examples to a rubric, alternate PASS/FAIL by example number (
 
 ## Rule 6: Drift Check on Model Upgrade
 
-When a new model tier ships, the rubric calibration set (`rubrics/calibration-set/`) MUST be replayed with the new model. Re-evaluator agreement with stored gold-standard verdicts must stay within 5% per rubric. If drift exceeds 5%, re-calibrate the anchors or downgrade the rubric's `hard_fail_threshold`.
+When a new model tier ships, replay the calibration set (`rubrics/calibration-set/`) by hand with the new model. If the re-evaluation disagrees with the stored gold-standard verdict on more than one anchor, re-calibrate the anchors or relax the rubric's `hard_fail_threshold`. This rule is the owner of the drift test; `references/calibration-guide.md` has the procedure.
 
 **WHY:** Drift checks catch model-upgrade grading changes before production verdicts.
 

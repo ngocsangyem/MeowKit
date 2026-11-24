@@ -172,4 +172,14 @@ injected into model context.
 ## After Verdict
 
 - **PASS/WARN:** Present the verdict to the user, each WARN named, and say the change is ready to ship
-- **FAIL:** List the required fixes, say the change is not ready, and route back to the developer agent
+- **FAIL:** List the required fixes, say the change is not ready, and route back to the developer agent (or `mk:fix`). The review reports; it edits only with `--fix`
+
+## Status block
+
+When the review returns to a controller, end with:
+
+```
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+**Summary:** [verdict and the main driver, 1-2 sentences]
+**Concerns/Blockers:** [coverage gaps, an attested evidence cap, anything not reviewed]
+```
