@@ -9,7 +9,7 @@ Before producing findings, run every candidate through this filter.
 - 8: Clear vulnerability pattern with known exploitation methods. Minimum bar.
 - Below 8: Do not report.
 
-**Comprehensive mode (`/cso --comprehensive`):** 2/10 confidence threshold. Filter true noise only (test fixtures, documentation, placeholders) but include anything that MIGHT be a real issue. Flag these as `TENTATIVE` to distinguish from confirmed findings.
+**Comprehensive mode (`/mk:cso --comprehensive`):** 2/10 confidence threshold. Filter true noise only (test fixtures, documentation, placeholders) but include anything that MIGHT be a real issue. Flag these as `TENTATIVE` to distinguish from confirmed findings.
 
 **Hard exclusions — automatically discard findings matching these:**
 
@@ -76,7 +76,7 @@ When a finding is VERIFIED, search the entire codebase for the same vulnerabilit
 
 **Parallel Finding Verification:**
 
-For each candidate finding, launch an independent verification sub-task using the Agent tool. The verifier has fresh context and cannot see the initial scan's reasoning — only the finding itself and the FP filtering rules.
+For each surviving candidate finding, launch an independent verification sub-task using the Agent tool: one verifier per finding, at most about 8 in parallel. With more candidates than that, with `--diff` on a small change, or when the host cannot delegate, self-verify instead. The verifier has fresh context and cannot see the initial scan's reasoning — only the finding itself and the FP filtering rules.
 
 Prompt each verifier with:
 - The file path and line number ONLY (avoid anchoring)

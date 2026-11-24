@@ -55,8 +55,8 @@ Inject this block into every researcher prompt:
 - **Primary sources.** Follow every claim back to the source that owns it — cite the owner, not a summary of it.
 - Require **≥2 independent sources** for any load-bearing claim; attach a confidence level (high / medium / low) to each finding.
 - Prefer material from the last 12 months; mark anything older as potentially stale.
-- **Retrieval chain:** `mk:docs-finder` for library / framework / API docs → `mk:web-to-markdown --wtm-accept-risk --caller mk:research` for arbitrary pages → `WebSearch` as last resort. Never fetch a URL directly; do NOT call WebFetch even if the subagent has it granted — delegate every fetch through the chain.
-- **Budget:** max 5 retrieval calls per researcher. Hard cap. Raise only when the user explicitly asks for more depth.
+- **Retrieval chain:** `mk:docs-finder` for library / framework / API docs → `mk:web-to-markdown --wtm-accept-risk` for arbitrary pages → `WebSearch` as last resort. Never fetch a URL directly; do NOT call WebFetch even if the subagent has it granted — delegate every fetch through the chain.
+- **Budget:** max 5 retrieval calls per researcher; raise it only when the user asks for more depth, because past that point extra fetches rarely change the answer. If the host cannot delegate, run the same chain inline in this session and say so.
 
 ## Output Format
 
@@ -109,8 +109,6 @@ When `--html` is passed:
 
 ## Gotchas
 
-- The 5-call cap is the cost guardrail — do not silently raise it.
 - Active plan present → save into its `research/` dir; don't fork a parallel report location.
 - A missed "NOT for" usually means `mk:docs-finder` should have fired — one library question is not research.
-- Planning flow already researching this session → defer to its budget; double-spawning researchers doubles cost for the same question.
 - HTML drift — `--html` is opt-in and derived from the markdown report. Never hand-edit the HTML; re-run with `--html` so it stays in sync with the markdown source of truth.

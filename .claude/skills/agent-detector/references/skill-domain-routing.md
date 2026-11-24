@@ -24,7 +24,8 @@ The orchestrator routes by skill names:
 | Mermaid v11 markdown diagram block (inline in docs or README) | `mk:mermaidjs-v11` |
 | Diagram inside an HTML page or interactive presentation | `mk:preview --html --diagram` |
 | Media or document analysis/generation | `mk:multimodal` |
-| Security audit | `mk:cso` or `mk:vulnerability-scanner` |
+| Security audit (whole repo) | `mk:cso` |
+| Security pattern scan of a module or diff | `mk:vulnerability-scanner` |
 | Skill creation | `mk:skill-creator` |
 | AI-friendly docs index | `mk:llms` |
 | One honest recommendation on a raw idea or decision, after the user's framing is challenged and confirmed | `mk:advise` — NOT for interrogation with no recommendation (`mk:grill`); NOT for enumerating alternatives to an already-validated problem (`mk:brainstorming`); NOT for "is this worth building at all" (`mk:office-hours`); NOT for multi-perspective deliberation (`mk:party`) |
