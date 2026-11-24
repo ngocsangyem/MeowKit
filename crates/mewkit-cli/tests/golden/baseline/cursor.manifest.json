@@ -1674,89 +1674,19 @@
       "size": 5364
     },
     {
-      "path": ".cursor/skills/mk-document-release/references/ask-user-question-format.md",
-      "sha256": "2a36ea49ba9330c4b2cfbab267b6a4597a04fcd8ab86ed13122d88af1606cb3b",
-      "size": 1815
+      "path": ".cursor/skills/mk-document-release/references/audit-and-apply.md",
+      "sha256": "26219a141b82a0ee8d3dcbbda029ac803d82cc8b22b7bbc6df005d7878ed98f6",
+      "size": 2099
     },
     {
-      "path": ".cursor/skills/mk-document-release/references/automation-rules.md",
-      "sha256": "6edd590aa539080db0470065e4793c46ad08e91215770000eba5f61d274bafc8",
-      "size": 1310
+      "path": ".cursor/skills/mk-document-release/references/changelog-and-version.md",
+      "sha256": "219922babf2b281d06dd8e3acd6f1d238a30a250e01e94044237ae139d1f12e9",
+      "size": 1808
     },
     {
-      "path": ".cursor/skills/mk-document-release/references/base-branch-detection.md",
-      "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
-      "size": 708
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/completion-and-telemetry.md",
-      "sha256": "3cbe04153255c1e1c66ec589449ff6ae9085609ae119e7c621f3e88173a764c7",
-      "size": 3482
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/general-documentation.md",
-      "sha256": "2d7bca22e113f1b3c01bab671ca5df9ffe56272f6b598d787c13de89c4e2e54c",
-      "size": 1030
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/important-rules.md",
-      "sha256": "98cf67338f2e0c8b201844157229b60dc2fdf223179dc97ab9ec75d33ea19d2f",
-      "size": 1011
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/preamble.md",
-      "sha256": "7a07dff3841800a8758809e9a23f1fb4ebdcd97c1811260084717ebe07392c5b",
-      "size": 3122
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/repo-ownership-and-search.md",
-      "sha256": "b402ee515228334574dd82e79312b7f8ddcb62c54d5400c14eadba1b02d1eae6",
-      "size": 2318
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step1-preflight-diff-analysis.md",
-      "sha256": "ef2146ad7f41ccb77d9c9ff61c7e002618d5f4376eaa41a9808c414a4adc6ecb",
-      "size": 1016
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step2-per-file-audit.md",
-      "sha256": "da89dcab6200a802b354b27c5f5081b2c538073d3bf0e4a319fd4f7ee03a7b43",
-      "size": 1948
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step3-apply-auto-updates.md",
-      "sha256": "698bd230c4342ec2c8b3edadfd03086b3200e5721690c9dee28810809a4cdc4e",
-      "size": 497
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step4-risky-changes.md",
-      "sha256": "6434a90705acad9501adb5b46273965734cff2f5ddfef81acaaf92167203f09d",
-      "size": 412
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step5-changelog-voice-polish.md",
-      "sha256": "1606a4b7b43445519d5207aba05d28657c7d26dfd0be557bdb259cd49bcfc59a",
-      "size": 1559
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step6-cross-doc-consistency.md",
-      "sha256": "5930f6bf273e7215ab45901009a2d070ef0f9e1ca4df5925b57888bff1086a62",
-      "size": 812
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step7-todos-cleanup.md",
-      "sha256": "05a4acf1947e47f981425ec0e3accbc4a1d3ce11b4815db95e8da85b6d15acc6",
-      "size": 1054
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step8-version-bump.md",
-      "sha256": "5bdf3a4d0572136ce97a9a0953a41331e51322f2079afaec2547481a3fda76dc",
-      "size": 1871
-    },
-    {
-      "path": ".cursor/skills/mk-document-release/references/step9-commit-and-output.md",
-      "sha256": "4a0a705204b5e47f7076889b4397864b4698942b2f040d9b6f3175112d2fb5dd",
-      "size": 2136
+      "path": ".cursor/skills/mk-document-release/references/commit-and-pr-body.md",
+      "sha256": "ae02d4546d234679c2698d38651cb7df0154913c19075b385eba023c539c1804",
+      "size": 1388
     },
     {
       "path": ".cursor/skills/mk-elicit/SKILL.md",
@@ -3759,11 +3689,6 @@
       "size": 1676
     },
     {
-      "path": ".cursor/skills/mk-project-context/templates/skeleton.md",
-      "sha256": "31ed53c0aeb3aa8edc55d8fbbd7e0d70f62c8b4a59154b098826eb7bafce6eff",
-      "size": 1808
-    },
-    {
       "path": ".cursor/skills/mk-project-organization/SKILL.md",
       "sha256": "27695ad10c21c6884523b0a368084e9456942d225672c7ee2ceec7756ce57043",
       "size": 5054
@@ -4327,19 +4252,9 @@
       "size": 4287
     },
     {
-      "path": ".cursor/skills/mk-scout/references/report-and-handoff.md",
-      "sha256": "53724a8ff8dd745d5917540fff8b02a25dc68d5ce997e0623509d4cb606461f2",
-      "size": 3844
-    },
-    {
-      "path": ".cursor/skills/mk-scout/references/scouting-strategy.md",
-      "sha256": "5204bbcb5437189cf93d4c61d2d946e591ee39f7f4809f1f719d3c7a251bae26",
-      "size": 7941
-    },
-    {
-      "path": ".cursor/skills/mk-scout/references/search-scope.md",
-      "sha256": "fba6aefdc52eaaaba690b098c2b6838374a8123e3287fb7a5c1323348a151f22",
-      "size": 2846
+      "path": ".cursor/skills/mk-scout/references/subagent-brief.md",
+      "sha256": "9b88f675fd29b358bb6c61c2969f02902cbd3a1103b9006396b07c57558038a4",
+      "size": 1116
     },
     {
       "path": ".cursor/skills/mk-sequential-thinking/SKILL.md",
@@ -4435,6 +4350,11 @@
       "size": 3565
     },
     {
+      "path": ".cursor/skills/mk-ship/references/agile-dod.md",
+      "sha256": "2f28fbdb50b5333e86d842212536c42e68e1e969c53ec3580c555dae440f53de",
+      "size": 1002
+    },
+    {
       "path": ".cursor/skills/mk-ship/references/canary-deploy.md",
       "sha256": "6f137e2d6ea75c106b2a1c5bfb2b397e5deea444457b228c3fa6e182d39a484a",
       "size": 4334
@@ -4443,21 +4363,6 @@
       "path": ".cursor/skills/mk-ship/references/commit-push-pr.md",
       "sha256": "86532aaf29de624326af9127ac09087045b95b5b453850cd87af929b88a75a37",
       "size": 8389
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/distribution-pipeline.md",
-      "sha256": "a6c7a1e7f8ea38be981cb4582d3352baa668738386db2f6dd2b6788b4c72229c",
-      "size": 1163
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/eval-suites.md",
-      "sha256": "84de8e916f1e33d3b2ce51540aaae364aa47d3900e7f7d293d4573264c44b520",
-      "size": 2921
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/merge-and-test-bootstrap.md",
-      "sha256": "ea8939b352327bbd5edbf34675526366c0b76256af9b5e1a2562df4ef9d73cd8",
-      "size": 8057
     },
     {
       "path": ".cursor/skills/mk-ship/references/plan-completion-audit.md",
@@ -4475,16 +4380,6 @@
       "size": 3125
     },
     {
-      "path": ".cursor/skills/mk-ship/references/preamble-ship.md",
-      "sha256": "9c282cba2523bc6c9dc67c8f5c6c124676003eca1aa0a5f54780438ec6f28a12",
-      "size": 8435
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/preamble.md",
-      "sha256": "f67c3c12f42e166336e750e55cf883f7516225c2f775ebee1a70a30a146f69fa",
-      "size": 12058
-    },
-    {
       "path": ".cursor/skills/mk-ship/references/rollback-protocol.md",
       "sha256": "b303adc3fed163b0653b71661725e94a2ae08a94813430399240f936c7011a12",
       "size": 4590
@@ -4493,16 +4388,6 @@
       "path": ".cursor/skills/mk-ship/references/rules.md",
       "sha256": "2c958868213ed8cdcfbd75a57bf4f2cf1d1792a593fd92f58dd61f349eadd891",
       "size": 1272
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/ship-pipeline.md",
-      "sha256": "bbeb84fd1d77776e6b6bfd781be822dafdb0f410a420aecb109e800886cdba6d",
-      "size": 4146
-    },
-    {
-      "path": ".cursor/skills/mk-ship/references/test-coverage-audit.md",
-      "sha256": "a2dbf3f41b30291cd823a60c410abf3b9caeb6f54002a802c9e40c3aaddd34fc",
-      "size": 11288
     },
     {
       "path": ".cursor/skills/mk-ship/references/test-execution.md",

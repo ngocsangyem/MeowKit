@@ -1,12 +1,14 @@
 # Ask-Me Answer Contract
 
-## Depth budgets
+## Depth guidance
 
-| Depth | Greps | Files | Lines/file | Output |
-|---|---:|---:|---:|---|
-| quick | 2 | 3 | 80 | Direct answer |
-| standard | 5 | 8 | 140 | Answer plus evidence |
-| deep | 8 | 14 | 220 | Saved report allowed |
+Stop when the answer is supported; these are ceilings, not targets.
+
+| Depth | Typical effort | Output |
+|---|---|---|
+| quick | A couple of targeted greps and reads of the small slices they find | Direct answer |
+| standard | A handful of greps and files, each read only where the grep points | Answer plus evidence |
+| deep | Wider reading across modules, up to about 8 greps and 14 files | Saved report allowed |
 
 ## Output
 
@@ -18,4 +20,4 @@ when applicable.
 
 Redirect specialist-owned work; request a concrete missing question; narrow whole-repo scope;
 label unavailable evidence low confidence; refuse forbidden paths or unsafe save paths; show
-conflicting evidence; stop at the depth cap; and ask before overwriting an existing save target.
+conflicting evidence; stop at the deep ceiling and say what was left unread; and ask before overwriting an existing save target.

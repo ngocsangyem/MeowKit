@@ -1792,89 +1792,19 @@
       "size": 5622
     },
     {
-      "path": ".claude/skills/document-release/references/ask-user-question-format.md",
-      "sha256": "213337cd7b6719ced9dbc72c3d614060c46bcf27030797b1886efec39a6cc015",
-      "size": 1759
+      "path": ".claude/skills/document-release/references/audit-and-apply.md",
+      "sha256": "26219a141b82a0ee8d3dcbbda029ac803d82cc8b22b7bbc6df005d7878ed98f6",
+      "size": 2099
     },
     {
-      "path": ".claude/skills/document-release/references/automation-rules.md",
-      "sha256": "daae0e39fad7a470e4af83cb82a5d46fbf0663c1ed7c581d6486af7e6346e61c",
-      "size": 1290
+      "path": ".claude/skills/document-release/references/changelog-and-version.md",
+      "sha256": "219922babf2b281d06dd8e3acd6f1d238a30a250e01e94044237ae139d1f12e9",
+      "size": 1808
     },
     {
-      "path": ".claude/skills/document-release/references/base-branch-detection.md",
-      "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
-      "size": 708
-    },
-    {
-      "path": ".claude/skills/document-release/references/completion-and-telemetry.md",
-      "sha256": "c3729cc5539afaa7012a427375f61fe588d208346f31cf5d896d1701053b3e8d",
-      "size": 3494
-    },
-    {
-      "path": ".claude/skills/document-release/references/general-documentation.md",
-      "sha256": "42d4e19ecc417efc913a6e5dbdf5082cc9f1c9875f1c5f95287c4105435496a4",
-      "size": 1024
-    },
-    {
-      "path": ".claude/skills/document-release/references/important-rules.md",
-      "sha256": "4dff1ffac65bd258722a62ac24d2568a4d7898aa1868fd2de8f16bae2cda943c",
-      "size": 1006
-    },
-    {
-      "path": ".claude/skills/document-release/references/preamble.md",
-      "sha256": "5d4ca070be55b3c52288e6edf3e06d12e6488870c8b2d7c25c4cd0b7468a2696",
-      "size": 3202
-    },
-    {
-      "path": ".claude/skills/document-release/references/repo-ownership-and-search.md",
-      "sha256": "975f35ba8e4913632f7753fff698af3738ce2b40cc0025f952e11874786c58cd",
-      "size": 2304
-    },
-    {
-      "path": ".claude/skills/document-release/references/step1-preflight-diff-analysis.md",
-      "sha256": "ef2146ad7f41ccb77d9c9ff61c7e002618d5f4376eaa41a9808c414a4adc6ecb",
-      "size": 1016
-    },
-    {
-      "path": ".claude/skills/document-release/references/step2-per-file-audit.md",
-      "sha256": "d6f49e04004ddf9e68d4b8c93084e8eb4482cb0cb1f5512aea4077dc475f3703",
-      "size": 1948
-    },
-    {
-      "path": ".claude/skills/document-release/references/step3-apply-auto-updates.md",
-      "sha256": "698bd230c4342ec2c8b3edadfd03086b3200e5721690c9dee28810809a4cdc4e",
-      "size": 497
-    },
-    {
-      "path": ".claude/skills/document-release/references/step4-risky-changes.md",
-      "sha256": "e8f818937c53f9606b557ba7279952322b49d6c399d46b657e5888bfe08adcce",
-      "size": 398
-    },
-    {
-      "path": ".claude/skills/document-release/references/step5-changelog-voice-polish.md",
-      "sha256": "9aa1e997eb6e31a22437def446e2d10faa86d7689ebef8e2d2f1ee8226d9860e",
-      "size": 1525
-    },
-    {
-      "path": ".claude/skills/document-release/references/step6-cross-doc-consistency.md",
-      "sha256": "72c201a07ef9c5d88642030b96beb3148c626f76de0d1bcaf03732f5db5ea3cc",
-      "size": 798
-    },
-    {
-      "path": ".claude/skills/document-release/references/step7-todos-cleanup.md",
-      "sha256": "f560e4b55e733f84bf93b5c355b8e1eeb2b384a084e1ebd0aacc7dcf4637ab11",
-      "size": 1020
-    },
-    {
-      "path": ".claude/skills/document-release/references/step8-version-bump.md",
-      "sha256": "f924ca0491b13a77bccb2781d42caaaad0dc3d10ab41440f9088e36c9337f671",
-      "size": 1843
-    },
-    {
-      "path": ".claude/skills/document-release/references/step9-commit-and-output.md",
-      "sha256": "c3d22b22dfff29fc8e438fbae35bf00b1183530e59918130209c177bd363500e",
-      "size": 2193
+      "path": ".claude/skills/document-release/references/commit-and-pr-body.md",
+      "sha256": "ae02d4546d234679c2698d38651cb7df0154913c19075b385eba023c539c1804",
+      "size": 1388
     },
     {
       "path": ".claude/skills/elicit/SKILL.md",
@@ -3856,11 +3786,6 @@
       "size": 1676
     },
     {
-      "path": ".claude/skills/project-context/templates/skeleton.md",
-      "sha256": "31ed53c0aeb3aa8edc55d8fbbd7e0d70f62c8b4a59154b098826eb7bafce6eff",
-      "size": 1808
-    },
-    {
       "path": ".claude/skills/project-organization/SKILL.md",
       "sha256": "966a688fb447f0e1f5452a3dabac1c0db79e47835463cb589fa38dad33b90a2f",
       "size": 5477
@@ -4414,19 +4339,9 @@
       "size": 4774
     },
     {
-      "path": ".claude/skills/scout/references/report-and-handoff.md",
-      "sha256": "53724a8ff8dd745d5917540fff8b02a25dc68d5ce997e0623509d4cb606461f2",
-      "size": 3844
-    },
-    {
-      "path": ".claude/skills/scout/references/scouting-strategy.md",
-      "sha256": "8bfa768b96e99a5883cfbe293b6c5b8fccfdb8e09e55d78ed2f0a32a87e3296c",
-      "size": 7865
-    },
-    {
-      "path": ".claude/skills/scout/references/search-scope.md",
-      "sha256": "fba6aefdc52eaaaba690b098c2b6838374a8123e3287fb7a5c1323348a151f22",
-      "size": 2846
+      "path": ".claude/skills/scout/references/subagent-brief.md",
+      "sha256": "9b88f675fd29b358bb6c61c2969f02902cbd3a1103b9006396b07c57558038a4",
+      "size": 1116
     },
     {
       "path": ".claude/skills/sequential-thinking/SKILL.md",
@@ -4522,6 +4437,11 @@
       "size": 6847
     },
     {
+      "path": ".claude/skills/ship/references/agile-dod.md",
+      "sha256": "2f28fbdb50b5333e86d842212536c42e68e1e969c53ec3580c555dae440f53de",
+      "size": 1002
+    },
+    {
       "path": ".claude/skills/ship/references/canary-deploy.md",
       "sha256": "6f137e2d6ea75c106b2a1c5bfb2b397e5deea444457b228c3fa6e182d39a484a",
       "size": 4334
@@ -4530,21 +4450,6 @@
       "path": ".claude/skills/ship/references/commit-push-pr.md",
       "sha256": "d10fa62d88bd3497d75b9bb13f8c00d448aef19eb038cd2aabcae9d6b0113d82",
       "size": 8467
-    },
-    {
-      "path": ".claude/skills/ship/references/distribution-pipeline.md",
-      "sha256": "40636da544a4b2d8df04801eb86bcd41b637928c13716f9e0f7181f4c4f56f11",
-      "size": 1149
-    },
-    {
-      "path": ".claude/skills/ship/references/eval-suites.md",
-      "sha256": "692ef46deef2a28ab12e35467610a07ebd87a51669ab078991ad237863ab068a",
-      "size": 2873
-    },
-    {
-      "path": ".claude/skills/ship/references/merge-and-test-bootstrap.md",
-      "sha256": "54e4ef2ba622a63201e960b07db0daa8c07e0a15c0c39e261e76d8845f805155",
-      "size": 8030
     },
     {
       "path": ".claude/skills/ship/references/plan-completion-audit.md",
@@ -4562,16 +4467,6 @@
       "size": 3077
     },
     {
-      "path": ".claude/skills/ship/references/preamble-ship.md",
-      "sha256": "9c282cba2523bc6c9dc67c8f5c6c124676003eca1aa0a5f54780438ec6f28a12",
-      "size": 8435
-    },
-    {
-      "path": ".claude/skills/ship/references/preamble.md",
-      "sha256": "db3ec5a13d7979c65c8e1b3c8fae9ddceabe10eee4ce2865eb56b9b76b68e88c",
-      "size": 12059
-    },
-    {
       "path": ".claude/skills/ship/references/rollback-protocol.md",
       "sha256": "b303adc3fed163b0653b71661725e94a2ae08a94813430399240f936c7011a12",
       "size": 4590
@@ -4580,16 +4475,6 @@
       "path": ".claude/skills/ship/references/rules.md",
       "sha256": "46155809598d4de20683bfd4887d683bfa01e553c323346919b630e801a19d90",
       "size": 1261
-    },
-    {
-      "path": ".claude/skills/ship/references/ship-pipeline.md",
-      "sha256": "37e309402e29cd574eb3f4ede923697a5c53d7d3395d546d6526fabd48d3e7f2",
-      "size": 4168
-    },
-    {
-      "path": ".claude/skills/ship/references/test-coverage-audit.md",
-      "sha256": "8d13dba995de9723d4687cebf49abe4b6169569991c61c55fe1d86e6d8f96183",
-      "size": 11260
     },
     {
       "path": ".claude/skills/ship/references/test-execution.md",
@@ -7117,89 +7002,19 @@
       "size": 5622
     },
     {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/ask-user-question-format.md",
-      "sha256": "213337cd7b6719ced9dbc72c3d614060c46bcf27030797b1886efec39a6cc015",
-      "size": 1759
+      "path": ".meowkit/cache/.claude/skills/document-release/references/audit-and-apply.md",
+      "sha256": "26219a141b82a0ee8d3dcbbda029ac803d82cc8b22b7bbc6df005d7878ed98f6",
+      "size": 2099
     },
     {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/automation-rules.md",
-      "sha256": "daae0e39fad7a470e4af83cb82a5d46fbf0663c1ed7c581d6486af7e6346e61c",
-      "size": 1290
+      "path": ".meowkit/cache/.claude/skills/document-release/references/changelog-and-version.md",
+      "sha256": "219922babf2b281d06dd8e3acd6f1d238a30a250e01e94044237ae139d1f12e9",
+      "size": 1808
     },
     {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/base-branch-detection.md",
-      "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
-      "size": 708
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/completion-and-telemetry.md",
-      "sha256": "c3729cc5539afaa7012a427375f61fe588d208346f31cf5d896d1701053b3e8d",
-      "size": 3494
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/general-documentation.md",
-      "sha256": "42d4e19ecc417efc913a6e5dbdf5082cc9f1c9875f1c5f95287c4105435496a4",
-      "size": 1024
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/important-rules.md",
-      "sha256": "4dff1ffac65bd258722a62ac24d2568a4d7898aa1868fd2de8f16bae2cda943c",
-      "size": 1006
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/preamble.md",
-      "sha256": "5d4ca070be55b3c52288e6edf3e06d12e6488870c8b2d7c25c4cd0b7468a2696",
-      "size": 3202
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/repo-ownership-and-search.md",
-      "sha256": "975f35ba8e4913632f7753fff698af3738ce2b40cc0025f952e11874786c58cd",
-      "size": 2304
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step1-preflight-diff-analysis.md",
-      "sha256": "ef2146ad7f41ccb77d9c9ff61c7e002618d5f4376eaa41a9808c414a4adc6ecb",
-      "size": 1016
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step2-per-file-audit.md",
-      "sha256": "d6f49e04004ddf9e68d4b8c93084e8eb4482cb0cb1f5512aea4077dc475f3703",
-      "size": 1948
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step3-apply-auto-updates.md",
-      "sha256": "698bd230c4342ec2c8b3edadfd03086b3200e5721690c9dee28810809a4cdc4e",
-      "size": 497
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step4-risky-changes.md",
-      "sha256": "e8f818937c53f9606b557ba7279952322b49d6c399d46b657e5888bfe08adcce",
-      "size": 398
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step5-changelog-voice-polish.md",
-      "sha256": "9aa1e997eb6e31a22437def446e2d10faa86d7689ebef8e2d2f1ee8226d9860e",
-      "size": 1525
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step6-cross-doc-consistency.md",
-      "sha256": "72c201a07ef9c5d88642030b96beb3148c626f76de0d1bcaf03732f5db5ea3cc",
-      "size": 798
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step7-todos-cleanup.md",
-      "sha256": "f560e4b55e733f84bf93b5c355b8e1eeb2b384a084e1ebd0aacc7dcf4637ab11",
-      "size": 1020
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step8-version-bump.md",
-      "sha256": "f924ca0491b13a77bccb2781d42caaaad0dc3d10ab41440f9088e36c9337f671",
-      "size": 1843
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/document-release/references/step9-commit-and-output.md",
-      "sha256": "c3d22b22dfff29fc8e438fbae35bf00b1183530e59918130209c177bd363500e",
-      "size": 2193
+      "path": ".meowkit/cache/.claude/skills/document-release/references/commit-and-pr-body.md",
+      "sha256": "ae02d4546d234679c2698d38651cb7df0154913c19075b385eba023c539c1804",
+      "size": 1388
     },
     {
       "path": ".meowkit/cache/.claude/skills/elicit/SKILL.md",
@@ -9182,11 +8997,6 @@
       "size": 1676
     },
     {
-      "path": ".meowkit/cache/.claude/skills/project-context/templates/skeleton.md",
-      "sha256": "31ed53c0aeb3aa8edc55d8fbbd7e0d70f62c8b4a59154b098826eb7bafce6eff",
-      "size": 1808
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/project-organization/SKILL.md",
       "sha256": "966a688fb447f0e1f5452a3dabac1c0db79e47835463cb589fa38dad33b90a2f",
       "size": 5477
@@ -9725,19 +9535,9 @@
       "size": 4774
     },
     {
-      "path": ".meowkit/cache/.claude/skills/scout/references/report-and-handoff.md",
-      "sha256": "53724a8ff8dd745d5917540fff8b02a25dc68d5ce997e0623509d4cb606461f2",
-      "size": 3844
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/scout/references/scouting-strategy.md",
-      "sha256": "8bfa768b96e99a5883cfbe293b6c5b8fccfdb8e09e55d78ed2f0a32a87e3296c",
-      "size": 7865
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/scout/references/search-scope.md",
-      "sha256": "fba6aefdc52eaaaba690b098c2b6838374a8123e3287fb7a5c1323348a151f22",
-      "size": 2846
+      "path": ".meowkit/cache/.claude/skills/scout/references/subagent-brief.md",
+      "sha256": "9b88f675fd29b358bb6c61c2969f02902cbd3a1103b9006396b07c57558038a4",
+      "size": 1116
     },
     {
       "path": ".meowkit/cache/.claude/skills/sequential-thinking/SKILL.md",
@@ -9833,6 +9633,11 @@
       "size": 6847
     },
     {
+      "path": ".meowkit/cache/.claude/skills/ship/references/agile-dod.md",
+      "sha256": "2f28fbdb50b5333e86d842212536c42e68e1e969c53ec3580c555dae440f53de",
+      "size": 1002
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/ship/references/canary-deploy.md",
       "sha256": "6f137e2d6ea75c106b2a1c5bfb2b397e5deea444457b228c3fa6e182d39a484a",
       "size": 4334
@@ -9841,21 +9646,6 @@
       "path": ".meowkit/cache/.claude/skills/ship/references/commit-push-pr.md",
       "sha256": "d10fa62d88bd3497d75b9bb13f8c00d448aef19eb038cd2aabcae9d6b0113d82",
       "size": 8467
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/distribution-pipeline.md",
-      "sha256": "40636da544a4b2d8df04801eb86bcd41b637928c13716f9e0f7181f4c4f56f11",
-      "size": 1149
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/eval-suites.md",
-      "sha256": "692ef46deef2a28ab12e35467610a07ebd87a51669ab078991ad237863ab068a",
-      "size": 2873
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/merge-and-test-bootstrap.md",
-      "sha256": "54e4ef2ba622a63201e960b07db0daa8c07e0a15c0c39e261e76d8845f805155",
-      "size": 8030
     },
     {
       "path": ".meowkit/cache/.claude/skills/ship/references/plan-completion-audit.md",
@@ -9873,11 +9663,6 @@
       "size": 3077
     },
     {
-      "path": ".meowkit/cache/.claude/skills/ship/references/preamble.md",
-      "sha256": "db3ec5a13d7979c65c8e1b3c8fae9ddceabe10eee4ce2865eb56b9b76b68e88c",
-      "size": 12059
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/ship/references/rollback-protocol.md",
       "sha256": "b303adc3fed163b0653b71661725e94a2ae08a94813430399240f936c7011a12",
       "size": 4590
@@ -9886,16 +9671,6 @@
       "path": ".meowkit/cache/.claude/skills/ship/references/rules.md",
       "sha256": "46155809598d4de20683bfd4887d683bfa01e553c323346919b630e801a19d90",
       "size": 1261
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/ship-pipeline.md",
-      "sha256": "37e309402e29cd574eb3f4ede923697a5c53d7d3395d546d6526fabd48d3e7f2",
-      "size": 4168
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/test-coverage-audit.md",
-      "sha256": "8d13dba995de9723d4687cebf49abe4b6169569991c61c55fe1d86e6d8f96183",
-      "size": 11260
     },
     {
       "path": ".meowkit/cache/.claude/skills/ship/references/test-execution.md",

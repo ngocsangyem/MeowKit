@@ -31,18 +31,17 @@ Use it after code is prepared or a PR is created, when you ask to "update the do
 
 | Mode | Trigger | Behaviour |
 |---|---|---|
-| Standalone | `/mk:document-release` | Full doc sync plus an optional VERSION bump. |
-| From `mk:ship release` | Called by ship | Doc sync only. A VERSION bump stays an explicit `publish` action. |
+| Standalone | `/mk:document-release` | Full doc sync. |
+| Offered by `mk:ship release` | The user invokes it | Doc sync only. A VERSION bump stays an explicit `publish` action. |
 
 ## Steps
 
-1. Initialize: run the preamble, detect the base branch, load the automation rules.
-2. Read the current docs and the diff, and classify what needs updating.
-3. Apply clear factual updates to README, ARCHITECTURE, CONTRIBUTING and AGENTS.md. Ask only for narrative or subjective changes.
-4. Polish the CHANGELOG voice (imperative mood, no rewritten entries) and clean up TODOS.
-5. Check cross-doc consistency: contradictions, broken links, discoverability. Grep for old paths after a rename.
-6. Ask before any VERSION bump.
-7. Present the doc health summary, then ask one question before staging, committing, pushing or updating a PR.
+1. Find the base branch and the diff. If the diff touches nothing a doc describes, report "docs current" and stop.
+2. Audit each doc against the diff; apply clear factual updates directly and ask only for narrative or subjective changes.
+3. Polish the CHANGELOG voice (imperative mood, no rewritten entries) and clean up TODOS.
+4. Check cross-doc consistency: contradictions, broken links, discoverability. Grep for old paths after a rename.
+5. Never bump the version here; a bump is a `mk:ship publish` decision.
+6. Present the doc health summary, then ask one question before staging, committing, pushing or updating a PR.
 
 ## Rules
 
@@ -55,7 +54,7 @@ Use it after code is prepared or a PR is created, when you ask to "update the do
 
 ## References
 
-Each step's detail is in `references/`: `step1-preflight-diff-analysis.md` through `step9-commit-and-output.md`, plus `automation-rules.md`, `important-rules.md`, `base-branch-detection.md`, `preamble.md`, `completion-and-telemetry.md`, `ask-user-question-format.md`, `completeness-principle.md`, `repo-ownership-and-search.md` and `general-documentation.md`.
+Detail is in `references/`: `audit-and-apply.md`, `changelog-and-version.md` and `commit-and-pr-body.md`.
 
 ## Gotchas
 
