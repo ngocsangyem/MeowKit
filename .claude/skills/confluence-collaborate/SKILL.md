@@ -55,8 +55,8 @@ Forks to the `confluence-collaborate` agent. The agent prefers footer comments o
 
 ## Gotchas
 
-- `validate_file_path` in `confluence-as` rejects `..` traversal but delegates to opaque `assistant-skills-lib`. Don't trust delegation alone — the agent independently validates upload paths at the agent boundary too. [from research]
-- Confluence Cloud comments do NOT have a strict internal/public flag like Jira Service Management. Inline vs footer is the closest semantic boundary — agent prefers footer. [from jira-collaborate parallel pattern]
-- Inline comment requires an anchor selection. If the selection text doesn't match unique content on the page, the comment fails with a 400-class error.
-- Bulk-label across 10+ pages goes through `mk:confluence-bulk`, NOT this skill. Single-page label add/remove only here.
-- Grow this list as new edge cases surface.
+- Upload paths are validated in `references/attachment-conventions.md`; read it before any upload.
+- Confluence comments have no internal/public flag (unlike Jira Service Management); footer vs inline is the nearest boundary, so the agent prefers footer.
+- An inline comment needs an anchor selection; if the text is not unique on the page the call fails with a 400-class error.
+- Labelling 10+ pages goes through `mk:confluence-bulk`; single-page label add/remove stays here.
+- The lossy-ADF warning is in `../confluence/references/cli-idioms.md`.

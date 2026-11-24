@@ -1,6 +1,6 @@
 # Sizing Heuristics
 
-Maps a `StoryRecord` to a Fibonacci point estimate, complexity verdict, inconsistency flags, optional split proposal, and (when the Agile rules are loaded) a DoR advisory. Reuses Fibonacci anchors from `.claude/skills/jira/references/estimation-guide.md` — DO NOT drift from that table.
+Maps a `StoryRecord` to a Fibonacci point estimate, complexity verdict, inconsistency flags, optional split proposal, and (when the Agile rules are loaded) a DoR advisory. Scores land on the Fibonacci scale (1, 2, 3, 5, 8, 13).
 
 ## Contents
 
@@ -141,7 +141,6 @@ If `agile_loaded == false`, omit the field silently.
 
 - Same `StoryRecord` produces the same `SizedRecord` on every run — math is integer arithmetic over text-derived counts.
 - Reasoning text in the report may vary across runs; the numbers do not.
-- Test coverage in `tests/story-sizer-heuristics.test.sh` asserts identical numeric output across replays.
 
 ## Refusal Path
 
@@ -153,7 +152,6 @@ Inputs that refuse sizing (return `points: null`):
 
 ## Cross-references
 
-- Fibonacci anchors: `.claude/skills/jira/references/estimation-guide.md`
 - Trust boundary: `.claude/rules/injection-rules.md` Rule 1 + Rule 11
 - Optional DoR rules: `.claude/skills/agent-detector/references/agile-story-gates.md`
 - Scout extraction (when `--scout` is passed): mirrors `mk:planning-engine` (see SKILL.md)

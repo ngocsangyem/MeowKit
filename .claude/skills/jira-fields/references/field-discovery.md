@@ -50,18 +50,9 @@ This returns only the fields that appear on the create screen for that project +
 
 These appear in most Jira Software projects:
 
-| Field Name | Typical ID | Type | Notes |
-|-----------|-----------|------|-------|
-| Story Points | `customfield_10016` | number | May be named "Story point estimate" in next-gen |
-| Sprint | `customfield_10020` | array | Sprint object with `id`, `name`, `state` |
-| Epic Link | `customfield_10014` | string | Epic issue key (classic projects only) |
-| Epic Name | `customfield_10011` | string | Short name for the epic |
-| Team | `customfield_10001` | object | Team object, varies by instance |
-| Start Date | `customfield_10015` | date | ISO 8601 format: `2026-04-03` |
-| Fix Version | `fixVersions` | array | System field, not custom |
-| Components | `components` | array | System field, not custom |
+Story Points, Sprint, Epic Link and similar agile fields: see `agile-field-ids.md`. Other custom fields (Team, Start Date, ...) have instance-specific IDs; system fields such as `fixVersions` and `components` have fixed names.
 
-Note: Custom field IDs differ between Jira instances. Always discover dynamically — never hardcode IDs.
+Discover the ID per instance; do not assume one.
 
 ---
 

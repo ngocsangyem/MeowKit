@@ -32,7 +32,7 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
 - "show worklogs for PROJ-123"
 - "set original estimate 1d, remaining 4h on PROJ-123"
 - "time report for project PROJ from 2026-04-01 to 2026-04-30"
-- "bulk-log 30m to all my open PROJ tickets" (dry-run first)
+- "bulk-log 30m to all my open PROJ tickets" (`time bulk-log` runs with `--dry-run` first; the user approves the count with a plain "yes")
 
 ## Examples
 
@@ -47,9 +47,9 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
 - Domain refs:
   - `references/time-tracking.md` — wrapper-flow patterns
   - `references/time-format-quick-ref.md` — duration syntax (15m, 2h, 1d 4h, 1w)
-  - `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user/date)
-  - `references/estimation-guide.md` — story-point vs time estimation tradeoffs
-- Peer leaves: `mk:jira-search` (JQL for worklog filters), `mk:jira-agile` (sprint capacity uses time data), `mk:jira-bulk` (bulk-log)
+  - `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user/date); general JQL is in `mk:jira-search`
+  - `references/estimation-guide.md` — time fields and how a worklog adjusts the remaining estimate (story points are in `mk:jira-estimator`)
+- Peer leaves: `mk:jira-search` (JQL for worklog filters), `mk:jira-agile` (sprint capacity uses time data), `mk:jira-bulk` (shares the dry-run rule for `time bulk-log`, which this leaf owns)
 
 ## Gotchas
 

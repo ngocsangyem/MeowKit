@@ -22,32 +22,16 @@ Inline comments are visually intrusive — they create a yellow highlight on the
 
 ## Markdown vs Storage Format
 
-`confluence-as` accepts:
-
-- **Markdown** (default for `--body "<text>"`) — auto-converted server-side by the wrapper
-- **Storage format (XHTML-like)** — pass with `--representation storage` if you have a known-good payload
-- **ADF** (`atlas_doc_format`) — pass `--representation atlas_doc_format --content-file <file.json>` for complex blocks
-
-For everyday team comments (text, code blocks, lists, links), markdown is sufficient and most reliable.
+`comment add <page-id> "<body>"` (or `--file <path>` for a longer body) takes markdown, which the CLI converts to storage format. Markdown is sufficient and most reliable for everyday comments (text, code blocks, lists, links). Do not hand-write storage XHTML: its parser is regex-based and malformed nesting fails silently.
 
 ## ADF Edge Cases
 
-These ADF nodes are **lossy** when round-tripped (read-then-write):
-
-- `panel` (info / warning / note callouts)
-- `expand` (collapsible section)
-- `mention` (`@user` references)
-- `emoji` (custom or Slack-style)
-- `media` (embedded images via media nodes, distinct from regular attachments)
-- `decision` / `task-list` (Confluence-specific blocks)
-
-If a comment you read contains any of these, do not round-trip the body through update — re-author the body cleanly. The regex-based XHTML parser in `confluence-as` may also misinterpret deeply nested or malformed storage XHTML, so prefer simple markdown for fresh comment bodies.
+ADF nodes such as panel, expand, mention, emoji, media, decision and task-list are lossy when a body is read and written back. The full list and the reason are in `../../confluence/references/cli-idioms.md` (Common gotchas); if a comment you read contains them, re-author the body cleanly instead of round-tripping it.
 
 ## Recommended Defaults
 
 | Scenario | Recommendation |
 |---|---|
-| Quick text update | Markdown via `--body "..."` |
-| Multi-line with code blocks | Markdown via `--body-file <file.md>` |
-| Complex blocks (callouts, mentions) | ADF via `--representation atlas_doc_format --content-file <file.json>` (only when you have a known-good payload) |
+| Quick text comment | Markdown as the `BODY` argument |
+| Multi-line with code blocks | Markdown via `--file <file.md>` |
 | Posting an analysis report (multi-section) | Markdown — it converts cleanly to storage format |

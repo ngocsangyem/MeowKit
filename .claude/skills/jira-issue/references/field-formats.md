@@ -442,20 +442,7 @@ Custom fields use the format `customfield_XXXXX` where XXXXX is the field ID.
 
 ## Finding Custom Field IDs
 
-To find custom field IDs:
-
-1. **Via API:**
-   ```
-   GET /rest/api/3/field
-   ```
-
-2. **Via Issue JSON:**
-   Get an issue and look at the fields returned
-
-3. **Via JIRA UI:**
-   - Go to Settings > Issues > Custom fields
-   - Click on a custom field
-   - The ID is in the URL: `customfield_10001`
+Discover IDs with `mk:jira-fields` (`../../jira-fields/references/field-discovery.md`).
 
 ## Validation Rules
 
@@ -493,43 +480,9 @@ To find custom field IDs:
 - **Type:** Array of strings
 - **Format:** No spaces, alphanumeric + dashes/underscores
 
-## Markdown to ADF Conversion (handled by jira-as)
+## Markdown to ADF
 
-You never need to author raw ADF when using the wrapper. Pass markdown to `--description` and `jira-as` converts it server-side.
-
-**Supported Markdown:**
-- Headings: `# ## ###`
-- Bold: `**text**`
-- Italic: `*text*`
-- Code: `` `code` ``
-- Links: `[text](https://...)`
-- Bullet lists: `- item`
-- Numbered lists: `1. item`
-- Code blocks: ` ```code``` `
-
-**Example:**
-
-```bash
-DESC=$(cat <<'EOF'
-# Bug Report
-
-## Steps to Reproduce
-1. Go to login page
-2. Enter credentials
-3. Click **Login**
-
-## Expected
-User should be logged in
-
-## Actual
-Error message appears
-EOF
-)
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh \
-  issue create --project PROJ --type Bug --summary "Login error" --description "$DESC"
-```
-
-For power-user raw-ADF flow, pass `--format adf` (where supported) with a JSON ADF document.
+Pass markdown to `--description`; `jira-as` converts it to ADF. Conversion details: `../../jira-collaborate/references/comment-formats.md`.
 
 ## References
 

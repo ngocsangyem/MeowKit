@@ -21,17 +21,7 @@ Reference guide for "magic numbers" and constants used in JIRA administration.
 
 ## Common Custom Field IDs
 
-**Important:** Custom field IDs vary by JIRA instance! Use `get_config.py PROJ` to discover YOUR instance's IDs.
-
-| Field | Common ID | Description | How to Find Yours |
-|-------|-----------|-------------|--------------------|
-| Story Points | `customfield_10016` | Agile estimation field | `get_config.py PROJ` |
-| Epic Link | `customfield_10014` | Links issue to epic | Field discovery script |
-| Epic Name | `customfield_10011` | Name shown on epic | Field discovery script |
-| Epic Color | `customfield_10012` | Epic color coding | Field discovery script |
-| Sprint | `customfield_10020` | Sprint assignment | `get_config.py PROJ` |
-| Rank | `customfield_10019` | Backlog ordering | Field discovery script |
-| Parent Link | `customfield_10015` | Parent issue relationship | Field discovery script |
+Field IDs vary by instance. `mk:jira-fields` owns them: see `../../jira-fields/references/agile-field-ids.md`, or run `ops discover-project PROJ`.
 
 ### Discovering Your Instance's Field IDs
 

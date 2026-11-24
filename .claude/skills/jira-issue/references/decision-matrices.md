@@ -15,7 +15,6 @@ Quick reference tables for common JIRA issue management decisions.
 - [Epic Guidelines](#epic-guidelines)
 - [Common Anti-Patterns](#common-anti-patterns)
 - [Label Anti-Patterns](#label-anti-patterns)
-- [Quality Metrics Targets](#quality-metrics-targets)
 - [Summary Pattern Cheat Sheet](#summary-pattern-cheat-sheet)
 
 ---
@@ -212,20 +211,6 @@ Truly unique to your process?
 
 ---
 
-## Quality Metrics Targets
-
-| Metric | Target | Indicates |
-|--------|--------|-----------|
-| Issues with acceptance criteria | 90%+ | Clarity of requirements |
-| Average time to first comment | < 24 hours | Team engagement |
-| Issues closed as duplicate | < 5% | Search before create |
-| Issues with priority set | 100% | Proper prioritization |
-| Description length | > 100 chars | Adequate detail |
-| Labels per issue | 1-5 | Appropriate categorization |
-| Linked issues | 30%+ | Relationship tracking |
-
----
-
 ## Summary Pattern Cheat Sheet
 
 | Issue Type | Pattern | Examples |
@@ -234,7 +219,3 @@ Truly unique to your process?
 | **Tasks** | [Verb] [object] for [purpose] | "Configure CI pipeline for testing" |
 | **Stories** | Users can [action] [object] | "Users can filter results by date" |
 | **Epics** | [High-level capability] | "User Authentication System" |
-
----
-
-*Last updated: December 2025*

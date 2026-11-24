@@ -1,51 +1,26 @@
 # Confluence Page Field Formats
 
-Quick reference for the body-content representations Confluence Cloud accepts and emits, and when to pass which.
+Body formats the CLI reads and writes, and which to use when.
 
-## Contents
+## Read
 
-- [Representation Types](#representation-types)
-- [ADF vs XHTML](#adf-vs-xhtml)
-- [Choosing on Read](#choosing-on-read)
-- [Choosing on Write](#choosing-on-write)
-- [Round-Trip Caveats](#round-trip-caveats)
+`page get <id> --body --format storage|view|markdown` (default `storage`).
 
-## Representation Types
-
-| Representation | Description | Typical use |
+| Format | What it is | Use |
 |---|---|---|
-| `storage` | XHTML-like canonical format used internally by Confluence Cloud | Authoritative read; programmatic edits |
-| `view` | HTML render produced by the page renderer | Display-only; do NOT round-trip |
-| `export_view` | HTML for export pipelines (PDF / Word) | Reports, exports |
-| `wiki` | Legacy wiki markup (deprecated; not all instances expose) | Avoid |
-| `atlas_doc_format` (ADF) | JSON document tree used by the v2 API | Programmatic edits where the storage format is too brittle |
+| `storage` | XHTML-like canonical format | Authoritative read; surgical edits |
+| `view` | Rendered HTML | Display only; do not round-trip |
+| `markdown` | Markdown conversion | Reading; fresh-body drafts |
 
-## ADF vs XHTML
+## Write
 
-- **ADF** (`atlas_doc_format`) is a JSON tree. Canonical for newer Confluence APIs and the format used by the comment endpoint and many newer macros.
-- **XHTML** (`storage`) is the long-standing on-disk format. Many programmatic edits still go through `storage`.
+`page create` and `page update` take `--body "<markdown or XHTML>"` or `--file <path>`.
 
-The `confluence-as` library converts internally; user-supplied markdown is normalized before issuing the create/update request. Avoid hand-editing storage XHTML — its parser is regex-based and malformed nesting fails silently.
+Which advice applies:
 
-## Choosing on Read
+- **Fresh body** (new page, or replacing a body wholesale): write markdown and let the CLI convert. Do not hand-write storage XHTML; its parser is regex-based and malformed nesting fails silently.
+- **Macro-heavy existing page** (panel, expand, mention, decision, task-list): read it with `--format storage`, change only the lines you need, and show the user the diff (current to proposed) before `page update`.
 
-- For programmatic comparison or diff: request `--representation storage`
-- For human-readable rendering: request `--representation view`
-- For an exported (PDF / Word) bundle: request `--representation export_view`
+## Round-trip caveat
 
-## Choosing on Write
-
-- For markdown-style content: pass `--content '<markdown>'` and let the wrapper convert
-- For raw storage XHTML (rare): pass `--representation storage --content '<xhtml>'`
-- For raw ADF (rare; only when you have a known-good JSON document): pass `--representation atlas_doc_format --content-file <file.json>`
-
-## Round-Trip Caveats
-
-- ADF round-trip is **lossy** on these node types: panel, expand, mention, emoji, media, decision, task-list. Re-saving a page containing these macros via update may flatten them.
-- `storage` round-trip is more robust but the regex-based parser in `confluence-as` may corrupt malformed or deeply nested input.
-- For pages containing macros, prefer `page get --representation storage` then surgical edit, rather than fetching `view` and trying to round-trip.
-- Always inspect a diff (current → proposed) before calling `page update` on a macro-heavy page.
-
-## See also
-
-- The local conversion helpers in the shared CLI idioms (loaded with this skill) — `adf-to-md.sh` walker for read-side macro preservation (panel / decision / task-list / expand / mention / media / inlineCard surface as labelled markdown).
+ADF round-trip is lossy on panel, expand, mention, emoji, media, decision and task-list nodes: re-saving a page that has them can flatten them. The read-side helper `adf-to-md.sh` (see `../confluence/references/cli-idioms.md`) keeps those macros as labelled markdown for reading.

@@ -20,11 +20,11 @@ Always pass sanitized values as positional args. **Never** construct a command s
 
 ```bash
 # SAFE — value is an argument; bash never re-evaluates it
-bash "$WRAPPER" search --cql "$SANITIZED_CQL"
+bash "$WRAPPER" search cql "$SANITIZED_CQL"
 
 # UNSAFE — never do this
-eval "bash $WRAPPER search --cql \"$SANITIZED_CQL\""
-bash -c "bash $WRAPPER search --cql \"$SANITIZED_CQL\""
+eval "bash $WRAPPER search cql \"$SANITIZED_CQL\""
+bash -c "bash $WRAPPER search cql \"$SANITIZED_CQL\""
 ```
 
 Stored variable values do not trigger command substitution on simple expansion, but the safe pattern uses positional args + double-quoted variable expansion only. This is the entire interface — agents have no permission to construct command strings.
@@ -34,22 +34,23 @@ Stored variable values do not trigger command substitution on simple expansion, 
 ```bash
 WRAPPER="scripts/confluence-as.sh"
 
-bash "$WRAPPER" page get --page-id 12345
+bash "$WRAPPER" page get 12345 --body --format markdown
 bash "$WRAPPER" space list --limit 50
-bash "$WRAPPER" hierarchy children --page-id 12345 --depth 1
+bash "$WRAPPER" hierarchy children 12345
 ```
 
 ## CRUD ops
 
 ```bash
-bash "$WRAPPER" page create --space-key DOCS --title "$TITLE" --content "$BODY"
-bash "$WRAPPER" page update --page-id 12345 --title "$NEW_TITLE"
-bash "$WRAPPER" page delete --page-id 12345 --confirm
+bash "$WRAPPER" page create --space DOCS --title "$TITLE" --body "$BODY"
+bash "$WRAPPER" page update 12345 --title "$NEW_TITLE"
+# moves the page to trash; --permanent cannot be undone
+bash "$WRAPPER" page delete 12345
 ```
 
 ## Search with sanitization
 
-User-derived input MUST flow through `cql-sanitize.sh` before reaching `--cql`:
+User-derived input MUST flow through `cql-sanitize.sh` before it reaches the CQL string (reason: a term can otherwise close the quote and add clauses):
 
 ```bash
 SANITIZER="scripts/cql-sanitize.sh"
@@ -131,7 +132,7 @@ Fixture and expected output for development: `scripts/tests/fixtures/adf-macros.
 
 ## Common gotchas
 
-- ADF roundtrip is lossy on macros (panel / expand / mention / emoji / media / decision / task-list). Re-saving via update may flatten them.
-- POST is in retry `allowed_methods` upstream — duplicate-create risk on flaky network. Check by listing same-title pages before retry.
-- `--quiet` flag declared but unimplemented upstream — don't depend on it.
-- The CLI binary is `confluence-as`. Both upstream READMEs that say `confluence` are wrong (verified empirically 260510).
+- ADF round-trip is lossy on macros (panel / expand / mention / emoji / media / decision / task-list); re-saving through update may flatten them.
+- POST is retried by the client, so a create on a flaky network can duplicate a page: list pages with the same title before retrying.
+- The CLI binary is `confluence-as` (some upstream READMEs say `confluence`); the wrapper handles this.
+- The global `--quiet` flag is declared but never read; do not depend on it.

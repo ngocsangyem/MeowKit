@@ -93,7 +93,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comm
 # Markdown comment
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "**Bold** text" --format markdown
 
-# Internal comment (Administrators only)
+# Restricted comment (Administrators role only)
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Secret info" --visibility-role Administrators
 
 # Group-restricted comment
@@ -120,39 +120,39 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate atta
 
 ```bash
 # Add watcher
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --add user@company.com
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --add user@company.com
 
 # Remove watcher
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --remove user@company.com
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --remove user@company.com
 
 # List watchers
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --list
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --list
 ```
 
 ### Notifications
 
 ```bash
 # Notify watchers
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --watchers --subject "Update" --body "Text"
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate notify PROJ-123 --watchers --subject "Update" --body "Text"
 
 # Notify specific users (preview first)
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --users accountId1 --dry-run
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate notify PROJ-123 --user accountId1 --dry-run
 
 # Notify assignee and reporter
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --assignee --reporter --subject "Status needed"
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate notify PROJ-123 --assignee --reporter --subject "Status needed"
 ```
 
 ### Activity
 
 ```bash
 # View activity table
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format table
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --output table
 
 # Filter by status changes
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --filter status
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --field status
 
 # Export to JSON
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format json > history.json
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --output json > history.json
 ```
 
 ---
@@ -169,5 +169,3 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate acti
 | Test evidence | `PROJ-123_TestResult_UserFlow_2025-12-28.mp4` |
 
 ---
-
-Link to deeper per-topic guidance here if the team keeps any.

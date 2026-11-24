@@ -1,6 +1,6 @@
 # Estimation Guide — Heuristic Signals & Escalation
 
-Used by jira-estimator agent. Single-ticket only. No --batch, no --deep (v3).
+Used by jira-estimator agent. Single-ticket only.
 
 ## Estimation Flow
 
@@ -45,7 +45,7 @@ All user-derived terms: `bash scripts/jql-sanitize.sh '<term>'`
 ## Evaluate-First
 
 If evaluate output available in session, use its signals. Otherwise include:
-"Tip: run `/mk:jira evaluate {ISSUE-KEY}` first for more informed estimation."
+"Tip: run ``mk:jira-evaluator` on {ISSUE-KEY}` first for more informed estimation."
 
 ## Gotchas
 

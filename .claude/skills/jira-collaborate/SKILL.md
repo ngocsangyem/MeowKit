@@ -24,7 +24,7 @@ default_enabled: false
 
 # mk:jira-collaborate
 
-Forks to the `jira-collaborate` agent. The agent confirms internal-vs-public for any comment that could be customer-facing (default `internal` if uncertain).
+Forks to the `jira-collaborate` agent. This leaf owns the visibility rule: a core Jira comment is visible to everyone who can see the issue unless restricted with `--visibility-role` or `--visibility-group`; an agent-only comment on a JSM request uses `jsm request comment --internal`. The agent confirms visibility for any comment that could be customer-facing and restricts it when uncertain.
 
 ## Triggers
 
@@ -46,8 +46,8 @@ Forks to the `jira-collaborate` agent. The agent confirms internal-vs-public for
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/comment-templates.md` — copy-paste comment templates (progress, blocker, handoff, evidence)
-  - `references/comment-formats.md` — text / markdown / ADF format reference
-- Peer leaves: `mk:jira-issue` (create-with-attachment), `mk:jira-jsm` (internal-vs-public on JSM tickets), `mk:jira-analyst` (post-analysis comment patterns)
+  - `references/comment-formats.md` — text / markdown / ADF format reference, and the one place markdown-to-ADF conversion is explained
+- Peer leaves: `mk:jira-issue` (create-with-attachment), `mk:jira-jsm` (JSM requests; follows the visibility rule above), `mk:jira-analyst` (post-analysis comment patterns)
 
 ## Gotchas
 

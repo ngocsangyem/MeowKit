@@ -24,7 +24,7 @@ default_enabled: false
 
 # mk:confluence-spec-analyst
 
-Forks to the `confluence-spec-analyst` agent. Read-only at the Confluence side — the agent has Write tool privilege ONLY for persisting the Spec Research Report locally; it never writes to Confluence itself.
+Forks to the `confluence-spec-analyst` agent. Read-only on the Confluence side: the agent may write only the local Spec Research Report and never writes to Confluence.
 
 ## Triggers
 
@@ -35,7 +35,7 @@ Forks to the `confluence-spec-analyst` agent. Read-only at the Confluence side �
 
 ## Operations
 
-`analyze PAGE-ID [--include-children N] [--no-images] [--with-commands]` — `--with-commands` is opt-in (default report has suggestions only, no executable commands).
+`analyze PAGE-ID [--include-children N] [--no-images] [--with-commands]`. `--include-children` takes at most 5 child pages (default depth 1), to stay inside the Cloud rate limit; the user must raise either explicitly. `--with-commands` is opt-in: the default report has suggestions only.
 
 ## See also
 
@@ -49,14 +49,9 @@ Forks to the `confluence-spec-analyst` agent. Read-only at the Confluence side �
 
 ## Handoff
 
-- `mk:planning-engine` accepts `--spec <report-path>` pointing at this report. User runs spec-analyst FIRST, then passes the resulting report path to planning-engine.
-- `mk:intake` recognizes Confluence URL/page-id as a 5th source — fetches raw page content via wrapper, recommends spec-analyst for deeper analysis.
-- `mk:jira-issue create` — human runs manually from the report's Suggested Commands (with `--with-commands` flag).
+`mk:planning-engine` reads the report via `--spec <report-path>`; run this skill first and pass it the path.
 
 ## Gotchas
 
-- Source page hash detects staleness; v1 produces a fresh report on every re-run (no diff mode).
-- `mk:multimodal` absent → Image / Diagram Findings section is omitted with `[NO_MULTIMODAL]` flag; rest of analysis proceeds.
-- Children pipeline: hard cap of 10 children. Default depth 1. User must explicitly raise both.
-- `--with-commands` is opt-in — default report has suggestions only; preserves "reports not automation".
-- Grow this list as new edge cases surface.
+- Every run writes a fresh report; the source-page hash in it shows whether the page changed.
+- Without `mk:multimodal` the Image / Diagram Findings section is omitted with a `[NO_MULTIMODAL]` flag and the rest proceeds.

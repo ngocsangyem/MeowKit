@@ -42,11 +42,11 @@ Rendered Markdown sections per story:
 6. **DoR** — sub-section (omitted when `dor_status` is null).
 7. **Split suggestion** — sub-section (omitted when `split_proposal` is null).
 8. **Refusal notice** — sub-section (only when `refusal_reason` is set).
-9. **Suggested Jira create command** — fenced bash block (v1 whitelist: `--project --type --summary --story-points --description [--epic] [--components] [--labels]`). Omitted for REFUSED records.
+9. **Suggested Jira create command** — fenced bash block (whitelist: `--project --type --summary --story-points --description [--epic] [--components] [--labels]`). Omitted for REFUSED records.
 
 The summary table at the end lists every story.
 
-## Suggested Create Command — v1 Field Whitelist
+## Suggested Create Command — Field Whitelist
 
 Allowed flags:
 
@@ -59,12 +59,12 @@ Allowed flags:
 - `--components <comma-list>`
 - `--labels <comma-list>`
 
-Not in v1: `--assignee`, `--priority`, `--sprint`, `--blocks`, `--custom-fields`. Phase 6 / 7 enforce the same whitelist at auto-create time.
+Not allowed: `--assignee`, `--priority`, `--sprint`, `--blocks`, `--custom-fields`. Gating and execution enforce the same whitelist at auto-create time.
 
 ## Idempotency
 
 The `source_hash` in the report header is the single mechanism for detecting "is this the same paste body as last time?". If the user re-runs the skill with an identical paste, the writer notices and prompts before overwriting.
 
-## Auto-Create Side Effects (Phase 7)
+## Auto-Create Side Effects
 
 `auto-create-execution.md` appends `## Created Tickets` (and optionally `## Comment Failures`) to the same report file. Those sections are NOT part of the initial render — they are appended only after batch confirmation completes.

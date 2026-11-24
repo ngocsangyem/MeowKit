@@ -1,10 +1,10 @@
-# Auto-Create Execution (Phase 7)
+# Auto-Create Execution
 
-Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in Phase 6 returns `Yes`. **Re-enforces the v1 field whitelist** at call time (defense in depth even though Phase 6 already checked).
+Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in gating returns `Yes`. **Re-enforces the field whitelist** at call time (defense in depth even though gating already checked).
 
 ## Contents
 
-- [Field Whitelist (v1)](#field-whitelist-v1)
+- [Field Whitelist](#field-whitelist)
 - [Two-Call Sequence (per story)](#two-call-sequence-per-story)
 - [Audit Comment Template](#audit-comment-template)
 - [Created Tickets Report Append](#created-tickets-report-append)
@@ -12,7 +12,7 @@ Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in
 - [Skill Rule of Two — call-time re-check](#skill-rule-of-two--call-time-re-check)
 - [What This File Does NOT Do](#what-this-file-does-not-do)
 
-## Field Whitelist (v1)
+## Field Whitelist
 
 Allowed flags on `/mk:jira-issue create`:
 
@@ -25,7 +25,7 @@ Allowed flags on `/mk:jira-issue create`:
 - `--components <comma-list>` (optional)
 - `--labels <comma-list>` (optional)
 
-**Strictly forbidden in v1** (call-time stripped): assignee, priority, sprint, blocks, and custom-field overrides. Phase 6 also rejects these at gating time; the executor re-strips as defense in depth.
+**Strictly forbidden** (call-time stripped): assignee, priority, sprint, blocks, and custom-field overrides. Gating also rejects these; the executor re-strips as defense in depth.
 
 ## Two-Call Sequence (per story)
 
@@ -46,18 +46,18 @@ Allowed flags on `/mk:jira-issue create`:
 On non-zero exit / error envelope:
 
 - STOP the batch immediately.
-- Print: `Batch stopped at story <id> (Call A failed). Created so far: <list>. Manual cleanup: /mk:jira-lifecycle delete <KEY> per stranded ticket.`
+- Print: `Batch stopped at story <id> (Call A failed). Created so far: <list>. Manual cleanup: /mk:jira-issue delete <KEY> per stranded ticket.`
 - Append `## Created Tickets` to the report covering what *did* get created.
 - DO NOT retry. DO NOT auto-rollback. The dev decides whether to delete the stranded tickets.
 
-### Call B — internal audit comment
+### Call B — restricted audit comment
 
 ```text
-/mk:jira-collaborate add-comment <NEW-KEY> --body "<rendered audit-comment template>" --internal
+/mk:jira-collaborate comment add <NEW-KEY> --body "<rendered audit-comment template>" --visibility-role Administrators
 → returns ok or error
 ```
 
-The `--internal` flag is mandatory. Audit comments are team-only and must never leak to customers/external watchers.
+The visibility restriction is mandatory. Audit comments must never reach customers or external watchers; Administrators is the safe default, and the user may name a team role instead.
 
 On Call-B error:
 
@@ -110,7 +110,7 @@ When Call A stopped mid-batch, also append:
 ### Stopped at S3 — Call A failed
 
 Reason: <error message>
-Manual cleanup hint: /mk:jira-lifecycle delete <KEY> per ticket above.
+Manual cleanup hint: /mk:jira-issue delete <KEY> per ticket above.
 ```
 
 When any Call B failed, also append:
@@ -134,13 +134,13 @@ Stories execute **sequentially** in `id` order — never in parallel. Sequential
 Before every Call A:
 
 1. Confirm the agent body (story-sizer) is NOT invoking the credentialed Jira wrapper directly.
-2. Confirm the flag-build step did NOT include any forbidden v1 flag.
-3. Confirm the description was already truncated to ≤5000 chars at Phase 6.
+2. Confirm the flag-build step did NOT include any forbidden flag.
+3. Confirm the description was already truncated to ≤5000 chars at gating.
 
-These are belt-and-braces — Phase 6 already enforces them — but they live in the executor too so a programmatic re-entry can't bypass them.
+These are belt-and-braces — gating already enforces them — but they live in the executor too so a programmatic re-entry can't bypass them.
 
 ## What This File Does NOT Do
 
 - It does NOT execute Jira calls itself. The actual `bash`/`jira-as` invocations are delegated to the peer skills (`mk:jira-issue`, `mk:jira-collaborate`) by the SKILL.md orchestration layer.
-- It does NOT auto-link blocks relationships (deferred from v1; dev links via `mk:jira-relationships` post-create).
+- It does NOT auto-link blocks relationships (not done here; dev links via `mk:jira-relationships` post-create).
 - It does NOT assign the ticket, set priority, or place it in a sprint. Those are team-poker decisions that happen post-creation.

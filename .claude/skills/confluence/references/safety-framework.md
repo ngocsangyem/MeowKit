@@ -30,24 +30,24 @@ Taxonomy for confluence-as ops, condensed to project conventions:
 - **Tier 1 (read-only)** — `page get`, `search`, `hierarchy *`, `version list`, `space list/get`, `comment list`, `attachment list/download`, `label list`, `watch list`. No confirmation; execute immediately.
 - **Tier 2 (single-item modify, reversible)** — `page create`, `comment add`, `label add`, `attachment upload`, `watch add`. Agent reports the change in response.
 - **Tier 3 (single-item destroy, version-history exists)** — `page update`, `page copy`, `page move`, `version restore`, `comment update`, `label remove`, `watch remove`. Agent confirms intent before exec; for `update`, show diff (current → proposed).
-- **Tier 4 (HIGH BLAST or irreversible)** — `page delete`, `comment delete`, `attachment delete`, `bulk *` (label add/remove, move, delete). Mandatory 3-step dry-run ceremony per `.claude/skills/confluence-bulk/references/dry-run-protocol.md`.
+- **Tier 4 (high blast or hard to undo)** — `page delete`, `comment delete`, `attachment delete`, `bulk *` (label add/remove, move, delete). `bulk *` follows the dry-run protocol in `.claude/skills/confluence-bulk/references/dry-run-protocol.md`; a single delete shows the page id and title and waits for a plain "yes".
 
 ## Dry-Run Protocol (Tier 4 ops)
 
 (Full enforcement details in `.claude/skills/confluence-bulk/references/dry-run-protocol.md`. Summary:)
 
-1. Always run with `--dry-run` first. Skipping is a hard violation.
-2. Agent presents `would_*` summary + impacted-count + first 5 affected page titles to the user.
-3. User must explicitly approve AND type a confirmation token (e.g. `"DELETE 47 PAGES"`). Bare "yes" is not enough — the typed token forces acknowledgment of count + operation.
-4. Agent re-invokes without `--dry-run` and with `--yes`.
+1. Run every `bulk` command with `--dry-run` first (the CLI has it); skipping is refused, because the CQL may match other pages than expected.
+2. Show the `would_*` summary, the impacted count and the first 5 affected page titles.
+3. A plain "yes" from the user approves it. Only an irreversible delete (`page delete --permanent`) needs a typed token, because a mistyped "yes" must not destroy data that cannot come back. A normal `page delete` or `bulk delete` moves pages to the trash.
+4. Re-run without `--dry-run` and with `--yes`.
 
-If the impacted_count differs by > 5% between dry-run and execute, surface as a concern in the Status block.
+If the impacted count differs by more than 5% between dry-run and execute, report it as a concern.
 
 ## Sanitization Rules
 
 - Any user-derived input flowing to `--cql` MUST pass through `cql-sanitize.sh` first. Sanitization is **unconditional** — there is no trusted-input path.
-- Any user-derived input flowing to `--page-id` MUST be numeric-validated: `[[ "$id" =~ ^[0-9]+$ ]]`
-- Any user-derived input flowing to `--space-key` MUST match `^[A-Z][A-Z0-9_]+$`
+- Any user-derived input used as a page id MUST be numeric-validated: `[[ "$id" =~ ^[0-9]+$ ]]`
+- Any user-derived input used as a space key MUST match `^[A-Z][A-Z0-9_]+$`
 - File paths for `--upload` MUST be under `$CLAUDE_PROJECT_DIR` or an explicitly allowlisted `/tmp/conf-*` prefix. Reject `..` traversal even though `confluence-as` also validates.
 - The wrapper rejects credentials in a host `settings.local.json` and any non-Cloud site URL.
 

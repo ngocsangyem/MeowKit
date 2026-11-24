@@ -1,6 +1,6 @@
 # Confluence Page Templates
 
-Canonical markdown skeletons for common page bodies. The wrapper accepts markdown via `--content` and auto-converts to Confluence storage format.
+Canonical markdown skeletons for common page bodies. The wrapper accepts markdown via `--body` (or `--file`) and auto-converts to Confluence storage format.
 
 ## Contents
 

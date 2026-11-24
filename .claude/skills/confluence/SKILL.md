@@ -46,7 +46,7 @@ dependency_edges:
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-This skill is a **pure routing layer**. Its sole purpose: identify the right `mk:confluence-*` leaf for the user's Confluence task, then point at it. **No execution.**
+This skill only routes: it identifies the right `mk:confluence-*` leaf for the user's Confluence task and points at it.
 
 ## Routing Table
 
@@ -72,7 +72,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`mewkit skill env confluence` installs `confluence-assistant-skills` into `.meowkit/envs/confluence/` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars). That reference also carries the **guided setup** sequence — the one place in this family that walks a user through credentials step by step, including the never-echo-the-token rule. Setup is the single operation the hub performs rather than routing, because it is a precondition for every leaf and belongs to no one of them.
+One-time install and credentials: `references/install-and-auth.md` (it also carries the guided setup, including the never-echo-the-token rule).
 
 ## Shared Resources (used by leaves)
 
@@ -86,13 +86,10 @@ See `references/install-and-auth.md` for one-time setup (`mewkit skill env confl
 
 ## Handoff
 
-- `mk:planning-engine` accepts `--spec <report-path>` flag pointing at an existing `mk:confluence-spec-analyst` report; user runs spec-analyst FIRST, then passes path
-- `mk:intake` recognizes Confluence URL/page-id as a 5th source; fetches page content directly via wrapper, does NOT auto-invoke spec-analyst
-- `mk:jira` → sister hub for Jira ticketing; spec-analyst report pairs with `mk:jira-issue create` to turn extracted user stories into tickets (manual review required, `--with-commands` is opt-in)
-- No write-back from `mk:cook` — Confluence write paths are out of scope
+Spec reports feed `mk:planning-engine` and `mk:intake`; see `mk:confluence-spec-analyst`.
 
 ## Gotchas
 
-- mk:confluence itself never executes; if you're in this skill thinking about wrapper commands, you're in the wrong place — forward to a leaf.
-- Binary name is `confluence-as` (NOT `confluence` despite some upstream README docs). The wrapper handles this; leaves call the wrapper.
-- Cloud-only — wrapper exits 3 on non-`*.atlassian.net` URLs. For Server/DC, users invoke MCP Atlassian directly per `references/install-and-auth.md`. Hub does NOT auto-fallback.
+- This hub never executes; if you are thinking about wrapper commands, forward to a leaf.
+- Shared CLI warnings (binary name, lossy ADF, POST retry, `--quiet`) live once in `references/cli-idioms.md`.
+- Cloud only: the wrapper exits 3 on a non-`*.atlassian.net` URL. Server/DC users call the Atlassian MCP server directly (`references/install-and-auth.md`); the hub does not fall back to it.

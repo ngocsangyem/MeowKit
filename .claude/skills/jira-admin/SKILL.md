@@ -39,8 +39,8 @@ Forks to the `jira-admin` agent. Highest-blast-radius leaf in the family.
 ## Examples
 
 - Project create: "create project KEY 'Project Name' as Software-Scrum"
-- Project delete (DESTRUCTIVE): "delete project STAGING" → agent enforces 2-step token confirmation: human types literal project key to confirm.
-- User deactivate: "deactivate user alice@..." (preferred over delete — preserves attribution)
+- Project delete (DESTRUCTIVE): "delete project STAGING" → irreversible, so the agent asks for the typed token from `../jira/references/safety-framework.md`.
+- User deactivate: "deactivate user alice@..." (preferred over delete: deactivation preserves attribution on past issues)
 
 ## Required Permissions
 
@@ -52,7 +52,7 @@ Admin role. Insufficient permission → exit code 3.
 - `user delete` — IRREVERSIBLE (use `deactivate` instead when possible)
 - `group delete` with members — affects member access globally
 
-The agent enforces 2-step token confirmation for these. The skill triggers them via natural language; the agent never auto-executes without explicit human-typed confirmation.
+The agent confirms each one per `../jira/references/safety-framework.md` (typed token for the irreversible deletes) and never runs one without that reply.
 
 ## Limitations
 

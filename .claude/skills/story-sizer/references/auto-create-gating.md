@@ -1,4 +1,4 @@
-# Auto-Create Gating (Phase 6)
+# Auto-Create Gating
 
 How `--auto-create --project <KEY>` reaches the human confirmation prompt — and the 5 pre-flight checks that ABORT before the prompt is ever shown. **No actual Jira mutation in this phase.** Execution lives in `references/auto-create-execution.md`.
 
@@ -84,7 +84,7 @@ Prevents the "I edited the paste then re-ran auto-create" footgun.
 
 ## Dry-run Table
 
-Once all five checks pass, render this markdown table (no Blocks column in v1):
+Once all five checks pass, render this markdown table (no Blocks column):
 
 ```text
 | # | Summary                  | Type  | Points | Epic       | Notes               |
@@ -98,10 +98,10 @@ Columns:
 
 - `#` — sequential within the batch.
 - `Summary` — truncated to 60 chars in the table (full summary in the report).
-- `Type` — defaults to `Story`. v1 has no `--type` override flag.
-- `Points` — heuristic estimate from Phase 3.
+- `Type` — defaults to `Story`. there is no `--type` override flag.
+- `Points` — heuristic estimate from the scorer.
 - `Epic` — value of `--epic` if provided, blank otherwise.
-- `Notes` — `SPLIT SUGGESTED` marker only; no `Blocks #N` in v1.
+- `Notes` — `SPLIT SUGGESTED` marker only; no `Blocks #N`.
 
 ## Single Confirmation Gate
 
@@ -127,8 +127,8 @@ When `--dry-run-only` is set:
 4. Print the rendered table to stdout.
 5. Exit code 0 (or non-zero if any check ABORTed).
 
-This is the entry point for tests in `tests/story-sizer-auto-create-gating.test.sh`. It exists for unit testing only — a real user never benefits from this flag.
+This is a test entry point. It exists for unit testing only — a real user never benefits from this flag.
 
 ## Defense in depth
 
-Phase 7 execution re-runs the v1 field whitelist + injection-pattern scan at call time. If a future caller bypasses Phase 6 gating (e.g., a programmatic re-entry), Phase 7 still refuses to emit forbidden flags or injection-tainted content.
+Execution re-runs the field whitelist + injection-pattern scan at call time. If a future caller bypasses gating (e.g., a programmatic re-entry), execution still refuses to emit forbidden flags or injection-tainted content.

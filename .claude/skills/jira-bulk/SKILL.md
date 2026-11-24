@@ -27,15 +27,9 @@ default_enabled: false
 
 Forks to the `jira-bulk` agent. The agent enforces a hard dry-run-first rule at runtime.
 
-## Dry-Run Workflow (MANDATORY)
+## Dry-Run Rule
 
-```
-Step 1: invocation + --dry-run
-Step 2: agent shows would_* JSON keys + impacted-count
-Step 3: explicit user "yes" → re-invoke without --dry-run
-```
-
-Skipping Step 1 is a hard violation. The agent will refuse if asked to skip the dry-run.
+Every bulk command runs with `--dry-run` first; the user approves the would_* summary and its count with a plain "yes", then the command runs again without it. Bulk changes are hard or impossible to undo, so the agent refuses to skip the dry-run. A bulk delete is irreversible and also needs the typed token in `../jira/references/safety-framework.md`.
 
 ## Triggers
 
@@ -49,19 +43,19 @@ Skipping Step 1 is a hard violation. The agent will refuse if asked to skip the 
 
 - Mass transition: "transition all PROJ tickets in 'In Progress' for >30 days to Stalled"
 - Reassignment: "reassign all open PROJ tickets from alice@ to bob@"
-- Cleanup: "delete spam tickets matching JQL 'reporter = ext-bot AND created < -1y'" (dry-run + 2-step confirm)
+- Cleanup: "delete spam tickets matching JQL 'reporter = ext-bot AND created < -1y'" (dry-run, then the typed delete token)
 
 ## See also
 
 - Agent: `../../agents/jira-bulk.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
 - Domain refs:
-  - `references/safety-checklist.md` — pre-flight checklist for any bulk operation >50 issues
-  - `references/checkpoint-guide.md` — checkpoint + resume strategy for 500+ issue ops
+  - `references/safety-checklist.md` — optional pre-flight checklist; use it above 50 issues
+  - `references/checkpoint-guide.md` — `--checkpoint` resume for long runs
 - **Workflow cache (read for accurate dry-run output)**:
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered statuses + transitions (run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent; see `../jira-lifecycle/references/workflow-discovery.md`)
-  - For `bulk transition --to "<Status>"`, validate the target status name exists in the cache; for `--id <N>`, validate the transition ID exists. Mismatch → reject before exec.
-- Peer leaves: `mk:jira-search` (JQL author + `bulk-update` overlap — same dry-run discipline), `mk:jira-lifecycle` (single-issue transitions; same cache), `mk:jira-relationships` (`bulk-link` is here)
+  - For `bulk transition --to "<Status>"`, validate the target status name exists in the cache. Mismatch → reject before exec.
+- Peer leaves: `mk:jira-search` (JQL author; `search bulk-update` above 10 issues comes here), `mk:jira-lifecycle` (single-issue transitions; same cache), `mk:jira-relationships` (`bulk-link`) and `mk:jira-time` (`bulk-log`) own those verbs and follow the same dry-run rule
 
 ## Gotchas
 

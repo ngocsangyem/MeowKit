@@ -1,135 +1,34 @@
 # Dry-Run Protocol
 
-The 3-step ceremony for any `mk:confluence-bulk` Tier-4 op, with example transcripts.
+How every `mk:confluence-bulk` operation runs. Shown as `$WRAPPER` below: `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh`.
 
-## Contents
-
-- [The Ceremony](#the-ceremony)
-- [Example Transcript: Bulk Label](#example-transcript-bulk-label)
-- [Example Transcript: Bulk Delete (with elevated confirmation)](#example-transcript-bulk-delete-with-elevated-confirmation)
-- [Refusal Patterns](#refusal-patterns)
-
-## The Ceremony
+## The protocol
 
 ```
-Step 1 — Dry-run
-  bash $WRAPPER bulk <op> --cql "<sanitized>" --dry-run --max-pages 100
-
-Step 2 — Inspect + Confirm
-  Agent presents:
-    - impacted_count
-    - first 5 affected page titles + IDs
-    - the confirm command to run next
-    - the typed-token requirement
-  User types: "<TOKEN>" matching the format the agent specifies
-
-Step 3 — Execute
-  bash $WRAPPER bulk <op> --cql "<sanitized>" --max-pages 100 --yes
+Step 1  $WRAPPER bulk <op> --cql "<sanitized>" --dry-run --max-pages 100
+Step 2  Show impacted count, first 5 page titles + ids, and what will change. The user replies "yes".
+Step 3  $WRAPPER bulk <op> --cql "<sanitized>" --max-pages 100 --yes
 ```
 
-## Example Transcript: Bulk Label
+A bulk delete moves pages to the trash and a plain "yes" is enough; restoring is manual in the Confluence UI.
+
+## Example
 
 ```
-USER:    label every page in space DOCS older than 90 days as 'archive'
-
-AGENT:   Step 1 — running dry-run.
-         (sanitizing CQL: "space = DOCS AND lastModified < now(\"-90d\")")
-
-         bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh \
-             bulk label add --cql 'space = DOCS AND lastModified < now("-90d")' \
-             --label "archive" --dry-run --max-pages 100
-
-         Result:
-           impacted_count: 23
-           first 5 affected:
-             - 12001 — "Old Onboarding Guide"
-             - 12002 — "Deprecated Auth Spec"
-             - 12003 — "v0.5 Release Notes"
-             - 12004 — "2024 Q1 Roadmap"
-             - 12005 — "Legacy Migration Plan"
-
-         Step 2 — Confirm.
-         To proceed, type: LABEL 23 PAGES ARCHIVE
-
-USER:    LABEL 23 PAGES ARCHIVE
-
-AGENT:   Step 3 — executing.
-
-         bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh \
-             bulk label add --cql 'space = DOCS AND lastModified < now("-90d")' \
-             --label "archive" --max-pages 100 --yes
-
-         Result:
-           pages_changed: 23
-           first 5: 12001, 12002, 12003, 12004, 12005
-           last 5: 12019, 12020, 12021, 12022, 12023
-           Search: https://acme.atlassian.net/wiki/search?cql=label%20%3D%20%22archive%22
-
-         Status: DONE
+USER:  label every page in space DOCS older than 90 days as 'archive'
+AGENT: $WRAPPER bulk label add --cql 'space = DOCS AND lastModified < now("-90d")' \
+           --labels "archive" --dry-run --max-pages 100
+       impacted_count: 23; first 5: 12001 "Old Onboarding Guide", 12002 ...
+       Label these 23 pages? Reply "yes" to proceed.
+USER:  yes
+AGENT: $WRAPPER bulk label add --cql '...' --labels "archive" --max-pages 100 --yes
+       23 pages changed. Status: DONE
 ```
 
-## Example Transcript: Bulk Delete (with elevated confirmation)
+## Refusals
 
-```
-USER:    delete every page in space TMP
+If asked to skip the dry-run ("I already checked"): run it anyway. A CQL that looked right from memory can match different pages than expected, and the check takes seconds.
 
-AGENT:   This operation matches a high-blast-radius pattern (no time restriction
-         on the CQL). Confirm the scope is intentional.
+If the dry-run count exceeds `--max-pages`: show the count, and ask whether to raise the cap or narrow the CQL.
 
-         Step 1 — running dry-run.
-
-         bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh \
-             bulk delete --cql 'space = TMP' --dry-run --max-pages 100
-
-         Result:
-           impacted_count: 47
-           first 5 affected:
-             - 9001 — "Sandbox Notes"
-             - 9002 — "Test Page (do not edit)"
-             - 9003 — "Throwaway Draft"
-             - 9004 — "Brainstorm 2025"
-             - 9005 — "Old Test"
-
-         Step 2 — Confirm.
-         Bulk delete is soft-delete to trash; restore requires the Confluence UI.
-         To proceed, type: DELETE 47 PAGES IN TMP
-
-USER:    DELETE 47 PAGES IN TMP
-
-AGENT:   Step 3 — executing.
-
-         bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh \
-             bulk delete --cql 'space = TMP' --max-pages 100 --yes
-
-         Result:
-           pages_changed: 47
-           ...
-
-         Status: DONE
-```
-
-## Refusal Patterns
-
-If the user asks the agent to skip the dry-run ("just delete them, I checked already"):
-
-```
-The dry-run is unconditional — every bulk op runs with --dry-run first regardless
-of who confirms it. The reason: a CQL that looked right from memory will sometimes
-match different pages than expected (recently created pages, label drift, ancestor
-shifts). Step 2 is a 5-second sanity check; the cost of skipping it is much higher
-than the cost of running it.
-
-I'll run the dry-run now.
-```
-
-If the user requests a count higher than the cap without raising `--max-pages`:
-
-```
-The default cap is 100 pages. The dry-run reported 187 matches. To proceed:
-  1. Re-run with --max-pages 200
-  2. Re-confirm the count after seeing the new dry-run
-
-Or, narrow the CQL to reduce the match set.
-```
-
-If the impacted_count differs by > 5% between dry-run and execute, surface as a concern in Status.
+If the impacted count differs by more than 5% between dry-run and execute, report it as a concern in the status.

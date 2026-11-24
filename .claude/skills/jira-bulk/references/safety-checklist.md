@@ -1,6 +1,6 @@
 # Bulk Operations Safety Checklist
 
-Use this checklist before executing any bulk operation affecting >50 issues.
+Optional: use this checklist for a bulk operation above 50 issues. Smaller runs need only the dry-run.
 
 ## Contents
 
@@ -66,8 +66,8 @@ For operations affecting >200 issues or high-impact changes:
 ### Execution Phase
 
 ```markdown
-- [ ] Current state exported for rollback: `jql_search.py ... --format csv > before.csv`
-- [ ] Checkpointing enabled (if >500 issues): `--enable-checkpoint`
+- [ ] Current state exported for rollback: `search export "<JQL>" --output before.csv`
+- [ ] Checkpointing enabled (if >500 issues): `--checkpoint <file>`
 - [ ] Test batch successful: `--max-issues 10`
 - [ ] Test batch results verified in JIRA
 - [ ] Full operation executed
@@ -145,8 +145,3 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk transition 
 2. Manual review of automation changes
 3. Contact JIRA admin for backup (last resort)
 ```
-
----
-
-## Related Documentation
-
