@@ -31,7 +31,7 @@ Discovery, composition, and validation for the rubric library at `rubrics/`.
 
 > **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
 
-> **Consumed by `evaluator` agent + `mk:evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` subagent (`.claude/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk:evaluate` skill (`.claude/skills/evaluate/`) is the orchestration shell. This skill (`mk:rubric`) remains independently invokable via `/mk:rubric <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
+> **Consumed by the `evaluator` agent and the `mk:evaluate` skill.** The dedicated `evaluator` subagent (`.claude/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk:evaluate` skill (`.claude/skills/evaluate/`) is the orchestration shell. This skill (`mk:rubric`) remains independently invokable via `/mk:rubric <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 
 ## When to Use
 
@@ -106,7 +106,7 @@ ${CLAUDE_SKILL_DIR}/scripts/validate-rubric.sh
 Rubrics MUST conform to `rubrics/schema.md`. The validator enforces:
 - Required frontmatter fields (`name`, `version`, `weight_default`, `applies_to`, `hard_fail_threshold`)
 - Required sections in order
-- ≥1 PASS + ≥1 FAIL anchor example, balanced (±1)
+- ≥1 PASS + ≥1 FAIL anchor example, balanced (`rubrics/schema.md` owns the exact rule)
 - File ≤200 lines
 
 Composition presets MUST have all weights summing to 1.0 ±0.01.
@@ -122,7 +122,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 
 - **Adding a new rubric:** drop a `.md` file into `rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
 - **Weight drift:** if you change a rubric's `weight_default`, all presets that reference it must be re-checked for sum=1.0.
-- **Anti-patterns are FIXED:** they trigger FAIL regardless of the surrounding criteria. Don't add subjective ones.
+- **Anti-patterns trigger FAIL regardless of the surrounding criteria**, so add only objective ones.
 - **Don't load all rubrics:** the evaluator should load only the relevant preset, not the whole library — context efficiency.
 
 ## References
@@ -131,12 +131,13 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 |---|---|
 | `scripts/load-rubric.sh` | Load + emit prompt fragment for one rubric or preset |
 | `scripts/validate-rubric.sh` | Schema conformance + weight-sum validator |
-| `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
+| `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized), and the drift check by hand |
+| `references/rubric-rules.md` | The ten rule statements; each points to the file that owns the detail |
 | `rubrics/schema.md` | Canonical rubric format specification |
-| `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
-| `../evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
+| `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification |
+| `../evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` |
 
 ## Start
 
 For interactive use, run `scripts/load-rubric.sh --list` to discover available rubrics.
-For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `.claude/skills/evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk:evaluate stub-guards on the `contract_schema_version:` marker).
+For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `.claude/skills/evaluate/scripts/run-evaluator.sh`. A signed sprint contract, when one exists, narrows the criteria (step 1 of `mk:evaluate`).

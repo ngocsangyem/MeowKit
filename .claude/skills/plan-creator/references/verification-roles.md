@@ -17,7 +17,7 @@
 
 ## Where it runs
 
-`step-04-semantic-checks.md` sub-step 4d. Runs AFTER 4a (semantic) and 4b (structural). Skipped if either prior sub-step fails or if `planning_mode = fast | product-level`.
+`step-04-semantic-checks.md`, verification part. Runs after the semantic and structural checks pass; skipped for `planning_mode = fast | spike | product-level`. With one or two phases the planner runs the Fact Checker inline instead of delegating.
 
 ## Tier selection by phase count
 

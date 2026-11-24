@@ -36,13 +36,24 @@ Match palette to product type:
 - **Line height**: 1.5–1.75 for body text, 1.1–1.3 for headings
 - **Line length**: 65–75 characters for readability
 
+## Spacing
+
+4px is the base unit and layouts step on an 8px rhythm: 4, 8, 12, 16, 24, 32, 48, 64, 80. Use scale values only, with component padding of 12–24px and section spacing of 48–80px. Vary spacing to signal hierarchy instead of using one value everywhere.
+
 ## Responsive Breakpoints
+
+Breakpoints follow Tailwind's defaults; the checked width below them is 320px.
 
 | Breakpoint | Target | Design approach |
 |-----------|--------|----------------|
-| 320px+ | Mobile (small) | Single column, stacked, thumb-zone navigation |
-| 768px+ | Tablet | 2-column options, expanded navigation |
-| 1024px+ | Desktop | Full layout, sidebar options, hover states |
-| 1440px+ | Large desktop | Max-width container, wider gutters |
+| 320px+ | Mobile (small): lowest width to verify | Single column, stacked, thumb-zone navigation |
+| 640px+ (`sm`) | Mobile landscape | Wider single column |
+| 768px+ (`md`) | Tablet | 2-column options, expanded navigation |
+| 1024px+ (`lg`) | Desktop | Full layout, sidebar options, hover states |
+| 1280px+ (`xl`), 1536px+ (`2xl`) | Large desktop | Max-width container, wider gutters |
 
-Always design mobile-first, enhance upward.
+Design mobile-first and enhance upward. Body text is at least 16px on mobile so iOS does not zoom.
+
+## Dark Mode
+
+Build a separate dark palette instead of inverting the light one: dark grey surfaces rather than pure black, text off pure white, saturation reduced by 10–15%, and every contrast ratio re-checked in the dark theme.

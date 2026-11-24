@@ -78,6 +78,10 @@ Fallback chain — try each step; move to next if step unavailable:
    → Ask user to export as PDF first
 ```
 
+## No vision available
+
+On a model that cannot read images or video, do not guess at their content. Work from the filenames, alt text, captions and surrounding ticket text, state which attachments were not analysed, and add the gap to the Design Context section (`Gaps:`) so the author can describe them.
+
 ## Output: Design Context Section
 
 After processing all attachments, append to intake analysis:

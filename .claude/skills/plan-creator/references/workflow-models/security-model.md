@@ -3,7 +3,7 @@
 Applies when: security reviews, vulnerability assessments, auth/payment changes, incident response.
 
 ## Plan Shape
-Required: Goal, Threat Model, Audit Scope, Security Checklist, Acceptance Criteria, Agent State
+Required: Goal, Threat Model, Audit Scope, Security Checklist, Acceptance Criteria
 Optional: Findings (filled during audit), Remediation Plan
 
 ## Phase Flow
@@ -18,13 +18,3 @@ planner → security (audit) → reviewer (verify remediations) → shipper
 
 ## Model Tier
 Always COMPLEX — uses best available model regardless of file count.
-
-## Context Reminder (MANDATORY)
-
-Once the plan is agreed, MUST print the cook command with absolute plan path.
-Always: `/mk:cook {path}/plan.md` (interactive, never --auto for security).
-
-> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
-> Then run the cook command.
-
-This is **NON-NEGOTIABLE** — always output once the plan is agreed.

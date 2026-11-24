@@ -14,7 +14,7 @@ Read this BEFORE emitting any mermaid block, in markdown or HTML.
 
 ## Pinned version
 
-`11.4.x` — keep this version identical in `references/html-design-rules.md` → "CDN resources". A single edit bumps both.
+Use the version already in the `assets/*.html` templates (11.4.1 at the time of writing); do not load `latest`. Mermaid syntax rules are owned by `mk:mermaidjs-v11`.
 
 ## Init pattern (HTML)
 

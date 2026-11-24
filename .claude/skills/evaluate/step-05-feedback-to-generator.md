@@ -51,10 +51,11 @@ PASS — no iteration feedback. Proceed to ship.
 
 ### 5c. Cleanup
 
-If step-02 booted a build process (`build_pid` is set), kill it now:
+If step 2 booted a build process (`$evidence_dir/.build-pid` exists), stop it now:
 
 ```bash
-if [ -n "${build_pid:-}" ]; then
+if [ -f "$evidence_dir/.build-pid" ]; then
+  build_pid=$(cat "$evidence_dir/.build-pid")
   kill "$build_pid" 2>/dev/null || true
   echo "Stopped booted build PID $build_pid"
 fi
@@ -77,7 +78,7 @@ FEEDBACK_COUNT: {N}
 {feedback list inline}
 
 NEXT_ACTION:
-  - PASS → route to shipper (Phase 5)
+  - PASS → route to the shipper
   - WARN → optional one more iteration (harness decides per budget)
   - FAIL → route back to generator with feedback list above
 ```
@@ -87,7 +88,7 @@ NEXT_ACTION:
 End the evaluator session with the structured status block per `agent-conduct.md` (A1):
 
 ```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
 **Summary:** {1-2 sentences: overall verdict + key driver}
 **Concerns/Blockers:** {if any criteria could not be probed, list them}
 ```
@@ -97,6 +98,7 @@ Examples:
 - `DONE` — verdict written, all criteria probed, validator stamped
 - `DONE_WITH_CONCERNS` — verdict written, but 2 criteria could not be probed because the WebSocket endpoint was unreachable; verdict reflects partial coverage
 - `BLOCKED` — could not produce a verdict (target never came up, rubric library missing, validator persistently rejected)
+- `NEEDS_CONTEXT` — the target, the rubric preset or the spec is missing and the caller must supply it
 
 ## Output
 
@@ -108,7 +110,7 @@ Examples:
 
 This is the final step. Return to the caller (the harness skill or the user who invoked `/mk:evaluate`).
 
-The harness (Phase 5) consumes:
+The harness consumes:
 - `overall_verdict` to decide whether to loop the generator or proceed to ship
 - `feedback` list to pass into the next generator iteration
 - `verdict_file` path for archival in the sprint contract record

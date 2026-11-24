@@ -1,6 +1,6 @@
 # Pre-Flight Checklist
 
-Per-mode checks before Figma operations. Run the Core block for every mode; add the Implement or
+Per-mode checks before Figma operations. Run the Core block before multi-node or write work; a quick read of one frame needs only items 1, 2 and 4. Add the Implement or
 Canvas-write block only for those workflows. STOP on any failure in the applicable blocks.
 
 ## Core (all modes) — 6 items

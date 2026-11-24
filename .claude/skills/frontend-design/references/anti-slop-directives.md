@@ -1,6 +1,6 @@
 # Anti-Slop Directives
 
-Patterns that mark AI-generated UI as generic and forgettable. Avoid all of them.
+Optional support for new screens and redesigns: patterns that mark AI-generated UI as generic and forgettable, with the replacements.
 
 ## Patterns to Avoid
 
@@ -18,7 +18,7 @@ Patterns that mark AI-generated UI as generic and forgettable. Avoid all of them
 
 | Instead of | Use |
 |---|---|
-| Generic gradient | Specific palette from `.claude/skills/ui-design-system/assets/colors.csv` matched to the product's emotional tone |
+| Generic gradient | Specific palette from the `mk:ui-design-system` colors.csv palette data matched to the product's emotional tone |
 | Excessive rounding | Intentional corner radius scale: sharp for data-dense UIs, rounded for consumer apps — applied consistently |
 | "Welcome to [App]" | Specific value proposition: what the user can do, not what the app is called |
 | Default component theme | Override at minimum: primary color, font, border radius, shadow scale |

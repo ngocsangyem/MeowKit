@@ -41,12 +41,11 @@ grill = "is this plan fully resolved?".
 
 ## When to Use
 
-- User says "grill me", "stress-test this plan", "get grilled on my design", or
-  "interrogate my plan / design".
+- User says "grill me", "get grilled on my design", or "interrogate my plan / design".
 - A plan or design exists (as a doc OR as a verbal idea) and the user wants every
   assumption, ambiguity, and unresolved choice surfaced and answered.
 - Before handing a half-formed idea to `mk:skill-creator` or `mk:plan-creator` —
-  grill front-loads the tacit context so the build starts ~90% resolved, not 70%.
+  grill front-loads the tacit context so the build starts from a resolved design.
 
 ## When NOT to Use
 
@@ -58,6 +57,9 @@ grill = "is this plan fully resolved?".
 | One-shot review of an existing plan                    | `mk:plan-ceo-review`  |
 | Apply named reasoning lenses to existing findings      | `mk:elicit`           |
 | Constitution derived from the CODEBASE (not the human) | `mk:project-context`  |
+| Check a finished plan's completeness (no questions to the user) | `mk:validate-plan` |
+
+To defend a plan against an adversarial read, grill: it asks the user, one question at a time. To check a finished plan's completeness, use `mk:validate-plan`.
 
 ## Plan-First Boundary
 
@@ -160,8 +162,8 @@ forever. The user always holds the stop button.
 
 On confirmed wrap-up, present the three handoffs:
 
-1. **`mk:skill-creator`** — if the resolved design is a skill to build. Context is
-   front-loaded, so the build starts ~90% resolved.
+1. **`mk:skill-creator`** — if the resolved design is a skill to build; the context is
+   front-loaded.
 2. **`mk:plan-creator`** (or **`mk:brainstorming`** if approaches are still open) —
    if it's a feature/system to plan or still needs solution exploration.
 3. **`mk:project-context`** — to merge the extracted human knowledge into the
@@ -211,16 +213,9 @@ plan) — not through grill editing the original.
 
 ## Gotchas
 
-- **Batching questions** — the whole point is ONE question per turn. If you feel
-  the urge to ask two, you have two turns, not one. Never reach for
-  Ask the user (it isn't in `allowed-tools` for exactly this reason).
 - **Proposing instead of interrogating** — the moment you suggest the answer,
   you've drifted into `mk:brainstorming`. Ask about the user's choice; don't make it.
-- **Skipping the checkpoint** — "I'll write it all at the end" loses everything on
-  a context reset. Write after every single answer; that's the survival mechanic.
 - **Papering over a gap** — a confident-sounding guess on something the user
   doesn't own is worse than a flagged Open Gap. Flag it and name who to ask.
 - **Grilling forever** — without the hybrid wrap-up you fatigue the user. Surface
   the readiness signal each checkpoint and propose wrap-up when branches drain.
-- **Editing the source doc** — grill is read-only on the plan/design; the only
-  file it writes is `docs/knowledge/<slug>.md`.

@@ -1,10 +1,10 @@
-# Fix-First Review (Step 5)
+# Fix-First Review
 
-**Every finding gets action — not just critical ones.**
+The review reports by default. This flow runs only with `--fix`, and when `mk:ship` applies its own pre-landing fixes. Without it, hand the findings to the developer or to `mk:fix`.
 
 Output a summary header: `Pre-Landing Review: N issues (X critical, Y informational)`
 
-## Step 5a: Classify each finding
+## Step a: Classify each finding
 
 For each finding, classify as AUTO-FIX or ASK:
 - **AUTO-FIX**: mechanical, low-ambiguity changes (formatting, typos, obvious null checks, missing imports, CSS pattern fixes like `!important` removal)
@@ -12,12 +12,12 @@ For each finding, classify as AUTO-FIX or ASK:
 
 Critical findings lean toward ASK; informational findings lean toward AUTO-FIX.
 
-## Step 5b: Auto-fix all AUTO-FIX items
+## Step b: Auto-fix all AUTO-FIX items
 
 Apply each fix directly. For each one, output a one-line summary:
 `[AUTO-FIXED] [file:line] Problem -> what you did`
 
-## Step 5c: Batch-ask about ASK items
+## Step c: Batch-ask about ASK items
 
 If there are ASK items remaining, present them in ONE ask the user:
 
@@ -42,7 +42,7 @@ RECOMMENDATION: Fix both — #1 is a real race condition, #2 prevents silent dat
 
 If 3 or fewer ASK items, you may use individual user questions instead of batching.
 
-## Step 5d: Apply user-approved fixes
+## Step d: Apply user-approved fixes
 
 Apply fixes for items where the user chose "Fix." Output what was fixed.
 
@@ -62,8 +62,8 @@ Before producing the final review output:
 
 If the PR has review comments from GitHub reviewers or CI bots:
 
-1. **VALID & ACTIONABLE comments:** Include in your findings — follow Fix-First flow (auto-fix if mechanical, batch into ASK if not). Log resolution to `.meowkit/telemetry/reviews.jsonl`.
+1. **VALID & ACTIONABLE comments:** Include in your findings — follow Fix-First flow (auto-fix if mechanical, batch into ASK if not).
 
 2. **FALSE POSITIVE comments:** Present each by asking the user with evidence for why it's incorrect. Options: A) Dismiss with explanation, B) Fix anyway, C) Ignore.
 
-3. **ALREADY ADDRESSED comments:** Note what was done and the fixing commit SHA. Log to `.meowkit/telemetry/reviews.jsonl`.
+3. **ALREADY ADDRESSED comments:** Note what was done and the fixing commit SHA.

@@ -8,7 +8,7 @@ scripts/      Executable scripts for deterministic checks
               Examples: security-scan.py, check-types.sh, validate-schema.py
 
 references/   Detailed docs loaded on-demand
-              Use when: SKILL.md would exceed 150 lines with inline content
+              Use when: SKILL.md would run past one screen of inline detail
               Examples: api-reference.md, error-codes.md, platform-specifics.md
 
 assets/       Templates and boilerplate to copy
@@ -26,6 +26,8 @@ config.json   User-specific setup
 
 ## Size guideline
 
-- SKILL.md: under 150 lines (router + gotchas + key decisions)
-- Each reference file: under 200 lines
+- SKILL.md: at most 500 lines and about 5,000 tokens (Rule 3), and a normal run reads far less
+- Each reference file: short enough that loading it is cheap; split a long one by situation
 - Scripts: as short as possible; one purpose per script
+
+Example file names above are illustrative; a skill does not need all of them.

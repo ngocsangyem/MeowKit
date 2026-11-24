@@ -2,7 +2,7 @@
 name: frontend-app
 version: 2.0.0
 applies_to: [frontend]
-description: Default composition for browser-rendered apps. 4 distinctive rubrics — pruned per red-team necessity audit (260408).
+description: Default composition for browser-rendered apps. 4 distinctive rubrics; the other three overlap existing review layers.
 rubrics:
   - name: product-depth
     weight: 0.30
@@ -24,18 +24,16 @@ Default composition for any frontend / browser-rendered build. **Pruned in v2.0.
 - Build has a visual surface and user interactions
 - The deliverable can be exercised by `mk:agent-browser` or `mk:playwright-cli`
 
-## What Changed in v2.0.0
+## What the preset loads and why
 
-The red-team necessity audit (`tasks/reports/red-team-260408-1117-rubric-necessity-audit.md`) found that `code-quality`, `craft`, and `ux-usability` rubrics overlap with existing `mk:review` 5-dim verdict, security-rules, and tdd-rules. Loading them by default duplicated work the existing layers already do.
+`code-quality`, `craft` and `ux-usability` overlap `mk:review`, the security rules and `mk:qa`, so they are not loaded by default. The four retained rubrics each cover a gap those layers leave:
 
-The 4 retained rubrics each close a verified gap:
-
-| Rubric | Gap closed (audit-verified) |
+| Rubric | Gap it covers |
 |---|---|
-| `product-depth` | Solo agent under-scoping. `mk:review` Criteria Auditor accepts stubs and silent feature substitutions. |
-| `functionality` | Active verification. `mk:verify` runs build/lint/test/coverage but never executes the artifact (no curl, no browser). |
-| `design-quality` | AI slop. `.claude/skills/review/references/design-review.md` was silently disabled by a deleted-file dependency until the 260408 fix. |
-| `originality` | AI slop, generic copy, stock illustrations. No existing layer evaluates visual originality at all. |
+| `product-depth` | A solo agent under-scoping; `mk:review`'s Criteria Auditor accepts stubs and silent feature substitution |
+| `functionality` | Active verification; `mk:verify` runs build, lint and tests but never exercises the artifact |
+| `design-quality` | Generic, templated visual output |
+| `originality` | Stock illustrations and generic copy; no other layer judges originality |
 
 ## Excluded Rubrics (still in library, opt-in only)
 
@@ -49,8 +47,8 @@ To opt in to one of these for a specific run, the evaluator can call `load-rubri
 
 ## Weight Rationale
 
-- **product-depth + functionality (0.60)** — under-scoping and active-verification are the audit's top scenarios. 60% of the weight is "the spec was honored AND it actually runs."
-- **design-quality + originality (0.40)** — slop is the dominant solo-agent failure mode per Anthropic. Combined weight matches Anthropic's published bias against generic output.
+- **product-depth + functionality (0.60)** — under-scoping and missing active verification are the top failure modes. 60% of the weight is "the spec was honored AND it actually runs."
+- **design-quality + originality (0.40)** — slop is the dominant solo-agent failure mode. Combined weight matches Anthropic's published bias against generic output.
 
 Weights sum to 1.00.
 

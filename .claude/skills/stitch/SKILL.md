@@ -79,21 +79,6 @@ npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd ${CLAUDE_
 `stitch-api-call.ts` also checks `STITCH_API_KEY` as its first action before any Stitch SDK
 call. If the key is unset the script exits 1 immediately — no network request is made.
 
-## Quick Start
-
-```bash
-# 1. Check quota
-npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-quota.ts check
-
-# 2. Generate (API call only — returns JSON with screenId + imageUrl)
-npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts \
-  generate "A checkout page with cart summary and payment form"
-
-# 3. Export + write files (pipe: API call → schema-validate → write to disk)
-npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts export <screen-id> | \
-  npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-write-output.ts
-```
-
 ## Commands
 
 | Task | Command / contract |
@@ -130,7 +115,7 @@ and the handoff contract are in [references/stitch-operations.md](references/sti
 - `tsx` must be installed (`npm install` in `scripts/`) — scripts will not run without it; install once per machine
 - Local quota can drift from real Stitch usage (e.g., designs made via the Stitch web UI); if you hit `RATE_LIMITED` despite the tracker showing credits, run `stitch-quota.ts reset`
 - Quota limits and paid-tier availability are volatile; load [quota-management.md](references/quota-management.md) before making a quota-based decision.
-- Screen IDs returned by `generate` are stable (Tool Contract Rule 2); project name auto-detection uses git remote then CWD basename
+- Project name auto-detection uses the git remote, then the working-directory basename
 - The optional MCP integration is configured in your runtime's MCP config (on Claude Code, `.mcp.json` at the project root). Reference the key as `${STITCH_API_KEY}` there and never paste the raw key into the file
 - `stitch-write-output.ts` validates CDN URLs against a Google-domain allowlist; if Stitch changes CDN domains, update `ALLOWED_CDN_SUFFIXES` in that script
 

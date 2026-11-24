@@ -1,60 +1,33 @@
-# Step 1: Research (Hard/Deep/Parallel/Two/Product-Level Only)
+# Step 1: Research and Scout
 
-**Skip if:** `planning_mode = fast`. Go directly to `step-03-draft-plan.md`.
+Hard-family and product-level modes only; `fast` and `spike` go straight to step 3. Done when the plan directory exists, `research/` holds the researcher reports (or says why none were needed), and you can state the codebase findings.
 
-Spawn bounded researchers to investigate unknowns before planning.
+## 1a. Create the plan directory
 
-## Instructions
+Create `tasks/plans/YYMMDD-{slug}/research/` now, so research has a home. Step 3 writes the plan files into it.
 
-If `intake_packet_path` is set (not `none`), read the packet FIRST — do not spawn
-researchers for questions the packet already answers with `from:` evidence.
+## 1b. Research unknowns
 
-### 1a. Determine Research Aspects
+If `intake_packet_path` is set, read the packet first and skip any question it already answers with `from:` evidence.
 
-From the task description, identify 2 distinct research questions:
-- Aspect A: typically technology/approach investigation
-- Aspect B: typically existing codebase patterns or constraints
+Name the one or two unknowns that would change the plan: usually a technology or approach question, and an existing-codebase pattern or constraint. One unclear aspect means one researcher; a familiar domain means none (note "research skipped: familiar domain"). REDUCTION uses one researcher.
 
-If only 1 aspect is unclear → spawn 1 researcher.
-If task is well-understood → skip research, note "research skipped: familiar domain".
+Delegate each aspect to a researcher subagent when the runtime can; for a small question, answer it inline. The brief:
 
-### 1b. Spawn Researchers (Max 2, Parallel)
+- Goal: what the plan needs to know, and the task it serves.
+- Boundaries: at most 5 tool calls; use `mk:docs-finder` for library or API facts, not raw web search.
+- Return: write `research/researcher-{N}-{topic}.md` of at most 150 lines with Summary, Key Findings (with `path:line` where applicable), Recommendations and Open Questions.
 
-For each researcher, use this prompt template:
+Collect the report paths, not the content; step 3 cites the files.
 
-```
-Task: Investigate {specific aspect} for planning "{task description}"
-Budget: Max 5 tool calls. Be focused, not exhaustive.
-Output: Write findings to {plan-dir}/research/researcher-{N}-{topic}.md
-Use mk:docs-finder for any library/API lookups.
+## 1c. Scout the codebase
 
-Format (max 150 lines):
-  ## Summary (3-5 bullets)
-  ## Key Findings (numbered, with file:line references where applicable)
-  ## Recommendations (what the planner should consider)
-  ## Open Questions (uncertainties for user to clarify)
-```
+Use `mk:scout` (or Glob and Grep when it is unavailable) on the two or three directories most likely to change. Deep mode follows `references/deep-mode.md`: at most five roots, producing a compact scope map of roots, existing tests, public contracts, risky dependencies and open uncertainties. When the packet has a Scope Shape block, do not re-scout what it covers.
 
-### 1c. Collect Report Paths
+Read, in this order, what exists: `docs/project-context.md` (if absent, say so and run `mk:project-context` later), `docs/architecture/system-architecture.md`, `docs/code-standards.md`, and matching entries in `.meowkit/memory/decisions.md`.
 
-After researchers complete, collect the file paths:
-- `{plan-dir}/research/researcher-01-{topic}.md`
-- `{plan-dir}/research/researcher-02-{topic}.md`
-
-Do NOT paste report content. Pass file paths to step-03.
-
-## Constraints
-
-- Max 2 researchers (token budget)
-- Max 5 tool calls per researcher (prevents runaway exploration)
-- Reports must be ≤150 lines (condensed findings, not raw exploration)
-- Use `mk:docs-finder` for external docs (not raw WebSearch)
-
-## Output
-
-- `research_reports` — list of report file paths (0, 1, or 2)
-- Print: `"Research: {N} reports saved to {plan-dir}/research/"`
+Scan `tasks/plans/` for unfinished plans (status not completed or cancelled) that share files or a feature area; step 3 records them as `blockedBy` / `blocks`.
 
 ## Next
 
-Read and follow `step-02-codebase-analysis.md`
+`step-03-draft-plan.md`

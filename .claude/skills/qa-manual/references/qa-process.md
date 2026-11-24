@@ -11,7 +11,7 @@
    b. Snapshot the page: `mk:playwright-cli snapshot`
    c. For each step in the flow:
       - Execute action using routing table (click/fill → playwright-cli, screenshot → agent-browser)
-      - On auth encounter: execute Authentication Protocol (STOP → prompt → wait)
+      - On auth encounter: execute the Authentication Protocol in SKILL.md (STOP, ask the user to sign in or give a saved state, wait)
       - After action: re-snapshot to verify result
       - Compare actual result to expected outcome from spec
       - On PASS: record step as passed, continue
@@ -46,7 +46,7 @@
    - `data-testid` found → use `getByTestId()` as primary locator (Playwright default)
    - `data-cy` found → use `getByTestId()` + note `testIdAttribute: 'data-cy'` config needed
    - Neither found → use `getByRole()` as primary locator
-5. **Generate feature test folder** — create the full structure (see `output-templates.md` for templates):
+5. **Generate the test files** — one spec file for a single flow; for a feature with more than one scenario, create the full feature folder (templates in `output-templates.md`):
    ```
    tests/e2e/{feature-name}/
    ├── common/
@@ -57,12 +57,11 @@
    └── {feature-name}.spec.ts             # ONE describe block only
    ```
    Rules:
-   - **One `test.describe` per file** — never multiple describes in one .spec.ts
-   - **All selectors in `common/{featureName}Selectors.ts`** — never inline selectors in spec
-   - **All assertions in `common/{featureName}Assertions.ts`** — reusable across tests
-   - **All API mocks in `common/{featureName}Intercepts.ts`** — centralized route handlers
-   - Use detected locator strategy (test IDs if available, then role-based)
-   - NEVER use CSS selectors or raw IDs
+   - One `test.describe` per file keeps specs readable
+   - Keep selectors in `common/{featureName}Selectors.ts` rather than inline
+   - Reusable assertions go in `common/{featureName}Assertions.ts`
+   - API route handlers go in `common/{featureName}Intercepts.ts`
+   - Locator: the detected test id attribute when the codebase uses one, else role-based; avoid CSS selectors and raw IDs, which break on restyling
 6. **Verify selectors exist** — for each `getByTestId('xxx')` in generated code:
    ```bash
    grep -rn "data-testid=\"xxx\"" src/ --include="*.vue" --include="*.tsx" --include="*.jsx" --include="*.ts"

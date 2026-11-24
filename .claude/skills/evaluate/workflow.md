@@ -14,7 +14,7 @@
 ## Rules
 
 - Halt at the active-verification check: no PASS without evidence
-- Reload `prompts/skeptic-persona.md` at session start (re-anchor before each criterion)
+- Load `prompts/skeptic-persona.md` at session start, at the start of each batch, and before writing each PASS
 
 ## Steps
 
@@ -48,7 +48,7 @@ Step 1: Load Rubrics
     ├── Detect target type (URL vs path vs binary)
     ├── Default preset by target type if not given
     ├── mk:rubric compose <preset> → composed_rubrics
-    ├── Read sprint contract if tasks/contracts/{slug}.md exists
+    ├── Use the signed contract in tasks/contracts/*-{slug}-sprint-*.md if one exists
     ├── Flatten criteria; cap at 15 (split if more)
     ├── Load skeptic-persona.md
     └── Create evidence_dir
@@ -60,7 +60,6 @@ Step 2: Boot App (conditional)
          ↓
 Step 3: Probe Criteria (loop)
     ├── For each criterion:
-    │   ├── Re-anchor skeptic persona
     │   ├── Pick probe technique from active-verification-patterns.md
     │   ├── Drive the build (browser / curl / CLI)
     │   ├── Capture evidence (screenshot / response / transcript)

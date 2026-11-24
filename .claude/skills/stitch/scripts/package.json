@@ -2,7 +2,7 @@
   "name": "mk-stitch-scripts",
   "version": "1.0.0",
   "type": "module",
-  "description": "mk:stitch skill SDK wrapper scripts",
+  "description": "Stitch SDK wrapper scripts for the stitch skill",
   "scripts": {
     "api-call": "tsx stitch-api-call.ts",
     "write-output": "tsx stitch-write-output.ts",

@@ -104,6 +104,10 @@ pub fn run(a: &RunArgs) -> Result<u8, Failure> {
             }
         }));
     }
+    // Each sandbox runs `mewkit init` from its own folder, so a relative path
+    // would point nowhere there.
+    let kit_archive = std::fs::canonicalize(kit_archive)
+        .map_err(|e| Failure::usage(format!("--kit-archive {}: {e}", kit_archive.display())))?;
     let telemetry = project.join(".meowkit/telemetry");
     let session_id = format!("eval-{}-{}", now_millis(), std::process::id());
     let ledger = Session(Ledger::new(&telemetry, &session_id));
@@ -118,7 +122,7 @@ pub fn run(a: &RunArgs) -> Result<u8, Failure> {
         timeout: Duration::from_secs(a.timeout_secs),
         max_turns: a.max_turns,
         parent_env: &parent_env,
-        kit_archive,
+        kit_archive: &kit_archive,
         kit_sha256: a.kit_sha256.as_deref(),
     };
     let mut results = Vec::new();

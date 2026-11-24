@@ -71,8 +71,8 @@ Determine whether a **merge** or a **rebase** is in progress — the finish step
 ```bash
 git status                                   # human summary + hint line
 git diff --name-only --diff-filter=U         # exact conflicted (unmerged) files
-ls .git/MERGE_HEAD 2>/dev/null && echo MERGE # present => merge in progress
-ls -d .git/rebase-merge .git/rebase-apply 2>/dev/null && echo REBASE
+test -e "$(git rev-parse --git-path MERGE_HEAD)" && echo MERGE   # present => merge in progress
+{ test -d "$(git rev-parse --git-path rebase-merge)" || test -d "$(git rev-parse --git-path rebase-apply)"; } && echo REBASE
 git log --oneline -5 --all --decorate        # orient on recent history
 ```
 
@@ -85,7 +85,7 @@ labels mark each side (`HEAD`/`ours` vs the incoming branch/commit).
 
 ### 2. Find the primary sources
 
-For each conflict, understand *why* each change was made — do not guess from the diff alone.
+For a conflict in a generated file, a lockfile, or a formatting-only or import-order hunk, regenerate the file or take the obvious side and note it; skip the history research. For a conflict where the two sides change behavior, understand *why* each change was made rather than guessing from the diff alone.
 
 ```bash
 git log --merge -p -- <file>                 # commits touching the conflict on both sides
@@ -108,7 +108,7 @@ For every hunk, in order of confidence:
    discarded intent is visible to the user.
 3. Remove **all** conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). Verify none remain:
    `git grep -nE '^(<{7}|={7}|>{7})' -- <files>` returns nothing.
-4. Stage each file as it is finished: `git add <file>`.
+4. Stage each file as it is finished: `git add <file>`. Stage only the files you resolved.
 
 Never resolve by blindly taking one whole side (`-X ours`/`-X theirs`) unless the file's
 two sides are genuinely one-or-the-other — that silently drops the other intent.
@@ -131,15 +131,15 @@ a function both sides renamed differently). Re-run until green.
 
 - **Ask first:** present the resolved files and check results. Do not run the following
   commands until the user explicitly approves completion.
-- **Merge:** stage everything, then commit. The prepared message is usually correct;
+- **Merge:** stage the resolved files (not unrelated untracked files), then commit. The prepared message is usually correct;
   keep it conventional and free of AI references.
   ```bash
-  git add -A
+  git add <the files you resolved>
   git commit --no-edit        # or write a conventional message if none is prepared
   ```
 - **Rebase:** continue, and **loop** — a rebase pauses once per conflicting commit.
   ```bash
-  git add -A
+  git add <the files you resolved>
   git rebase --continue       # repeat steps 1-4 for each subsequent pause
   ```
   Repeat until `git status` reports the rebase is complete (no further stops).
@@ -173,7 +173,15 @@ handing off.
 ## Handoff Protocol
 
 On a clean tree with green checks → return to `mk:ship` (if mid-ship) or `mk:verify` to
-confirm the full build is green before continuing.
+confirm the full build is green before continuing. End the hand-off with the status block:
+
+```
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+**Summary:** [1-2 sentences: what was resolved and the check results]
+**Concerns/Blockers:** [if applicable]
+```
+
+BLOCKED when a conflict's intent cannot be decided and the user has not answered; NEEDS_CONTEXT when the merge goal is unknown.
 
 ## Gotchas
 

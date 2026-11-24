@@ -58,7 +58,7 @@ the tracker stay — choose "Skip" for stories that already have one.
    a spec, a ticket description or a page body.
 
 2. **Decompose into stories.** For each story extract: title, acceptance criteria (binary
-   pass/fail only), a complexity hint, and the open questions the source leaves unanswered.
+   pass/fail only), a Low/Medium/High complexity hint (a rough signal, not story points; for points use `mk:story-sizer` or `mk:jira-estimator` when the user asks), and the open questions the source leaves unanswered.
    Open questions are part of the output, not a gap to fill by guessing.
 
 3. **Create tickets (optional).** Per accepted story, use `mk:jira-issue`. Require
@@ -69,7 +69,7 @@ the tracker stay — choose "Skip" for stories that already have one.
 5. **Write the report** to `tasks/reports/breakdown-{YYMMDD}-{slug}.md`, or into the active
    plan's `research/` directory when one is active.
 
-## Safety notes
+## Gotchas
 
 - Missing tracker configuration skips ticket creation; the spec analysis and the report still
   complete.
@@ -83,3 +83,6 @@ the tracker stay — choose "Skip" for stories that already have one.
 
 Print the report path, the story count, the ticket keys created, any non-fatal warnings, and the
 suggested next planning command (`mk:plan-creator` for implementation planning).
+
+Done when every story in the report has at least one binary acceptance criterion and a (possibly
+empty) open-questions list.

@@ -15,7 +15,7 @@
 - [When to Use chub Over Context7](#when-to-use-chub-over-context7)
 - [Trust Policy](#trust-policy)
 - [Content Model](#content-model)
-- [Coverage (~1,000+ APIs as of March 2026)](#coverage-1000-apis-as-of-march-2026)
+- [Coverage (a large community registry)](#coverage-1000-apis-as-of-march-2026)
 
 ## Usage
 
@@ -129,7 +129,7 @@ chub docs follow "write for machines" principles:
 - List common mistakes
 - Multi-language support
 
-## Coverage (~1,000+ APIs as of March 2026)
+## Coverage (a large community registry)
 
 Popular libs with good coverage:
 

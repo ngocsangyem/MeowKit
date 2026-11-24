@@ -26,13 +26,15 @@ runtime: claude-code
 
 # Code Simplification
 
-Runs after implementation, before review. Reduces complexity while preserving behavior.
+Goal: reduce the complexity of code you just built, with the same behavior, before review.
 
-> For ad-hoc quality review outside the current implementation diff, use `mk:clean-code`. `mk:simplify` is behavior-preserving and scoped to the current diff only.
+Scope is the current diff. A file or directory argument limits it to the files changed in the diff inside that path. For standards outside the diff use `mk:clean-code`, which also owns the numbers below.
 
 ## Iron Rule
 
-> **Behavior must not change.** Every simplification must pass the exact same tests as before. If tests fail after simplification, the simplification was wrong — revert it.
+> **Behavior must not change.** The tests that passed before must pass after. If they fail, the simplification was wrong: revert it.
+
+If the project has no tests, or the baseline is already red, say so and stop, or limit yourself to changes you can prove equivalent by reading the code.
 
 ## What to Look For
 
@@ -45,8 +47,8 @@ Runs after implementation, before review. Reduces complexity while preserving be
 
 ### Simplify
 
-- **Deep nesting** — 3+ levels of if/else → extract early returns or guard clauses
-- **God functions** — >50 lines → extract focused helpers
+- **Deep nesting** — about 3 levels of if/else → extract early returns or guard clauses
+- **God functions** — past about 50 lines → extract focused helpers
 - **Duplicate logic** — same pattern in 3+ places → extract shared utility
 - **Complex conditions** — `if (a && !b || (c && d))` → extract to named boolean or function
 
@@ -56,12 +58,14 @@ Runs after implementation, before review. Reduces complexity while preserving be
 - **Performance-optimized code** — it looks complex for a reason
 - **Code outside the current diff** — scope discipline, even for simplification
 
+The line and nesting figures are rules of thumb (see `mk:clean-code`), not limits.
+
 ## Process
 
 1. **Identify** — scan changed files for complexity signals
 2. **Propose** — list each simplification with before/after preview
 3. **Apply** — make changes one at a time
-4. **Verify** — run full test suite after each change (not batched)
+4. **Verify** — after each change (not batched) run the tests related to the changed files; run the broader suite once at the end
 5. **Report** — list what was simplified and why
 
 ## Gotchas

@@ -1,73 +1,11 @@
-# Review Cycle
+# Review cycle
 
-Mode-aware review handling for reviewer agent results.
+The review loop after a fix. The richer version, with regression recovery and returned work, is `.claude/skills/cook/references/review-cycle.md`; this file only fixes what differs for a bug fix.
 
-## Autonomous Mode
+- **auto**: run the `reviewer` agent and fix critical findings, re-run the tests, and repeat up to three times; critical findings still open after three cycles go to the user (fix manually, approve anyway, or abort). With no critical finding left, log the warnings and PRESENT for user approval of the ship: do NOT self-approve and do NOT ship on your own. The score is display only and decides nothing.
+- **review** (human in the loop): show the findings and ask the user what to do (fix critical, fix all, approve, abort); fix, re-test and re-review at most three cycles.
+- **quick**: one auto-fix cycle before escalating; focus on correctness, security and regressions; still ends at ready-for-user-approval.
 
-Auto mode auto-FIXES; it never decides to ship. The loop terminates in a
-"ready for the user to look at" state: shipping is the user's call, and the ship
-check (lint, related tests, type-check) runs on the commit itself. Score is
-advisory display only and never decides anything.
+Findings that count as critical: security vulnerabilities, data-loss risks, breaking changes without a migration, and architectural violations. Performance problems are critical only when they show up in a measured path.
 
-```
-cycle = 0
-LOOP:
-  1. Run reviewer agent → score, critical_count, warnings (score is display-only)
-
-  2. IF critical_count > 0 AND cycle < 3:
-     → Auto-fix critical issues
-     → Re-run tests
-     → cycle++, GOTO LOOP
-
-  3. ELSE IF cycle >= 3 AND critical_count > 0:
-     → ESCALATE to user
-     → Options: "Fix manually" / "Approve anyway" / "Abort"
-
-  4. ELSE (no critical remaining):
-     → Log any warnings + evidence completeness
-     → PRESENT for user approval of the ship (do NOT self-approve, do NOT ship on your own)
-```
-
-High-risk flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM,
-PUBLIC_CONTRACT, WEAK_PROOF from `.claude/skills/agent-detector/references/risk-checklist.md`) force
-explicit human approval before finalize regardless of cycle outcome.
-
-## Human-in-the-Loop Mode
-
-```
-ALWAYS:
-  1. Run reviewer agent → score, critical_count, warnings
-
-  2. Display findings to user
-
-  3. Ask the user:
-     IF critical_count > 0:
-       - "Fix critical issues"
-       - "Fix all issues"
-       - "Approve anyway"
-       - "Abort"
-     ELSE:
-       - "Approve"
-       - "Fix warnings/suggestions"
-       - "Abort"
-
-  4. Handle response:
-     - Fix → implement, re-test, re-review (max 3 cycles)
-     - Approve → proceed
-     - Abort → stop workflow
-```
-
-## Quick Mode Review
-
-Same as Autonomous but:
-- Only 1 auto-fix cycle before escalate
-- Focus: correctness, security, no regressions
-- Still terminates in "ready for user approval" — score never blocks; no self-approve
-
-## Critical Issues (Always Block)
-
-- Security vulnerabilities (XSS, SQL injection, OWASP)
-- Performance bottlenecks (O(n^2) when O(n) possible)
-- Architectural violations
-- Data loss risks
-- Breaking changes without migration
+The risk flags from `SKILL.md` (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, WEAK_PROOF) force explicit human approval before finalizing, whatever the review outcome. The commit and push themselves go through the ship check.

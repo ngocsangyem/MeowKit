@@ -28,11 +28,11 @@ Required:
 - Every AC has Given/When/Then form OR explicit assertion
 - Every AC has a Verification line (how the evaluator will probe it)
 - Every AC has a Rubric tie-in citing one rubric from the active preset
-- 5–15 ACs per sprint (validator warns at >20)
+- Enough ACs that every in-scope behaviour is checked; fewer than 5 or more than 15 deserves a second look
 
 The `contract_schema_version: 1.0.0` line MUST be the first frontmatter
 field — `.claude/skills/evaluate/step-01-load-rubrics.md` stub-guards on this marker
-to distinguish a real Phase 4 contract from stale pre-Phase-4 files.
+to tell a real contract from a stale stub file.
 -->
 
 # Sprint {N} Contract — {Task Title}
@@ -73,7 +73,7 @@ Each criterion is testable. Format: `Given X / When Y / Then Z` OR explicit asse
 - **Verification:** {...}
 - **Rubric tie-in:** {...}
 
-<!-- Continue 3, 4, 5... — minimum 5, target 5–15, validator warns at >20 -->
+<!-- Continue 3, 4, 5... until every in-scope behaviour has an AC; 5-15 is typical -->
 
 ## Out-of-Scope Clarifications
 

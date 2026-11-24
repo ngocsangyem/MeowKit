@@ -47,6 +47,7 @@
       ".claude/schemas/*",
       ".claude/eval/*",
       ".claude/skills/*/eval/*",
+      ".claude/skills/*/evals/*",
       ".claude/hooks/.logs/*",
       "*/.pytest_cache/*",
       "*/__tests__/*",

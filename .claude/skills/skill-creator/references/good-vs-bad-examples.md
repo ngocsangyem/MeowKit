@@ -2,31 +2,27 @@
 
 ## Description Field
 
-The description is a TRIGGER CONDITION — it tells Claude WHEN to activate the skill.
-
-**Bad** (summary — tells what it does):
-```
-description: "This skill analyzes code for security vulnerabilities using OWASP patterns"
-```
-
-**Good** (trigger — tells when to use):
-```
-description: "Use when auditing code for security issues, reviewing auth logic, or scanning dependencies for CVEs. Activates on /audit, security review requests, or pre-ship checks."
-```
+The `description` says what the skill does in one sentence, with a `NOT for mk:<neighbour>` clause when it sits near another skill. The trigger goes in `when_to_use`, once.
 
 **Bad** (too vague):
 ```
 description: "Helps with testing"
 ```
 
-**Good** (specific triggers):
+**Bad** (a trigger crammed into the description, or an essay):
 ```
-description: "Use when writing unit/integration tests, enforcing TDD red-green-refactor, or validating test coverage. Auto-activates during Phase 2 (Test RED) and Phase 3 (Build GREEN)."
+description: "Use when auditing code for security issues, reviewing auth logic, or scanning dependencies for CVEs. Activates on /audit, security review requests, or pre-ship checks."
+```
+
+**Good**:
+```
+description: "Security audit: secrets, deps, OWASP. NOT for mk:vulnerability-scanner."
+when_to_use: "Security audit."
 ```
 
 ## Gotchas Section
 
-The Gotchas section is the HIGHEST SIGNAL content. It captures what Claude gets wrong by default.
+A Gotchas section is the highest-signal content once it exists, and it exists only when a real failure earned it. It captures what the model gets wrong by default.
 
 **Bad** (obvious/generic):
 ```
@@ -71,7 +67,7 @@ SKILL.md is 400 lines with inline API docs, examples, and reference tables.
 **Good** (SKILL.md routes, details in subdirs):
 
 ```text
-SKILL.md is 80 lines. References:
+SKILL.md is 80 lines. References (the file names here are examples):
 - `references/api-patterns.md` — loaded when making API calls
 - `references/error-codes.md` — loaded when handling errors
 - `assets/output-template.md` — loaded when generating output

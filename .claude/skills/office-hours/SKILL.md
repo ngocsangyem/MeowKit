@@ -28,58 +28,38 @@ status: active
 runtime: claude-code
 ---
 
-# YC Office Hours
+# Office Hours
 
-You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
+Decides whether an idea is worth building and writes a design doc that feeds `mk:plan-creator`. It produces a document, never code: do not scaffold, build or invoke an implementation skill. The doc goes under `tasks/plans/<slug>/`; there are no memory writes.
 
-**Boundary:** Do not invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
+| The user wants | Skill |
+|---|---|
+| To know whether the idea should exist, who needs it, the smallest wedge | this skill |
+| Technical approaches to a validated requirement | `mk:brainstorming` |
+| Scope and ambition of an existing plan | `mk:plan-ceo-review` |
+| A plan for an agreed idea | `mk:plan-creator` |
 
-## Skill wiring
+A bare "brainstorm" request is ambiguous: ask whether the user wants product discovery or technical approaches (`mk:brainstorming` owns that rule).
 
-- **Writes:** the design doc beside its plan under `tasks/plans/<slug>/`; no memory writes.
+## Process
 
-## Plan First
+1. **Context and mode** (`references/discovery-flow.md`, step 1). Ask the user's goal. Startup or internal project runs the startup diagnostic; hackathon, open source, research, learning or fun runs builder mode.
+2. **Questions.** Startup: `references/startup-diagnostic.md`, six forcing questions routed by product stage, one at a time, with direct pushback. Builder: `references/builder-mode.md`, generative questions one at a time. With a fully formed plan, skip the questions but still do premises and alternatives.
+3. **Premises and alternatives** (`references/discovery-flow.md`). Landscape search only with the user's consent and generalised terms. Challenge premises and have the user agree to each. Give two or more approaches when more than one path exists.
+4. **Stop early when the evidence is missing.** If the diagnostic finds no evidence of demand, say so, recommend not building yet, name the cheapest validation, and stop; the doc is then optional.
+5. **Design doc and handoff** (`references/design-doc.md`). One template with Startup-only lines marked; state the assignment and the next skill.
 
-Office hours produce a design doc — they ARE the planning step:
-1. If user has an idea → office-hours runs BEFORE plan-creator
-2. Output: design doc → feeds into `mk:plan-creator` as input
+Ask one question at a time; one batched list of questions gets one shallow answer. Wait for each answer.
 
-Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, not the reverse.
+Product health questions about an existing product ("should I keep building this?", "why is retention bad?") use `references/product-lens-modes.md`.
 
-## When to Use
+## Status
 
-- User describes a new product, feature, or side-project concept whose problem/value is unvalidated
-- User asks whether something is worth building, who needs it, or what smallest wedge to validate
-- Before running `/mk:plan-ceo-review`
-
-A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk:brainstorming`.
-
-## Workflow
-
-1. **Initialize** — run preamble, gather context (codebase, prior designs, user goal), determine mode (Startup vs Builder). See `references/preamble.md`, `references/preamble-office-hours.md`, `references/phase1-context-gathering.md`
-2. **Discovery** — Startup: six forcing questions with anti-sycophancy. Builder: generative brainstorming. Then landscape check + premise challenge. See `references/phase2a-startup-mode.md`, `references/phase2b-builder-mode.md`, `references/phase2.5-landscape-and-premises.md`
-3. **Alternatives + design doc** — generate 2-3 approaches, synthesize founder signals, write design doc, run spec review loop. See `references/phase4-alternatives-and-sketch.md`, `references/phase4.5-signals-and-design-doc.md`
-4. **Handoff** — three-beat closing, next-skill recommendations. See `references/phase6-handoff.md`, `references/important-rules.md`
-
-## References
-
-- `references/preamble.md` — Branch, proactive flag and repo mode; local skill-usage log line
-- `references/preamble-office-hours.md` — Browse setup check, loaded with the preamble
-- `references/shared-protocols.md` — User question format, completion status, escalation
-- `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
-- `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
-- `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling
-- `references/phase2.5-landscape-and-premises.md` — Related design discovery, landscape awareness, premise challenge, adversarial second opinion via Claude subagent
-- `references/phase4-alternatives-and-sketch.md` — Alternatives generation, visual sketch wireframe, outside design voices
-- `references/phase4.5-signals-and-design-doc.md` — Founder signal synthesis, design doc templates (startup + builder), spec review loop with adversarial subagent
-- `references/phase6-handoff.md` — Three-beat closing sequence, tiered Garry plea, next-skill recommendations
-- `references/important-rules.md` — Hard rules: no implementation, one question at a time, mandatory assignment, completion statuses
-
-## Product Diagnostic Modes
-
-For Founder Review (PMF scoring) or User Journey Audit (friction mapping), load `references/product-lens-modes.md`. Use when the user asks about product health, retention, or whether to continue building — not for new ideas.
+End with DONE, DONE_WITH_CONCERNS, BLOCKED or NEEDS_CONTEXT as defined in `references/design-doc.md`.
 
 ## Gotchas
 
-- **Solutioning before understanding the problem**: Jumping to "how to build" before validating "should we build" → Force problem statement completion before any technical discussion
-- **Anchoring on first idea**: First brainstormed solution gets disproportionate attention → Generate at least 3 alternatives before evaluating any
+- Solutioning before the problem is understood: finish the problem statement before any technical discussion.
+- Anchoring on the first idea: generate alternatives before judging any of them.
+- Accepting a polished first answer: ask again for a name, a number or a behaviour.
+- Treating enthusiasm as demand: ask what the person did, not what they said.

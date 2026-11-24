@@ -46,14 +46,14 @@ Result: `{domain: frontend_ui, level: medium, workflow: standard, model_tier_ove
 |-----------|-------|------|
 | Goal/Problem | 20/20 | Clear: dark mode with OS preference + manual override |
 | Acceptance Criteria | 0/20 | **Missing** — no binary pass/fail conditions |
-| Scope | 10/15 | In-scope clear, **out-of-scope not stated** |
+| Scope | 0/15 | **Missing**: out-of-scope not stated |
 | Steps to Reproduce | 15/15 | N/A for feature — full score |
 | Technical Constraints | 10/10 | Must persist across sessions (stated) |
 | Priority/Severity | 10/10 | P3 stated |
 | Dependencies | 10/10 | No dependencies (stated implicitly) |
 | Design/Visual | 10/10 | Figma + PNG exports provided |
 
-**Score: 85/100 — Ready (with one recommended clarification)**
+**Score: 70/100 — Minor clarification needed**
 
 Missing:
 - Acceptance Criteria: define binary conditions (e.g., "Dark mode applies to all pages", "Setting persists after browser refresh", "OS preference detected on first visit")
@@ -89,7 +89,7 @@ N/A — this is a feature request, not a bug.
 ### Product Area: frontend_ui (confidence: HIGH)
 Routing: medium → standard → STANDARD
 
-### Completeness: 85/100 (Ready)
+### Completeness: 70/100 (Needs clarification)
 Recommended before starting:
 - Acceptance Criteria: add binary pass/fail (e.g., "Setting persists after page refresh")
 - Scope: clarify whether admin panel and email templates are in or out of scope

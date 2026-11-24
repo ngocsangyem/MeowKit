@@ -63,36 +63,17 @@ The whole surface reduces to four moves. Name the one you need, then triage.
 
 ## Decision Framework
 
-Pointer-style — the rules below own the detail; do not restate them here.
+Pick the move; each rule below points at its owner rather than restating it.
 
-- **Read more** — only when a Retrieval Trigger in `.claude/skills/agent-detector/references/context-budget-rules.md` matches (schema/contract change, security surface, cross-cutting refactor, failed verification, resume). No trigger → no read. (Rule file is present in a toolkit install; if absent downstream, fall back to: read only what a named acceptance criterion requires.)
-- **Stop** — you have enough to act, OR two consecutive reads changed no decision, OR the phase/tier read ceiling is reached. "Seems right" without evidence is not stop — verify.
-- **Ask** — an ungreppable fact, a spec-vs-code conflict, or a business/irreversible decision (`core-behaviors.md` #2, if present). Scout first: if grep/read answers it, don't ask.
-- **Assume** — cheap-to-fix uncertainty. Emit an `ASSUMPTIONS I'M MAKING` block (format in Output Format below; matches `core-behaviors.md` #1 where present) and proceed; never silently guess.
-- **Delegate** — an independent sub-scope that would bloat this window → Isolate into a sub-agent.
+- **Read more**: only when a retrieval trigger in `.claude/skills/agent-detector/references/context-budget-rules.md` matches. No trigger, no read. If that file is absent, read only what a named acceptance criterion requires.
+- **Stop**: you have enough to act, or two consecutive reads changed no decision, or the phase and tier read ceiling is reached. "Seems right" without evidence is not stop; verify.
+- **Ask**: an ungreppable fact, a spec-versus-code conflict, or a business or irreversible decision. Scout first: if grep or a read answers it, do not ask.
+- **Assume**: cheap-to-fix uncertainty. List your assumptions ("ASSUMPTIONS I'M MAKING ...") and proceed; never guess silently.
+- **Delegate**: an independent sub-scope that would bloat this window goes to a sub-agent that returns a distilled result.
 
-Anti-overengineering (keep it small): pick the smallest read-set that satisfies the
-acceptance criteria; do not introduce a new pattern or abstraction without an observed
-failure; prefer the boring move.
+Keep it small: the smallest read-set that satisfies the acceptance criteria, no new pattern without an observed failure. Never quote an API, number or config from memory when it is greppable: read it.
 
-Anti-hallucination (don't invent): never quote an API, number, or config from memory
-when it is greppable — read it. An unverifiable fact is an **Ask** or an explicit
-**Assume**, never a silent guess.
-
-## Triage (copy this checklist)
-
-```
-Context triage:
-- [ ] 1. Phase + tier — which of Orient/Plan/Test/Build/Review/Ship/Reflect, and low/standard/complex?
-- [ ] 2. Context risk — near ceiling? drifting? poisoned by a prior claim? key fact buried? (labeled heuristics, not measured)
-- [ ] 3. Minimal read-set — the smallest set for THIS step (see .claude/skills/agent-detector/references/context-budget-rules.md phase×tier, if present)
-- [ ] 4. Route — load exactly ONE section of references/pattern-index.md matching the intent
-- [ ] 5. Apply + emit the output contract (Context decision: …)
-```
-
-Step 2 thresholds are **labeled heuristics** (e.g. "compact around ~60–70% of the
-effective window") — signals to act on, not measured facts. Do not present them as
-measured.
+When unsure which move fits, a short triage helps: which phase and tier; is the window near its ceiling, drifting, or poisoned by an earlier claim; what is the minimal read-set for this step; which one section of `references/pattern-index.md` matches. The size heuristic is to compact around 60 to 70% of the effective window; it is a signal, not a measurement. State the decision and the reason in a sentence.
 
 ## Pattern Routing Table
 
@@ -115,32 +96,18 @@ load several.
 If no intent matches, note "no matching pattern" and proceed with the Four Operations
 + Decision Framework — do not stall or invent a reference.
 
-## Host-Runtime Operations (host-specific)
+## Host operations
 
-The only host-coupled choices. Everything else above is host-agnostic.
-
-| Situation | Move | Why |
-| --- | --- | --- |
-| Window long, task continues, keep thread | `/compact` | Summarize in place; costs latency — skip on small tasks. |
-| Switching to an unrelated task | `/clear` | Fresh window; only after durable state is Written out. |
-| Independent sub-scope, would bloat this window | Sub-agent | Isolated window; returns a distilled result. |
-
-## Output Format
-
-When this skill drives a decision, emit one line:
-
-```
-Context decision: <read-more | stop | ask | assume | delegate> — <one-line reason>
-```
-
-For **assume**, follow it with the `ASSUMPTIONS I'M MAKING` block and `→ Correct me now
-or I'll proceed with these.`
+| Situation | Move |
+| --- | --- |
+| Window long, task continues, keep the thread | Summarize in place; it costs latency, so skip it on small tasks. On Claude Code, `/compact` |
+| Switching to an unrelated task | Start fresh, only after durable state is written out. On Claude Code, `/clear` |
+| Independent sub-scope that would bloat this window | Hand it to a sub-agent |
 
 ## Gotchas
 
-- Compacting at ~50% is safe but wastes latency on small tasks — the threshold is a heuristic, not a rule.
 - Bad routing turns this into "a dump with extra steps" — load ONE reference section per decision, never several.
-- The risk thresholds here are labeled heuristics, not measured baselines — don't quote them as data.
+- The thresholds here are heuristics, not measured baselines: do not quote them as data.
 
 ## Related Skills
 

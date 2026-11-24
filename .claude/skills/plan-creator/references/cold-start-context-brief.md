@@ -8,39 +8,9 @@ When an agent loads a phase file in a new session, it has zero memory of prior c
 
 Self-contained phase files eliminate this problem entirely. Each file carries exactly the context needed to execute that phase, nothing more, nothing less.
 
-## Phase File Template
+## What a phase file carries
 
-Every phase file follows `phase-template.md` (frontmatter plus 12 sections). The 7 sections below are the cold-start minimum those sections must carry inline. No section may reference another file for its content.
-
-```markdown
-## Goal
-[One sentence. Outcome-focused. "Users can reset their password via email" not "Implement password reset".]
-
-## Context
-[What exists now — stated explicitly, not referenced.
-Describe the current system state: what files exist, what they do,
-what's working, what's missing. Write as if the reader has never seen the codebase.]
-
-## Files to Modify
-[Exact paths. One per line. No globs.]
-
-## Files to Read for Context
-[Exact paths. One per line. The agent reads these before starting work.]
-
-## Acceptance Criteria
-[Binary pass/fail only. Each criterion must be verifiable with a command or file check.
-BAD: "code is clean"
-GOOD: "npx tsc --noEmit exits 0"]
-
-## Verification Commands
-[Runnable commands. Copy-paste ready. No placeholders.
-These are what the agent runs to verify AC are met.]
-
-## Exit Criteria
-[What state the system must be in before this phase is considered complete.
-Includes: all ACs green, all tests passing, no regressions, specific artifact exists at path.
-Where applicable, the system is left runnable and a demoable increment exists — a feature phase ends with one working end-to-end path, not a half-wired layer. Pure foundation phases (migrations, shared types, env/config) are exempt.]
-```
+A phase file follows `phase-template.md` (frontmatter plus 12 sections). Cold-start means those sections state, in the file itself: the outcome, the current state of the system (what exists and what is missing, written for a reader who has never seen the codebase), exact paths to modify and to read, binary acceptance criteria, copy-paste-ready verification commands with no placeholders, and the exit state (artifacts exist, no regressions, and the system is runnable where the phase is a feature slice). A section may point to a research report for background, never for content it needs to execute.
 
 ## Anti-Patterns
 

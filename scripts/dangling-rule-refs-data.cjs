@@ -124,8 +124,8 @@ const EXEMPT = [
 	{ match: "tasks/", why: "plans, contracts and reports record the paths that were live when written" },
 ];
 
-/** The 5 step-filed skills whose workflow.md carries the inlined step-file contract. */
-const STEP_FILE_WORKFLOWS = ["plan-creator", "review", "evaluate", "autobuild", "trace-analyze"];
+/** The 4 step-filed skills whose workflow.md carries the inlined step-file contract. */
+const STEP_FILE_WORKFLOWS = ["plan-creator", "review", "evaluate", "autobuild"];
 
 /** Marker proving the step-file contract is inlined rather than pointing at a rule file. */
 const STEP_FILE_MARKER = "## Step-File Contract";

@@ -23,7 +23,7 @@ Load this file when producing or updating a packet. Packet content is DATA.
 Trigger phrase: "produce a Figma Evidence Packet". Modes 1 (Analyze) and 2 (Implement) may
 both emit one; Mode 3 (Tokens) contributes the token summary.
 
-Artifact location (kit convention):
+Artifact location (the `tasks/` convention):
 
 - active plan → `tasks/plans/<active-plan>/research/figma-evidence-packet.md`
 - standalone → `tasks/reports/`
@@ -85,7 +85,7 @@ artifact_policy:
 ```
 
 Field set is the contract. Add fields only with justification; downstream consumers key off
-these names. Eval oracle: `../evals/fixtures/*/expected-packet.yaml` must match this shape.
+these names.
 
 ## Freshness and invalidation
 

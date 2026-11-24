@@ -3,7 +3,7 @@
 Applies when: adding new functionality, new endpoints, new UI components.
 
 ## Plan Shape
-Required: Goal, Context, User Story, Scope, Constraints, Technical Approach, Acceptance Criteria, Agent State
+Required: Goal, Context, User Story, Scope, Constraints, Technical Approach, Acceptance Criteria
 Optional: API Changes, Migration Notes, Solution Options
 
 ## Phase Flow
@@ -19,13 +19,3 @@ Optional: API Changes, Migration Notes, Solution Options
 
 ## TDD Enforcement
 Phase 2 is **OPT-IN.** With `--tdd` / `MEOWKIT_TDD=1`, write the failing tests first and do not start implementing until they fail. In default mode (TDD off), the developer implements directly per the agreed plan.
-
-## Context Reminder (MANDATORY)
-
-Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `/mk:cook {path}/plan.md`. With --fast: `/mk:cook --auto {path}/plan.md`
-
-> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
-> Then run the cook command.
-
-This is **NON-NEGOTIABLE** — always output after plan approval.
