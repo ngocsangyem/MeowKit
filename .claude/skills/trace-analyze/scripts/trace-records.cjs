@@ -7,6 +7,7 @@
 // Usage:
 //   trace-records.cjs ingest      <trace-log.jsonl> <analysis-dir> [limit]
 //   trace-records.cjs partition   <analysis-dir>
+//   trace-records.cjs detect      <analysis-dir> [pattern]
 //   trace-records.cjs count       <findings.json> <label>
 //   trace-records.cjs synthesize  <analysis-dir>
 //   trace-records.cjs threshold   <analysis-dir> [min-occurrences]
@@ -17,6 +18,7 @@
 const path = require("node:path");
 const { die, readJsonl, writeJsonl } = require("./lib/json-io.cjs");
 const { count, synthesize, threshold, crossBatch } = require("./lib/pattern-synthesis.cjs");
+const { detect } = require("./lib/pattern-detect.cjs");
 
 const KNOWN_SCHEMA_VERSIONS = new Set(["1.0"]);
 const MAX_BATCHES = 3;
@@ -86,6 +88,10 @@ switch (subcommand) {
 		requireArgs(rest, 1, "partition <analysis-dir>");
 		partition(rest[0]);
 		break;
+	case "detect":
+		requireArgs(rest, 1, "detect <analysis-dir> [pattern]");
+		detect(rest[0], rest[1]);
+		break;
 	case "count":
 		requireArgs(rest, 2, "count <findings.json> <label>");
 		count(rest[0], rest[1]);
@@ -103,5 +109,5 @@ switch (subcommand) {
 		crossBatch(rest[0]);
 		break;
 	default:
-		die("usage: trace-records.cjs <ingest|partition|count|synthesize|threshold|cross-batch> ...");
+		die("usage: trace-records.cjs <ingest|partition|detect|count|synthesize|threshold|cross-batch> ...");
 }

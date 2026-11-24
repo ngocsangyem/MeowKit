@@ -10,7 +10,6 @@
       ".claude/skills/plan-creator/references/parallel-mode.md": 1,
       ".claude/skills/plan-creator/references/phase-template.md": 1,
       ".claude/skills/qa/references/workflow-phases.md": 1,
-      ".claude/skills/retro/references/data-gathering.md": 1,
       ".claude/skills/ship/references/pre-landing-review.md": 1,
       "installed:codex/.agents/skills/mk-cook/references/orchestration-rules.md": 1,
       "installed:codex/.agents/skills/mk-fix/references/prevention-gate.md": 1,
@@ -20,7 +19,6 @@
       "installed:codex/.agents/skills/mk-plan-creator/references/parallel-mode.md": 1,
       "installed:codex/.agents/skills/mk-plan-creator/references/phase-template.md": 1,
       "installed:codex/.agents/skills/mk-qa/references/workflow-phases.md": 1,
-      "installed:codex/.agents/skills/mk-retro/references/data-gathering.md": 1,
       "installed:codex/.agents/skills/mk-ship/references/pre-landing-review.md": 1,
       "installed:cursor/.cursor/skills/mk-cook/references/orchestration-rules.md": 1,
       "installed:cursor/.cursor/skills/mk-fix/references/prevention-gate.md": 1,
@@ -30,7 +28,6 @@
       "installed:cursor/.cursor/skills/mk-plan-creator/references/parallel-mode.md": 1,
       "installed:cursor/.cursor/skills/mk-plan-creator/references/phase-template.md": 1,
       "installed:cursor/.cursor/skills/mk-qa/references/workflow-phases.md": 1,
-      "installed:cursor/.cursor/skills/mk-retro/references/data-gathering.md": 1,
       "installed:cursor/.cursor/skills/mk-ship/references/pre-landing-review.md": 1,
       "installed:grok/.grok/skills/mk-cook/references/orchestration-rules.md": 1,
       "installed:grok/.grok/skills/mk-fix/references/prevention-gate.md": 1,
@@ -40,7 +37,6 @@
       "installed:grok/.grok/skills/mk-plan-creator/references/parallel-mode.md": 1,
       "installed:grok/.grok/skills/mk-plan-creator/references/phase-template.md": 1,
       "installed:grok/.grok/skills/mk-qa/references/workflow-phases.md": 1,
-      "installed:grok/.grok/skills/mk-retro/references/data-gathering.md": 1,
       "installed:grok/.grok/skills/mk-ship/references/pre-landing-review.md": 1,
       "installed:omp/.agents/skills/mk-cook/references/orchestration-rules.md": 1,
       "installed:omp/.agents/skills/mk-fix/references/prevention-gate.md": 1,
@@ -50,7 +46,6 @@
       "installed:omp/.agents/skills/mk-plan-creator/references/parallel-mode.md": 1,
       "installed:omp/.agents/skills/mk-plan-creator/references/phase-template.md": 1,
       "installed:omp/.agents/skills/mk-qa/references/workflow-phases.md": 1,
-      "installed:omp/.agents/skills/mk-retro/references/data-gathering.md": 1,
       "installed:omp/.agents/skills/mk-ship/references/pre-landing-review.md": 1,
       "installed:pi/.agents/skills/mk-cook/references/orchestration-rules.md": 1,
       "installed:pi/.agents/skills/mk-fix/references/prevention-gate.md": 1,
@@ -60,7 +55,6 @@
       "installed:pi/.agents/skills/mk-plan-creator/references/parallel-mode.md": 1,
       "installed:pi/.agents/skills/mk-plan-creator/references/phase-template.md": 1,
       "installed:pi/.agents/skills/mk-qa/references/workflow-phases.md": 1,
-      "installed:pi/.agents/skills/mk-retro/references/data-gathering.md": 1,
       "installed:pi/.agents/skills/mk-ship/references/pre-landing-review.md": 1
     }
   }

@@ -51,24 +51,22 @@ Three concrete triggers:
    confirm the project is below the 25% structural-overhead threshold.
 2. **Post-degradation diagnostic** — when sessions feel slow, off-topic, or
    over-compacted, audit to see if structural overhead has grown past 10%.
-3. **Periodic health audit** — quarterly or on model upgrades, confirm
-   the always-on bundle still pays its keep (paired with the dead-weight audit
-   in `.claude/skills/cook/references/harness-rules.md` Rule 7).
+3. **Periodic health audit** — on model upgrades, confirm the always-on bundle
+   still pays its keep (the dead-weight audit in
+   `.claude/skills/cook/references/harness-rules.md` Rule 7, where that tooling is present).
 
 ## Context vs Cost (Boundary)
 
-| Concern                         | Mechanism                                                | Unit          |
-| ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `mewkit budget` + `../autobuild/scripts/budget-tracker.sh` | USD           |
-| Window utilization (this skill) | `/mk:context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
+| Concern | Mechanism | Unit |
+| --- | --- | --- |
+| Monetary cost | `mewkit budget` and `.claude/skills/autobuild/scripts/budget-tracker.sh` | USD |
+| Window utilization (this skill) | `/mk:context-audit` and `scripts/inventory-context.sh` | tokens / % |
 
-The three concerns are deliberately separate. This skill measures only what
-is **statically loaded** into every session — the always-on bundle. Conversation
-history, tool output, and active edits live elsewhere.
+This skill measures only what is statically loaded into every session: the always-on bundle (project instructions, agents, skills, rules, any project commands, MCP config). Conversation history, tool output and active edits live elsewhere.
 
 ## Workflow
 
-The slash command runs the pipeline:
+Run the pipeline from the project root (or pass the root as the first argument):
 
 ```bash
 SCAN_ROOT="${1:-$PWD}"
@@ -77,50 +75,9 @@ bash ${CLAUDE_SKILL_DIR}/scripts/inventory-context.sh "$SCAN_ROOT" \
   | bash ${CLAUDE_SKILL_DIR}/scripts/format-audit-report.sh
 ```
 
-Output is markdown, printed to terminal. The skill does NOT write any files.
+The scripts print a markdown report (summary, top consumers, recommendations, banner) and write no files. The banner and its thresholds come from the script; `references/token-cost-model.md` owns the numbers and their reasoning. The window size defaults to 200,000 tokens and `MEOWKIT_CONTEXT_WINDOW` overrides it. If a script exits non-zero, show its stderr and stop.
 
-Steps:
-
-1. **Inventory** — `inventory-context.sh` walks `.claude/` and emits raw
-   byte/line counts per category (CLAUDE.md chain, agents, skills, rules,
-   commands, MCP) as JSON.
-2. **Estimate** — `estimate-tokens.sh` enriches the inventory with
-   `estimated_tokens` (chars/4 heuristic, mirrors `budget-tracker.cjs`) and
-   computes `totals` including `structural_overhead_pct` against a 200K window.
-3. **Format** — `format-audit-report.sh` emits a 5-section markdown report:
-   header, summary table, top consumers, recommendations, footer.
-4. **Banner** — the formatter selects a banner based on
-   `structural_overhead_pct`:
-   - `< 10%`  → Healthy
-   - `10–25%` → Watch
-   - `≥ 25%`  → Action recommended
-
-## Output Format
-
-```
-# Context Audit — <scan_root>
-*Scanned at <timestamp> · model window 200K tokens · banner: <Healthy|Watch|Action>*
-
-## Summary
-| Category | Components | Bytes | Tokens | % of Window |
-| ...      | ...        | ...   | ...    | ...          |
-
-## Top Consumers
-1. <component> ~<tokens> (<path>)
-... (top 10)
-
-## Recommendations
-1. <priority finding> — saves ~<tokens>
-... (sorted by token impact, descending)
-
-## How to Act
-- Cost: see `mewkit budget`
-- Runtime trim: an agent file costs tokens only when that agent is spawned; archive agent files that are never used
-```
-
-The 10% / 25% thresholds are the canonical source of truth for token-overhead
-banners — see `references/token-cost-model.md`. They are NOT linked to
-the `budget.*` config keys (those are USD amounts, not token percentages).
+Print the script output as it is: header, summary table, top consumers (top 10), recommendations sorted by token impact, and how to act (cost: `mewkit budget`; an agent file costs tokens only when that agent is spawned).
 
 ## Integration Points
 
@@ -128,14 +85,12 @@ the `budget.*` config keys (those are USD amounts, not token percentages).
   hook. Shell scripts inline the same heuristic with a citation comment.
 - **Reads, does not write:** `.meowkit/telemetry/cost-log.json`,
   `.claude/`, `.mcp.json`. No file writes anywhere.
-- **No env vars introduced.** Window size is hard-coded 200K; override deferred
-  until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
   `mewkit budget`. There is no separate routing rule.
 
 ## Gotchas
 
-(none yet — grow from observed failures)
+- Inventory counts bytes, not what a host actually loads: an agent file costs tokens only when that agent is spawned, so weigh trims by how often the file is loaded.
 
 ## Related Rules
 

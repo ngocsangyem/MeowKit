@@ -31,7 +31,7 @@ scan the whole repo and use all docs to refactor everything for consistency
 ### Context-engineering lazy gate (recommendation only)
 
 - The "scan the whole repo" / "use all docs" phrasing triggers the lazy gate
-  (`references/context-safeguards.md` §7).
+  (`SKILL.md` (scope the read-set)).
 - The rewrite RECOMMENDS `mk:context-engineering` (name an intent → one
   pattern-index section, e.g. retrieval / less-noise) to pick a minimal read-set.
 - It adds a CONSTRAINTS line asking to scope the read-set — it does NOT read the

@@ -35,7 +35,7 @@ Process for each component under test:
 1. **Baseline:** run `/mk:benchmark run --full`, capture the run id
 2. **Disable** the component (env var flag, comment out hook registration, comment out a rule import)
 3. **Re-run** `/mk:benchmark run --full`, capture the disabled run id
-4. **Compare:** `/mk:benchmark compare {baseline-run-id} {disabled-run-id}` and read the `measured_delta` field (= `baseline_avg − disabled_avg`)
+4. **Compare:** `/mk:benchmark compare {baseline-run-id} {disabled-run-id}` and read the delta in the TOTAL row (baseline average minus disabled average)
 5. **Re-enable** the disabled component before exiting the audit (non-destructive measurement)
 
 WHY: Vibes-based pruning either keeps dead weight or removes load-bearing components by accident; only measurement is reliable.
@@ -112,7 +112,6 @@ Two deterministic CLI surfaces feed it (no subagent, no inner-harness hook, exit
 
 ## Applies To
 
-- `` — the measurement runner
 - `.claude/skills/autobuild/` — adaptive-density decisions consume the audit's output
 - `.claude/skills/trace-analyze/` — field-data complement to the benchmark
 - `.claude/skills/cook/references/harness-rules.md` Rule 7 — points at this rule for the audit specifics

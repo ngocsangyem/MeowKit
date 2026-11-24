@@ -107,7 +107,7 @@ Count how many questions have RED FLAG answers:
 |----------------|------------|--------|
 | 0-2 | Low | Proceed to Decision phase |
 | 3-4 | Medium | Resolve critical assumptions first |
-| 5+ | High | Switch to `--compare` or reject |
+| 5+ | High | Recommend `--compare` or rejection; the user decides |
 
 A question is "critical" when being wrong could cause: data loss, security holes,
 breaking existing features, or >2 days of rework.
