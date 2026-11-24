@@ -23,110 +23,55 @@ status: active
 runtime: claude-code
 ---
 
-# Plan Validation — 8-Dimension Quality Check
+# Plan Validation
 
-Audits an agreed plan against 8 dimensions to catch gaps before implementation begins.
-Does not replace the conversation with the user, modify plans, or route edits itself. If it
-finds an Insert or Split mutation is needed, the planner performs it and presents the plan
-again; Skip and Reorder changes require notification plus audit log.
+Audits an agreed plan across 8 dimensions and reports what is missing before anyone builds. It operates on plans from `mk:plan-creator`, reports only and never edits or gates: the planner revises, and the user decides whether to proceed. Run it once the plan is agreed, before building; plan-creator and the user decide when.
 
-> For green-field harness sprints (generator↔evaluator loop), use `mk:sprint-contract` instead. `mk:validate-plan` operates on plans from `mk:plan-creator` (cook flow only).
+| The user wants | Skill |
+|---|---|
+| Is the agreed plan complete and executable? | this skill |
+| Is the scope ambitious or right-sized? | `mk:plan-ceo-review` |
+| An adversarial read with fixes | `mk:plan-creator red-team {path}` |
+| To be interviewed on the plan's open decisions | `mk:plan-creator validate {path}` |
+| A green-field harness sprint contract | `mk:sprint-contract` |
 
-## When to Use
+## Process
 
-- Once the plan is agreed, before Phase 2 (Test)
-- When `/mk:cook` detects a COMPLEX task (auto-suggested)
-- When user wants to stress-test a plan before committing to implementation
-- When user says "validate this plan", "check my plan", "is this plan complete"
+1. **Locate the plan.** Read `tasks/plans/YYMMDD-name/plan.md`. If it is missing or empty, say so and stop. A hard-mode plan with no phase files is also a stop: say so.
+2. **Structure first.** Run `mewkit plan check --structural {plan}`. It checks that required sections exist; fix structure before judging content. This skill judges content quality, which the command does not.
+3. **Check each dimension.** A dimension that does not apply (security on a docs-only plan, test strategy when tests are optional) is marked N/A with one reason. Everything else gets PASS, WARN or FAIL with a finding that cites `path:line`; a PASS cites the line that satisfies it.
+4. **Consistency sweep** (hard-mode plans with phase files). Run the read-only pass of `.claude/skills/plan-creator/references/whole-plan-sweep.md`: build the deltas, search every plan file for stale references, and append the stale ones as `sweep_failures`. Sweep failures do not auto-FAIL; they are inconsistencies the planner reconciles.
+5. **Report.** FAIL means the planner revises, with specific revision requests; WARN is the user's call to proceed or revise.
 
-## 8 Validation Dimensions
+## Dimensions
 
-| #   | Dimension                   | Pass Criteria                                                        | Common Failure                                               |
-| --- | --------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------ |
-| 1   | **Scope Clarity**           | In-scope and out-of-scope sections are explicit and non-overlapping  | Vague scope: "improve the auth system" without boundaries    |
-| 2   | **Acceptance Criteria**     | Every criterion is binary (pass/fail), not subjective                | Subjective: "should feel fast" vs binary: "response < 200ms" |
-| 3   | **Dependencies Resolved**   | All external dependencies identified with status (available/blocked) | Missing: needs DB migration but not listed as dependency     |
-| 4   | **Risks Identified**        | At least 1 risk flag with mitigation strategy                        | No risks listed (every plan has risks; zero = not evaluated) |
-| 5   | **Architecture Documented** | Technical approach references existing patterns or includes ADR      | "We'll figure out the architecture during implementation"    |
-| 6   | **Test Strategy**           | Test approach covers acceptance criteria; edge cases identified      | "We'll add tests after" (violates TDD)                       |
-| 7   | **Security Considered**     | Auth, data access, input validation addressed (or explicitly N/A)    | No mention of security for a feature handling user data      |
-| 8   | **Effort Estimated**        | Time/complexity estimate with confidence level                       | No estimate or "it depends" without qualification            |
+| # | Dimension | Passes when | Common failure |
+|---|---|---|---|
+| 1 | Scope clarity | In and out of scope are explicit and do not overlap | "improve the auth system" with no boundary |
+| 2 | Acceptance criteria | Every criterion is binary | "should feel fast" instead of "response under 200ms" |
+| 3 | Dependencies resolved | External dependencies are named with their status | A DB migration is needed but not listed |
+| 4 | Risks identified | At least one risk with a mitigation | No risks (zero means not evaluated) |
+| 5 | Architecture documented | The approach references existing patterns or an ADR | "We'll figure out the architecture while building" |
+| 6 | Test approach | A test approach covering the criteria and edge cases, or a stated reason none is needed | Tests deferred with no reason |
+| 7 | Security considered | Auth, data access and input validation addressed, or explicitly N/A | Nothing on security for a feature handling user data |
+| 8 | Effort estimated | An estimate with a confidence level | No estimate, or "it depends" |
 
-## Workflow
-
-1. **Load plan file** — Read from `tasks/plans/YYMMDD-name/plan.md`
-2. **Check each dimension** — Evaluate against pass criteria
-3. **Produce validation report** — Pass/fail per dimension with findings
-4. **Route result:**
-   - All 8 PASS → proceed to Phase 2
-   - Any FAIL → return to planner with specific revision requests
-   - WARN (partially met) → user decides: proceed or revise
-
-## Output Format
+## Output
 
 ```markdown
 ## Plan Validation: [Plan Name]
 
-| #   | Dimension               | Status         | Finding            |
-| --- | ----------------------- | -------------- | ------------------ |
-| 1   | Scope Clarity           | PASS/FAIL/WARN | [specific finding] |
-| 2   | Acceptance Criteria     | PASS/FAIL/WARN | [specific finding] |
-| 3   | Dependencies Resolved   | PASS/FAIL/WARN | [specific finding] |
-| 4   | Risks Identified        | PASS/FAIL/WARN | [specific finding] |
-| 5   | Architecture Documented | PASS/FAIL/WARN | [specific finding] |
-| 6   | Test Strategy           | PASS/FAIL/WARN | [specific finding] |
-| 7   | Security Considered     | PASS/FAIL/WARN | [specific finding] |
-| 8   | Effort Estimated        | PASS/FAIL/WARN | [specific finding] |
-
-**Result:** [N]/8 passed | [Action: proceed / revise dimensions X,Y]
-```
-
-## Whole-Plan Consistency Sweep (final pre-emit step)
-
-After scoring the 8 dimensions and BEFORE emitting the validation report, run a cross-file consistency check on the plan directory.
-
-**Why:** Distributed plans (`plan.md` + N × `phase-*.md`) drift after edits. One phase gets renamed; another phase still references the old name. Each phase reads as self-consistent but the plan as a whole is contradictory.
-
-**Procedure:**
-1. Re-read `plan.md` and every `phase-*.md` in the plan dir
-2. Build a delta of: renamed entities, scope changes, dropped features, decision changes
-3. Grep every plan file for stale references to renamed/dropped items
-4. Reconcile contradictions across files (not only the file that surfaced them)
-
-**Output:** Append a `sweep_failures` block to the validation report. Sweep failures DO NOT auto-FAIL — they surface inconsistencies the human must reconcile before Phase 3.
-
-```
+| # | Dimension | Status | Finding (path:line) |
+|---|---|---|---|
+| 1 | Scope clarity | PASS/WARN/FAIL/N/A | ... |
+...
+**Result:** N of M applicable dimensions passed | proceed / revise dimensions X, Y
 sweep_failures:
-  - phase-02.md:18  references `userController` (renamed to `authController` in plan.md:42)
-  - phase-04.md:8   declares scope item that plan.md:62 marks out-of-scope
+  - phase-02.md:18 references `userController` (renamed to `authController` at plan.md:42)
 ```
-
-**Skip conditions:** plan has only `plan.md` (no phase files); plan dir not found.
-
-**Source:** Adapted from external verification-role guidance for whole-plan consistency sweeps.
-
-## Integration with Cook Workflow
-
-In `/mk:cook`, validation runs automatically for COMPLEX tasks:
-
-```
-plan agreed → mk:validate-plan → Phase 2 (Test)
-```
-
-For STANDARD tasks, validation is optional (user-triggered).
-For TRIVIAL tasks, validation is skipped.
 
 ## Gotchas
 
-- **Not the same as the structural check**: `mewkit plan check --structural` validates plan file *structure* (required sections exist). This skill validates plan *content quality* (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
-
-## Relationship to plan-creator v2.3.1
-
-Note: plan-creator's step-06 now includes an enhanced validation interview with detection keywords and section mapping. mk:validate-plan focuses on 8-dimension structural validation, which is complementary — not a replacement.
-
-## What This Skill Does NOT Do
-
-- Does NOT replace the user's own read of the plan
-- Does NOT modify plan files — read-only analysis
-- Does NOT generate tests — that's Phase 2 (tester agent)
-- Does NOT block anything — runs after the plan is agreed, before Phase 2
+- `mewkit plan check --structural` and this skill check different things: structure versus content quality. Run both.
+- It does not modify plan files, generate tests or block anything: read-only analysis. It does not replace the user's own read of the plan.
+- The word "validate" also names the plan-creator interview (`/mk:plan-creator validate`), a different thing: that asks the user decisions and writes answers in.

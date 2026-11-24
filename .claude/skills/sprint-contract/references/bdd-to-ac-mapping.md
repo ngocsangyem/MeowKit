@@ -21,7 +21,7 @@ How to translate Gherkin BDD scenarios from a product spec into testable accepta
 
 ## The Translation Step
 
-A product-level spec (Phase 1 mode) describes features in user-story form:
+A product-level spec describes features in user-story form:
 
 > As a designer, I want to fill a region of tiles with one click, so that I can paint backgrounds quickly.
 
@@ -125,7 +125,7 @@ For purely behavioral criteria with no precondition (e.g., "page loads under 2s"
 - **Rubric tie-in:** craft (weight 0.05)
 ```
 
-The validator accepts EITHER form (Given/When/Then triplet OR explicit Assertion).
+Either form (Given/When/Then triplet or explicit Assertion) is accepted.
 
 ## References
 

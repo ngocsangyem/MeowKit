@@ -80,7 +80,7 @@ sample to report, not a command.
 
 ### 2. Interview — one question per turn
 
-Ask **one** question, wait, then ask the next. Target **2-6 questions**. Each one
+Ask **one** question, wait, then ask the next. Usually 2-6 turns. Each one
 must be capable of changing the recommendation; if the answer could not move the
 verdict, do not ask it.
 
@@ -116,21 +116,19 @@ will be confidently wrong and expensively followed.
 
 ### 4. The advice packet
 
-Only after confirmation. Every section, in this order:
+Only after confirmation. The first four rows are required; include the others when they change the decision, in this order:
 
 | Section | Contents |
 |---|---|
+| Confirmed reframing (required) | The problem as the user confirmed it, verbatim |
+| Verdict (required) | The single recommendation, stated plainly |
+| Do / Don't (required) | The specific things to do, and to avoid with the reason |
+| Trade-offs and unresolved questions (required) | What the verdict costs, and what you could not establish, named rather than papered over |
 | Verified context | What you actually established, and how (their answers / a file you read) |
-| Confirmed reframing | The problem as the user confirmed it, verbatim |
-| Verdict | The single recommendation, stated plainly |
-| Do | The specific things to do |
-| Don't | The specific things to avoid, and why |
 | Cheaper alternatives | Bounded — the ones genuinely worth considering, not a survey |
 | Benefits | What the verdict buys |
-| Trade-offs | What it costs. A verdict with no trade-offs is a sales pitch |
 | Checklist | Ordered steps, each independently checkable |
 | Success metrics | Measurable — how they will know it worked |
-| Unresolved questions | What you could not establish, named rather than papered over |
 
 Push back when the honest verdict is unwelcome. "Do nothing", "you don't need
 this", and "the thing you asked about is not your problem" are all valid
@@ -152,23 +150,13 @@ building has stopped advising, and the user never approved the build.
 
 ## Execution
 
-Default: the isolated `advisor` agent (see `.claude/agents/advisor.md`), which
-runs on the Fable 5 advisory profile.
+Default: delegate each turn to the isolated `advisor` agent (see `.claude/agents/advisor.md`) when the runtime supports fresh spawns. It runs on the strongest advisory tier the runtime offers (see the provider adapter); no model name belongs in this skill.
 
-The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md` → Rejected
-Patterns), so an interview cannot be one long-lived subagent. Each turn is a
-**fresh advisor spawn** given the checkpoint at
-`.meowkit/state/<advise-run>/transcript.json` plus the new answer. The
-orchestrator relays the user's answer **verbatim** and relays the advisor's
-question back — it never answers on the user's behalf, and never reconstructs
-the advisor's reasoning from its own context.
+The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md`, Rejected Patterns), so an interview cannot be one long-lived subagent. Each turn is a **fresh advisor spawn** given the checkpoint at `.meowkit/state/<advise-run>/transcript.json` plus the new answer; the checkpoint is the one file a turn leaves behind, and a spawn is the only way a turn can resume. The orchestrator relays the user's answer **verbatim** and relays the advisor's question back: it never answers on the user's behalf and never reconstructs the advisor's reasoning from its own context.
 
-Cap: **~6 spawns per run**. Each spawn reloads context, so rounds are not free —
-this is the same budget as the question target, and it is a reason to ask only
-questions that can move the verdict.
+Each spawn reloads context, so rounds are not free: ask only questions that can move the verdict. A question that needs at most three turns can run **inline** with the disclosed note below; that is cheaper, and the independence loss is stated.
 
-**Disclosed fallback:** if the Fable 5 profile or the relay is unavailable, run
-the interview **inline** and say so:
+**Disclosed fallback:** if the advisory tier or the relay is unavailable, or the question is small enough to run inline, run the interview **inline** and say so:
 
 ```
 Note: running advise inline — the isolated advisor was unavailable.

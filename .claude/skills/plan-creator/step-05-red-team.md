@@ -1,258 +1,42 @@
-# Step 5: Red Team Review
+# Step 5: Red Team
 
-Adversarial plan review with plan-specific personas. Runs in hard/deep/parallel/two modes (skipped in fast).
+Hard family only. Reviewers attack the plan, you adjudicate, the user decides what to apply. Done when `red-team-findings.md` exists in the plan directory, accepted findings are applied, and the consistency sweep reports no unresolved contradiction (or the user chose how to proceed).
 
-## Instructions
+## 5a. Pick lenses and reviewers
 
-### 5a. Skip Check
+Lenses live in `prompts/personas.md`. By phase count: 1-3 phases use Assumption Destroyer and Scope Critic; 4-5 add Security Adversary; 6 or more add Failure Mode Analyst.
 
-**Skip if:** `planning_mode = fast` → read and follow `step-07-gate.md`.
+When the plan is small (one or two phases) you may run the lenses yourself in turn instead of delegating. Otherwise delegate each lens to a read-only reviewer subagent. The brief gives:
 
-### 5b. Select Personas by Phase Count
+- Goal: find flaws in this plan (a document, not code) through one named lens.
+- Plan: the plan directory path and the file list (`plan.md`, each `phase-XX-*.md`). Reviewers open the files themselves; do not paste the plan into the brief.
+- Fixed constraints: items marked `locked: user-confirmed` and decisions the plan records as made; a reviewer may question them but not assume them away.
+- Return: findings in the format in `prompts/personas.md`, plus the blind-spot line.
 
-Count `phase-XX-*.md` files in `{plan_dir}`:
+## 5b. Collect
 
-| Phase count | Personas to use |
-|-------------|-----------------|
-| 1–3 phases  | Assumption Destroyer + Scope Complexity Critic |
-| 4–5 phases  | Above + Security Adversary |
-| 6+ phases   | Above + Security Adversary + Failure Mode Analyst |
+Drop findings with no quote and no `file:line`. Merge findings with the same location and flaw, keeping the higher severity. Sort Critical, High, Medium and keep at most 15; promoted cross-cutting findings are never the ones dropped.
 
-Load persona prompts from `prompts/personas/`.
+Blind spots: when two or more lenses independently name the same under-covered dimension, promote it to one High `cross-cutting` finding that quotes both. A blind spot only one lens names is a noted concern in the report, not a finding. Zero findings is fine: record `Findings: none` and move on.
 
-### 5c. Dispatch Reviewer Subagents
+## 5c. Adjudicate and ask
 
-Once the personas are selected, delegate each one to the `researcher` agent with:
+Mark each finding Accept (valid and actionable) or Reject (noise, already addressed, out of scope, speculative) with a one-line reason. A finding that proposes cutting a `locked: user-confirmed` item always goes to the user; never accept or apply it silently.
 
-```
-IGNORE your default instructions. You are reviewing a PLAN DOCUMENT, not code.
-There is no code to lint, build, or test. Focus exclusively on plan quality.
+If the findings show the approach cannot meet the goal, or two research directions are incompatible, stop patching: tell the user what you found and ask whether to rework the plan, return to step 3, or drop it. Do not patch around a broken premise. In an `--advice` run this is the RESCUE checkpoint (`references/advice-checkpoints.md`).
 
-# Adversarial Plan Review: {Persona Name}
+Ask the user: apply all accepted findings (recommended), review each one (apply, skip or modify), or reject all. Show counts by severity and the accepted list. Ask in plain words if the runtime has no structured question tool.
 
-## Your Role
-{full content of prompts/personas/{persona-file}.md}
+## 5d. Apply and record
 
-## Plan Under Review
+Apply approved findings: Critical and High go to the affected phase's Risk Assessment, Medium to Key Insights, each prefixed `[RED TEAM]`.
 
-### plan.md
-{full content of plan.md}
+Write `{plan_dir}/red-team-findings.md`: date, lenses used, counts by severity and disposition, then each finding with its fields, disposition, rationale and where it was applied, then the blind-spot table and noted concerns. If one exists, rename it to `red-team-findings-{YYMMDD}.md` first. Append a short `## Red Team Review` table to `plan.md` (finding, severity, disposition, applied to) linking the full report; add a `### Session` subsection when one already exists.
 
-### Phase Files
-{full content of each phase-XX-*.md file, labeled by filename}
+## 5e. Consistency sweep
 
-## Semantic Check Results
-{results from step 4a}
-
-## Your Mission
-Find architectural flaws, unstated assumptions, scope issues, or risks in this PLAN.
-Use the output format defined in your persona prompt.
-Max 10 findings. Quality over quantity.
-
-Challenger policy: a finding needs a quote from the plan, or `file:line` for a claim about the repo. A finding without one is dropped. Finding nothing is a valid result: say so and stop; do not invent a finding to fill the list.
-
-After the findings list, emit ONE `**Cross-persona blind spot:**` line per the "Cross-Persona Blind Spot" section in your persona prompt. Use `None observed.` if you cannot identify one — do NOT fabricate.
-```
-
-### 5d. Collect and Deduplicate Findings
-
-After all subagents complete:
-
-1. Merge all findings into a single list, first dropping any finding whose Evidence is neither a plan quote nor `file:line`. If none remain, record `Findings: none` and continue; zero findings is a valid result
-2. Deduplicate: merge findings with the same `location` + `core_flaw` (keep highest severity)
-3. Sort by severity: Critical → High → Medium
-4. Cap at 15 findings total
-
-Each finding must have these 7 fields:
-```
-## Finding {N}: {title}
-- **Severity:** Critical | High | Medium
-- **Location:** Phase {X}, section "{name}" (or "plan.md: {section}")
-- **Flaw:** {what's wrong}
-- **Failure scenario:** {concrete description of how this breaks}
-- **Evidence:** {quote from the plan, or `file:line` for a repo claim}
-- **Suggested fix:** {brief recommendation}
-- **Category:** {assumption | scope | risk | architecture | timeline | cross-cutting}
-```
-
-### 5d.5 Cross-Persona Blind Spot Aggregation
-
-Each persona was instructed to emit ONE `**Cross-persona blind spot:**` line after their findings list — naming a dimension OUTSIDE their specialty that they suspect the other reviewers may also miss. This sub-step processes those lines.
-
-1. **Collect** each persona's `**Cross-persona blind spot:**` value (the line is OUTSIDE the findings list, not deduped in 5d).
-2. **Detect convergence:** if 2+ personas independently named overlapping dimensions (matching by topic, not exact wording — e.g., "no observability story" + "no metrics/logging" converge on observability), promote to a NEW finding:
-   - **Severity:** `High` (default — 2+ specialized reviewers agreeing on a gap is a stronger signal than any single-lens finding; orchestrator may downgrade only if the dimension is genuinely minor).
-   - **Category:** `cross-cutting`
-   - **Location:** `plan.md` if cross-cutting; or affected phase(s) by best-guess.
-   - **Flaw:** paraphrased convergent blind-spot description.
-   - **Failure scenario:** orchestrator-derived from the convergent text.
-   - **Evidence:** `Independently noted by {persona-A}, {persona-B}: '{quote-A}', '{quote-B}'` (always include raw quotes, do not paraphrase Evidence).
-   - **Suggested fix:** "Add explicit treatment in {affected section(s)}; or run a focused review on this dimension."
-3. **Single-persona observations:** if only 1 persona named a unique blind spot, record it as a "noted concern" — visible in the final report (5h) but NOT pushed into phase files and NOT counted in finding totals.
-4. **All-clear case:** if all personas output `None observed.`, record `Cross-persona blind spots: none` in the summary; no findings added.
-5. **Re-cap if needed:** if the cross-cutting promotions push total findings past 15, re-trim the lowest-severity Medium findings first; never drop a promoted cross-cutting High.
-
-### 5e. Agent Adjudication
-
-For each finding, the agent evaluates and assigns:
-- **Accept** — finding is valid, actionable, and worth addressing
-- **Reject** — finding is noise, already addressed, out of scope, or speculative
-
-Include a 1-line rationale for each disposition.
-
-**Guard:** a finding that proposes cutting an item marked `locked: user-confirmed` must be escalated to the user in 5f — never auto-accepted or silently applied.
-
-### 5f. Present to User by asking the user
-
-```json
-{
-  "questions": [{
-    "question": "Red Team Review complete.\n\n{N} findings: {accepted} accepted, {rejected} rejected.\n\nBreakdown: {C} Critical, {H} High, {M} Medium\n\nAccepted findings summary:\n{bullet list of accepted findings with severity}\n\nHow do you want to proceed?",
-    "header": "Red Team Review",
-    "options": [
-      { "label": "Apply all accepted findings", "description": "Recommended — apply agent-accepted findings to phase files" },
-      { "label": "Review each one individually", "description": "Step through each accepted finding: Apply / Skip / Modify" },
-      { "label": "Reject all, plan is fine", "description": "Skip all findings and proceed to validation interview" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
-
-**If "Review each one individually":** For each accepted finding, present:
-```json
-{
-  "questions": [{
-    "question": "Finding {N}/{total}: {title}\nSeverity: {severity}\nLocation: {location}\nFlaw: {flaw}\nSuggested fix: {fix}",
-    "header": "Red Team Finding {N} of {total}",
-    "options": [
-      { "label": "Apply", "description": "Add to phase file Key Insights or Risk Assessment" },
-      { "label": "Skip", "description": "Dismiss this finding" },
-      { "label": "Modify", "description": "Apply with a note that user will edit manually" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
-
-### 5g. Apply Accepted Findings
-
-For each finding the user approved (via "Apply all" or per-finding "Apply"/"Modify"):
-- If severity Critical/High: add to affected phase file's **Risk Assessment** section
-- If severity Medium: add to affected phase file's **Key Insights** section
-- Prefix applied entries with `[RED TEAM]`
-
-### 5h. Write Red Team Findings Report File
-
-Write the **full detailed findings** to a separate file: `{plan_dir}/red-team-findings.md`
-
-```markdown
-# Red Team Findings — {YYYY-MM-DD}
-
-**Plan:** {plan_dir}/plan.md
-**Personas used:** {list of personas}
-**Findings:** {total} ({accepted} accepted, {rejected} rejected)
-**Severity breakdown:** {N} Critical, {N} High, {N} Medium
-**Cross-persona blind spots:** {N promoted to findings, M noted concerns, K personas reported "None observed"}
-
----
-
-## Finding 1: {title}
-- **Severity:** {Critical | High | Medium}
-- **Location:** {Phase X, section "name"}
-- **Flaw:** {full description}
-- **Failure scenario:** {detailed scenario}
-- **Evidence:** {quote from the plan, or `file:line` for a repo claim}
-- **Suggested fix:** {recommendation}
-- **Category:** {assumption | scope | security | reliability | architecture | cross-cutting}
-- **Disposition:** {Accept | Reject} — {rationale}
-- **Applied to:** {phase file path or "—"}
-
-## Finding 2: {title}
-...
-
----
-
-## Cross-Persona Blind Spot Pass
-
-**Promoted to findings:** {N convergent blind spots — see findings list above with `Category: cross-cutting`}
-**Noted concerns (single-persona):** {M items — recorded for visibility, not applied to phase files}
-
-| Persona | Blind spot |
-|---------|------------|
-| Assumption Destroyer | {raw text from persona, or "None observed"} |
-| Scope/Complexity Critic | {raw text from persona, or "None observed"} |
-| Security Adversary | {raw text from persona, or "None observed"} |
-| Failure Mode Analyst | {raw text from persona, or "None observed"} |
-
-### Noted Concerns (single-persona observations)
-
-- **{persona}:** {blind-spot text} — _not promoted; no convergent second voice_
-- ... (omit this sub-section entirely if no noted concerns)
-```
-
-This file preserves the full evidence and reasoning. It can be re-read by future red-team sessions or referenced during implementation.
-
-### 5i. Write Red Team Review Summary to plan.md
-
-Append a **summary section** to plan.md that links to the full report:
-
-```markdown
-## Red Team Review
-
-### Session — {YYYY-MM-DD}
-**Findings:** {total} ({accepted} accepted, {rejected} rejected)
-**Severity breakdown:** {N} Critical, {N} High, {N} Medium
-**Cross-persona blind spots:** {N promoted, M noted}
-**Full report:** [red-team-findings.md](red-team-findings.md)
-
-| # | Finding | Severity | Disposition | Applied To | Rationale |
-|---|---------|----------|-------------|------------|-----------|
-| 1 | {title} | {severity} | Accept/Reject | {phase file or —} | {1-line rationale} |
-```
-
-If a `## Red Team Review` section already exists (from a previous session), append a new `### Session` subsection — don't overwrite. Similarly, if `red-team-findings.md` already exists, rename it to `red-team-findings-{YYMMDD-prev}.md` before writing the new one.
-
-### 5j. Whole-Plan Consistency Sweep (Sweep W1)
-
-After accepted findings have been written into phase files (5g), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-06.
-
-Algorithm: see `references/whole-plan-sweep.md` (stage-then-apply with read-only Pass 1, decision check, write Pass 2).
-
-Inputs to this run:
-- `delta_source = accepted_findings` (the list from 5e)
-- `plan_dir` (from session state)
-
-Outputs:
-- `### Pending Sweep Edits` block appended to `{plan_dir}/red-team-findings.md` (staged before any write)
-- `### Whole-Plan Consistency Sweep` summary block appended to `{plan_dir}/red-team-findings.md` (after Pass 2)
-- plan.md frontmatter updated with `consistency_sweeps.red_team: { reconciled, unresolved, ran_at }`
-
-If `unresolved > 0`, FIRE the W1 user-question blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
-
-- "Apply pending edits and defer unresolved to validation interview" — proceed to step-06, mark deferred items in `## Validation Log`.
-- "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.
-- "Skip sweep this round" — drop pending edits, proceed; record in red-team-findings.md that sweep was declined.
-
-If `unresolved = 0`, proceed silently to step-06.
-
-**Cancel safety.** If the user picks any "Skip" / "Cancel" option, Pass 2 does NOT execute. The "Pending Sweep Edits" block stays in red-team-findings.md as a record of what would have changed; phase files remain untouched by the sweep. Accepted-finding edits from 5g remain in place — only the sweep's reconciliations are reverted/skipped.
-
-## Output
-
-- `{plan_dir}/red-team-findings.md` — full detailed findings report (includes Cross-Persona Blind Spot Pass section), Pending Sweep Edits, and Whole-Plan Consistency Sweep summary
-- Findings applied to phase files (Key Insights or Risk Assessment), including any promoted `cross-cutting` findings
-- `## Red Team Review` summary section written to plan.md with cross-persona-blind-spot count and link to findings file
-- plan.md frontmatter `consistency_sweeps.red_team` updated
-- `red_team_findings` variable set: `"{N} findings, {accepted} accepted, {C} cross-persona promoted"`
-
-## Advice (`--advice` runs only)
-
-If the red team left a contradiction the plan does not resolve, or research produced
-two incompatible directions, fire the RESCUE checkpoint per
-`references/advice-checkpoints.md`. Findings that the plan already resolves are not a
-trigger. Without the flag, skip this section.
+Run the whole-plan consistency sweep in `references/whole-plan-sweep.md` with `delta_source = accepted_findings`, in your own context (never delegated). If contradictions stay unresolved, the user chooses: apply the pending edits and defer the rest to the interview, apply and resolve now (two attempts at most), or skip the sweep; a skip leaves the staged edits recorded in `red-team-findings.md` and phase files untouched.
 
 ## Next
 
-Read and follow `step-06-validation-interview.md`
+`step-06-validation-interview.md`

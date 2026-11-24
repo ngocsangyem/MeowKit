@@ -1,6 +1,6 @@
 # Gotchas
 
-Update when Claude hits new brainstorming edge cases. Highest-signal content in the skill — keep it sharp.
+Real failure modes only; keep it sharp.
 
 - **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first; do not generate ideas until the problem is confirmed by asking the user.
 - **Anchoring on first idea** — the first idea gets disproportionate attention in evaluation. Generate ALL ideas before scoring any; use `scoring-criteria.md` only after the full list is complete.
@@ -17,3 +17,7 @@ Update when Claude hits new brainstorming edge cases. Highest-signal content in 
 - **Semantic clustering** — all ideas are variations of the same underlying mechanism (e.g., WebSocket / Socket.IO / ws library). Apply anti-bias pivot: force one orthogonal category before closing.
 - **User pre-decided / solution-as-input** — user arrives holding a solution and steers every question back to it. First DECOMPRESS via `solution-decompression.md` to recover the underlying problem + ≥3 problem framings; THEN optionally `reverse.md` to stress-test the chosen path. If the problem's value is unvalidated, redirect to `mk:office-hours`.
 - **Empty intersection** — `constraint-mapping.md` produces no solution satisfying all hard constraints. Do not fabricate a solution that fudges a hard constraint. Report back to the user: "Constraints A and B cannot both be satisfied."
+- **Known pattern, not a novel problem** — you opened `first-principles.md`, then recognised a standard producer-consumer queue. Switch to `multi-alternative.md` and use the standard patterns; do not reinvent because the first technique is sunk cost.
+- **Tied scores** — top three within 2 points means the criteria are not separating signal. Ask the user for the one criterion that breaks the tie and re-score on it alone.
+- **User accepts the first idea listed** — force a comparison ("Idea 1 wins on X, idea 3 on Y; which matters more here?"). If they still pick 1 knowing that, it is an informed choice.
+- **No winner** — a report that lists options without a recommendation cannot become phases without repeating discovery. Say "no clear winner" and ask for one tie-break criterion; otherwise emit the handoff packet.

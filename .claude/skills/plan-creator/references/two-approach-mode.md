@@ -77,4 +77,4 @@ After semantic checks pass on BOTH approach files, present by asking the user:
 2. Non-selected → move to `{plan-dir}/archived/` (preserve, do not delete).
 3. Set `selected_approach = "a"` or `"b"` in session state.
 4. Red-team (step-05) reviews ONLY the selected approach's phase files.
-5. Add `selected_approach` to `.plan-state.json` in step-08.
+5. Step 8 hydrates tasks only from the selected approach's phases.

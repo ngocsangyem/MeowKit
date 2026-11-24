@@ -23,15 +23,15 @@ directly. Without a packet, that context arrives as a raw list of file paths and
 the planner re-derives (or silently drops) what those artifacts already settled.
 
 The packet is an ADAPTER for artifacts that exist BEFORE plan-creator runs. It is
-explicitly NOT for artifacts plan-creator generates itself — step-01 research
-reports and step-02 scout output are consumed directly by step-03, never routed
+explicitly NOT for artifacts plan-creator generates itself — step 1 research
+reports and scout output are consumed directly by step 3, never routed
 through the packet. One pre-existing ticket with no other sources is single-ticket
 triage — that is `mk:intake`'s job, not this packet's.
 
 ## Activation
 
 - **≥ 2 external artifact paths** referenced in the invocation / task description
-  → build the packet (step-00-5).
+  → build the packet (step 0).
 - **0–1 sources** → skip entirely. No packet, no behavior change.
 
 An "external artifact" is a readable file path supplied by the user or an upstream
@@ -97,7 +97,7 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 
 ## Output Location
 
-- **Draft (step-00-5):** `.meowkit/state/plan-creator-intake-packet.md`
+- **Draft (step 0):** `.meowkit/state/plan-creator-intake-packet.md`
 - **Final (step-03):** moved to `{plan_dir}/research/plan-intake-packet.md` and
   cited by the plan like any research report (`from: research/plan-intake-packet.md`).
 

@@ -25,94 +25,69 @@ runtime: claude-code
 
 # Sequential Thinking
 
-Structured step-by-step reasoning with hypothesis generation, elimination, and revision capability.
+Evidence-first reasoning for a question whose cause or answer is not obvious: state what is observed, form hypotheses from evidence, test the cheapest first, and conclude only on a test that could have failed. Use it for diagnosis where the root cause is unclear, and for decisions where "I think it's X" needs evidence before acting. Skip it for a trivial fix (typo, lint) or a single-file change with an obvious cause.
 
-## When to Use
-
-- Complex problem requiring multi-step reasoning
-- Debugging where root cause isn't obvious
-- When mk:fix invokes diagnosis (Phase 3)
-- Architecture decisions with multiple trade-offs
-- Any situation where "I think it's X" needs evidence before acting
-
-**Do not use for:** trivial fixes (typo, lint), single-file changes with obvious cause.
+| Situation | Use |
+|---|---|
+| Something is broken and needs fixing | `mk:fix` (it calls this skill when it diagnoses) |
+| Unknown symptoms, nothing reproduced yet | `mk:investigate` first, then this skill |
+| Stuck on an approach, not a cause | `mk:problem-solving` |
+| A decision between known options | `mk:advise` or `mk:party` |
 
 ## Process
 
-1. **State the problem** — what is observed vs expected
-2. **Generate hypotheses** — from evidence, NOT guessing. Each hypothesis needs: what evidence would confirm it, what would refute it
-3. **Test hypotheses** — use Grep/Read/Bash to find evidence for/against each
-4. **Eliminate** — mark each CONFIRMED, REFUTED, or INCONCLUSIVE with evidence
-5. **Conclude** — state root cause with confidence level + evidence chain
-6. **Scope the fix** — what must change to address root cause (not symptoms)
+1. **State the problem**: observed against expected.
+2. **Hypothesise from evidence**, never from a guess. Each hypothesis says what would confirm it and what would refute it.
+3. **Test** with Grep, Read or Bash, cheapest test first (grep for the string before a full build). Search for evidence against your favourite hypothesis too.
+4. **Mark** each CONFIRMED, REFUTED or INCONCLUSIVE with its evidence.
+5. **Conclude** when a test that could have failed confirms a hypothesis; otherwise test the next one. A cause confirmed that way needs no second hypothesis for its own sake.
+6. **Scope the fix**: what must change to address the root cause, not the symptom.
 
-Adjust dynamically: expand if more complex than expected, contract if simpler.
+Expand if the problem is bigger than expected and contract if it is simpler.
 
-## Output Format
+## Output
 
-Use `references/hypothesis-testing.md` template. Key sections:
+For diagnosis, use the table in `references/hypothesis-testing.md`:
 
 ```markdown
 ## Sequential Analysis: [problem]
-
-### Hypotheses
-
-| #   | Hypothesis | Evidence for | Evidence against | Status |
-| --- | ---------- | ------------ | ---------------- | ------ |
-
+| # | Hypothesis | Evidence for | Evidence against | Status |
 ### Root Cause
-
-Confirmed: [root cause]
-Confidence: [high/medium/low]
-Evidence: [what confirms this]
-
+Confirmed: [cause] | Confidence: high/medium/low | Evidence: [what confirms it]
 ### Fix Scope
-
-[what must change — files, functions, logic]
+[what must change: files, functions, logic]
 ```
 
-## Revision & Branching
+For a decision (not a diagnosis), give: the options, the evidence for each, the chosen option, and what would change it.
 
-When new evidence invalidates a previous conclusion:
+## Revision and branching
 
-- Mark revision explicitly: `[REVISION of Hypothesis N]: [correction + why]`
-- When 2+ approaches viable: branch, evaluate each, converge with decision
+When new evidence invalidates a conclusion, mark it (`[REVISION of Hypothesis N]: correction and why`). When two or more approaches are viable, branch, evaluate each and converge on one. Patterns: `references/core-patterns.md`; spiral refinement and multi-branch convergence: `references/advanced-techniques.md`; uncertainty and revision cascades: `references/advanced-strategies.md`; worked examples: `references/examples-debug.md`, `examples-api.md`, `examples-architecture.md`.
 
-Load `references/core-patterns.md` for revision/branching patterns.
-For advanced techniques (spiral refinement, multi-branch convergence): `references/advanced-techniques.md`
-For uncertainty + revision cascades: `references/advanced-strategies.md`
-For concrete examples: `references/examples-debug.md`, `examples-api.md`, `examples-architecture.md`
+## Diagnostic frameworks
 
-## Diagnostic Frameworks
+Load one only when a method fits:
 
-Load when a specific methodology fits the investigation:
+- `references/five-whys-plus.md`: post-mortems, recurring problems, human-error investigations.
+- `references/scientific-method.md`: A/B tests, performance work, production incidents.
+- `references/kepner-tregoe.md`: multi-system bugs, contested root causes, high-stakes decisions.
 
-- `references/five-whys-plus.md` — enhanced 5-Whys with bias guards + stopping criteria. Use for post-mortems, recurring problems, human-error investigations.
-- `references/scientific-method.md` — hypothesis → falsifiable prediction → experiment → revise. Use for A/B tests, performance investigations, production incidents.
-- `references/kepner-tregoe.md` — SA/PA/DA/PPA + IS/IS-NOT matrix. Use for multi-system bugs, contested root causes, high-stakes decisions.
+## Scripts (optional)
 
-## Scripts
-
-Track and format thoughts deterministically:
-
-- `scripts/process-thought.js` — validate, track history, branches, revisions. Max 20 thoughts.
-  `node scripts/process-thought.js --thought "..." --number N --total M --next true`
-  `node scripts/process-thought.js --summary` (context-efficient handoff to mk:fix)
-- `scripts/format-thought.js` — format as box/simple/markdown/json
-  `node scripts/format-thought.js --thought "..." --number N --total M --format json`
+Use only to hand a long chain of thoughts to another session; they are not part of the process. `scripts/process-thought.js` validates and tracks thought history (max 20 thoughts; `--summary` gives a compact handoff to `mk:fix`); `scripts/format-thought.js` formats a thought as box, simple, markdown or json. Run them as `node ${CLAUDE_SKILL_DIR}/scripts/...`.
 
 ## Gotchas
 
-- **Premature conclusion**: confirming first hypothesis without testing alternatives → test at least 2 hypotheses before concluding
-- **Evidence-free hypotheses**: "I think it's X" without evidence → every hypothesis needs at least one piece of evidence
-- **Revision avoidance**: refusing to revise when new evidence contradicts → revise explicitly, don't force-fit
+- **Premature conclusion**: confirming a hypothesis with a test that could not have failed. Pick a test that would have refuted it.
+- **Evidence-free hypotheses**: "I think it's X" without at least one piece of verifiable evidence.
+- **Revision avoidance**: when new evidence contradicts the conclusion, revise explicitly; being wrong early costs less than being wrong at the end.
 
-Full list: `references/gotchas.md`
+More in `references/gotchas.md`.
 
-## Workflow Integration
+## Workflow
 
-Called by `mk:fix` during diagnosis (Step 2). Receives input from `mk:investigate` or direct observation. Output feeds into fix implementation.
+`mk:fix` calls this skill during diagnosis; input comes from `mk:investigate` or direct observation, and the output feeds the fix.
 
 ```
-mk:investigate → symptoms + traces → mk:sequential-thinking → root cause → mk:fix
+mk:investigate -> symptoms and traces -> mk:sequential-thinking -> root cause -> mk:fix
 ```

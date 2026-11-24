@@ -64,135 +64,83 @@ dependency_edges:
 
 # Plan Creator
 
-> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+Turns a task into a plan the executor can build from: `plan.md` (at most 80 lines) plus, for larger work, one `phase-XX-*.md` per phase, under `tasks/plans/YYMMDD-slug/`. Use it when there is no plan yet and the task touches more than 2 files, takes more than 30 minutes or involves an architectural decision. Skip it when `mk:scale-routing` says one-shot with no blast radius, or `/mk:fix` handles a simple bug (the fix is the plan). Script paths in this skill's files are relative to `${CLAUDE_SKILL_DIR}`.
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → present to the user. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, archive, and memory entries stay with their existing owners.
+## What a plan must answer
 
-## When to Use
+Before drafting, be able to answer these in concrete sentences (the same contract `mk:cook` checks; skip it when the input is already a plan path):
 
-Activate when:
+1. **Expected output**: the artifacts the user will see (file paths, behaviour, endpoint and payload, command and flags).
+2. **Acceptance criteria**: inputs, outputs and edge cases that must work; each checkable by a command or file check.
+3. **Scope boundary**: what is out this round.
+4. **Constraints**: stack, locations, naming, compatibility, deadlines, performance.
+5. **Touchpoints**: the existing files and contracts the work touches, from scout.
 
-- User runs `/mk:plan-creator [task]` or `/mk:cook [task]`
-- Non-trivial task (> 2 files OR > 30 min OR architectural decisions)
-- User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
-- User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
-- Phase 3 needs a plan to build from
-- Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
-- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
-- Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps of that flow and must never be routed away; the `red-team {path}` and `validate {path}` aliases below run them standalone on an existing plan.
-- Compatibility aliases: `/mk:plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk:plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
+Cite a scout file path in every clarifying question's options ("Add to `src/api/users.ts`, which matches the existing pattern"); an option like "add the feature" gives the user nothing to decide.
 
-Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
+## Where to go
 
-Skip when:
+| Request | Route |
+|---|---|
+| Plan a task | `workflow.md` |
+| `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`, `--spike --timebox <d>`, `--tdd`, `--advice` | `workflow.md` mode matrix; `references/modes-and-flags.md` |
+| `red-team {path}`: attack an existing plan with reviewers, then apply fixes | `references/red-team-standalone.md` |
+| `validate {path}`: ask the plan's open decisions, write the answers in | `references/validate-standalone.md` |
+| `archive` | `references/archive-workflow.md` |
+| Is the agreed plan complete and executable? (report only) | `mk:validate-plan` |
+| Is the scope ambitious or right-sized? | `mk:plan-ceo-review` |
+| Should this exist at all? | `mk:office-hours` |
+| Two approaches or an open trade-off | `mk:brainstorming` first |
 
-- `/mk:fix` with complexity=simple (the fix is the plan)
-- `mk:scale-routing` returns workflow=one-shot + zero blast radius
+Hard-family plans run their own red team and interview before presenting; the `red-team` and `validate` aliases run them again on an existing plan.
 
-## Arguments
+## The plan file
 
-Modes: (default) auto-detect from scope | `--fast` | `--hard` | `--deep` | `--parallel` | `--two` | `--product-level` | `--spike --timebox <duration>`. What each mode changes (research, phase files, validation) and the `--spike` constraints (timebox required, frontmatter, incompatible combinations, story-point cap): `references/modes-and-flags.md` — load it when a mode flag is present or step-00 picks a mode.
+`mewkit plan check --structural` enforces `## Goal`, the frontmatter fields title, type, status and priority, an optional `handoff.next` in `cook | validate | red-team | autobuild | end`, and the phase-file shape (`references/phase-template.md`). The rest, such as the quality of goals and criteria, is judgment, checked in step 4. Phase files are at contract level; file-level detail only when the executor needs it.
 
-**Composable flags:**
+With an agile ticket list in the plan frontmatter (`jira_tickets:`) and `agile-story-gates.md` loaded, show its definition-of-ready checklist per ticket before drafting phases; advisory, never blocking.
 
-- `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- `--advice` — opt-in strategic supervision; see `--advice` below.
+## `--advice` (off by default)
 
-## Requirements Capture Contract
+With the flag, a supervisor reads the plan at four named points (after the scope challenge, on an unresolved red-team contradiction, before the plan is presented, after a correction), at most four calls per run. It may send the plan back to the planner; it never writes the plan or settles it with the user. Without the flag nothing is called and no state is written. Checkpoints: `references/advice-checkpoints.md`; the call contract, loaded only with the flag: `.claude/skills/advise/references/advice-supervision-rules.md`.
 
-Before producing a plan, plan-creator MUST be able to answer all 5 dimensions in concrete sentences (cook's exact-requirements contract — see `.claude/skills/cook/SKILL.md` "Exact-Requirements Contract (Phase 1)"):
+## Optional guides
 
-1. **Expected output** — concrete artifact(s) the user will see at the end (file paths, feature behavior, UI screen, API endpoint + payload, CLI command + flags).
-2. **Acceptance criteria** — specific behaviors / inputs → outputs / edge cases that MUST work to call it "done".
-3. **Scope boundary** — what is explicitly OUT of scope this round.
-4. **Non-negotiable constraints** — stack, file locations, naming, backward compatibility, deadlines, performance.
-5. **Touchpoints** — which existing files/modules (from scout) will be modified or extended; which contracts must stay stable.
+| When | Load |
+|---|---|
+| The task is about metrics, KPIs or dashboards | `references/ops-metrics-design.md` |
+| A plan records an architectural decision | `references/adr-generation.md` |
+| An existing plan needs a split, insert, skip, reorder or abandon | `references/plan-mutation-protocol.md` |
+| Two or more upstream reports feed the plan | `references/plan-intake-packet.md` |
+| A design evidence packet (for example from `mk:figma`) is present | `references/design-evidence-consumption.md` |
+| Writing phase files an executor reads cold | `references/cold-start-context-brief.md` |
 
-Every clarifying question MUST cite scout findings (file paths) in its options. Abstract options like "Add the feature" without a file path are a failure mode — replace with options of the form "Add to `src/api/users.ts` (matches existing pattern)" or "Create new `src/api/profile.ts`".
+`references/file-index.md` lists every shipped file.
 
-Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan already encodes scout output and the 5 dimensions.
+## Exits
 
-## Workflow
-
-Before starting, read `references/failure-catalog.md` for common planning failure modes to avoid.
-
-Execute via `workflow.md`. Step-file architecture — load one step at a time.
-Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
-
-**Agile DoR advisory (Phase 1 entry, conditional):** if the parsed plan frontmatter contains a non-empty `jira_tickets:` list AND `agile-story-gates.md` is loaded (Agile context active per `mk:agent-detector` Step 0b), run 1 of `agile-story-gates.md` for each ticket BEFORE generating phase files. Render the advisory checklist; never block — let the user decide. Skip silently when `jira_tickets:` is absent or the rule is not loaded.
-
-```
-Step 0: Scope Challenge → TRIVIAL (exit) | STANDARD (fast) | COMPLEX (hard/deep)
-Step 0.5: Intake Packet (conditional: ≥2 external artifacts) → consolidate upstream artifacts, else clean skip
-Step 1: Research (hard/deep/parallel/two only) → 2-3 researchers, max 5 calls each
-Step 2: Codebase Analysis (hard/deep/parallel/two only) → scout + docs (deep: bounded scope map)
-Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template; deep: + phase map; tdd: + regression sections)
-Step 4: Semantic Checks → goal/ACs/constraints + structural validation
-Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
-Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
-Step 7: Present plan → self-check + ask the user (Looks right | Modify | Reject)
-Step 8: Hydrate Tasks → phase checkboxes → session tasks
-Step 9: Post-Plan Handoff → mode-pruned ask the user (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
-```
-
-## Output Structure
-
-**Fast mode:** Single `plan.md` (goal, context, scope, approach, ACs)
-**Hard mode:** Directory with plan.md + phase files:
-
-```
-tasks/plans/YYMMDD-name/
-├── plan.md              ← overview (≤80 lines)
-├── research/            ← researcher reports (hard mode)
-├── phase-01-name.md     ← 12-section detail (≤150 lines)
-├── phase-02-name.md
-└── ...
-```
+- Trivial task: send it to `/mk:fix` or a direct edit.
+- Approach and touchpoints both unclear: ask for scout or brainstorm; do not draft phases.
+- Red team or interview show the approach cannot meet the goal: stop and tell the user what you found instead of patching around it.
 
 ## Gotchas
 
-- **Wrong workflow model**: feature-model on a bug fix skips investigation → confirm type at Step 0
-- **Goal describes activity**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite as outcome
-- **ACs can't be verified**: "code is clean" gives the reviewer nothing to check → every AC must reference a command/file check
-- **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
-- **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
-- **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope check exits early
-- **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
-- **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
-- **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
-- **Post-Plan Handoff is deterministic**: step-09 asks the user; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
-- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
-- **Whole-Plan Consistency Sweeps W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
-- **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
-- **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per sweep; further unresolved items convert to Risk rows.
-- **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
-- **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
-- **Re-analyzing a design source that already has a packet duplicates interpretation**: when a design evidence packet path is present, cite the packet — do NOT call the design source's tools or re-parse its raw JSON. See `references/design-evidence-consumption.md`.
+- Goal as activity ("Implement OAuth") instead of outcome ("Users can log in with OAuth"): rewrite it.
+- Acceptance criteria nobody can verify ("code is clean"): tie each to a command or file check.
+- A monolithic `plan.md` over 80 lines: move detail into phase files.
+- Research that is archived but not cited: step 3 must pull it into Key Insights.
+- Planning a trivial task with full research: step 0 exits early.
+- Skipping scout on an unfamiliar codebase: scout first.
+- Using `--deep` to decide an architecture: it maps a chosen approach, so an unclear one goes to `mk:brainstorming`.
+- Dropping `--tdd` at handoff: step 9 prints cook with `--tdd` because a state file will not survive a new session.
+- Auto-running the chosen command at step 9: the user types it in a fresh session.
+- `handoff.next` outside the enum fails the structural check.
+- A failed post-hydration integrity check is a hard stop for a human to resolve; do not recover silently.
+- Re-analysing a design source that already has an evidence packet duplicates interpretation: cite the packet.
+- `.plan-state.json` is a cache that `mewkit plan sync` updates only when it exists; do not write it by hand.
 
-## `--advice` (composable, off by default)
+## Related
 
-Opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the
-scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the plan is agreed
-step, RECHECK after a correction.
+`.claude/rules/meowkit-core.md` (plan, then agree with the user, before building); `.claude/skills/cook/references/orchestration-rules.md` (verification subagents stay read-only; the sweep stays in your context); `.claude/skills/cook/references/task-state-emission.md` (status updates when a durable task record exists).
 
-Athena reads the plan and can return it to the planner. It never writes the plan and never
-settles it with the user.
-
-Without the flag there are zero calls and no state is written.
-
-Checkpoints: `references/advice-checkpoints.md`. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the
-flag is present).
-
-## Related Rules
-
-- `.claude/rules/meowkit-core.md` — planning as a practice: write the plan and agree it with the user before Phase 3
-- `.claude/skills/cook/references/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
-- `.claude/skills/cook/references/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
-
-## File Index
-
-Every step file, template, persona prompt, script and reference this skill ships, with its purpose, plus the documented filename exception for the few-shot calibration example: `references/file-index.md` — load it when you need a file no step names, such as the metrics design guide, the plan mutation protocol, the ADR guide or a worked example.
-
-## Start
-
-Read and follow `workflow.md`.
+Start with `workflow.md`.

@@ -1,6 +1,6 @@
 # Jira Handoff Protocol — mk:intake → mk:jira-*
 
-Defines how mk:intake passes structured data to the `mk:jira-*` family for execution. Auto-execution is NOT in v1 scope — user reviews suggestions and runs commands manually.
+Defines how mk:intake passes structured data to the `mk:jira-*` family for execution. The skill does not execute them: the user reviews the suggestions and runs the commands.
 
 ## Handoff Flow
 
