@@ -48,7 +48,6 @@ const RETAINED_SKILL_SCRIPTS = [
 	".claude/skills/evaluate/scripts/recompute-score.py",
 	".claude/skills/evaluate/scripts/run-evaluator.sh",
 	".claude/skills/evaluate/scripts/validate-verdict.sh",
-	".claude/skills/figma/evals/validate-evidence-packets.py",
 	".claude/skills/html-video/scripts/render-html-to-mp4.sh",
 	".claude/skills/investigate/scripts/find-polluter.sh",
 	".claude/skills/jira/scripts/fetch-workflow.sh",
@@ -102,12 +101,13 @@ const RETAINED_SKILL_SCRIPTS = [
 ];
 
 /**
- * Interpreter scripts owned by a skill the published kit withholds.
+ * Interpreter scripts the published kit withholds: a withheld skill's scripts,
+ * and eval scripts that run from the checkout only.
  *
  * They are held to the same one-way claim as the shipped ones, against the
  * REPOSITORY instead of the ship set: each must still exist at exactly this
  * path. Splitting them out keeps both halves honest. Dropping them from the
- * retention list entirely would let a later change delete a benchmark script
+ * retention list entirely would let a later change delete a benchmark or eval script
  * with nothing noticing, and leaving them in it would make the check demand
  * that a withheld skill ship — one of the two lists has to say which claim
  * applies, and silence in either direction reads as a tidy-up in the diff.
@@ -116,6 +116,7 @@ const RETAINED_UNSHIPPED_SKILL_SCRIPTS = [
 	".claude/skills/benchmark/scripts/compare-runs.sh",
 	".claude/skills/benchmark/scripts/git-index-audit.sh",
 	".claude/skills/benchmark/scripts/run-canary.sh",
+	".claude/skills/figma/evals/validate-evidence-packets.py",
 ];
 
 module.exports = { NODE_ONLY_TREES, RETAINED_SKILL_SCRIPTS, RETAINED_UNSHIPPED_SKILL_SCRIPTS };
