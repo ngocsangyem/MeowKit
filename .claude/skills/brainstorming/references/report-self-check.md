@@ -11,7 +11,7 @@ Run before finalizing a brainstorm report.
 - Ideas are generated before evaluation.
 - Anti-bias pivot is present or explicitly not needed for fewer than 4 ideas.
 - Challenge pass result is present.
-- Recommendation cites evidence: score, constraint fit, novelty, scout touchpoint, or rejected alternative.
+- The recommendation names the evidence that beats the top rejected alternative (score, constraint fit, novelty, scout touchpoint), not only its own merits.
 - Handoff packet is present when the output is ready for planning.
 
 ## Fail Conditions

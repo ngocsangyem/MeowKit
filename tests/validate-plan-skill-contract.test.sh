@@ -11,9 +11,9 @@ assert_match() {
 }
 
 assert_match "validates plan against 8 dimensions" '^description:.*agreed plan across 8 dimensions' "$SKILL"
-assert_match "runs once the plan is agreed, before Phase 2" 'Once the plan is agreed, before Phase 2' "$SKILL"
+assert_match "runs once the plan is agreed, before building" 'Run it once the plan is agreed, before building' "$SKILL"
 assert_match "checks plans, never creates them (consumes mk:plan-creator output)" 'operates on plans from .mk:plan-creator.' "$SKILL"
-assert_match "read-only analysis: does NOT modify plan files" 'Does NOT modify plan files.*read-only analysis' "$SKILL"
+assert_match "read-only analysis: does NOT modify plan files" 'does not modify plan files.*read-only analysis' "$SKILL"
 
 echo
 echo "Results: $PASS passed, $FAIL failed"

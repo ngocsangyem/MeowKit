@@ -138,7 +138,7 @@ If no frontend is involved (CLI tool, backend API, data pipeline), write "N/A �
 
 ### 3a.5. Structural Validation
 
-Run the dedicated product-spec validator script (NOT inline bash — per `lessons-build-skill.md` "Store Scripts" principle):
+Run the product-spec validator script:
 
 ```bash
 scripts/check-product-spec.sh "{plan_dir}/plan.md"
@@ -166,24 +166,21 @@ Do NOT proceed to step-04 until the script exits 0.
 
 Do NOT write `phase-XX-*.md` files in this mode.
 
-The harness skill (`mk:autobuild`, added in Phase 5) will negotiate a sprint contract
+The harness skill (`mk:autobuild`) will negotiate a sprint contract
 with the generator and own implementation decomposition. The planner's job ends at the spec.
 
 ### 3a.7. Cross-Plan Dependency Detection
 
-Same as `step-03-draft-plan.md` section 3f: scan for overlapping scope with existing plans,
+Same as `step-03-draft-plan.md` (overlapping unfinished plans): scan for overlapping scope with existing plans,
 set `blockedBy` / `blocks` in frontmatter if applicable.
 
 ## Output
 
 - `plan_dir` — absolute path to the created plan directory
 - `plan_file` — absolute path to `{plan_dir}/plan.md`
-- Print: `"Product spec: {plan_dir}/plan.md ({N} features)"`
 
 ## Next
 
 Read and follow `step-04-semantic-checks.md`.
 
-Note: step-04's structural validator may flag missing phase files. For product-level mode,
-this is expected — the validator treats product-level specs as a separate schema
-(see step-04 section 4c for product-level handling).
+Step 4 skips the structural validator for product-level plans (they carry a product spec, not phase files) and runs `scripts/check-product-spec.sh` instead.

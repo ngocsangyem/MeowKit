@@ -1127,11 +1127,6 @@
       "size": 1253
     },
     {
-      "path": ".claude/skills/brainstorming/references/edge-cases.md",
-      "sha256": "de09d0d1271404d366648df879acf2de8d901fa349fd7b9b1ef97eb799c65e21",
-      "size": 3580
-    },
-    {
       "path": ".claude/skills/brainstorming/references/editorial-html.md",
       "sha256": "f9eff824bcfbc6c7ebba1c6c79a58e05d91a120374d227c59575c1770e859471",
       "size": 6368
@@ -2231,11 +2226,6 @@
       "size": 2468
     },
     {
-      "path": ".claude/skills/intake/references/confluence-handoff-protocol.md",
-      "sha256": "3c558d4c5f8373418c9d578d7d11065ffb54bf113909c308413a8d738babde56",
-      "size": 4087
-    },
-    {
       "path": ".claude/skills/intake/references/examples/example-bug-intake.md",
       "sha256": "7a8570a0c2fdcaa08990203aac0dbbff735a25b9ff01f0db3bd3cd8754547a02",
       "size": 4288
@@ -2269,11 +2259,6 @@
       "path": ".claude/skills/intake/references/output-template.md",
       "sha256": "0a4e44e5bca5ceb4ff3ecbb9b867f5f3a355b0c7369f7debfd770710454f5569",
       "size": 3695
-    },
-    {
-      "path": ".claude/skills/intake/references/tool-integration-guide.md",
-      "sha256": "44749f55d8e5b0ffbc29f58f1fb2a90eb1a8126a6615f6481780cbde959400a6",
-      "size": 3040
     },
     {
       "path": ".claude/skills/intake/scripts/sanitize-ticket.cjs",
@@ -3034,54 +3019,19 @@
       "size": 4855
     },
     {
-      "path": ".claude/skills/office-hours/references/important-rules.md",
-      "sha256": "3fbf72407a0aafd52ba67ddfd5096af786d270a7ab5c692b1a2e8652dc83e984",
-      "size": 781
+      "path": ".claude/skills/office-hours/references/builder-mode.md",
+      "sha256": "fbecae4ea5c1cc72a4a7161e8c26a001e954729a5e4d72ed35db0e5de436314a",
+      "size": 954
     },
     {
-      "path": ".claude/skills/office-hours/references/phase1-context-gathering.md",
-      "sha256": "d7a3430bfcb70809a68d8681370a88e1c55dde3466a9d4b5fe0221a62bc285e6",
-      "size": 1718
+      "path": ".claude/skills/office-hours/references/design-doc.md",
+      "sha256": "bf7d458f5ebfdf1ee3e46448751ecda5cfb14738e14dd9dcc9973ef3fb3cd02f",
+      "size": 2239
     },
     {
-      "path": ".claude/skills/office-hours/references/phase2.5-landscape-and-premises.md",
-      "sha256": "f32bbf9ba3cb2ae17237ee0436ece47dfc4738df377cc1b6b529c12a51888607",
-      "size": 8172
-    },
-    {
-      "path": ".claude/skills/office-hours/references/phase2a-startup-mode.md",
-      "sha256": "0d5a204e6079c516b8bd42ddb4a5a1002c8fe49e8a384c2d5e358b8ece304d46",
-      "size": 12600
-    },
-    {
-      "path": ".claude/skills/office-hours/references/phase2b-builder-mode.md",
-      "sha256": "29580a72da18de55bc94bacd26e641f6bddbd2caebc0d9cd2c2a549f5f0a21e2",
-      "size": 2431
-    },
-    {
-      "path": ".claude/skills/office-hours/references/phase4-alternatives-and-sketch.md",
-      "sha256": "89ebef142bd726ea45eea921b137bc20b606d0db0ad156f6718b77268b1598fd",
-      "size": 4908
-    },
-    {
-      "path": ".claude/skills/office-hours/references/phase4.5-signals-and-design-doc.md",
-      "sha256": "5d847d69a099ac3cd0daa3888c08c7ac1245f3105a87e5aac8f34bcc968cd698",
-      "size": 9775
-    },
-    {
-      "path": ".claude/skills/office-hours/references/phase6-handoff.md",
-      "sha256": "33acc18c516012555a0cc306d6128d1866ec37651bc7d8032299954ac1ec5937",
-      "size": 4943
-    },
-    {
-      "path": ".claude/skills/office-hours/references/preamble-office-hours.md",
-      "sha256": "1cf341450bb9deb5bb1cbd2774eabcd48ee1fd78c793dfdcb7a000a79324bb23",
-      "size": 693
-    },
-    {
-      "path": ".claude/skills/office-hours/references/preamble.md",
-      "sha256": "923ad118178d2eb5706ffcc0564eef279d435f1dc7f1f18174d7549200bac486",
-      "size": 4002
+      "path": ".claude/skills/office-hours/references/discovery-flow.md",
+      "sha256": "a5df077f0f6717706508aec6feb921877b77915f8f09ec9ea548a44b9af7b29e",
+      "size": 3040
     },
     {
       "path": ".claude/skills/office-hours/references/product-lens-modes.md",
@@ -3089,9 +3039,9 @@
       "size": 3552
     },
     {
-      "path": ".claude/skills/office-hours/references/shared-protocols.md",
-      "sha256": "24638f2c79c793764a4ce3bbf2a053bb9431f97293f8c480d3acc8f413b108f3",
-      "size": 10114
+      "path": ".claude/skills/office-hours/references/startup-diagnostic.md",
+      "sha256": "c3c4166504a9f85a9da3ed60c39178aff1716c14ce0a7813067e4086fae9408f",
+      "size": 3671
     },
     {
       "path": ".claude/skills/orchestrate/SKILL.md",
@@ -3150,44 +3100,9 @@
       "size": 12277
     },
     {
-      "path": ".claude/skills/party/prompts/agent-selector.md",
-      "sha256": "3cbf6568dafaed7f40a40221c005349c17c7fe5710a71c9b48772dffe19ade43",
-      "size": 345
-    },
-    {
-      "path": ".claude/skills/party/prompts/synthesis.md",
-      "sha256": "060b4e60cee29c5eb2d18ba1ab3dfd0526d72e30c907f4094ef8fa745229bcfd",
-      "size": 445
-    },
-    {
       "path": ".claude/skills/plan-ceo-review/SKILL.md",
       "sha256": "bf6cb2aa5f5a50f664ccf7a8efaef37028c90fc2b7adff4e6240bd8e64e0a5b7",
       "size": 5872
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/base-branch-detection.md",
-      "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
-      "size": 708
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/outside-voice.md",
-      "sha256": "6fd44c42051d3fac3586e4e87b76336e7d1c6a923aa5a8d89b658c16554168c5",
-      "size": 3704
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/philosophy-and-principles.md",
-      "sha256": "2e3017d959f58e2294a0f6fc9cb2a6073ea28b0c16069f7a0fe3d3c56ae103f6",
-      "size": 8885
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/post-review.md",
-      "sha256": "7a3b62f42279462938e3bc13bcca20832fca4126f49bf2bc3bfeef3b64d583a5",
-      "size": 12579
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/pre-review-system-audit.md",
-      "sha256": "216958f84d919fa9cd18fa9fb18dd3f4e95c019b9cdc419ef7e2d4bbe797a115",
-      "size": 4922
     },
     {
       "path": ".claude/skills/plan-ceo-review/references/pre-screen.md",
@@ -3195,39 +3110,19 @@
       "size": 4324
     },
     {
-      "path": ".claude/skills/plan-ceo-review/references/preamble.md",
-      "sha256": "eb5e7dd59973fbe0ad173dec7d9cb48d2aedff7c534acd23a82f364ea520c4c4",
-      "size": 3202
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/prerequisite-skill-offer.md",
-      "sha256": "61587db6a4eadb15a28ec4f4ed9a98044e75a0a7683eac883486a40abc9d5572",
-      "size": 3166
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/required-outputs.md",
-      "sha256": "cc520e51edd5e6397229127aa465b09c1cc04ca99d7d8197791cc4b4f0162fa5",
-      "size": 7227
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/review-sections.md",
-      "sha256": "40f90a0e5569bcfd2e0f9c6f61192785462c3300490ca9649e944cdd36708431",
-      "size": 19814
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/shared-protocols.md",
-      "sha256": "24638f2c79c793764a4ce3bbf2a053bb9431f97293f8c480d3acc8f413b108f3",
-      "size": 10114
-    },
-    {
-      "path": ".claude/skills/plan-ceo-review/references/step0-scope-and-mode.md",
-      "sha256": "e827d41c746b06a821bbe7030801c18b71f28f43f886d0219b4a59ac721f30d0",
-      "size": 13240
+      "path": ".claude/skills/plan-ceo-review/references/review-checklist.md",
+      "sha256": "658515d03e5624ead0aab77d400090822e55567cc2b43f3dbd9342cf26e23501",
+      "size": 3401
     },
     {
       "path": ".claude/skills/plan-ceo-review/references/two-lens-evaluation.md",
       "sha256": "d9e79af1bcf205a1d07d09204a7c2c5cf40a0dd83c6e7378e206d918531b3b46",
       "size": 4345
+    },
+    {
+      "path": ".claude/skills/plan-ceo-review/references/verdict-and-output.md",
+      "sha256": "b64b94d15970d5cfca3e7edb914c106dbe6448515f39b3a394b159cf7f888e45",
+      "size": 1266
     },
     {
       "path": ".claude/skills/plan-creator/SKILL.md",
@@ -3238,11 +3133,6 @@
       "path": ".claude/skills/plan-creator/assets/bead-template.md",
       "sha256": "ffa276861aac10c134fb59bc83e7280e52bec8ad7d549e8da4c155c91ad59855",
       "size": 1304
-    },
-    {
-      "path": ".claude/skills/plan-creator/assets/plan-phase.md",
-      "sha256": "2a85c805ff8bd2927646a4fc41a2ca78d4698b2db261ace5ddb9370968af36a5",
-      "size": 1705
     },
     {
       "path": ".claude/skills/plan-creator/assets/plan-quick.md",
@@ -3265,24 +3155,9 @@
       "size": 3520
     },
     {
-      "path": ".claude/skills/plan-creator/prompts/personas/plan-assumption-destroyer.md",
-      "sha256": "7ad9ca1e049859dab8d46228ec2bd51b8638f6490a6c612d4f3c05c8e80c95ca",
-      "size": 2906
-    },
-    {
-      "path": ".claude/skills/plan-creator/prompts/personas/plan-failure-mode-analyst.md",
-      "sha256": "d33eaef5b94e2623653a9e094e604a370bbf917d2752e7971e3e6298efcd71c6",
-      "size": 3286
-    },
-    {
-      "path": ".claude/skills/plan-creator/prompts/personas/plan-scope-complexity-critic.md",
-      "sha256": "459cb2e60d5a557cff2fbf4f221e8b439d14057abe311d72aef4da676d4e3302",
-      "size": 2860
-    },
-    {
-      "path": ".claude/skills/plan-creator/prompts/personas/plan-security-adversary.md",
-      "sha256": "e9d11f13c1984af3eb2caf410aaeaa0c53b1000a08203027cad32f50c00cdcba",
-      "size": 3321
+      "path": ".claude/skills/plan-creator/prompts/personas.md",
+      "sha256": "221c53e0e240fbd8e3b4bdcce4d83dfb85484ac75c9223ef1c406dffd2a263a7",
+      "size": 2953
     },
     {
       "path": ".claude/skills/plan-creator/references/adr-generation.md",
@@ -3320,19 +3195,9 @@
       "size": 4557
     },
     {
-      "path": ".claude/skills/plan-creator/references/failure-catalog.md",
-      "sha256": "e08d4a5a140f12b0e48fadc71fe9a23ee1884a137b91cd835468fb083c74b2e1",
-      "size": 1477
-    },
-    {
       "path": ".claude/skills/plan-creator/references/file-index.md",
       "sha256": "4af66165078831101f15173d7728b7df304b980fbf62fa0bd374bc58d6964cb2",
       "size": 6053
-    },
-    {
-      "path": ".claude/skills/plan-creator/references/gotchas.md",
-      "sha256": "31503f64b8b94366233cb0c6259805ed80ab914fcb9402f125a527f360d623a2",
-      "size": 2847
     },
     {
       "path": ".claude/skills/plan-creator/references/modes-and-flags.md",
@@ -3343,11 +3208,6 @@
       "path": ".claude/skills/plan-creator/references/ops-metrics-design.md",
       "sha256": "5d1eca8372784deb72c6cf7ae9c4de5a18fa670c7fd15c1e0a9a664d1952b871",
       "size": 3227
-    },
-    {
-      "path": ".claude/skills/plan-creator/references/output-standards.md",
-      "sha256": "fadaaf181bd55f6bfeb6b68c36a8ac34dd3103d88de3379e5c8e1df020a1f4ce",
-      "size": 2662
     },
     {
       "path": ".claude/skills/plan-creator/references/parallel-mode.md",
@@ -3370,11 +3230,6 @@
       "size": 3430
     },
     {
-      "path": ".claude/skills/plan-creator/references/plan-organization.md",
-      "sha256": "968f7ccd03e06102dafc6d0805687167b104127dcaf54b20552c16d358d4898d",
-      "size": 980
-    },
-    {
       "path": ".claude/skills/plan-creator/references/plan-presentation.md",
       "sha256": "09b2c00df76a8d5249222fa765e9cfb434f448bfc3934717b69bda570b74c383",
       "size": 3515
@@ -3385,24 +3240,9 @@
       "size": 2347
     },
     {
-      "path": ".claude/skills/plan-creator/references/research-phase.md",
-      "sha256": "d347e2e8273a9aa5f76dc72d60b06fb074e8f555e5dcc11a3bcb55961f936b42",
-      "size": 797
-    },
-    {
-      "path": ".claude/skills/plan-creator/references/scope-challenge.md",
-      "sha256": "ea001c8d3a4b18f4550602a7ae9671dca67d1edd82b329c8c0fe67d76606ac72",
-      "size": 2014
-    },
-    {
       "path": ".claude/skills/plan-creator/references/solution-design-checklist.md",
       "sha256": "1e67918599b0e9e1e3e377c09a1667e3797072989361793327cda2951de81e52",
       "size": 2518
-    },
-    {
-      "path": ".claude/skills/plan-creator/references/solution-evaluation.md",
-      "sha256": "98661682324234cb7ee7055f9bae2442706caf6c7b29969c4a31d19cee769a2c",
-      "size": 796
     },
     {
       "path": ".claude/skills/plan-creator/references/task-management.md",
@@ -3440,11 +3280,6 @@
       "size": 9615
     },
     {
-      "path": ".claude/skills/plan-creator/references/worked-example-stripe-billing.md",
-      "sha256": "2b053801202699cdf7471573daee4e7104615fb6a5287f1b0bddf5acc5679d16",
-      "size": 8059
-    },
-    {
       "path": ".claude/skills/plan-creator/references/workflow-models/bugfix-model.md",
       "sha256": "51a9c9fa2bb120365a3cda6186d5061ca1ac0b8fb1e621c38d46049de165107f",
       "size": 1329
@@ -3471,11 +3306,6 @@
       "exec": true
     },
     {
-      "path": ".claude/skills/plan-creator/step-00-5-intake-packet.md",
-      "sha256": "8ea88dadf21aebeab39e4d5b4043c9b89c2014f48c9db5a2f890ff917d95436f",
-      "size": 3068
-    },
-    {
       "path": ".claude/skills/plan-creator/step-00-scope-challenge.md",
       "sha256": "542c509727d61fd1de02ecd47b6d3541d046c0b078928cc215dca11a81620c35",
       "size": 12334
@@ -3484,11 +3314,6 @@
       "path": ".claude/skills/plan-creator/step-01-research.md",
       "sha256": "002fa60490e900aabaadd5986c887745595709d96f50225a1db90e80037bad47",
       "size": 2023
-    },
-    {
-      "path": ".claude/skills/plan-creator/step-02-codebase-analysis.md",
-      "sha256": "c61452220055bd057eb8fb7dd5c21e4e2bf62b6f3ac71e1d6632325d156be461",
-      "size": 2086
     },
     {
       "path": ".claude/skills/plan-creator/step-03-draft-plan.md",
@@ -3529,11 +3354,6 @@
       "path": ".claude/skills/plan-creator/step-09-post-plan-handoff.md",
       "sha256": "c1a7ac0f123d7daccce079673af2514b77a1149fe4ac3e596432607b32f0b1b3",
       "size": 4859
-    },
-    {
-      "path": ".claude/skills/plan-creator/workflow-fast.md",
-      "sha256": "ed947f079a6423c8e8102c3f29e0eb228fc12cff578464211fe481859cc979ff",
-      "size": 2764
     },
     {
       "path": ".claude/skills/plan-creator/workflow.md",
@@ -6262,11 +6082,6 @@
       "size": 1253
     },
     {
-      "path": ".meowkit/cache/.claude/skills/brainstorming/references/edge-cases.md",
-      "sha256": "de09d0d1271404d366648df879acf2de8d901fa349fd7b9b1ef97eb799c65e21",
-      "size": 3580
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/brainstorming/references/editorial-html.md",
       "sha256": "f9eff824bcfbc6c7ebba1c6c79a58e05d91a120374d227c59575c1770e859471",
       "size": 6368
@@ -7405,11 +7220,6 @@
       "size": 2468
     },
     {
-      "path": ".meowkit/cache/.claude/skills/intake/references/confluence-handoff-protocol.md",
-      "sha256": "3c558d4c5f8373418c9d578d7d11065ffb54bf113909c308413a8d738babde56",
-      "size": 4087
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/intake/references/examples/example-bug-intake.md",
       "sha256": "7a8570a0c2fdcaa08990203aac0dbbff735a25b9ff01f0db3bd3cd8754547a02",
       "size": 4288
@@ -7443,11 +7253,6 @@
       "path": ".meowkit/cache/.claude/skills/intake/references/output-template.md",
       "sha256": "0a4e44e5bca5ceb4ff3ecbb9b867f5f3a355b0c7369f7debfd770710454f5569",
       "size": 3695
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/intake/references/tool-integration-guide.md",
-      "sha256": "44749f55d8e5b0ffbc29f58f1fb2a90eb1a8126a6615f6481780cbde959400a6",
-      "size": 3040
     },
     {
       "path": ".meowkit/cache/.claude/skills/intake/scripts/sanitize-ticket.cjs",
@@ -8220,49 +8025,19 @@
       "size": 4855
     },
     {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/important-rules.md",
-      "sha256": "3fbf72407a0aafd52ba67ddfd5096af786d270a7ab5c692b1a2e8652dc83e984",
-      "size": 781
+      "path": ".meowkit/cache/.claude/skills/office-hours/references/builder-mode.md",
+      "sha256": "fbecae4ea5c1cc72a4a7161e8c26a001e954729a5e4d72ed35db0e5de436314a",
+      "size": 954
     },
     {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase1-context-gathering.md",
-      "sha256": "d7a3430bfcb70809a68d8681370a88e1c55dde3466a9d4b5fe0221a62bc285e6",
-      "size": 1718
+      "path": ".meowkit/cache/.claude/skills/office-hours/references/design-doc.md",
+      "sha256": "bf7d458f5ebfdf1ee3e46448751ecda5cfb14738e14dd9dcc9973ef3fb3cd02f",
+      "size": 2239
     },
     {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase2.5-landscape-and-premises.md",
-      "sha256": "f32bbf9ba3cb2ae17237ee0436ece47dfc4738df377cc1b6b529c12a51888607",
-      "size": 8172
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase2a-startup-mode.md",
-      "sha256": "0d5a204e6079c516b8bd42ddb4a5a1002c8fe49e8a384c2d5e358b8ece304d46",
-      "size": 12600
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase2b-builder-mode.md",
-      "sha256": "29580a72da18de55bc94bacd26e641f6bddbd2caebc0d9cd2c2a549f5f0a21e2",
-      "size": 2431
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase4-alternatives-and-sketch.md",
-      "sha256": "89ebef142bd726ea45eea921b137bc20b606d0db0ad156f6718b77268b1598fd",
-      "size": 4908
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase4.5-signals-and-design-doc.md",
-      "sha256": "5d847d69a099ac3cd0daa3888c08c7ac1245f3105a87e5aac8f34bcc968cd698",
-      "size": 9775
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/phase6-handoff.md",
-      "sha256": "33acc18c516012555a0cc306d6128d1866ec37651bc7d8032299954ac1ec5937",
-      "size": 4943
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/preamble.md",
-      "sha256": "923ad118178d2eb5706ffcc0564eef279d435f1dc7f1f18174d7549200bac486",
-      "size": 4002
+      "path": ".meowkit/cache/.claude/skills/office-hours/references/discovery-flow.md",
+      "sha256": "a5df077f0f6717706508aec6feb921877b77915f8f09ec9ea548a44b9af7b29e",
+      "size": 3040
     },
     {
       "path": ".meowkit/cache/.claude/skills/office-hours/references/product-lens-modes.md",
@@ -8270,9 +8045,9 @@
       "size": 3552
     },
     {
-      "path": ".meowkit/cache/.claude/skills/office-hours/references/shared-protocols.md",
-      "sha256": "24638f2c79c793764a4ce3bbf2a053bb9431f97293f8c480d3acc8f413b108f3",
-      "size": 10114
+      "path": ".meowkit/cache/.claude/skills/office-hours/references/startup-diagnostic.md",
+      "sha256": "c3c4166504a9f85a9da3ed60c39178aff1716c14ce0a7813067e4086fae9408f",
+      "size": 3671
     },
     {
       "path": ".meowkit/cache/.claude/skills/orchestrate/SKILL.md",
@@ -8331,44 +8106,9 @@
       "size": 12277
     },
     {
-      "path": ".meowkit/cache/.claude/skills/party/prompts/agent-selector.md",
-      "sha256": "3cbf6568dafaed7f40a40221c005349c17c7fe5710a71c9b48772dffe19ade43",
-      "size": 345
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/party/prompts/synthesis.md",
-      "sha256": "060b4e60cee29c5eb2d18ba1ab3dfd0526d72e30c907f4094ef8fa745229bcfd",
-      "size": 445
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-ceo-review/SKILL.md",
       "sha256": "bf6cb2aa5f5a50f664ccf7a8efaef37028c90fc2b7adff4e6240bd8e64e0a5b7",
       "size": 5872
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/base-branch-detection.md",
-      "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
-      "size": 708
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/outside-voice.md",
-      "sha256": "6fd44c42051d3fac3586e4e87b76336e7d1c6a923aa5a8d89b658c16554168c5",
-      "size": 3704
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/philosophy-and-principles.md",
-      "sha256": "2e3017d959f58e2294a0f6fc9cb2a6073ea28b0c16069f7a0fe3d3c56ae103f6",
-      "size": 8885
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/post-review.md",
-      "sha256": "7a3b62f42279462938e3bc13bcca20832fca4126f49bf2bc3bfeef3b64d583a5",
-      "size": 12579
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/pre-review-system-audit.md",
-      "sha256": "216958f84d919fa9cd18fa9fb18dd3f4e95c019b9cdc419ef7e2d4bbe797a115",
-      "size": 4922
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/pre-screen.md",
@@ -8376,39 +8116,19 @@
       "size": 4324
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/preamble.md",
-      "sha256": "eb5e7dd59973fbe0ad173dec7d9cb48d2aedff7c534acd23a82f364ea520c4c4",
-      "size": 3202
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/prerequisite-skill-offer.md",
-      "sha256": "61587db6a4eadb15a28ec4f4ed9a98044e75a0a7683eac883486a40abc9d5572",
-      "size": 3166
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/required-outputs.md",
-      "sha256": "cc520e51edd5e6397229127aa465b09c1cc04ca99d7d8197791cc4b4f0162fa5",
-      "size": 7227
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/review-sections.md",
-      "sha256": "40f90a0e5569bcfd2e0f9c6f61192785462c3300490ca9649e944cdd36708431",
-      "size": 19814
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/shared-protocols.md",
-      "sha256": "24638f2c79c793764a4ce3bbf2a053bb9431f97293f8c480d3acc8f413b108f3",
-      "size": 10114
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/step0-scope-and-mode.md",
-      "sha256": "e827d41c746b06a821bbe7030801c18b71f28f43f886d0219b4a59ac721f30d0",
-      "size": 13240
+      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/review-checklist.md",
+      "sha256": "658515d03e5624ead0aab77d400090822e55567cc2b43f3dbd9342cf26e23501",
+      "size": 3401
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/two-lens-evaluation.md",
       "sha256": "d9e79af1bcf205a1d07d09204a7c2c5cf40a0dd83c6e7378e206d918531b3b46",
       "size": 4345
+    },
+    {
+      "path": ".meowkit/cache/.claude/skills/plan-ceo-review/references/verdict-and-output.md",
+      "sha256": "b64b94d15970d5cfca3e7edb914c106dbe6448515f39b3a394b159cf7f888e45",
+      "size": 1266
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/SKILL.md",
@@ -8419,11 +8139,6 @@
       "path": ".meowkit/cache/.claude/skills/plan-creator/assets/bead-template.md",
       "sha256": "ffa276861aac10c134fb59bc83e7280e52bec8ad7d549e8da4c155c91ad59855",
       "size": 1304
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/assets/plan-phase.md",
-      "sha256": "2a85c805ff8bd2927646a4fc41a2ca78d4698b2db261ace5ddb9370968af36a5",
-      "size": 1705
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/assets/plan-quick.md",
@@ -8446,24 +8161,9 @@
       "size": 3520
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/prompts/personas/plan-assumption-destroyer.md",
-      "sha256": "7ad9ca1e049859dab8d46228ec2bd51b8638f6490a6c612d4f3c05c8e80c95ca",
-      "size": 2906
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/prompts/personas/plan-failure-mode-analyst.md",
-      "sha256": "d33eaef5b94e2623653a9e094e604a370bbf917d2752e7971e3e6298efcd71c6",
-      "size": 3286
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/prompts/personas/plan-scope-complexity-critic.md",
-      "sha256": "459cb2e60d5a557cff2fbf4f221e8b439d14057abe311d72aef4da676d4e3302",
-      "size": 2860
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/prompts/personas/plan-security-adversary.md",
-      "sha256": "e9d11f13c1984af3eb2caf410aaeaa0c53b1000a08203027cad32f50c00cdcba",
-      "size": 3321
+      "path": ".meowkit/cache/.claude/skills/plan-creator/prompts/personas.md",
+      "sha256": "221c53e0e240fbd8e3b4bdcce4d83dfb85484ac75c9223ef1c406dffd2a263a7",
+      "size": 2953
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/adr-generation.md",
@@ -8501,24 +8201,9 @@
       "size": 4557
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/failure-catalog.md",
-      "sha256": "e08d4a5a140f12b0e48fadc71fe9a23ee1884a137b91cd835468fb083c74b2e1",
-      "size": 1477
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/file-index.md",
       "sha256": "4af66165078831101f15173d7728b7df304b980fbf62fa0bd374bc58d6964cb2",
       "size": 6053
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/gate-1-approval.md",
-      "sha256": "85bcb627fc580f78b5060ae59f0fd27e817b4eb67edbb7039ebfd8081f326beb",
-      "size": 3517
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/gotchas.md",
-      "sha256": "31503f64b8b94366233cb0c6259805ed80ab914fcb9402f125a527f360d623a2",
-      "size": 2847
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/modes-and-flags.md",
@@ -8529,11 +8214,6 @@
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/ops-metrics-design.md",
       "sha256": "5d1eca8372784deb72c6cf7ae9c4de5a18fa670c7fd15c1e0a9a664d1952b871",
       "size": 3227
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/output-standards.md",
-      "sha256": "fadaaf181bd55f6bfeb6b68c36a8ac34dd3103d88de3379e5c8e1df020a1f4ce",
-      "size": 2662
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/parallel-mode.md",
@@ -8556,34 +8236,14 @@
       "size": 3430
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/plan-organization.md",
-      "sha256": "968f7ccd03e06102dafc6d0805687167b104127dcaf54b20552c16d358d4898d",
-      "size": 980
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/red-team-standalone.md",
       "sha256": "787c5e7b316610cf6cb1af64ca06bb9c13ef67936067119eecd9ede8d9dac68c",
       "size": 2347
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/research-phase.md",
-      "sha256": "d347e2e8273a9aa5f76dc72d60b06fb074e8f555e5dcc11a3bcb55961f936b42",
-      "size": 797
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/scope-challenge.md",
-      "sha256": "ea001c8d3a4b18f4550602a7ae9671dca67d1edd82b329c8c0fe67d76606ac72",
-      "size": 2014
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/solution-design-checklist.md",
       "sha256": "1e67918599b0e9e1e3e377c09a1667e3797072989361793327cda2951de81e52",
       "size": 2518
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/solution-evaluation.md",
-      "sha256": "98661682324234cb7ee7055f9bae2442706caf6c7b29969c4a31d19cee769a2c",
-      "size": 796
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/task-management.md",
@@ -8621,11 +8281,6 @@
       "size": 9615
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/worked-example-stripe-billing.md",
-      "sha256": "2b053801202699cdf7471573daee4e7104615fb6a5287f1b0bddf5acc5679d16",
-      "size": 8059
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/workflow-models/bugfix-model.md",
       "sha256": "51a9c9fa2bb120365a3cda6186d5061ca1ac0b8fb1e621c38d46049de165107f",
       "size": 1329
@@ -8652,11 +8307,6 @@
       "exec": true
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/step-00-5-intake-packet.md",
-      "sha256": "8ea88dadf21aebeab39e4d5b4043c9b89c2014f48c9db5a2f890ff917d95436f",
-      "size": 3068
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-00-scope-challenge.md",
       "sha256": "542c509727d61fd1de02ecd47b6d3541d046c0b078928cc215dca11a81620c35",
       "size": 12334
@@ -8665,11 +8315,6 @@
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-01-research.md",
       "sha256": "002fa60490e900aabaadd5986c887745595709d96f50225a1db90e80037bad47",
       "size": 2023
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/step-02-codebase-analysis.md",
-      "sha256": "c61452220055bd057eb8fb7dd5c21e4e2bf62b6f3ac71e1d6632325d156be461",
-      "size": 2086
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-03-draft-plan.md",
@@ -8710,11 +8355,6 @@
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-09-post-plan-handoff.md",
       "sha256": "c1a7ac0f123d7daccce079673af2514b77a1149fe4ac3e596432607b32f0b1b3",
       "size": 4859
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/workflow-fast.md",
-      "sha256": "ed947f079a6423c8e8102c3f29e0eb228fc12cff578464211fe481859cc979ff",
-      "size": 2764
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/workflow.md",
@@ -9696,18 +9336,6 @@
       "path": ".meowkit/cache/.claude/skills/sprint-contract/references/bdd-to-ac-mapping.md",
       "sha256": "89f3d566b813514e9d6679797eb7a03c97bc8969cace61ba197182973dcb457f",
       "size": 7034
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/sprint-contract/scripts/check-contract-signed.cjs",
-      "sha256": "454758658bcc2bea41e44060e1adcd05a256ff8acf21fa01771fc0a835f2d727",
-      "size": 928,
-      "exec": true
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/sprint-contract/scripts/validate-contract.cjs",
-      "sha256": "834dfc36fa5c6880b299fa62ed9d600a0e5885f00d5606233cc2d45757b20372",
-      "size": 817,
-      "exec": true
     },
     {
       "path": ".meowkit/cache/.claude/skills/status/SKILL.md",

@@ -1,7 +1,6 @@
 # Hypothesis-Driven Investigation
 
 > Part of mk:sequential-thinking. Use during debugging and root cause analysis.
-> Source: open-source upstream (MIT)
 
 ## Output Template
 
@@ -42,7 +41,7 @@ What NOT to change: [explicitly scope out unrelated areas]
 ## Hypothesis Generation Rules
 
 1. **From evidence only** — never "I think" without evidence
-2. **Minimum 2 hypotheses** — prevents anchoring on first idea
+2. **Keep an alternative in view** — test the first hypothesis with a check that could refute it; if it survives, conclude, otherwise move to the next
 3. **Each testable** — must be verifiable with Grep/Read/Bash
 4. **Common categories** to consider:
    - Recent code change introduced regression (`git log --oneline -10`)

@@ -1,71 +1,27 @@
 # Step 7: Present the Plan
 
-Self-check, then show the plan to the user and settle it with them.
+Show the plan and settle it with the user. Done when the user has answered Looks right, Modify or Reject; silence is not agreement.
 
-**`--advice` runs:** the REVIEW checkpoint fires BEFORE this step, never inside it
-(`references/advice-checkpoints.md`). Athena does not settle the plan and its directive is
-not part of the conversation with the user — `READY_FOR_EXISTING_GATE` means only that
-presenting the plan is the correct next step. The exchange below is unchanged.
+`--advice` run: the REVIEW checkpoint fires before this step, never inside it (`references/advice-checkpoints.md`). Its approval to present is not the user's agreement.
 
-## Instructions
+## 7a. Self-check
 
-### 7a. Self-Check Before Presenting
+Say what was completed (checks, red team, interview), what was skipped and why (for example "red team: fast mode"), and what you are unsure of. Include `Uncertain: none` when that is true.
 
-State each category explicitly:
+## 7b. Ask
 
-1. **Completed:** list what was done (semantic checks, structural validation, red team, interview)
-2. **Skipped:** list what was intentionally skipped with justification (e.g., "Red team — fast mode")
-3. **Uncertain:** list items the agent is unsure about (empty if none)
+Show title, type, goal, phases, files affected, the structural-check result and the self-check, per `references/plan-presentation.md`. For a plan with an `## Autonomy Boundaries` block, add a line summarising it and say the user may adjust it now; record any adjustment in plan.md.
 
-### 7b. Present the plan
+Ask the user (plain question if the runtime has no structured tool):
 
-Load `references/plan-presentation.md` for the exact user question format and Context Reminder block.
+| Option | When |
+|---|---|
+| Looks right (recommended) | No uncertain items and no skipped step that risks correctness |
+| Modify | Minor changes: apply them, rerun step 4, present again |
+| Reject | Requirements changed fundamentally: ask for the new requirements, restart at step 0 |
 
-Present the plan by asking the user. Header: "Plan". Question text composes the self-check summary, plan path, phase count, and mode:
-
-> Plan ready for review
->
-> {self-check summary}
->
-> Plan: {plan_dir}/plan.md
-> Phases: {N} phase files
-> Mode: {planning_mode}
-> Autonomy Boundaries: {one-line summary of the Always / Ask-first latitude}   ← include ONLY when plan.md has an `## Autonomy Boundaries` block (long-horizon plans)
->
-> All checks passed. Ready to proceed?
-
-For long-horizon plans that carry an `## Autonomy Boundaries` block, note in the question that the user may adjust the Always / Ask-first latitude before you continue; record any adjustment in plan.md (and its Agent State) on Looks right / Modify. Omit the line entirely for fast / trivial / single-phase plans that have no block.
-
-Single-select.
-
-| Option | Recommend When | Why |
-|--------|----------------|-----|
-| Looks right | Self-check has zero Uncertain items and no Skipped item flags correctness risk | Plan is good — proceeds to task hydration |
-| Modify | Minor changes needed first | Apply changes, re-validate, present again |
-| Reject | Requirements have fundamentally changed | Restart from step-00 with new requirements |
-
-### 7c. Handle Decision
-
-**On "Looks right":**
-- Update Agent State in plan.md: `Agreed with: human`, `Validation: agreed`
-- Print Context Reminder block (from `references/plan-presentation.md`) with absolute path to plan.md
-- Proceed to step-08
-
-**On Modify:**
-- Apply requested changes inline
-- Re-run semantic checks (step-04 4a)
-- Re-run structural validation (step-04 4b)
-- Present the plan again
-
-**On Reject:**
-- Ask user for new or revised requirements
-- Restart from `step-00-scope-challenge.md`
-
-## Output
-
-- Outcome: agreed | modified | rejected
-- Context Reminder printed (once agreed) with cook command and absolute path
+On Looks right, go to step 8.
 
 ## Next
 
-If agreed → read and follow `step-08-hydrate-tasks.md`
+`step-08-hydrate-tasks.md`

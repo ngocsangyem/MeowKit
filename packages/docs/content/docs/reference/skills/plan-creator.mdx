@@ -58,8 +58,8 @@ Before drafting, the skill can state the expected output, acceptance criteria, s
 | Step | What happens |
 |---|---|
 | 0 | Scope challenge: exit for trivial, fast for simple, hard or deep for complex |
-| 0.5 | If two or more upstream artifacts exist, consolidate them into an intake packet |
-| 1 and 2 | Research and codebase analysis (hard, deep, parallel, two) |
+| 0 (cont.) | If two or more upstream artifacts exist, consolidate them into an intake packet |
+| 1 | Create the plan directory, research unknowns and scout the codebase (hard family) |
 | 3 | Draft `plan.md` and the phase files |
 | 4 | Semantic and structural checks |
 | 5 | Red team with up to four personas, recorded in `red-team-findings.md` |
@@ -83,4 +83,4 @@ The skill never starts the next command. Type `/mk:cook <plan path>` yourself in
 
 ## Gotchas
 
-Rewrite a goal that describes an activity ("Implement OAuth") as an outcome ("Users can log in with OAuth"). Every acceptance criterion needs a command or file check. Do not use `--deep` to choose an architecture, since deep maps a chosen approach. A failed integrity check after task hydration stops the run for a human to fix. The full list is in `references/gotchas.md`, and `references/failure-catalog.md` lists common planning failures.
+Rewrite a goal that describes an activity ("Implement OAuth") as an outcome ("Users can log in with OAuth"). Every acceptance criterion needs a command or file check. Do not use `--deep` to choose an architecture, since deep maps a chosen approach. A failed integrity check after task hydration stops the run for a human to fix.

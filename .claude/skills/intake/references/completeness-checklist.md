@@ -23,6 +23,23 @@ Only applies when the task involves UI changes visible to users.
 For backend-only tasks: redistribute 10 points → Goal/Problem (+5) and Acceptance Criteria (+5).
 This makes the effective weights for backend tasks: Goal 25, AC 25, Scope 15, Repro 15, Constraints 10, Priority 10, Dependencies 10.
 
+### Adjustments (the only place deductions live)
+
+Apply after the base score. Other references name the condition and point here.
+
+| Condition | Deduction |
+|---|---|
+| UI ticket, Design/Visual: mockup, screenshot or Figma frame present and readable | 0 |
+| UI ticket, Figma link present but inaccessible (auth, broken URL), noted in the gaps | -2 |
+| UI ticket, only a written description of the UI | -5 |
+| UI ticket, nothing visual or descriptive | -10 (the dimension's full weight) |
+| Jira: bug with no Components set | -5 |
+| Jira: story with no Story Points | -3 |
+| Jira: epic with no start date or no due date | -3 |
+| Jira: no Fix Version on any ticket type | -2 |
+
+Jira deductions are capped at -10 together. A UI-less ticket takes no Design deduction (see the note above). Scores are whole numbers from this table, so a worked example shows the deductions it applied and nothing else.
+
 ## Thresholds
 
 | Score | Status | Action |

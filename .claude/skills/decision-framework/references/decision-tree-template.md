@@ -65,6 +65,6 @@ Order rules within each type by: **Safety → Compliance → Economics → Speed
 
 ## Calibration Check
 
-Before deploying this taxonomy, run 5 real historical cases through it.
-If more than 1 case doesn't fit cleanly → revise the taxonomy.
+Before deploying this taxonomy, run at least 3 real historical cases through it.
+If two of the three do not fit cleanly → revise the taxonomy.
 If expert judgment disagrees with the matrix output → adjust thresholds, not the case.
