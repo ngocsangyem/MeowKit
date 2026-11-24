@@ -1,43 +1,27 @@
-# Prevention Check (Post-Fix)
+# Prevention check
 
-> Run AFTER fix implementation, BEFORE marking complete.
+Run after the fix and before calling it complete.
 
-## 1. Regression Test
+## Regression test
 
-- Follow `.claude/skills/cook/references/tdd-rules.md`: a regression test is required when behavior, security, or a public contract can regress. For lint-only, formatting-only, or configuration-only changes, it may be omitted with a recorded rationale. Flaky failures may use a probabilistic reproducer.
-- When required, the test MUST fail without the fix and pass with it.
+`.claude/skills/cook/references/tdd-rules.md` decides when one is required: when behavior, security or a public contract can regress. Lint, format and config-only changes may omit it with a recorded reason. A flaky failure may use a probabilistic reproducer. A required test fails without the fix and passes with it.
 
-## 2. Defense-in-Depth (consider for each fix)
+## Defense in depth
 
-Not every fix needs all 4 layers. But ALWAYS consider each:
+Consider each layer; most fixes need one or two.
 
-| Layer                  | When to apply                    | Example                           |
-| ---------------------- | -------------------------------- | --------------------------------- |
-| Entry point validation | Fix involves user/external input | Add input validation, sanitize    |
-| Business logic guard   | Fix involves data processing     | Add assertion, boundary check     |
-| Error handling         | Fix involves recoverable failure | Add try/catch, fallback, timeout  |
-| Type safety            | Fix involves wrong type/null     | Add type guard, strict null check |
+| Layer | When | Example |
+|---|---|---|
+| Entry validation | The fix involves user or external input | Validate and sanitize at the boundary |
+| Business-logic guard | The fix involves data processing | Assertion or boundary check |
+| Error handling | The failure is recoverable | try/catch, fallback, timeout |
+| Type safety | Wrong type or null | Type guard, strict null check |
 
-## 3. Verification Checklist
+Common patterns: null or undefined gets a strict check and a guard; a race gets a lock or an idempotent operation; an unhandled edge case gets a boundary test; an environment-dependent bug gets an environment check with a clear error.
 
-Run through before marking fix complete:
+## Checklist
 
-- [ ] Pre-fix state captured? (error messages, test output)
-- [ ] Fix addresses ROOT CAUSE (not symptom)?
-- [ ] Fresh verification run? (exact same commands as pre-fix)
-- [ ] Before/after comparison documented?
-- [ ] Regression test added? (fails without fix, passes with fix)
-- [ ] Defense-in-depth layers considered?
-- [ ] No new warnings/errors introduced?
-- [ ] Full test suite passes? (not just the fixed test)
-
-## 4. Common Prevention Patterns
-
-| Bug type               | Prevention                                  |
-| ---------------------- | ------------------------------------------- |
-| Null/undefined         | Add strict null check + type guard          |
-| Wrong type             | Add runtime type validation at boundary     |
-| Missing error handling | Add try/catch + explicit error logging      |
-| Race condition         | Add mutex/lock or make operation idempotent |
-| Unhandled edge case    | Add boundary condition test                 |
-| Environment-dependent  | Add environment check + clear error message |
+- The pre-fix state was captured and the fix addresses the root cause, not the symptom.
+- The exact pre-fix commands were re-run and the before/after comparison is written down.
+- The regression test exists (or the omission is justified) and no new warnings or errors appeared.
+- The tests related to the change pass, and the full suite too when a shared contract or shared code changed.

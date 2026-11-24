@@ -1342,9 +1342,19 @@
       "size": 15415
     },
     {
-      "path": ".agents/skills/mk-fix/references/complexity-assessment.md",
-      "sha256": "5be40c6885f47dc8672df1dd645d9418a2a5267f9f741081760718c13fdae462",
-      "size": 1373
+      "path": ".agents/skills/mk-fix/references/advice-stages.md",
+      "sha256": "191b30a6dce9f9e402fdc49aadf5b1eeddcaf5848d317d5428aa32a12a2dc5f8",
+      "size": 2244
+    },
+    {
+      "path": ".agents/skills/mk-fix/references/by-symptom.md",
+      "sha256": "a61eeac7bd499c42c69f2cafd3352c6c1a8d7ded3878f5ff8abd93459e764b6a",
+      "size": 2406
+    },
+    {
+      "path": ".agents/skills/mk-fix/references/choosing-a-profile.md",
+      "sha256": "e019e6c5625455082188f09987e858f228923ae9e3e5c4420ee697b96f182a49",
+      "size": 1114
     },
     {
       "path": ".agents/skills/mk-fix/references/diagnosis-protocol.md",
@@ -1352,19 +1362,9 @@
       "size": 3269
     },
     {
-      "path": ".agents/skills/mk-fix/references/gotchas.md",
-      "sha256": "ee6faeb58dd52ab0482774fabce517d2d7365a42573bc4ff0508dd5a21c1e931",
-      "size": 2102
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/mode-selection.md",
-      "sha256": "57c6b64fd746ee8ade31ba893e74ef49e3d37ac5250750f7f3649de1dc0ab556",
-      "size": 1261
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/parallel-exploration.md",
-      "sha256": "2452495f6b235d7a872a4fe65dfff6d913c0719300fe363597446873d0d9fc28",
-      "size": 1442
+      "path": ".agents/skills/mk-fix/references/evidence-index.md",
+      "sha256": "cb575b33a88d5c5cec0dd22310a49d1ccbbb0d3d768340feed330f7646b2d252",
+      "size": 1310
     },
     {
       "path": ".agents/skills/mk-fix/references/prevention-gate.md",
@@ -1375,56 +1375,6 @@
       "path": ".agents/skills/mk-fix/references/review-cycle.md",
       "sha256": "8b7797b75400e72d383076441527d89db435588dd68b2f085dbaf03193bc787b",
       "size": 2048
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/skill-activation-matrix.md",
-      "sha256": "676709b17ac897d17f328914197b58f4c1bc384d59874d08b5bc1741eb53d6e6",
-      "size": 1446
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/task-orchestration.md",
-      "sha256": "ccd2d0b8b64e6b31fffbcc59b8efdcd1e32bf90a1e8c33bd5dbff4ce4a65a18d",
-      "size": 2034
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-ci.md",
-      "sha256": "d803e6e50a1be2c498fb71762a383294b7b7ad8507b1fcec7920e19a306d1062",
-      "size": 1179
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-deep.md",
-      "sha256": "d0d3195f3488ecee90b7f57e5e6d1d4d87ae08ba61ed6ae0fe31bad5f6846b41",
-      "size": 4300
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-logs.md",
-      "sha256": "96d5f87ba771b194493713c5cd1651cefd0cf7d78ddc29017ee5f2f2a7bba571",
-      "size": 1030
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-quick.md",
-      "sha256": "671c8bdec376e9460ac88d8b6d11d021429dfe57be4655a4ddc988daa770f14c",
-      "size": 1254
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-standard.md",
-      "sha256": "47a98205b5a67cab9c83f5a230f06c6b8b9a98a56de1646a3a6a3d8c33b86d27",
-      "size": 3967
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-test.md",
-      "sha256": "9d7b45c13819466d5373b1db8740940e09f10e495ef8ace41d608a3972ee1448",
-      "size": 1539
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-types.md",
-      "sha256": "0fa1b6ca8b7497fdc75b851ebb3e48e12c1a57c26c10038fb4046ca22f273f69",
-      "size": 1257
-    },
-    {
-      "path": ".agents/skills/mk-fix/references/workflow-ui.md",
-      "sha256": "a7b6e2829ad6b3b63bb1d89a6e5d08aea5ca9a5510fff5dabd9866cc70187a90",
-      "size": 1524
     },
     {
       "path": ".agents/skills/mk-freeze/SKILL.md",
@@ -1441,6 +1391,11 @@
       "path": ".agents/skills/mk-freeze/references/freeze-mechanics.md",
       "sha256": "d526120b1f877a24751ab077d264f72ced399dc99d1d6dfab74f19cab9744142",
       "size": 2340
+    },
+    {
+      "path": ".agents/skills/mk-freeze/scripts/set-freeze.cjs",
+      "sha256": "24491b9e9d8b18d56da459b042d27ebc21ba34ecb64564cf77f8bc4e325890a4",
+      "size": 2136
     },
     {
       "path": ".agents/skills/mk-frontend-design/SKILL.md",
@@ -1657,11 +1612,6 @@
       "path": ".agents/skills/mk-investigate/references/performance-diagnostics.md",
       "sha256": "443cccdce8f2f80e90e505253270b9e585190375bb016ff9ffe02ef9c8948c66",
       "size": 4314
-    },
-    {
-      "path": ".agents/skills/mk-investigate/references/preamble-investigate.md",
-      "sha256": "0be35d1bea0d772c451e64fdaf56f41cad5a83440d59f3c34a4a4ab48a0e1933",
-      "size": 817
     },
     {
       "path": ".agents/skills/mk-investigate/references/preamble.md",
@@ -3226,24 +3176,14 @@
       "size": 4765
     },
     {
-      "path": ".agents/skills/mk-qa/references/browser-qa-checklist.md",
-      "sha256": "1f7eeca46557352234ef832f7df69d00c016e1eae63a586e6382535f85f94d36",
-      "size": 4636
+      "path": ".agents/skills/mk-qa/references/fix-loop.md",
+      "sha256": "c196f2c0af5bc4d75bb234f250ca5df272258beef2331d4252be91f633e1b0f4",
+      "size": 1902
     },
     {
       "path": ".agents/skills/mk-qa/references/framework-guidance.md",
       "sha256": "7fe35667c598ab3e45dd938d1b512f13b2908b9827166dd647b9d1385f6981cf",
       "size": 1165
-    },
-    {
-      "path": ".agents/skills/mk-qa/references/health-score.md",
-      "sha256": "58e5869317d7dbbfe39b7a745a9129d3e65780c740ac9a61c85e0b18d1e19b63",
-      "size": 790
-    },
-    {
-      "path": ".agents/skills/mk-qa/references/issue-taxonomy.md",
-      "sha256": "00e8a5f8de02a80b7f92be4b332fb09dc339ecaaa63424f24166790bee688ac5",
-      "size": 2705
     },
     {
       "path": ".agents/skills/mk-qa/references/modes.md",
@@ -3261,6 +3201,11 @@
       "size": 2823
     },
     {
+      "path": ".agents/skills/mk-qa/references/scoring-and-taxonomy.md",
+      "sha256": "6534d04c1ce1218743cc8bba1ddccaa7c70ee78bfaca010af45602689d426264",
+      "size": 2870
+    },
+    {
       "path": ".agents/skills/mk-qa/references/setup.md",
       "sha256": "27e61fdcad5d7326064d7aee42f6c4dc52d79135a848abdf63336b8f4f3e3b3b",
       "size": 11428
@@ -3269,11 +3214,6 @@
       "path": ".agents/skills/mk-qa/references/shared-protocols.md",
       "sha256": "746489e680811f3e56184fdd3d9bae86883f215d32977fc849817c7ab8612bc3",
       "size": 10206
-    },
-    {
-      "path": ".agents/skills/mk-qa/references/workflow-phases.md",
-      "sha256": "f6ad5d413364cf28d3baeef15d9fb7e6c23a0a1c3e5fcf9f6459b2d599dd2d49",
-      "size": 11925
     },
     {
       "path": ".agents/skills/mk-research/SKILL.md",
@@ -3436,11 +3376,6 @@
       "size": 990
     },
     {
-      "path": ".agents/skills/mk-review/references/adversarial-review.md",
-      "sha256": "6d335dbc18ed73649ce29ebf8066c6e7683addd8291beabc721424a50b67ed83",
-      "size": 4963
-    },
-    {
       "path": ".agents/skills/mk-review/references/artifact-verification.md",
       "sha256": "e77e7fa800bc5315984c735da6efecb734c34d1373ec4d9335019adab1db598e",
       "size": 2940
@@ -3466,11 +3401,6 @@
       "size": 2885
     },
     {
-      "path": ".agents/skills/mk-review/references/post-review-steps.md",
-      "sha256": "250b9238fd755649b8cff153e2419c9131ed3f3ab8d12ab6659b5d0110b0c393",
-      "size": 2749
-    },
-    {
       "path": ".agents/skills/mk-review/references/preamble-review.md",
       "sha256": "2383d726ca20e6c89e506cfe7c1509bca6aeeb00857756a9b4a0a4db89204b50",
       "size": 1204
@@ -3494,11 +3424,6 @@
       "path": ".agents/skills/mk-review/references/test-coverage.md",
       "sha256": "e2c7cf4c04dd0c52ca77378b0e5d658c262f401f265f647baa1e626bc6ec043c",
       "size": 9981
-    },
-    {
-      "path": ".agents/skills/mk-review/references/two-pass-review.md",
-      "sha256": "e0fd7cf9f22e5906d40e5c94dd8841356462831e4bf0524650e17d6c96149e11",
-      "size": 1425
     },
     {
       "path": ".agents/skills/mk-review/security-checklist.md",
@@ -3534,11 +3459,6 @@
       "path": ".agents/skills/mk-review/step-04-verdict.md",
       "sha256": "fe84cbe57d02ea0b53901bf845ca474f6d3913e92c90ebb7ed2d793cf21d31da",
       "size": 7894
-    },
-    {
-      "path": ".agents/skills/mk-review/structural-audit.md",
-      "sha256": "e0fc82c13cbb5c1afa1b5946c38141b9ff6ccd4d58eec00814434d62bfefb5e7",
-      "size": 4672
     },
     {
       "path": ".agents/skills/mk-review/workflow.md",

@@ -1,126 +1,26 @@
-# Skill: Deterministic Validation Scripts
+# Validation scripts
 
-**Purpose:** Run real, deterministic checks that do not depend on LLM judgment. These scripts provide ground-truth validation for security, code quality, and correctness.
+Deterministic checks that do not depend on model judgment. They live in `mk:lint-and-validate`; this file says when to run them and what to expect.
 
-## Contents
+## What the scripts do
 
-- [When to Use](#when-to-use)
-- [Available Scripts](#available-scripts)
-  - [`.claude/skills/lint-and-validate/scripts/validate.py`](#claudescriptsvalidatepy)
-  - [`.claude/skills/lint-and-validate/scripts/security-scan.py`](#claudescriptssecurity-scanpy)
-- [Why Deterministic Validation Matters](#why-deterministic-validation-matters)
-- [How to Extend](#how-to-extend)
-- [Integration with Workflow](#integration-with-workflow)
+Both are pattern scanners, not test or build runners.
 
+| Script | Scope | Looks for |
+|---|---|---|
+| `.claude/skills/lint-and-validate/scripts/validate.py [dir]` | Every source file under the directory; writes a report file | Secret, `any`, SQL-interpolation and framework-guard patterns (per language) |
+| `.claude/skills/lint-and-validate/scripts/security-scan.py [dir]` | The git-changed files, or the whole directory without git | The same family of security patterns |
 
-## When to Use
+Run them with `node .claude/hooks/lib/skill-python.cjs <script path> [dir]`. Exit code `0` means no BLOCK-level finding; `1` means at least one. WARN findings print but do not change the exit code. The scripts do not run the type checker, the linter, the tests or the build: for those use the project's own commands or `mk:verify`.
 
-Run validation scripts at two mandatory points:
-1. **Phase 4 (Review)** — before a change is approved for shipping
-2. **Pre-Ship** — immediately before creating a PR or deploying
+## When to run
 
-Also run on-demand whenever you want to verify code quality without relying on subjective assessment.
+Run them at review time and before shipping, or whenever you want a reproducible pattern check. The ship check enforces lint, related tests and a type-check on commit, push and merge; these scanners add a pattern check that it does not make. Treat a BLOCK finding as a defect to fix or to justify in the review, since a pattern match can be a false positive.
 
----
+## Why a script
 
-## Available Scripts
+A script finds a `console.log` buried in a large diff every time, applies the same rules on every run, and cannot claim tests pass when they fail. Use its output as evidence next to the review, not instead of it.
 
-### `.claude/skills/lint-and-validate/scripts/validate.py`
+## Extending
 
-General validation script that checks code quality and correctness.
-
-**What it checks:**
-- Type errors (runs the type checker for the project's language)
-- Lint violations (runs the project's linter)
-- Test suite passes (runs all tests)
-- Build succeeds (runs the build command)
-- No TODO/FIXME/HACK without linked issue
-- No debug statements left in code (`console.log`, `print`, `debugger`)
-
-**How to run:**
-```bash
-node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py
-```
-
-**Exit codes:**
-- `0` — all checks passed
-- `1` — one or more checks failed (details in output)
-
-### `.claude/skills/lint-and-validate/scripts/security-scan.py`
-
-Security-focused validation. See `review/security-checklist.md` for the full list of checks.
-
-**What it checks:**
-- No secrets in code (API keys, tokens, passwords)
-- No raw SQL with string interpolation
-- No `eval()` or equivalent unsafe execution
-- Dependencies have no known critical vulnerabilities
-- Environment variables accessed safely
-- Auth guards present on protected routes
-
-**How to run:**
-```bash
-node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py
-```
-
-**Exit codes:**
-- `0` — no security issues found
-- `1` — security issues found (details in output, each with severity)
-
----
-
-## Why Deterministic Validation Matters
-
-LLMs can miss issues that pattern-matching scripts catch reliably:
-- A human or LLM might overlook a `console.log` buried in a large diff
-- A script will always find it
-- A script applies rules consistently across every run
-- A script does not hallucinate that tests pass when they fail
-
-These scripts are the **source of truth**. If the script says FAIL, the change does not ship — regardless of what any LLM review says.
-
----
-
-## How to Extend
-
-To add a new check to `validate.py`:
-
-1. Create a new check function:
-```python
-def check_no_hardcoded_urls():
-    """Ensure no hardcoded production URLs in source code."""
-    issues = []
-    for file in get_source_files():
-        content = read_file(file)
-        if re.search(r'https?://(?:api|www)\.production\.com', content):
-            issues.append(f"{file}: contains hardcoded production URL")
-    return issues
-```
-
-2. Register it in the `CHECKS` list:
-```python
-CHECKS = [
-    check_types,
-    check_lint,
-    check_tests,
-    check_build,
-    check_no_debug_statements,
-    check_no_hardcoded_urls,  # new check
-]
-```
-
-3. Run the script to verify the new check works.
-
-To add a new security check, follow the same pattern in `security-scan.py`.
-
----
-
-## Integration with Workflow
-
-```
-[Development] → [Unit Tests] → [Validation Scripts] → [Review] → [Security Scan] → [Ship]
-                                      ↑                                    ↑
-                                  Phase 4 run                        Pre-ship run
-```
-
-Both runs must pass with exit code `0` before proceeding. No exceptions.
+A new pattern goes in the matching `check_*` function of the script (`check_ts_js` for TypeScript and JavaScript, and its siblings per language); add one case the scanner flags and one it passes.

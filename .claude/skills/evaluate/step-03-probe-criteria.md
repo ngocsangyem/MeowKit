@@ -1,6 +1,6 @@
 # Step 3: Probe Each Criterion
 
-For each criterion in the loaded list, drive the running build via active verification, capture concrete evidence, and write a finding line. Re-anchor the skeptic persona before each grading.
+For each criterion in the loaded list, drive the running build via active verification, capture concrete evidence, and write a finding line. Reload the skeptic persona at the start of the batch and before writing each PASS.
 
 ## Instructions
 
@@ -9,7 +9,6 @@ For each criterion in the loaded list, drive the running build via active verifi
 ```
 findings = []
 for criterion in criteria:
-    re-load skeptic-persona.md  # leniency drift mitigation
     pick probe technique (see references/active-verification-patterns.md)
     drive the build
     capture evidence
@@ -84,7 +83,7 @@ Append to working `findings` list:
 
 ### 3f. Skeptic persona re-anchor checkpoint
 
-**Before grading each criterion**, re-read the relevant section of `prompts/skeptic-persona.md`. This is not optional. Leniency drift accumulates over a session — the persona needs explicit re-anchoring.
+Read `prompts/skeptic-persona.md` at the start of the batch, and again before you write any PASS. Leniency drift builds up over a session, and a PASS is where it shows.
 
 The re-anchor check: ask yourself before writing a verdict:
 - "Am I marking PASS because the anchor matches, or because I'm tired of finding bugs?"

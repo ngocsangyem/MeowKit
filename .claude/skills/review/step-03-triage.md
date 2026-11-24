@@ -1,6 +1,6 @@
 # Step 3: Triage
 
-Categorize findings to separate signal from noise. Only current-change findings block shipping.
+Categorize findings to separate signal from noise. Current-change findings count toward the verdict; incidental ones go to the backlog.
 
 ## Coverage Check (assured PR mode only)
 
@@ -41,7 +41,7 @@ A finding needs `file:line` (or a quote from the plan, for a plan review). Befor
 
 ### current-change
 Finding is directly caused by or related to the current diff.
-**Action:** Must be addressed before the change ships.
+**Action:** Counts toward the verdict; the developer addresses it before the change ships.
 
 ### incidental
 Finding exists in code touched by the diff but is NOT caused by the current change.

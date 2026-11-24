@@ -1,4 +1,4 @@
-# Scope Drift Detection (Step 1.5)
+# Scope Drift Detection
 
 Before reviewing code quality, check: **did they build what was requested — nothing more, nothing less?**
 

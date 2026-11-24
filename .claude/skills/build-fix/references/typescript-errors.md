@@ -57,7 +57,7 @@ import { X } from './x-module';
 1. Narrow the source type to match the target
 2. Widen the target type to accept the source (if appropriate)
 3. Add runtime guard for union types
-**NEVER use `as any` — use explicit type narrowing or fix the source type.**
+Do not use `as any` (`.claude/rules/security-rules.md`); use explicit type narrowing or fix the source type.
 
 ```ts
 // Fix: type guard
@@ -82,7 +82,7 @@ if (typeof value === 'string') { target = value; }
 1. Check function signature — is the parameter type too restrictive?
 2. Fix the argument type at call site
 3. Add overload if both types are valid use cases
-**NEVER cast with `as any` — fix the type or use a proper type assertion with `as Y` only if provably correct.**
+Do not cast with `as any`; fix the type, or use `as Y` only when it is provably correct.
 
 ### TS7006 — Parameter implicitly has 'any'
 
@@ -103,7 +103,7 @@ function process(data: string): void {
 **Fix:**
 1. Add null check before use: `if (obj !== null) { ... }`
 2. Use optional chaining: `obj?.prop`
-3. Use non-null assertion `obj!.prop` only if you can guarantee non-null (document why)
+3. Use a non-null assertion `obj!.prop` only when non-null is guaranteed (document why); prefer a guard
 
 ### TS2532 — Object is possibly undefined
 

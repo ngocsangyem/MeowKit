@@ -9,7 +9,7 @@
 #
 # Used by:
 #   - mk:rubric SKILL.md as the implementation of list/load/compose subcommands
-#   - evaluator subagent (via mk:evaluate, shipped Phase 3) to inject rubrics into its grading prompt
+#   - evaluator subagent (via mk:evaluate) to inject rubrics into its grading prompt
 #
 # Exit: 0 on success, 1 if rubric/preset not found, 2 on usage error
 #
