@@ -16,11 +16,9 @@
       "canonical": "skills/review/references/preamble.md",
       "members": [
         "skills/cso/references/preamble.md",
-        "skills/document-release/references/preamble.md",
         "skills/investigate/references/preamble.md",
         "skills/qa/references/preamble.md",
-        "skills/retro/references/preamble.md",
-        "skills/ship/references/preamble.md"
+        "skills/retro/references/preamble.md"
       ]
     },
     {

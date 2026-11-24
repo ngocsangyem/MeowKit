@@ -61,13 +61,13 @@ about the current project only.
 
 **Explicit:** `/mk:ask-me [question] [--depth quick|standard|deep] [--save-to <path>]`
 
-**Do NOT invoke when:** the request matches any Redirect First row, asks to
+**Do NOT invoke when:** the request matches any Route first row, asks to
 change code, or is a pure general-knowledge question (answer those directly,
 no scouting).
 
 ## Process
 
-1. **Route check.** Match against Redirect First. Owned elsewhere → name the
+1. **Route check.** Match against Route first. Owned elsewhere → name the
    skill, stop.
 2. **Parse.** Extract the question. Infer kind: factual, explanation, rationale,
    constraint-summary, or claim-check. Depth: `standard` unless flagged.
@@ -78,7 +78,7 @@ no scouting).
    as soon as the answer is sufficiently supported. Track `path:line` for every
    source-backed claim.
 5. **Synthesize.** Direct answer first; separate verified claims from inference;
-   state confidence (high/medium/low — mandatory); list limitations; mention a
+   state confidence (high, medium or low) so the reader knows how far to trust it; list limitations; mention a
    related specialist skill only if the user's next likely action leaves scope.
 6. **Optional save.** Only via `--save-to` or explicit request, per the
    save-path policy below. On unsafe path or conflict, refuse the write and
@@ -88,14 +88,14 @@ Depth budgets and output/failure contracts: [references/answer-contract.md](refe
 
 ### Forbidden Paths (never read)
 
-`.env*`, secrets/keys/credentials/tokens of any kind, `.meowkit/memory/`,
-`.meowkit/state/`, dependency dirs (`node_modules/`, `.venv/`), build outputs,
+The sensitive files in `.claude/rules/injection-rules.md` Rule 4, plus `.meowkit/memory/`,
+`.meowkit/state/`, dependency dirs (`node_modules/`, `.venv/`), build outputs and
 browser profiles. No WebSearch — current-docs lookup belongs to `mk:docs-finder`.
 
 ### Save-Path Policy
 
 Write only when asked, and only under: an explicit user path inside the project
-root, `tasks/reports/`, or `${CLAUDE_PLUGIN_DATA}/ask-me/`. Path escapes a safe
+root, or `tasks/reports/`. Path escapes a safe
 root → refuse and answer inline. Target exists → ask before overwrite or use a
 timestamped name.
 
