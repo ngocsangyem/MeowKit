@@ -2141,7 +2141,7 @@
       "title": "mk:plan-creator",
       "description": "Writes the multi-file plan before building. NOT for mk:planning-engine.",
       "sourcePath": "skills/plan-creator/SKILL.md",
-      "sourceHash": "738d3c73fb1fdf9bbabb7cacf54fe911cacb7373bfc99b1086cf2859a4087455",
+      "sourceHash": "11ea8ecf359afc47cca8e36972c67af08c3d700cd8795a747fa92725bf3ef065",
       "aliases": [],
       "owner": "lifecycle",
       "phase": null,

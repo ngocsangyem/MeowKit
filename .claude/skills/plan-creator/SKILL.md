@@ -54,6 +54,10 @@ dependency_edges:
     type: peer
   - id: mk:fix
     type: peer
+  - id: mk:office-hours
+    type: peer
+  - id: mk:plan-ceo-review
+    type: peer
   - id: mk:scale-routing
     type: peer
   - id: mk:scout
