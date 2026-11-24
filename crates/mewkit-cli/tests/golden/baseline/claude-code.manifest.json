@@ -1387,6 +1387,11 @@
       "exec": true
     },
     {
+      "path": ".claude/skills/confluence/scripts/fetch_adf.py",
+      "sha256": "c09fb96713616ddbb83bddb810d55b19ff574c82e16f2d0a8166f1eed2060b4b",
+      "size": 1083
+    },
+    {
       "path": ".claude/skills/confluence/scripts/requirements.txt",
       "sha256": "124a46b4b6266dc1c394b03f13acf28899e707641eb3d3c5cd9ca6e3238f2281",
       "size": 624
