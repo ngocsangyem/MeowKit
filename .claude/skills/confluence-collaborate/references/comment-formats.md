@@ -26,7 +26,7 @@ Inline comments are visually intrusive — they create a yellow highlight on the
 
 ## ADF Edge Cases
 
-ADF nodes such as panel, expand, mention, emoji, media, decision and task-list are lossy when a body is read and written back. The full list and the reason are in `../../confluence/references/cli-idioms.md` (Common gotchas); if a comment you read contains them, re-author the body cleanly instead of round-tripping it.
+ADF nodes such as panel, expand, mention, emoji, media, decision and task-list are lossy when a body is read and written back. The converter cannot represent them, so if a comment you read contains them, re-author the body cleanly instead of round-tripping it.
 
 ## Recommended Defaults
 

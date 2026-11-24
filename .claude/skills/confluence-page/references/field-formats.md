@@ -23,4 +23,4 @@ Which advice applies:
 
 ## Round-trip caveat
 
-ADF round-trip is lossy on panel, expand, mention, emoji, media, decision and task-list nodes: re-saving a page that has them can flatten them. The read-side helper `adf-to-md.sh` (see `../confluence/references/cli-idioms.md`) keeps those macros as labelled markdown for reading.
+ADF round-trip is lossy on panel, expand, mention, emoji, media, decision and task-list nodes: re-saving a page that has them can flatten them. The read-side helper `adf-to-md.sh` in the confluence skill's `scripts/` keeps those macros as labelled markdown for reading.

@@ -4,7 +4,7 @@ This skill uses JIRA's standard Agile custom fields. Field IDs may vary by insta
 
 ## Field IDs
 
-Field IDs vary by instance and are owned by `mk:jira-fields`: run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --agile`, or read `../../jira-fields/references/agile-field-ids.md`.
+Field IDs vary by instance and are owned by `mk:jira-fields`: run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --agile`.
 
 ## Common Field Issues
 

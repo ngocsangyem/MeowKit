@@ -140,7 +140,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships cl
 
 ## Dependency Visualization
 
-> Before emitting any Mermaid block, read `../../preview/references/mermaid-essentials.md` and follow its rules.
+> Mermaid blocks follow `mk:mermaidjs-v11` syntax.
 
 ### Choosing the Right Format
 

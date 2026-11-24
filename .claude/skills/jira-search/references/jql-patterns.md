@@ -1,5 +1,11 @@
 # JQL Patterns — 15 Core Templates
 
+## Contents
+
+- [My Work](#my-work) · [Bug Triage](#bug-triage) · [Sprint Planning](#sprint-planning) · [Overdue / Stale](#overdue--stale) · [Search by Field](#search-by-field) · [Tips](#tips)
+- [More examples by scenario](#more-examples-by-scenario): personal, time, project and status, priority and type, assignment, label and component, text, complex, sprint, version
+- [Run from the wrapper](#run-from-the-wrapper)
+
 Replace placeholders (ALL_CAPS) with actual values.
 
 ## My Work
