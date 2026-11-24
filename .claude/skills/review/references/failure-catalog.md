@@ -20,6 +20,6 @@ Observable patterns that indicate you're off-track:
 - Self-grading as PASS without concrete evidence (build output, test results, runtime data)
 - Ignoring the security dimension because "it's just a UI change"
 - Reviewing implementation before reviewing tests (tests reveal intent — read them first)
-- All findings marked as "Nit" — if nothing is Critical or Important, you aren't looking hard enough
+- All findings marked as "Nit" with no check that anything more serious was ruled out: say what you checked
 - Approving a change you wouldn't confidently explain to another engineer
 - Skipping the architecture dimension for "small" changes (small changes create large precedents)

@@ -29,7 +29,7 @@ TypeScript or Python references.
 ### Missing dependency
 
 **Symptoms:** `command not found`, `module not found`, `cannot resolve`, `package not found`
-**Class:** auto-fixable
+**Class:** suggest-with-confidence (an install changes the lockfile; ask first)
 **Fix:**
 1. Identify package manager: `package.json` → npm/yarn/pnpm/bun; `go.mod` → go; `Cargo.toml` → cargo
 2. Install missing package with the appropriate command
@@ -76,11 +76,11 @@ pip install <package>
 ### Port already in use
 
 **Symptoms:** `EADDRINUSE`, `address already in use`, `port X is already in use`
-**Class:** auto-fixable
+**Class:** suggest-with-confidence (killing a process is destructive; ask first)
 **Fix:**
 1. Find process: `lsof -i :<port>` or `ss -tulpn | grep <port>`
-2. Kill it: `kill -9 <pid>`
-3. Or change the port in the project config
+2. Show the user the process, and kill it only with their go-ahead (`kill <pid>`)
+3. Or change the port in the project config (preferred when the process is not yours)
 
 ## Build Tool Errors
 
@@ -103,7 +103,7 @@ Report: identify the cycle, suggest extracting shared code to a third module bot
 ### Stale cache
 
 **Symptoms:** Build worked before but fails now with no code changes; errors reference deleted files
-**Class:** auto-fixable
+**Class:** suggest-with-confidence (deletes directories; ask first)
 **Fix:**
 1. Clear build cache: `rm -rf .cache dist .next out`
 2. For npm: `npm ci` (clean install from lockfile)
@@ -114,7 +114,7 @@ Report: identify the cycle, suggest extracting shared code to a third module bot
 ### cannot find package
 
 **Message:** `cannot find package "X" in any of:`
-**Class:** auto-fixable
+**Class:** suggest-with-confidence (changes `go.mod`; ask first)
 **Fix:** `go get X` — adds to `go.mod` and downloads
 
 ### undefined: X
@@ -127,7 +127,7 @@ Report: identify the cycle, suggest extracting shared code to a third module bot
 
 ### error[E0432] unresolved import
 
-**Class:** auto-fixable
+**Class:** suggest-with-confidence (changes `Cargo.toml`; ask first)
 **Fix:** Add to `Cargo.toml` dependencies, then `cargo build`
 
 ### error[E0308] mismatched types

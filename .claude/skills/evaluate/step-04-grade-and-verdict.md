@@ -1,6 +1,6 @@
 # Step 4: Grade and Write Verdict
 
-Aggregate findings into per-rubric verdicts, compute the weighted score, write the verdict file at the canonical path, and run `validate-verdict.sh` to enforce the active-verification requirement.
+Aggregate findings into per-rubric verdicts, write the verdict file at the canonical path, and run `validate-verdict.sh` to enforce the active-verification requirement.
 
 ## Instructions
 
@@ -14,54 +14,24 @@ Group `findings` from step-03 by rubric name. For each rubric, derive a single v
 | No FAIL but ≥1 WARN | Rubric verdict = WARN |
 | All criteria PASS | Rubric verdict = PASS |
 
-### 4b. Compute weighted score
+### 4b. Weighted score, hard-fail check, overall
 
-Pull weights from `composed_rubrics` (set in step-01). For each rubric, compute its contribution:
+Scoring model (this file is its single owner): PASS = 1.0, WARN = 0.5, FAIL = 0.0, and `weighted_score` is the sum of each rubric's weight times its value, rounded to two decimals.
 
-| Verdict | Numeric value |
-|---|---|
-| PASS | 1.0 |
-| WARN | 0.5 |
-| FAIL | 0.0 |
+- **Hard fail:** each rubric has a `hard_fail_threshold` (`FAIL` or `WARN`, from the rubric library). If any rubric verdict reaches its threshold, `overall` is FAIL whatever the score. A soft average does not save a weak dimension.
+- **Overall:** otherwise PASS at 0.85 or above, WARN at 0.65 or above, FAIL below.
 
-```
-weighted_score = sum(rubric_weight * verdict_value for each rubric)
-```
+Do not compute this by hand. Write the verdict file in 4e with the per-rubric headers (each carries its weight and verdict) and placeholder frontmatter values, then run:
 
-Range: 0.0 to 1.0. Rounded to 2 decimals.
-
-### 4c. Check hard-fail thresholds
-
-Per `mk:rubric` schema, each rubric has a `hard_fail_threshold` (`FAIL` or `WARN`). Iterate the per-rubric verdicts:
-
-```
-hard_fail_triggered = false
-for rubric in composed_rubrics:
-    if rubric_verdict >= rubric.hard_fail_threshold:
-        hard_fail_triggered = true
-        break
+```bash
+python3 scripts/recompute-score.py "$verdict_file"
 ```
 
-If `hard_fail_triggered`, the overall verdict is **FAIL** regardless of weighted score. Soft averages do not save weak dimensions — this is the rubric library's hard-fail semantic.
-
-### 4d. Determine overall verdict
-
-```
-if hard_fail_triggered:
-    overall = FAIL
-elif weighted_score >= 0.85:
-    overall = PASS
-elif weighted_score >= 0.65:
-    overall = WARN
-else:
-    overall = FAIL
-```
+It prints JSON with `recomputed_score`, `expected_overall` and `hard_fail_triggered`; put those into the frontmatter (`weighted_score`, `overall`, `hard_fail_triggered`), then validate in 4f.
 
 ### 4e. Write the verdict file
 
-Path: `tasks/reviews/${MEOWKIT_EVAL_SLUG}-evalverdict.md`
-
-**Slug consistency:** read `MEOWKIT_EVAL_SLUG` (set by step-01) — do NOT re-derive the slug here. Step-01 owns the slug-source priority (task slug → contract slug → branch slug → cwd basename). Re-deriving in step-04 risks divergence between the evidence directory path (set in step-01) and the verdict file path, which corrupts the relative-path citations the validator follows.
+Path: `tasks/reviews/{date}-{slug}-evalverdict.md`: the evidence directory's name with `-evidence` removed and `.md` added.
 
 ```markdown
 ---
@@ -80,9 +50,9 @@ batches_total: {if multi-batch}
 ---
 ```
 
-**`evaluator:` is REQUIRED (validator v2).** It records who produced the verdict — anti-accidental provenance, not an unforgeable identity. **`weighted_score` and `overall` are recomputed and checked by the validator** from the per-rubric verdicts below and the preset's canonical weights: a declared score/overall that does not follow from the per-rubric verdicts (the audit's forged-PASS shape) is rejected. Emit the per-rubric section with EVERY preset rubric exactly once, each header carrying its weight and verdict:
+**`evaluator:` is REQUIRED (validator v2).** It records who produced the verdict — anti-accidental provenance, not an unforgeable identity. **`weighted_score` and `overall` are recomputed and checked by the validator** from the per-rubric verdicts below and the preset's canonical weights: a declared score/overall that does not follow from the per-rubric verdicts (a forged PASS) is rejected. Emit the per-rubric section with EVERY preset rubric exactly once, each header carrying its weight and verdict:
 
-> **Boundary (anti-accidental, not unforgeable):** the validator checks that the score and overall *follow from* the per-rubric verdicts — it does NOT judge whether each per-rubric verdict is itself honest. A self-consistent fabricated verdict (every rubric marked PASS with weak evidence) still passes recompute; catching that is the skeptic-evaluator's job (Rule 9) and the evidence's, not this arithmetic check. The check closes the *inconsistent* forgery (PASS with a score that cannot be derived), which is the audit's shape.
+> **Boundary (anti-accidental, not unforgeable):** the validator checks that the score and overall *follow from* the per-rubric verdicts — it does NOT judge whether each per-rubric verdict is itself honest. A self-consistent fabricated verdict (every rubric marked PASS with weak evidence) still passes recompute; catching that is the skeptic-evaluator's job (Rule 9) and the evidence's, not this arithmetic check. The check closes the *inconsistent* forgery (PASS with a score that cannot be derived), which is the forged-PASS shape.
 
 ```markdown
 
@@ -122,7 +92,7 @@ scripts/validate-verdict.sh "$verdict_file"
 
 The validator checks (v2):
 1. Frontmatter has all required fields, including the `evaluator:` identity block
-2. `evidence_dir` exists and is non-empty (the active-verification requirement, locked 260408)
+2. `evidence_dir` exists and is non-empty (the active-verification requirement)
 3. Every PASS/WARN rubric cites at least one evidence file in its section
 4. Evidence files referenced in the verdict actually exist on disk; a per-file SHA-256 + type manifest is written next to the evidence dir
 5. `weighted_score` is RECOMPUTED from the preset weights × per-rubric verdicts and must match the declared value within 0.01

@@ -38,7 +38,11 @@ Otherwise, set `review_scope = minimal`.
 
 ### Document
 
-Print: `Scope check: {minimal|full} — files:{N}, lines:{N}, security:{yes|no}, domain:{level}`
+Record the scope check: `{minimal|full}` with the file count, line count, security flag and domain level.
+
+### Optional references
+
+If the diff touches frontend files, load `references/design-review.md` and `design-checklist.md` (the frontend check is `source <(.claude/hooks/lib/workflow-diff-scope <base>)`, which sets `SCOPE_FRONTEND`). If a plan exists, `references/scope-drift-detection.md` helps the Criteria Auditor. Skip both otherwise.
 
 ## Output
 

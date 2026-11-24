@@ -56,5 +56,5 @@ Measures whether the implementation is **maintainable** by a human reviewer (or 
 
 ## References
 
-- `meowkit/.claude/rules/development-rules.md` (file size, no `any`)
-- `meowkit/.claude/rules/security-rules.md` (hardcoded secrets are non-negotiable)
+- `.claude/rules/development-rules.md` (file size, no `any`)
+- `.claude/rules/security-rules.md` (hardcoded secrets are non-negotiable)

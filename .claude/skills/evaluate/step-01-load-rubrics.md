@@ -32,41 +32,20 @@ If `--rubric-preset` flag was passed, use it. Otherwise default:
 Run the rubric library loader:
 
 ```bash
-.claude/skills/rubric/scripts/load-rubric.sh --preset "$rubric_preset"
+../rubric/scripts/load-rubric.sh --preset "$rubric_preset"
 ```
 
 This emits the composed prompt fragment with all member rubrics' bodies inlined. Capture stdout into `composed_rubrics` (working memory).
 
-**Frontend default is pruned to 4 rubrics** per Phase 2 v2.0.0 — product-depth, functionality, design-quality, originality. Do NOT auto-load code-quality, craft, or ux-usability for frontend targets — they overlap existing kit layers (per audit 260408).
+**Frontend default is pruned to 4 rubrics**: product-depth, functionality, design-quality, originality. Do not auto-load code-quality, craft or ux-usability for frontend targets; they overlap `mk:review` and the security rules.
 
 ### 1d. Load the skeptic persona
 
-Read `prompts/skeptic-persona.md` into working memory. **Re-anchor before each criterion grading in step-03** — leniency drift is the dominant evaluator failure mode. The persona is not a once-per-session read; it's a checkpoint.
+Read `prompts/skeptic-persona.md` into working memory. Leniency drift is the dominant evaluator failure mode, so reload it at the start of each batch in step 3 and before writing each PASS.
 
-### 1e. Parse sprint contract (if exists)
+### 1e. Use the sprint contract (if signed)
 
-**Phase 4 — pending.** The sprint contract format is defined in Phase 4 of the harness plan and the `tasks/contracts/` directory does not exist as a registered canonical path until Phase 6 runs. Until both ship, treat any pre-existing contract file with caution.
-
-Stub-guard logic:
-
-```bash
-contract_path="tasks/contracts/${slug}.md"
-if [ -f "$contract_path" ]; then
-  # Verify it has the Phase 4 schema marker before trusting it
-  if grep -q '^contract_schema_version:' "$contract_path"; then
-    # Phase 4 has shipped — read it and filter composed_rubrics by contract criteria
-    echo "Sprint contract found at $contract_path — applying as criterion filter"
-    # ... apply filter ...
-  else
-    # Stale file from before Phase 4 shipped — ignore with warning
-    echo "WARN: $contract_path exists but lacks contract_schema_version marker; ignoring (Phase 4 not yet active)" >&2
-  fi
-fi
-```
-
-If no contract exists OR the file lacks the schema marker, use the full composed preset.
-
-The filter logic itself lands when Phase 4 ships and defines `contract_schema_version`.
+`mk:sprint-contract` writes signed contracts to `tasks/contracts/{date}-{slug}-sprint-{N}.md`. List `tasks/contracts/*-{slug}-sprint-*.md`; if a signed contract exists, use its acceptance criteria as the filter over `composed_rubrics`. Otherwise use the full composed preset.
 
 ### 1f. Build the criterion list
 
@@ -93,11 +72,9 @@ If the flatten produces > 15 entries:
 **Slug source priority** (use the first that resolves):
 
 1. Task slug from the active plan (read from `tasks/plans/*/plan.md` frontmatter `slug:` field if a current plan is identifiable)
-2. Sprint contract slug (if `tasks/contracts/{slug}.md` was found in 1e)
+2. Sprint contract slug (from the `tasks/contracts/*-{slug}-sprint-*.md` filename, if one was found in 1e)
 3. Branch name slug (`git rev-parse --abbrev-ref HEAD` → kebab-case)
 4. Fallback: `basename "$(pwd)"` (lowest priority — only when none of the above work)
-
-This same priority order MUST be used by step-04 when writing the verdict file path. Drift between step-01's evidence dir and step-04's verdict path corrupts the evidence-citation relative paths.
 
 ```bash
 # Resolve slug per priority above
@@ -105,12 +82,11 @@ slug="${task_slug:-${contract_slug:-${branch_slug:-$(basename "$(pwd)")}}}"
 date_prefix=$(date +%y%m%d)
 evidence_dir="tasks/reviews/${date_prefix}-${slug}-evalverdict-evidence"
 mkdir -p "$evidence_dir"
-
-# Persist for step-04 to read — same value, no re-derivation
-export MEOWKIT_EVAL_SLUG="${date_prefix}-${slug}"
 ```
 
-Store `evidence_dir` as an absolute path. Step-03 writes screenshots/captures here. Step-04 reads `MEOWKIT_EVAL_SLUG` to derive the verdict file path — never re-derives the slug independently.
+The slug is not kept in a shell variable, because each tool call starts a fresh shell. The evidence directory's name carries it: step 4 derives the verdict path by replacing the trailing `-evalverdict-evidence` with `-evalverdict.md`.
+
+Store `evidence_dir` as an absolute path. Step 3 writes screenshots and captures here; step 4 reads the directory name to derive the verdict path and does not re-derive the slug.
 
 ## Output
 

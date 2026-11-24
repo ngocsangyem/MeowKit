@@ -77,7 +77,7 @@ Do NOT repeat these. Find what was MISSED.
 3. Challenge any base finding you believe is WRONG or understated
 4. If a base WARN should be FAIL, provide concrete evidence for the upgrade
 5. Output format: [SEVERITY] [FILE:LINE] [CATEGORY] [DESCRIPTION]
-6. Max 10 findings (quality over quantity)
+6. Keep the strongest findings: a short list of supported ones beats a long list
 ```
 
 ## Findings Summary Condensation
@@ -103,7 +103,7 @@ Before dispatching personas, condense Phase A findings into a compact summary:
 5. Dispatch persona subagents with context template above (anchor included per dispatch)
 6. If 4 personas: run batch 1, wait for completion, then run batch 2
 7. Collect all persona findings into `phase_b_findings`
-8. Document: `"Phase B: {N} personas activated — {persona names}, skeptic-anchored"`
+8. Note which personas ran
 
 ## Output
 

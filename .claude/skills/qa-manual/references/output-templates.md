@@ -17,7 +17,7 @@
   - [`common/{featureName}Assertions.ts`](#commonfeaturenameassertionsts)
   - [`common/{featureName}Intercepts.ts`](#commonfeaturenameinterceptsts)
   - [`{feature-name}.spec.ts`](#feature-namespects)
-  - [Locator Rules (MANDATORY)](#locator-rules-mandatory)
+  - [Locator Rules](#locator-rules)
   - [Test ID Detection (run BEFORE generating code)](#test-id-detection-run-before-generating-code)
   - [Verifying Selectors Exist (run AFTER generating code)](#verifying-selectors-exist-run-after-generating-code)
 
@@ -213,7 +213,7 @@ test.describe('{Feature Name}', () => {
 });
 ```
 
-### Locator Rules (MANDATORY)
+### Locator Rules
 
 | Priority | Locator                                   | When to use                                                            |
 | -------- | ----------------------------------------- | ---------------------------------------------------------------------- |
