@@ -1,0 +1,173 @@
+---
+title: "Environment Variables"
+description: "Every environment variable MeowKit reads: where to put API keys, the order the env files are read in, and the shell-only switches."
+sourceOfTruth: ".meowkit/.env.example"
+lastVerified: "2026-11-24"
+---
+
+MeowKit reads two kinds of variables. API keys and integration settings go in an env file, and the scripts that need them read that file. Workflow switches such as `MEOWKIT_TDD` are read by hooks and agents from the session's own environment, so you export those in your shell. `.meowkit/.env.example` lists both kinds with a comment on each.
+
+## Set up the env file
+
+Copy the example and fill in only the keys you need:
+
+```bash
+cp .meowkit/.env.example .meowkit/.env
+chmod 600 .meowkit/.env
+```
+
+For keys you use in every project, such as one Gemini key, put them in a user-wide file instead:
+
+```bash
+mkdir -p ~/.meowkit
+cp .meowkit/.env.example ~/.meowkit/.env
+chmod 600 ~/.meowkit/.env
+```
+
+`mewkit setup --only=env` creates a short `.meowkit/.env` with the Gemini, MiniMax and OpenRouter lines when the project has none. It leaves an existing file alone.
+
+Neither file belongs in git. `.meowkit/.env` is ignored by the kit's `.gitignore`, and the `privacy-block.cjs` hook stops the agent from reading either one, so a key you put there never enters the conversation.
+
+To check the Jira keys, start a new session. The `jira-env-loader` hook prints `[mk:jira] env OK`, or names the missing key and the files it searched.
+
+## Where the scripts look
+
+Every script that reads env files uses the same order. The first source that sets a key wins:
+
+1. A variable already exported in the shell. `export VAR=x` overrides the files for one session.
+2. The project's `.meowkit/.env`.
+3. The project's `.claude/.env`, where older releases kept what now goes in `.meowkit/.env`. It is still read so an existing install keeps working.
+4. `~/.meowkit/.env`, shared by every project.
+
+A key set in the project file therefore beats the same key in `~/.meowkit/.env`, so one project can use a different token from the rest.
+
+The project is the folder the runtime names in `MEOWKIT_PROJECT_DIR`, `CLAUDE_PROJECT_DIR` or `CURSOR_PROJECT_DIR`, checked in that order. Without one of them, it is the nearest folder above the working directory that contains `.meowkit/`. The folder the skill is installed in plays no part, so a skill installed under your home folder still reads the open project's file.
+
+The files are read line by line as `KEY=VALUE` and never executed:
+
+- Blank lines and lines starting with `#` are skipped, and an `export ` prefix is accepted.
+- An unquoted value ends at ` #`, so `VAR=on  # comment` reads as `on`.
+- A quoted value keeps every character, so `KEY="abc#123"` reads as `abc#123`. Quote any API key that contains `#`.
+- Windows line endings are fine.
+- `PATH`, `LD_PRELOAD`, `LD_LIBRARY_PATH`, `DYLD_INSERT_LIBRARIES`, `DYLD_FRAMEWORK_PATH`, `IFS`, `BASH_ENV` and `ENV` are ignored, because an env file must not change how a process starts.
+
+These are the only readers of the env files:
+
+| Reader | Reads |
+| --- | --- |
+| `jira-as.sh` and `confluence-as.sh` (the `mk:jira-*` and `mk:confluence-*` wrappers) | Every key in the files, before calling the CLI |
+| `jira-env-loader` (SessionStart hook) | The three `MEOW_JIRA_*` keys. It checks they exist and never prints or exports them |
+| `mk:docs-finder` scripts | `CONTEXT7_API_KEY`, `DEBUG` |
+| `mk:multimodal` scripts | The Gemini, MiniMax and OpenRouter keys, provider chains and model overrides |
+| `mk:stitch` `stitch-api-call.ts` | `STITCH_API_KEY`, `STITCH_PROJECT_ID`, `STITCH_QUOTA_LIMIT` |
+
+Everything else reads only the shell. That covers the other hooks, the agents themselves, `mk:web-to-markdown`, `mk:autobuild`, `mk:context-audit` and the `mk:stitch` quota script.
+
+## Keys for the env file
+
+### Jira
+
+The `mk:jira-*` skills need all three keys. `jira-as.sh` passes them to `jira-as` under its own `JIRA_*` names. Install the CLI first with `mewkit skill env jira`.
+
+| Variable | Purpose |
+| --- | --- |
+| `MEOW_JIRA_API_TOKEN` | Atlassian Cloud API token, created at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens). Required |
+| `MEOW_JIRA_EMAIL` | The Atlassian account the token belongs to. Required |
+| `MEOW_JIRA_SITE_URL` | For example `https://your-company.atlassian.net`. Required |
+| `JIRA_OUTPUT` | Output format for `jira-as`. The wrapper uses `json` unless you set it |
+
+### Confluence
+
+The `mk:confluence-*` skills need the first three keys. Install the CLI with `mewkit skill env confluence`. The wrapper accepts Atlassian Cloud sites only (`*.atlassian.net`), and it refuses to run when `CONFLUENCE_API_TOKEN` appears in `.claude/settings.local.json`.
+
+| Variable | Purpose |
+| --- | --- |
+| `MEOW_CONFLUENCE_API_TOKEN` | Atlassian Cloud API token. The Jira token works. Required |
+| `MEOW_CONFLUENCE_EMAIL` | The account the token belongs to. Required |
+| `MEOW_CONFLUENCE_SITE_URL` | Your `*.atlassian.net` site. Required |
+| `MEOW_CONFLUENCE_STDOUT_FILTER` | `off` (default) or `trim-tail`, which drops the success line `confluence-as` prints after its JSON |
+| `CONFLUENCE_OUTPUT` | Output format for `confluence-as`. The wrapper uses `json` unless you set it |
+
+### Documentation lookup
+
+| Variable | Purpose |
+| --- | --- |
+| `CONTEXT7_API_KEY` | Optional key for `mk:docs-finder`, which raises the Context7 rate limit. Get one from the [Context7 dashboard](https://context7.com/dashboard/api-keys) |
+
+### Stitch
+
+| Variable | Purpose |
+| --- | --- |
+| `STITCH_API_KEY` | Required for `mk:stitch`. Create one under Settings, API Keys at [stitch.withgoogle.com](https://stitch.withgoogle.com/settings/api) |
+| `STITCH_PROJECT_ID` | Optional default project, used when a command names none |
+| `STITCH_QUOTA_LIMIT` | Daily credit limit the skill tracks. Default `400`. The quota script reads only the shell, so export it if you change it |
+
+### Media generation and analysis
+
+`mk:multimodal` needs a Gemini key for analysis and Gemini generation. MiniMax and OpenRouter are optional providers. Each name also works without the `MEOWKIT_` prefix (`GEMINI_API_KEY` for `MEOWKIT_GEMINI_API_KEY`, for example), and the prefixed name wins when both are set.
+
+| Variable | Purpose |
+| --- | --- |
+| `MEOWKIT_GEMINI_API_KEY` | Gemini key from [Google AI Studio](https://aistudio.google.com/apikey) |
+| `MEOWKIT_GEMINI_API_KEY_2` to `_4` | Extra Gemini keys. Analysis switches to the next one when a key hits its rate limit |
+| `MEOWKIT_MINIMAX_API_KEY` | MiniMax key from [platform.minimax.io](https://platform.minimax.io/), for image, Hailuo video, speech and music |
+| `MEOWKIT_OPENROUTER_API_KEY` | OpenRouter key from [openrouter.ai](https://openrouter.ai/keys), the image fallback |
+| `MEOWKIT_OPENROUTER_FALLBACK_ENABLED` | `true` lets image generation fall back to OpenRouter |
+| `MEOWKIT_IMAGE_PROVIDER_CHAIN` | Providers tried in order for images, comma-separated. Example: `gemini,minimax,openrouter` |
+| `MEOWKIT_VIDEO_PROVIDER_CHAIN` | The same for video. Example: `gemini,minimax` |
+| `MEOWKIT_SPEECH_PROVIDER_CHAIN` | The same for speech. Example: `minimax` |
+| `MEOWKIT_MUSIC_PROVIDER_CHAIN` | The same for music. Example: `minimax` |
+| `MEOWKIT_IMAGE_GEN_MODEL`, `MEOWKIT_VIDEO_GEN_MODEL` | Gemini model for image and video generation |
+| `MEOWKIT_MINIMAX_IMAGE_MODEL`, `MEOWKIT_MINIMAX_VIDEO_MODEL`, `MEOWKIT_MINIMAX_SPEECH_MODEL`, `MEOWKIT_MINIMAX_MUSIC_MODEL` | MiniMax model for each kind of output |
+| `MEOWKIT_MINIMAX_SPEECH_VOICE` | MiniMax voice for speech |
+| `MEOWKIT_OPENROUTER_IMAGE_MODEL` | OpenRouter model for the image fallback |
+
+`.meowkit/.env.example` shows the current default model for each override.
+
+## Shell-only variables
+
+Hooks, agents and the remaining skill scripts read the variables below from the session's environment, and no code loads them from an env file. Set them in your shell profile, or per run with `export`. On Claude Code you can also put them in the `env` block of `.claude/settings.local.json`, which applies to every session and hook in the project.
+
+### Workflow
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MEOWKIT_TDD` | off | Strict test-first mode. Truthy values are `1`, `true`, `yes`, `on`, `enable` and `enabled`, in any case. Falsy values are `0`, `false`, `no`, `off`, `disable` and `disabled`. Any other value is ignored with a warning. It outranks `tdd` in the config and the `--tdd` prompt flag |
+| `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when the SessionStart input has no `model` field. It is read before `CLAUDE_MODEL`, `CLAUDE_MODEL_ID` and `ANTHROPIC_MODEL`. A Claude model name behind a non-Anthropic `ANTHROPIC_BASE_URL` is not trusted: the tier is unknown and density is FULL |
+| `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` turns `learning-observer`, `post-session` and `pre-task-check` into no-ops. `standard` and `strict` behave the same. The legacy alias `MEOW_HOOK_PROFILE` still works, and `MEOWKIT_HOOK_PROFILE` wins when both are set |
+| `MEOWKIT_AUTOBUILD_MODE` | none | Density for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. Also settable as `autobuild.mode` in the config |
+| `MEOWKIT_PM_AUTO` | on | `off` stops the project-manager agent from running in the background after a phase. `/mk:status` still works |
+| `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | `off` makes every turn re-read the safety rules instead of trusting the marker written at session start. That costs about 9,700 tokens a turn |
+| `MEOWKIT_RUN_ID` | none | Per-run id that `mk:autobuild` sets and the trace log records |
+| `HOOK_SESSION_ID` | none | Session id that `mewkit budget --session` reads before `.meowkit/state/last-session-id` |
+
+### Integrations
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `JIRA_MOCK_MODE` | off | `true` makes the Jira agents mark their output `**[MOCK MODE]**`, and the analysis agents avoid live writes. For sandboxes and CI |
+
+### Web fetching (`mk:web-to-markdown`)
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS` | `1` | `0` skips the `robots.txt` check |
+| `MEOWKIT_WEB_FETCH_ROBOTS_TTL_HOURS` | `24` | How long a fetched `robots.txt` stays cached |
+| `MEOWKIT_WEB_FETCH_THROTTLE_MS` | `2000` | Minimum gap between two requests to the same host. `0` turns throttling off |
+| `MEOWKIT_WEB_FETCH_MAX_BYTES` | `10485760` | Largest page it downloads, in bytes. The hard ceiling is 100 MB |
+| `MEOWKIT_WEB_FETCH_JS` | `0` | `1` allows rendering a page with Playwright. It also needs Playwright installed and a request that asks for JavaScript |
+| `MEOWKIT_WEB_FETCH_PERSIST` | `on` | `off` returns the page inline instead of saving it to a file |
+
+### Tooling
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MEOWKIT_PROJECT_DIR` | none | Project root for hooks and skill scripts, checked before `CLAUDE_PROJECT_DIR` and `CURSOR_PROJECT_DIR`. The runtime normally sets one of those for you |
+| `MEOWKIT_CLI` | none | Path to the `mewkit` binary the hooks call, checked before `.meowkit/bin/mewkit`, `node_modules/.bin` and `PATH` |
+| `MEOWKIT_COST_LOG` | `.meowkit/telemetry/cost-log.json` | File the `mk:autobuild` budget tracker reads |
+| `MEOWKIT_CONTEXT_WINDOW` | `200000` | Window size, in tokens, that `mk:context-audit` measures against |
+| `MEOWKIT_HOOK_DEBUG` | off | `1` makes `learning-observer` also log a churn record when a file is edited many times |
+
+## Retired variables
+
+Older releases read budget thresholds, hook switches, the project-context size and a few other settings from `MEOWKIT_*` variables. Those settings now live in `.meowkit/config.yaml` (`hooks.*`, `budget.warn`, `budget.block`, `budget.cap`, `projectContext.maxBytes`), and the old variables do nothing. `mewkit doctor` lists any of them still exported in your shell and names the config key that replaced it, when there is one.

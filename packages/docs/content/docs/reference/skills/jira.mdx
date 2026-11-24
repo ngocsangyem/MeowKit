@@ -46,7 +46,7 @@ Use it for "jira", "jira ticket" or any Jira request where the leaf is unclear.
 
 ## Setup
 
-`mewkit skill env jira` installs `jira-as` into `.meowkit/envs/jira/`. Fill `.meowkit/.env` with the three `MEOW_JIRA_*` variables. Install, authentication, safety rules and troubleshooting are in [Jira integration](/guides/jira-integration) and `references/install-and-auth.md`. The variable list is in [Configuration](/reference/configuration#jira).
+`mewkit skill env jira` installs `jira-as` into `.meowkit/envs/jira/`. Fill `.meowkit/.env` with the three `MEOW_JIRA_*` variables. Install, authentication, safety rules and troubleshooting are in [Jira integration](/guides/jira-integration) and `references/install-and-auth.md`. The variable list is in [Environment Variables](/reference/environment-variables#jira).
 
 The SessionStart handler `jira-env-loader.cjs` checks the environment, and `scripts/jira-as.sh` translates `MEOW_JIRA_*` into the native `JIRA_*` variables and sets `JIRA_OUTPUT=json`.
 

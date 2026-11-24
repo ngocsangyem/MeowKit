@@ -1697,11 +1697,6 @@
       "size": 5821
     },
     {
-      "path": ".claude/skills/docs-finder/.env.example",
-      "sha256": "2065bc2b34d921669fd2bd5e5173f59c6443c722213f06fc0ecac92bf65f5c58",
-      "size": 337
-    },
-    {
       "path": ".claude/skills/docs-finder/SKILL.md",
       "sha256": "07cdda5cfe13c52ae952c6a45593b8a5fadee47eaff0584b155380bce7ca945b",
       "size": 10731
@@ -2747,11 +2742,6 @@
       "path": ".claude/skills/mermaidjs-v11/references/integration.md",
       "sha256": "5fb7b5b6e14aa87d9ec9a672d42489680b5aa59ff61a9f1509862227fcadf5e3",
       "size": 6014
-    },
-    {
-      "path": ".claude/skills/multimodal/.env.example",
-      "sha256": "afae3dccab61eb9421a569259dd807b33c6b6c66e2bd2ea6f629db0ac4b7be6a",
-      "size": 465
     },
     {
       "path": ".claude/skills/multimodal/SKILL.md",
@@ -4160,6 +4150,11 @@
       "path": ".claude/skills/stitch/references/stitch-setup.md",
       "sha256": "16b705408a66ba8054bc9820fd229d409aebe0ea81dde46a6d6565543b4c73ed",
       "size": 492
+    },
+    {
+      "path": ".claude/skills/stitch/scripts/load-env-files.ts",
+      "sha256": "a89a183e04484780c173c4a9b07d320c074dd7fa2bc91a2e49f6147c25ebba27",
+      "size": 2625
     },
     {
       "path": ".claude/skills/stitch/scripts/package.json",
@@ -6407,11 +6402,6 @@
       "size": 5821
     },
     {
-      "path": ".meowkit/cache/.claude/skills/docs-finder/.env.example",
-      "sha256": "2065bc2b34d921669fd2bd5e5173f59c6443c722213f06fc0ecac92bf65f5c58",
-      "size": 337
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/docs-finder/SKILL.md",
       "sha256": "07cdda5cfe13c52ae952c6a45593b8a5fadee47eaff0584b155380bce7ca945b",
       "size": 10731
@@ -7513,11 +7503,6 @@
       "path": ".meowkit/cache/.claude/skills/mermaidjs-v11/references/integration.md",
       "sha256": "5fb7b5b6e14aa87d9ec9a672d42489680b5aa59ff61a9f1509862227fcadf5e3",
       "size": 6014
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/multimodal/.env.example",
-      "sha256": "afae3dccab61eb9421a569259dd807b33c6b6c66e2bd2ea6f629db0ac4b7be6a",
-      "size": 465
     },
     {
       "path": ".meowkit/cache/.claude/skills/multimodal/SKILL.md",
@@ -8941,6 +8926,11 @@
       "path": ".meowkit/cache/.claude/skills/stitch/references/stitch-setup.md",
       "sha256": "16b705408a66ba8054bc9820fd229d409aebe0ea81dde46a6d6565543b4c73ed",
       "size": 492
+    },
+    {
+      "path": ".meowkit/cache/.claude/skills/stitch/scripts/load-env-files.ts",
+      "sha256": "a89a183e04484780c173c4a9b07d320c074dd7fa2bc91a2e49f6147c25ebba27",
+      "size": 2625
     },
     {
       "path": ".meowkit/cache/.claude/skills/stitch/scripts/package.json",

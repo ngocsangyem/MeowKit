@@ -13,7 +13,7 @@ Install the CLI into the `jira` skill's own environment. Every `mk:jira-*` skill
 mewkit skill env jira
 ```
 
-That puts `jira-as` at `.meowkit/envs/jira/bin/jira-as`. Then put three values in `.meowkit/.env`, which is gitignored:
+That puts `jira-as` at `.meowkit/envs/jira/bin/jira-as`. Then put three values in `.meowkit/.env`, which is gitignored, or in `~/.meowkit/.env` to share them with every project:
 
 | Variable | What it is |
 |---|---|
@@ -23,7 +23,7 @@ That puts `jira-as` at `.meowkit/envs/jira/bin/jira-as`. Then put three values i
 
 Start a session. The `jira-env-loader.cjs` hook checks the file and prints `[mk:jira] env OK`, or names the missing key, so you find out at session start rather than mid-task. The wrapper translates `MEOW_JIRA_*` into the native `JIRA_*` variables for each call, so your shell never needs them.
 
-The full variable list is in [Configuration](/reference/configuration#jira).
+The full variable list is in [Environment Variables](/reference/environment-variables#jira).
 
 ## Rules for writes
 
@@ -67,7 +67,7 @@ Ask for what you want and `mk:jira` routes you, or invoke the skill directly:
 
 ## When it goes wrong
 
-**`[mk:jira] MEOW_JIRA_SITE_URL missing` at session start.** The variable is absent or `.meowkit/.env` is not where the loader looks. Check that the file is at `.meowkit/.env`.
+**`[mk:jira] MEOW_JIRA_SITE_URL missing` at session start.** The variable is in none of the places the loader looks: a shell export, `.meowkit/.env`, `.claude/.env` or `~/.meowkit/.env`. The message names the files it found.
 
 **Authentication fails with all three variables set.** Atlassian API tokens are tied to the account that created them. Confirm `MEOW_JIRA_EMAIL` is that account, not a shared or admin address.
 

@@ -46,7 +46,7 @@ def check_api_key():
         fail("GEMINI_API_KEY not found")
         info("Set it: export MEOWKIT_GEMINI_API_KEY='your-key'")
         info("Legacy: export GEMINI_API_KEY='your-key' (also works)")
-        info("Or add to .env: MEOWKIT_GEMINI_API_KEY=your-key")
+        info("Or add MEOWKIT_GEMINI_API_KEY=your-key to .meowkit/.env (project) or ~/.meowkit/.env (all projects)")
         info("Get a key: https://aistudio.google.com/apikey")
         return None
 
@@ -82,13 +82,6 @@ def check_dependencies():
         except ImportError:
             fail(f"{package} NOT installed")
             missing.append(package)
-
-    # Optional deps
-    try:
-        from dotenv import load_dotenv
-        ok("python-dotenv installed (optional)")
-    except ImportError:
-        warn("python-dotenv not installed (optional — .env files won't auto-load)")
 
     if missing:
         fail(f"\nInstall missing: pip install {' '.join(missing)}")
