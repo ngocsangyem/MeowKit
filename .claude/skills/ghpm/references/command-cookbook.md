@@ -39,7 +39,7 @@ gh label delete wontfix --yes
 
 ```bash
 gh api repos/{owner}/{repo}/milestones
-gh api repos/myorg/myrepo/milestones --method POST --field title=v1.3 --field description="Q3 release" --field due_on=2026-09-30T00:00:00Z
+gh api repos/myorg/myrepo/milestones --method POST --field title=v1.3 --field description="Q3 release" --field due_on=<YYYY-MM-DD>T00:00:00Z
 gh api repos/myorg/myrepo/milestones/2 --method PATCH --field state=closed
 gh api repos/myorg/myrepo/milestones/2 --method DELETE
 ```

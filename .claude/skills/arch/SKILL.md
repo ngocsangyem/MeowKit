@@ -30,9 +30,12 @@ runtime: claude-code
 Architecture as a first-class concern. Owns the ADR lifecycle under `docs/architecture/adr/`
 and the impact analysis of a proposed change against the decisions already taken.
 
-The `architect` agent authors the decision content; this skill owns the lifecycle — naming,
-file layout, status transitions and the impact read. `docs/architecture/` is the architect
-agent's directory, so ADR bodies are written by that agent, never by another one.
+The `architect` agent writes the ADR file and its content; this skill owns the lifecycle: the
+filename, the layout, status transitions and the impact read. `docs/architecture/` is the architect
+agent's directory, so ADR bodies come from that agent. If the host cannot delegate, write the ADR
+inline from the same sections and say so.
+
+Not for analysing existing code for shallow modules: that is `mk:improve-codebase-architecture`, which hands accepted candidates here as `mk:arch new`.
 
 ## Usage
 
@@ -49,11 +52,15 @@ mk:arch impact [change description]
 2. Gather context before writing anything: what decision is being made, what constrains it,
    what options exist. If any of the three is unknown, ask — an ADR with an invented context
    records a decision nobody took.
-3. Delegate the body to the `architect` agent, with the sections: Title, Status (Proposed),
-   Context, Decision, Consequences, Alternatives Considered.
-4. Write `docs/architecture/adr/YYMMDD-decision.md`.
-5. Print the path and a one-paragraph summary, then ask for review. A Proposed ADR is not an
-   approved one.
+3. Pick the filename `YYMMDD-<slug>.md`, where the slug is two to four lowercase words naming the
+   decision (`260105-postgres-storage`); if that name exists, add a distinguishing word.
+4. Delegate to the `architect` agent. Brief: the context, constraints and options from step 2;
+   the sections Title, Status (Proposed), Context, Decision, Consequences, Alternatives
+   Considered; the target path `docs/architecture/adr/<filename>`; return the written file's
+   path and a one-paragraph summary. Skip delegation for a single short ADR and write it inline.
+5. Done when the file exists with a `Status:` line. Print the path and the summary, then ask for
+   review. A Proposed ADR is not an approved one. End with the four-status block from
+   `.claude/rules/agent-conduct.md` (A1).
 
 ## list
 
@@ -92,7 +99,7 @@ mk:arch impact [change description]
 
 | Mode | Output |
 | --- | --- |
-| `new` | `docs/architecture/adr/YYMMDD-decision.md` plus a printed summary awaiting review |
+| `new` | `docs/architecture/adr/YYMMDD-<slug>.md` plus a printed summary awaiting review |
 | `list` | table of every ADR with status |
 | `review` | the updated ADR with dated review notes |
 | `impact` | printed assessment: components, ADRs, risk, recommendation |
@@ -102,3 +109,9 @@ mk:arch impact [change description]
 - An ADR is documentation, not authority: recording a decision never approves a plan or a review.
 - `docs/architecture/adr/` is append-mostly. A superseded decision stays in the tree with its
   status changed, so the record of what was believed at the time survives.
+
+## Gotchas
+
+- A second ADR for a decision that already has one: scan first, and supersede the old record instead of adding a duplicate.
+- Rewriting history: review notes are appended with a date; the original Context and Decision text stays as written.
+- Proposed is not Accepted: an ADR changes status only when a person accepts it, and only then does it bind later plans.

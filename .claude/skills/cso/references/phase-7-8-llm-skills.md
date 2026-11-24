@@ -22,7 +22,7 @@ Use Grep to search for these patterns:
 
 # Phase 8: Skill Supply Chain
 
-Scan installed host-runtime skills for malicious patterns. 36% of published skills have security flaws, 13.4% are outright malicious (Snyk ToxicSkills research).
+Scan installed host-runtime skills for malicious patterns. Published skills have been found with security flaws and some with outright malicious code, so treat every installed skill as untrusted input.
 
 **Tier 1 — repo-local (automatic):** Scan the repo's local skills directory for suspicious patterns:
 

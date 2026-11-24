@@ -7,14 +7,14 @@ When the user types `/mk:cso`, run this skill.
 ## Arguments
 
 - `/mk:cso` — full daily audit (all phases, 8/10 confidence threshold)
-- `/cso --comprehensive` — monthly deep scan (all phases, 2/10 bar — surfaces more)
-- `/cso --infra` — infrastructure-only (Phases 0-6, 12-14)
-- `/cso --code` — code-only (Phases 0-1, 7, 9-11, 12-14)
-- `/cso --skills` — skill supply chain only (Phases 0, 8, 12-14)
-- `/cso --diff` — branch changes only (combinable with any above)
-- `/cso --supply-chain` — dependency audit only (Phases 0, 3, 12-14)
-- `/cso --owasp` — OWASP Top 10 only (Phases 0, 9, 12-14)
-- `/cso --scope auth` — focused audit on a specific domain
+- `/mk:cso --comprehensive` — monthly deep scan (all phases, 2/10 bar — surfaces more)
+- `/mk:cso --infra` — infrastructure-only (Phases 0-6, 12-14)
+- `/mk:cso --code` — code-only (Phases 0-1, 7, 9-11, 12-14)
+- `/mk:cso --skills` — skill supply chain only (Phases 0, 8, 12-14)
+- `/mk:cso --diff` — branch changes only (combinable with any above)
+- `/mk:cso --supply-chain` — dependency audit only (Phases 0, 3, 12-14)
+- `/mk:cso --owasp` — OWASP Top 10 only (Phases 0, 9, 12-14)
+- `/mk:cso --scope auth` — focused audit on a specific domain
 
 ## Mode Resolution
 
@@ -28,4 +28,4 @@ When the user types `/mk:cso`, run this skill.
 
 ## Important: Use the Grep tool for all code searches
 
-The bash blocks throughout this skill show WHAT patterns to search for, not HOW to run them. Use the host runtime's Grep tool (which handles permissions and access correctly) rather than raw bash grep. The bash blocks are illustrative examples — do NOT copy-paste them into a terminal. Do NOT use `| head` to truncate results.
+The bash blocks throughout this skill show WHAT patterns to search for, not HOW to run them. Use the host runtime's Grep tool (which handles permissions and access correctly) rather than raw bash grep. The bash blocks are illustrative examples — do NOT copy-paste them into a terminal. Do NOT use `| head` to truncate results: a security scan that drops matches silently reports a clean result it did not earn, which is why this skill overrides the usual output-limit habit.
