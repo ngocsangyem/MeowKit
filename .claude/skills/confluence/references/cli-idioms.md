@@ -103,12 +103,12 @@ when a real consumer surfaces.
 
 ### Single-call fetch pattern (used by `mk:confluence-spec-analyst`)
 
-`page get --representation atlas_doc_format` returns metadata + body in one
+`adf-get <id>` (a wrapper mode: `page get` has no ADF format) returns metadata + body in one
 response — extract both with `jq` rather than making a second metadata call:
 
 ```bash
-RAW=$(bash "$WRAPPER" page get --page-id "$ID" --representation atlas_doc_format)
-META=$(printf '%s' "$RAW" | jq '{id, title, space: .space.key, version: .version.number}')
+RAW=$(bash "$WRAPPER" adf-get "$ID")
+META=$(printf '%s' "$RAW" | jq '{id, title, spaceId, version: .version.number}')
 ADF=$(printf '%s' "$RAW" | jq -r '.body.atlas_doc_format.value' | jq '.')
 MD=$(printf '%s' "$ADF" | bash "$ADF2MD")
 ```

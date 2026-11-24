@@ -58,8 +58,8 @@ Single mode: `analyze`. Flag inputs:
 WRAPPER="$CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh"
 ADF2MD="$CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/adf-to-md.sh"
 
-RAW=$(bash "$WRAPPER" page get --page-id <id> --representation atlas_doc_format)
-META=$(printf '%s' "$RAW" | jq '{id, title, space: .space.key, version: .version.number, author: .history.createdBy.displayName, lastModified: .version.when}')
+RAW=$(bash "$WRAPPER" adf-get <id>)
+META=$(printf '%s' "$RAW" | jq '{id, title, spaceId, version: .version.number, authorId: .version.authorId, lastModified: .version.createdAt}')
 ADF=$(printf '%s' "$RAW" | jq -r '.body.atlas_doc_format.value' | jq '.')
 MD=$(printf '%s' "$ADF" | bash "$ADF2MD")
 ```
@@ -69,14 +69,14 @@ One call returns metadata + body. Macros (panel, decisionList, taskList, expand,
 ### Step 2 — Fetch children (if `--include-children N` and N >= 1)
 
 ```bash
-bash "$WRAPPER" hierarchy children --page-id <id> --depth <N>
+bash "$WRAPPER" hierarchy descendants <id> --max-depth <N> --limit 5 --output json
 ```
 
-Fallback to `hierarchy descendants` if missing. For each child id (depth-bounded; hard cap 5 children total per Cloud rate-limit guard) reuse the Step 1 pipeline. Per-child failure must NOT abort the run:
+For each child id (depth-bounded; hard cap 5 children total per Cloud rate-limit guard) reuse the Step 1 pipeline. Per-child failure must NOT abort the run:
 
 ```bash
 for CID in $CHILDREN; do
-  CRAW=$(bash "$WRAPPER" page get --page-id "$CID" --representation atlas_doc_format) || {
+  CRAW=$(bash "$WRAPPER" adf-get "$CID") || {
     INCOMPLETE+=("$CID"); continue
   }
   CADF=$(printf '%s' "$CRAW" | jq -r '.body.atlas_doc_format.value' | jq '.')

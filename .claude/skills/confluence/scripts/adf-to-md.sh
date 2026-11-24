@@ -22,7 +22,7 @@ if [ "${1:-}" = "--page-id" ]; then
     echo "[adf-to-md] invalid --page-id: must be numeric" >&2
     exit 1
   fi
-  RAW=$("$WRAPPER" page get --page-id "$PAGE_ID" --representation atlas_doc_format)
+  RAW=$("$WRAPPER" adf-get "$PAGE_ID")
   if ! printf '%s' "$RAW" | jq -e '.body.atlas_doc_format.value' >/dev/null 2>&1; then
     echo "[adf-to-md] body.atlas_doc_format.value missing for page $PAGE_ID -" \
          "page may not support ADF (storage-only, blog, or v1-style)" >&2

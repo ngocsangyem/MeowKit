@@ -14,7 +14,7 @@ The skeleton the agent fills in. Slot placeholders are in `{braces}`.
 # Spec Research Report: {page-title}
 
 **Source:** {page-url} (page-id: {id})
-**Space:** {space-key}
+**Space:** {space-key from the page URL, else spaceId}
 **Author:** {page-author}
 **Last modified:** {timestamp}
 **Generated:** {now} by mk:confluence-spec-analyst

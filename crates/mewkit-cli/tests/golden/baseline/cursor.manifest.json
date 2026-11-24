@@ -1234,6 +1234,11 @@
       "exec": true
     },
     {
+      "path": ".cursor/skills/mk-confluence/scripts/fetch_adf.py",
+      "sha256": "c09fb96713616ddbb83bddb810d55b19ff574c82e16f2d0a8166f1eed2060b4b",
+      "size": 1083
+    },
+    {
       "path": ".cursor/skills/mk-confluence/scripts/requirements.txt",
       "sha256": "b9466944ac2c139e8a2d579d5f851ef21a74adbd8e0f3bb4c6740353e2a4c63f",
       "size": 606

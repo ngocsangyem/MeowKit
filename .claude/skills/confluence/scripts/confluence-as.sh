@@ -58,6 +58,12 @@ export CONFLUENCE_EMAIL="$MEOW_CONFLUENCE_EMAIL"
 export CONFLUENCE_SITE_URL="$MEOW_CONFLUENCE_SITE_URL"
 export CONFLUENCE_OUTPUT="${CONFLUENCE_OUTPUT:-json}"
 
+# `adf-get <page-id>`: the CLI's `page get` has no ADF body format, so this mode reads
+# the page through the package's client (fetch_adf.py) with the same credentials and gates.
+if [ "${1:-}" = "adf-get" ]; then
+  exec "$ROOT/.meowkit/envs/confluence/bin/python3" "$ROOT/.claude/skills/confluence/scripts/fetch_adf.py" "${2:-}"
+fi
+
 # Stdout-filter mode (controls print_success trailing-line stripping):
 #   off       — pass through raw (default until empirical channel verified)
 #   trim-tail — strip the last stdout line (use only after smoke-live.sh confirms
