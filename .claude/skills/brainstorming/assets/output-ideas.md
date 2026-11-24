@@ -26,7 +26,7 @@
 ### Technique Selection
 
 **Chosen:** `[technique-name].md`
-**Why this over alternatives:** [one sentence — typically references the SKILL.md tiebreaker order or a problem-shape match]
+**Why this over alternatives:** [one sentence — name the problem shape that matched, per the technique table in SKILL.md]
 
 ### Ideas
 
@@ -75,24 +75,7 @@ These are subjective picks after the challenge pass, not formal scoring. For wei
 
 ### Ready-to-Plan Packet
 
-Use only if the user chooses one idea to plan. Do not invoke `mk:plan-creator` automatically.
-
-```yaml
-problem: "[confirmed problem]"
-binding_constraint: "[binding constraint]"
-success_criterion: "[success criterion]"
-excluded_scope: "[excluded scope]"
-selected_idea: "[idea title or empty until user chooses]"
-why_selected: "[qualitative rationale]"
-scores: {}
-touchpoints: []
-rejected_alternatives:
-  - idea: "[idea title]"
-    reason: "[why it lost or why it remains a secondary option]"
-open_risks: []
-planning_questions: []
-report_path: "tasks/reports/[report-name].md"
-```
+Only if the user chooses one idea to plan. Append the packet defined in `assets/output-action-plan.md` (leave `selected_idea` empty until the user chooses and `scores` empty). Do not invoke `mk:plan-creator` automatically.
 
 ### Next Steps
 

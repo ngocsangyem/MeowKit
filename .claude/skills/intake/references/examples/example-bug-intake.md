@@ -43,15 +43,15 @@ Result: `{domain: auth_session, level: high, workflow: enhanced, model_tier_over
 | Dimension | Score | Note |
 |-----------|-------|------|
 | Goal/Problem | 20/20 | Clear: unexpected logout after 24h |
-| Acceptance Criteria | 0/20 | **Missing** — no pass/fail criteria stated |
-| Scope | 10/15 | Scope described but out-of-scope not explicit |
-| Steps to Reproduce | 0/15 | **Missing** — no exact repro steps |
+| Acceptance Criteria | 0/20 | **Missing**: no pass/fail criteria stated |
+| Scope | 0/15 | **Missing**: out-of-scope not explicit |
+| Steps to Reproduce | 0/15 | **Missing**: no exact repro steps |
 | Technical Constraints | 10/10 | "No error message" implies silent behavior must stay |
 | Priority/Severity | 10/10 | P2 with user impact stated |
-| Dependencies | 5/10 | Mentions web + mobile but no ticket links |
-| Design/Visual | 5/10 | Screenshot present but incomplete context |
+| Dependencies | 10/10 | Web and mobile named; "no linked tickets" stated |
+| Design/Visual | 10/10 | Screenshot present and readable |
 
-**Score: 60/100 — Needs minor clarification**
+**Score: 60/100 — Minor clarification needed**
 
 Missing:
 - Acceptance Criteria: need binary pass/fail (e.g., "Users remain logged in for 7 days unless they log out")

@@ -1,119 +1,42 @@
 # Step 9: Post-Plan Handoff
 
-Deterministic handoff after task hydration. Presents mode-pruned options by asking the user, writes the chosen next-step to plan.md frontmatter, prints the suggested command, and STOPs without auto-invoking it.
+Record the user's next step and print the one command that starts it. Done when `plan.md` frontmatter carries `handoff:` and the command line is printed. Then stop: never run the chosen command, because a fresh session picks the plan up without planning-context carryover.
 
-## Inputs
+## 9a. Risk re-scan
 
-- `planning_mode` (from step-00)
-- `tdd_mode` (from step-00)
-- `matched_flags` (from `mk:agent-detector` Phase 0; may be unset when plan-creator invoked directly)
-- `plan_dir` (from step-03)
+Search `plan.md` and every `phase-XX-*.md` for the literal words AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM (risk flags defined in `.claude/skills/agent-detector/references/risk-checklist.md`). A hit the task's original flags did not carry means the plan touches a risk surface the scope check missed: say that red-team review is recommended and order the options as if the flag were set. False positives are acceptable; the user chooses.
 
-## Instructions
+If the plan was started directly rather than through `mk:agent-detector` or `mk:cook`, there are no original flags; use the default ordering and say so in one line.
 
-### 9a. Defensive Fallback Advisory
+## 9b. Options
 
-If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, print this advisory BEFORE the user question:
+At most four, first one recommended.
 
-```
-`matched_flags` is unset — plan-creator was invoked directly rather than
-through `mk:agent-detector` routing. Using default mode recommendation.
-For risk-tiered routing, invoke via `/mk:cook` or `/mk:fix`.
-```
-
-### 9b. Live Risk Re-Scan
-
-Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.claude/skills/agent-detector/references/risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
-
-If any keyword appears that was NOT in the original `matched_flags`, print this advisory and treat the re-scan match as the effective risk set for option ordering:
-
-```
-Plan content suggests {flag}-class risk surface not flagged at Phase 0
-scope check. Red-team review is recommended before implementation.
-```
-
-Conservative false-positives are accepted — the user has final say via the option choice.
-
-### 9c. Build Option Set
-
-Compute the effective risk set: `risk_hit = (matched_flags ∪ re_scan_flags) ∩ {AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}`.
-
-Option set is mode-pruned. First option is `(Recommended)`. Ask the user caps options at 4.
-
-| Mode | risk_hit non-empty? | Options (first = Recommended) |
+| Mode | Risk hit | Options |
 |---|---|---|
 | fast | yes | Red-team, Validate, Cook, End |
 | fast | no | Cook, Validate, Red-team, End |
-| hard / deep / parallel / two | (n/a — both prior steps ran) | Cook, End |
-| product-level | (n/a) | Hand off to mk:autobuild, End |
-| spike | (n/a) | Cook, End |
+| hard, deep, parallel, two, spike | n/a (red team and interview already ran, or the spike has none) | Cook, End |
+| product-level | n/a | Hand off to `mk:autobuild`, End |
 
-### 9d. Present ask the user
+## 9c. Record and print
 
-Build the question payload using the option set above. Each option has `label` and `description` (≤120 chars). Labels are display-only — no shell-executable text.
-
-```json
-{
-  "questions": [{
-    "question": "Plan is approved and tasks hydrated. What next?",
-    "header": "Next Step",
-    "options": [
-      { "label": "Cook (Recommended)", "description": "Run /mk:cook to implement the plan" },
-      { "label": "Validate", "description": "Run /mk:plan-creator validate for a critical-questions interview" },
-      { "label": "Red-team", "description": "Run /mk:plan-creator red-team for adversarial review" },
-      { "label": "End", "description": "Stop here — review plan before deciding" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
-
-(Substitute the pruned option subset per the table above.)
-
-### 9e. Write Frontmatter
-
-After the user selects, edit `plan.md` to add (or update) under the existing frontmatter block:
+After the answer, add under the frontmatter of `plan.md` (an Edit anchored on the closing `---`, never overwriting the body):
 
 ```yaml
 handoff:
-  next: <choice>
-  decided_at: <ISO-8601 timestamp>
+  next: <cook | validate | red-team | autobuild | end>
+  decided_at: <ISO-8601>
 ```
 
-Where `<choice>` is one of `cook | validate | red-team | autobuild | end`. Use the Edit tool with the existing `---` boundary as the exact-match context — do NOT overwrite the body.
+Print one line:
 
-### 9f. Print Suggested Command
-
-Print exactly one line matching the selection:
-
-| Selection | Output line |
+| Choice | Line |
 |---|---|
-| Cook | `Run: /mk:cook {absolute-path-to-plan.md}` |
-| Cook with TDD | `Run: /mk:cook {absolute-path-to-plan.md} --tdd` |
-| Cook (parallel mode) | `Run: /mk:cook --parallel {absolute-path-to-plan.md}` |
-| Cook (parallel + TDD) | `Run: /mk:cook --parallel {absolute-path-to-plan.md} --tdd` |
-| Cook (fast mode) | `Run: /mk:cook --auto {absolute-path-to-plan.md}` |
-| Cook (fast + TDD) | `Run: /mk:cook --auto {absolute-path-to-plan.md} --tdd` |
-| Validate | `Run: /mk:plan-creator validate {absolute-path-to-plan.md}` |
-| Red-team | `Run: /mk:plan-creator red-team {absolute-path-to-plan.md}` |
-| Hand off to mk:autobuild | `Run: /mk:autobuild {absolute-path-to-plan.md}` |
-| End | (no command line — print "Plan complete. No next command queued.") |
+| Cook | `Run: /mk:cook {absolute plan.md}`; add `--auto` for fast, `--parallel` for parallel mode, `--tdd` when `tdd_mode` (do not rely on a state file surviving a new session) |
+| Validate | `Run: /mk:plan-creator validate {absolute plan.md}` |
+| Red-team | `Run: /mk:plan-creator red-team {absolute plan.md}` |
+| Autobuild | `Run: /mk:autobuild {absolute plan.md}` |
+| End | `Plan complete. No next command queued.` |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
-
-After the command line, print the Context Reminder block from `references/plan-presentation.md` with the absolute path substituted.
-
-### 9g. Stop
-
-**STOP. Do NOT auto-invoke the next command.** The user must type the suggested command themselves so a fresh session can pick up cleanly without planning-context carryover.
-
-## Output
-
-- `plan.md` frontmatter contains `handoff: { next, decided_at }`.
-- Suggested command printed.
-- Context Reminder block printed.
-- Session STOPs.
-
-## Next
-
-STOP. User decides.
+Suggest `/clear` before running it. Then stop.

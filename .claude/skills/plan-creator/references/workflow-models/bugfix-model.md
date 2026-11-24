@@ -3,7 +3,7 @@
 Applies when: fixing broken behavior, reported bugs, failed tests, runtime errors.
 
 ## Plan Shape
-Required: Goal, Bug Report, Root Cause Analysis, Fix Approach, Regression Risk, Acceptance Criteria, Agent State
+Required: Goal, Bug Report, Root Cause Analysis, Fix Approach, Regression Risk, Acceptance Criteria
 Optional: Context (if root cause is known), Solution Options (if multiple fix strategies)
 
 ## Phase Flow
@@ -19,13 +19,3 @@ Optional: Context (if root cause is known), Solution Options (if multiple fix st
 
 ## Iron Law
 No fix without confirmed root cause. 3-strike escalation if hypotheses fail.
-
-## Context Reminder (MANDATORY)
-
-Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `/mk:cook {path}/plan.md`. Quick fixes skip planning entirely.
-
-> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
-> Then run the cook command.
-
-This is **NON-NEGOTIABLE** — always output after plan approval.
