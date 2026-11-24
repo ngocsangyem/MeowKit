@@ -20,6 +20,13 @@
   ],
   "nonSuffixLiterals": {
     "comment": "Upper-case literals inside a composition zone that are NOT environment-name suffixes. Listed by name so a newly composed suffix is a violation rather than silently tolerated.",
+    "BASH_ENV": "an env-file key the loader refuses, never read",
+    "CLAUDE_PROJECT_DIR": "a runtime's project-root variable, read by its own name",
+    "CURSOR_PROJECT_DIR": "a runtime's project-root variable, read by its own name",
+    "DYLD_FRAMEWORK_PATH": "an env-file key the loader refuses, never read",
+    "DYLD_INSERT_LIBRARIES": "an env-file key the loader refuses, never read",
+    "LD_LIBRARY_PATH": "an env-file key the loader refuses, never read",
+    "LD_PRELOAD": "an env-file key the loader refuses, never read",
     "MEDIA_RESOLUTION_HIGH": "a Gemini request parameter value",
     "MEDIA_RESOLUTION_LOW": "a Gemini request parameter value",
     "MEDIA_RESOLUTION_MEDIUM": "a Gemini request parameter value",
