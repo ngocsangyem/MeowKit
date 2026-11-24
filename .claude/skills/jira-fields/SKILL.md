@@ -1,6 +1,6 @@
 ---
 name: mk:jira-fields
-description: "mk:jira leaf: custom field IDs, field config."
+description: "mk:jira leaf: custom field IDs, field config. NOT for mk:jira-admin."
 phase: on-demand
 source: local
 keywords:

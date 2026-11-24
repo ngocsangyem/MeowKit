@@ -89,7 +89,7 @@ Decision: Denied.
 Basis: Item returned 38 days after delivery, outside our 30-day return window (Section 4.2, Terms of Sale).
 Effective date: 2024-12-11.
 
-To dispute this decision, contact our Customer Relations team at relations@company.com
+To dispute this decision, contact our Customer Relations team at relations@example.com
 within 5 business days of this notice.
 
 Regards,

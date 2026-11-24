@@ -81,7 +81,7 @@ git commit -m "PROJ-789 #in-review #time 3h #comment Ready for review"
 
 1. **Email must match:** Git email must exactly match JIRA user email
    ```bash
-   git config user.email "your.email@company.com"
+   git config user.email "your.email@example.com"
    ```
 
 2. **Integration required:** JIRA must have Git integration installed

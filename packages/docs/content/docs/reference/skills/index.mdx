@@ -259,9 +259,9 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:frontend-design`](/reference/skills/frontend-design) | Designs and reviews UI, accessibility. NOT for mk:ui-design-system. |
 | [`mk:ghpm`](/reference/skills/ghpm) | GitHub issues, Projects v2, milestones. NOT for mk:review-pr. |
 | [`mk:grill`](/reference/skills/grill) | Grills the user on their plan. NOT for mk:advise. |
-| [`mk:help`](/reference/skills/help) | Names the next workflow step from plans, tests, git. |
+| [`mk:help`](/reference/skills/help) | Names the next workflow step from plans, tests, git. NOT for mk:status. |
 | [`mk:henshin`](/reference/skills/henshin) | Plans wrapping code as CLI or MCP. NOT for mk:cook. |
-| [`mk:html-video`](/reference/skills/html-video) | Renders an HTML/CSS/JS template to MP4 via Playwright. |
+| [`mk:html-video`](/reference/skills/html-video) | Renders an HTML/CSS/JS template to MP4 via Playwright. NOT for mk:preview. |
 | [`mk:improve-codebase-architecture`](/reference/skills/improve-codebase-architecture) | Finds shallow modules, proposes refactors. NOT for mk:arch. |
 | [`mk:intake`](/reference/skills/intake) | Scores a ticket or PRD for completeness. NOT for mk:breakdown. |
 | [`mk:investigate`](/reference/skills/investigate) | Root-cause debugging ending in a report, not an edit. NOT for mk:fix. |
@@ -273,17 +273,17 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:jira-collaborate`](/reference/skills/jira-collaborate) | mk:jira leaf: comments, watchers. NOT for mk:jira-relationships. |
 | [`mk:jira-dev`](/reference/skills/jira-dev) | mk:jira leaf: branch names, PR bodies. NOT for mk:ship. |
 | [`mk:jira-estimator`](/reference/skills/jira-estimator) | mk:jira leaf: points for one ticket. NOT for mk:story-sizer. |
-| [`mk:jira-evaluator`](/reference/skills/jira-evaluator) | mk:jira leaf: scores a ticket's complexity. |
-| [`mk:jira-fields`](/reference/skills/jira-fields) | mk:jira leaf: custom field IDs, field config. |
+| [`mk:jira-evaluator`](/reference/skills/jira-evaluator) | mk:jira leaf: scores a ticket's complexity. NOT for mk:planning-engine. |
+| [`mk:jira-fields`](/reference/skills/jira-fields) | mk:jira leaf: custom field IDs, field config. NOT for mk:jira-admin. |
 | [`mk:jira-issue`](/reference/skills/jira-issue) | mk:jira leaf: create, read, update, delete one issue. NOT for mk:jira-bulk. |
 | [`mk:jira-jsm`](/reference/skills/jira-jsm) | mk:jira leaf: Service Management, SLAs. NOT for mk:jira-admin. |
 | [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) | mk:jira leaf: transition, assign. NOT for mk:jira-bulk. |
-| [`mk:jira-ops`](/reference/skills/jira-ops) | mk:jira leaf: Jira cache status, clear. |
-| [`mk:jira-relationships`](/reference/skills/jira-relationships) | mk:jira leaf: issue links, blockers, clone. |
+| [`mk:jira-ops`](/reference/skills/jira-ops) | mk:jira leaf: Jira cache status, clear. NOT for mk:jira-admin. |
+| [`mk:jira-relationships`](/reference/skills/jira-relationships) | mk:jira leaf: issue links, blockers, clone. NOT for mk:jira-collaborate. |
 | [`mk:jira-search`](/reference/skills/jira-search) | mk:jira leaf: JQL search, export. NOT for mk:jira-bulk. |
-| [`mk:jira-time`](/reference/skills/jira-time) | mk:jira leaf: worklogs, estimates, time reports. |
+| [`mk:jira-time`](/reference/skills/jira-time) | mk:jira leaf: worklogs, estimates, time reports. NOT for mk:jira-estimator. |
 | [`mk:lint-and-validate`](/reference/skills/lint-and-validate) | Runs lint and static analysis after edits. NOT for mk:verify. |
-| [`mk:llms`](/reference/skills/llms) | Generates llms.txt from project docs. |
+| [`mk:llms`](/reference/skills/llms) | Generates llms.txt from project docs. NOT for mk:docs-init. |
 | [`mk:loop`](/reference/skills/loop) | Iterates one metric in git trials. NOT for mk:evaluate. |
 | [`mk:markdown-reader`](/reference/skills/markdown-reader) | Serves markdown as a local book reader. NOT for mk:preview. |
 | [`mk:memory`](/reference/skills/memory) | Appends or prunes team memory entries. NOT for mk:retro. |
@@ -296,7 +296,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:party`](/reference/skills/party) | 2-4 agent round-table on a trade-off. NOT for mk:brainstorming. |
 | [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) | Founder-mode critique of plan scope. NOT for mk:validate-plan. |
 | [`mk:plan-creator`](/reference/skills/plan-creator) | Writes the multi-file plan before building. NOT for mk:planning-engine. |
-| [`mk:planning-engine`](/reference/skills/planning-engine) | Scores ticket complexity against the codebase. |
+| [`mk:planning-engine`](/reference/skills/planning-engine) | Scores ticket complexity against the codebase. NOT for mk:jira-evaluator. |
 | [`mk:playwright-cli`](/reference/skills/playwright-cli) | Scripted browser control via Playwright. NOT for mk:agent-browser. |
 | [`mk:preview`](/reference/skills/preview) | Renders code or a diff as diagram or deck. NOT for mk:tech-graph. |
 | [`mk:problem-solving`](/reference/skills/problem-solving) | Unsticks a stalled approach. NOT for mk:investigate. |
@@ -325,7 +325,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:status`](/reference/skills/status) | Evidence-based status of the active plan. NOT for mk:help. |
 | [`mk:stitch`](/reference/skills/stitch) | Generates a UI design via Stitch AI. NOT for mk:figma. |
 | [`mk:story-sizer`](/reference/skills/story-sizer) | Fibonacci-sizes pasted stories. NOT for mk:jira-estimator. |
-| [`mk:task-queue`](/reference/skills/task-queue) | Shared task claiming with file-ownership checks. |
+| [`mk:task-queue`](/reference/skills/task-queue) | Shared task claiming with file-ownership checks. NOT for mk:team-config. |
 | [`mk:team-config`](/reference/skills/team-config) | Sets up a parallel agent team. NOT for mk:worktree. |
 | [`mk:tech-graph`](/reference/skills/tech-graph) | Publish-grade SVG/PNG diagrams. NOT for mk:preview. |
 | [`mk:testing`](/reference/skills/testing) | Writes and runs tests; TDD cycle. NOT for mk:nyquist. |

@@ -1,6 +1,6 @@
 ---
 name: mk:help
-description: "Names the next workflow step from plans, tests, git."
+description: "Names the next workflow step from plans, tests, git. NOT for mk:status."
 argument-hint: '[--verbose]'
 source: local
 allowed-tools:

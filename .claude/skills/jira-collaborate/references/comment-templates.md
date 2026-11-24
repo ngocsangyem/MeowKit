@@ -120,10 +120,10 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate atta
 
 ```bash
 # Add watcher
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --add user@company.com
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --add user@example.com
 
 # Remove watcher
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --remove user@company.com
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --remove user@example.com
 
 # List watchers
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watchers PROJ-123 --list

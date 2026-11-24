@@ -1,6 +1,6 @@
 ---
 name: mk:jira-evaluator
-description: "mk:jira leaf: scores a ticket's complexity."
+description: "mk:jira leaf: scores a ticket's complexity. NOT for mk:planning-engine."
 phase: on-demand
 source: local
 keywords:

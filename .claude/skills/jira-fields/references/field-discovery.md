@@ -80,7 +80,7 @@ When setting custom field values, the payload format depends on `schema.type`:
 User picker fields require `accountId`, not display name or email:
 
 ```
-GET /rest/api/3/user/search?query=john.doe@company.com
+GET /rest/api/3/user/search?query=john.doe@example.com
 ```
 
 Returns array of users with `accountId`. Use the `accountId` in field payloads.

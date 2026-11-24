@@ -1,6 +1,6 @@
 ---
 name: mk:llms
-description: "Generates llms.txt from project docs."
+description: "Generates llms.txt from project docs. NOT for mk:docs-init."
 argument-hint: '[--source path] [--full] [--output dir] [--base-url url]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
