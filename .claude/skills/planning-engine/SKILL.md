@@ -1,7 +1,7 @@
 ---
 name: mk:planning-engine
 version: 1.0.0
-description: "Scores ticket complexity against the codebase."
+description: "Scores ticket complexity against the codebase. NOT for mk:jira-evaluator."
 phase: 1
 source: local
 argument-hint: review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]

@@ -1,6 +1,6 @@
 ---
 name: mk:html-video
-description: "Renders an HTML/CSS/JS template to MP4 via Playwright."
+description: "Renders an HTML/CSS/JS template to MP4 via Playwright. NOT for mk:preview."
 keywords:
   - html-to-video
   - mp4-export

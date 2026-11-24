@@ -1,6 +1,6 @@
 ---
 name: mk:task-queue
-description: "Shared task claiming with file-ownership checks."
+description: "Shared task claiming with file-ownership checks. NOT for mk:team-config."
 source: local
 keywords:
   - task-queue

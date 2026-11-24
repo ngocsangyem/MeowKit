@@ -115,7 +115,7 @@ timespent > 0 AND timespent < 3600 AND status = Done
 
 ```jql
 # Worklogs by specific user
-worklogAuthor = "john.doe@company.com"
+worklogAuthor = "john.doe@example.com"
 
 # Worklogs in date range
 worklogDate >= "2025-01-01" AND worklogDate <= "2025-01-31"

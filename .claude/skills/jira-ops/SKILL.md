@@ -1,6 +1,6 @@
 ---
 name: mk:jira-ops
-description: "mk:jira leaf: Jira cache status, clear."
+description: "mk:jira leaf: Jira cache status, clear. NOT for mk:jira-admin."
 phase: on-demand
 source: local
 keywords:

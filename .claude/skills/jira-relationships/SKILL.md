@@ -1,6 +1,6 @@
 ---
 name: mk:jira-relationships
-description: "mk:jira leaf: issue links, blockers, clone."
+description: "mk:jira leaf: issue links, blockers, clone. NOT for mk:jira-collaborate."
 phase: on-demand
 source: local
 keywords:

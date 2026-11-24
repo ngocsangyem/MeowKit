@@ -1,6 +1,6 @@
 ---
 name: mk:jira-time
-description: "mk:jira leaf: worklogs, estimates, time reports."
+description: "mk:jira leaf: worklogs, estimates, time reports. NOT for mk:jira-estimator."
 phase: on-demand
 source: local
 keywords:
