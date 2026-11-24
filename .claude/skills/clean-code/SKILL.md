@@ -23,50 +23,30 @@ status: active
 runtime: portable
 ---
 
-# Clean Code — Pragmatic AI Coding Standards
+# Clean Code
 
-> Be **concise, direct, and solution-focused**.
+Goal: apply the repo's own standards to code you are writing, or reviewing outside the current implementation diff, without growing the change.
 
-> For post-implementation complexity reduction within the current diff (Phase 3.5 workflow), use `mk:simplify`. `mk:clean-code` is for broader quality-standards enforcement at any phase.
+- Shrinking the diff you just built: `mk:simplify` (behavior-preserving, current diff only).
+- The principles (YAGNI, KISS, DRY) and file-size and naming rules are in `.claude/rules/development-rules.md` and the project's `docs/code-standards.md` when it has one. Follow those first; the project's lint config beats the defaults here.
 
-## Core Principles
+## Before editing any file
 
-| Principle     | Rule                                                       |
-| ------------- | ---------------------------------------------------------- |
-| **SRP**       | Single Responsibility — each function/class does ONE thing |
-| **DRY**       | Don't Repeat Yourself — extract duplicates, reuse          |
-| **KISS**      | Keep It Simple — simplest solution that works              |
-| **YAGNI**     | You Aren't Gonna Need It — don't build unused features     |
-| **Boy Scout** | Leave code cleaner than you found it                       |
+1. What imports it, and what does it import? An interface change reaches the importers; edit them in the same task.
+2. What tests cover it? Run them after the change.
+3. Is it shared? A shared component affects several places.
 
-## Process
+## Defaults
 
-1. **Read existing code** — understand structure before changing
-2. **Check dependencies** — what imports this file? what tests cover it?
-3. **Apply coding standards** — load `references/coding-standards.md` for detailed rules
-4. **Self-check** — goal met? all files edited? code works? no errors? nothing forgotten?
-5. **Run verification** — execute agent-appropriate scripts from references
+`references/coding-standards.md` holds naming and structure defaults and the numbers behind "small" (about 50 lines for a function, three levels of nesting). They are rules of thumb: past them, look for a split, and keep the code if the split would be forced.
 
-## References
+Stay inside the requested change. Cleaning adjacent code is the user's call (`.claude/rules/core-behaviors.md` 5), so propose it rather than doing it. Explain only what the user needs to know: what changed and why.
 
-| Reference                                                   | When to load                | Content                                                           |
-| ----------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------- |
-| **[coding-standards.md](./references/coding-standards.md)** | Step 3 — applying standards | Naming, functions, structure, anti-patterns, verification scripts |
+## Verify
 
-## Summary
-
-| Do                     | Don't                     |
-| ---------------------- | ------------------------- |
-| Write code directly    | Write tutorials           |
-| Let code self-document | Add obvious comments      |
-| Fix bugs immediately   | Explain the fix first     |
-| Inline small things    | Create unnecessary files  |
-| Name things clearly    | Use abbreviations         |
-| Keep functions small   | Write 100+ line functions |
-
-> The user wants working code, not a programming lesson.
+Run the project's own lint and tests (`npm run lint`, `npm test`, `pytest`). If this host gives the skill no shell, say which checks you could not run. For a fast post-edit scan, use `mk:lint-and-validate`.
 
 ## Gotchas
 
-- **Over-abstracting simple code**: Creating helpers for one-time operations violates YAGNI → Three similar lines are better than a premature abstraction
-- **Removing error handling deemed unnecessary**: Stripping try-catch from system boundaries loses resilience → Only remove error handling for internal calls with guaranteed contracts
+- **Over-abstracting simple code**: a helper for a one-time operation is premature. Three similar lines beat a speculative abstraction.
+- **Removing error handling you think is unnecessary**: stripping try/catch at a system boundary loses resilience. Remove it only for internal calls with a guaranteed contract.

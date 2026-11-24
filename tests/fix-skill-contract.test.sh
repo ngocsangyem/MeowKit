@@ -5,7 +5,7 @@ set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$ROOT/.claude/skills/fix/SKILL.md"
-TEST_WORKFLOW="$ROOT/.claude/skills/fix/references/workflow-test.md"
+TEST_WORKFLOW="$ROOT/.claude/skills/fix/references/by-symptom.md"
 REVIEW_CYCLE="$ROOT/.claude/skills/fix/references/review-cycle.md"
 INVESTIGATE="$ROOT/.claude/skills/investigate/SKILL.md"
 BUILD_FIX="$ROOT/.claude/skills/build-fix/SKILL.md"

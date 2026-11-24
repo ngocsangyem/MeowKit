@@ -30,9 +30,9 @@ For the whole documentation suite (README, architecture, code standards) use `mk
 
 | Action | What it does | Use when |
 |---|---|---|
-| `generate` | Scans the codebase and writes `docs/project-context.md` from `templates/project-context-template.md` | An established project with real code |
+| `generate` | Scans the codebase and writes a draft `docs/project-context.md` from `templates/project-context-template.md`, filling only what a scan can show and leaving judgment sections as prompts | An established project with real code |
 | `update` | Rescans and refreshes the file, keeping sections marked `<!-- manual -->` | The existing file is stale |
-| `init` | Writes the TODO skeleton `templates/skeleton.md`, creating `docs/` if needed | An empty project with fewer than five source files |
+| `init` | Writes the same template with its TODO prompts, creating `docs/` if needed | An empty project with fewer than five source files |
 
 `init` refuses to overwrite an existing file. Use `update`, or delete the file by hand to reset it. `generate` replaces `<!-- manual -->` sections, so back them up first.
 

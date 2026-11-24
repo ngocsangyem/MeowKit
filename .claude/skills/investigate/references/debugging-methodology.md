@@ -1,13 +1,10 @@
-<!-- Extracted from SKILL.md for progressive disclosure (checklist #11, #14) -->
-<!-- The actual debugging methodology — loaded when investigation begins -->
-
 # Systematic Investigation Methodology
 
 ## Iron Law
 
 **NO REMEDIATION WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
 
-Fixing symptoms creates whack-a-mole debugging. Find the root cause, then fix it.
+Fixing symptoms creates whack-a-mole debugging. Find the root cause first; `mk:fix` then fixes it.
 
 ---
 
@@ -39,7 +36,7 @@ Also check `TODOS.md` and `git log` for prior fixes in same area.
 
 1. **Confirm:** Use existing logs, traces, read-only diagnostics, or an already available reproducer to test the suspected root cause.
 2. **If wrong:** Sanitize error and search. Return to Phase 1. Do not guess.
-3. **3-strike rule:** If 3 hypotheses fail, STOP. Ask the user with options: continue, escalate, or instrument.
+3. **Three hypotheses failed:** stop and ask the user: continue, escalate, or instrument (the user adds logging, or `mk:fix` does).
 
 **Red flags:**
 - "Quick fix for now" — there is no "for now"
@@ -63,12 +60,12 @@ Evidence:        [logs, traces, reproduction result]
 Blast radius:    [affected callers, modules, behaviors]
 Next owner:      [mk:fix | mk:build-fix | user]
 Related:         [TODOS.md items, prior bugs in same area]
-Status:          DONE | DONE_WITH_CONCERNS | BLOCKED
+Status:          DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
 ════════════════════════════════════════
 ```
 
 ## Important Rules
 
-- 3+ failed hypotheses → STOP and question the architecture
-- Never claim a fix was applied or verified by this skill
-- Never say "this should fix it" — report evidence and route to the correct owner
+- Never claim a fix was applied or verified by this skill.
+- Never say "this should fix it"; report evidence and route to the correct owner.
+- The full report skeleton is in `reporting-standards.md`.

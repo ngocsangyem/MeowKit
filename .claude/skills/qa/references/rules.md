@@ -1,41 +1,18 @@
-# QA Rules
+# QA rules
 
-## Important Rules
+1. Every issue has at least one screenshot, and you retry it once to confirm it reproduces.
+2. Credentials never go in repro steps or the report; write `[REDACTED]`. Never ask for a password in chat.
+3. Write each issue to the report when you find it, not in a batch.
+4. Test as a user. Read source code only to fix a defect you have confirmed.
+5. Check the console after every interaction: JS errors that never surface visually are still bugs.
+6. Use realistic data and walk complete workflows end to end.
+7. Use `snapshot -C` for UIs where the accessibility tree misses clickable divs.
+8. Never delete output files; screenshots and reports accumulate on purpose.
+9. When you take a screenshot, give the user its path, and view it yourself if you can see images.
+10. The user asked for browser testing, so open the browser even when the diff looks backend-only; backend changes change app behavior.
+11. A clean working tree is required; if it is dirty, ask the user to commit, stash or abort.
+12. One commit per fix. Only add new test files; never change CI configuration or existing tests.
+13. Revert a fix that makes things worse (`git revert HEAD`).
+14. Follow the stop rules in `fix-loop.md`; when in doubt, stop and ask.
 
-1. **Repro is everything.** Every issue needs at least one screenshot. No exceptions.
-2. **Verify before documenting.** Retry the issue once to confirm it's reproducible, not a fluke.
-3. **Never include credentials.** Write `[REDACTED]` for passwords in repro steps.
-4. **Write incrementally.** Append each issue to the report as you find it. Don't batch.
-5. **Never read source code.** Test as a user, not a developer.
-6. **Check console after every interaction.** JS errors that don't surface visually are still bugs.
-7. **Test like a user.** Use realistic data. Walk through complete workflows end-to-end.
-8. **Depth over breadth.** 5-10 well-documented issues with evidence > 20 vague descriptions.
-9. **Never delete output files.** Screenshots and reports accumulate — that's intentional.
-10. **Use `snapshot -C` for tricky UIs.** Finds clickable divs that the accessibility tree misses.
-11. **Show screenshots to the user.** After every `agent-browser screenshot` (with or without `--annotate`) or responsive-viewport sweep, use the Read tool on the output file(s) so the user can see them inline. For a 3-viewport sweep (mobile/tablet/desktop), Read all three. This is critical — without it, screenshots are invisible to the user.
-12. **Never refuse to use the browser.** When the user invokes /mk:qa, they are requesting browser-based testing. Never suggest evals, unit tests, or other alternatives as a substitute. Even if the diff appears to have no UI changes, backend changes affect app behavior — always open the browser and test.
-
-## Additional Rules (qa-specific)
-
-13. **Clean working tree required.** If dirty, ask the user to offer commit/stash/abort before proceeding.
-14. **One commit per fix.** Never bundle multiple fixes into one commit.
-15. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
-16. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.
-17. **Self-regulate.** Follow the WTF-likelihood heuristic. When in doubt, stop and ask.
-
-## Output Structure
-
-```
-tasks/reports/qa/
-├── qa-report-{domain}-{YYYY-MM-DD}.md    # Structured report
-├── screenshots/
-│   ├── initial.png                        # Landing page annotated screenshot
-│   ├── issue-001-step-1.png               # Per-issue evidence
-│   ├── issue-001-result.png
-│   ├── issue-001-before.png               # Before fix (if fixed)
-│   ├── issue-001-after.png                # After fix (if fixed)
-│   └── ...
-└── baseline.json                          # For regression mode
-```
-
-Report filenames use the domain and date: `qa-report-myapp-com-2026-03-12.md`
+Output structure: `tasks/reports/qa/` holds the report, `screenshots/` (initial, per-issue steps, before and after) and `baseline.json`.

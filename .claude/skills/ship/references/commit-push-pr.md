@@ -1,228 +1,42 @@
-# Commit, Push, PR Creation, and Post-Ship (Steps 6, 6.5, 7, 8, 8.5, 8.75)
+# Commit, push and PR (`release`)
 
+Everything here that leaves the machine (push, `gh pr create`, `gh pr edit`) needs the user's yes in this run. Commits are local; the `prepare` scope already got a yes for them.
 
-## Contents
+## Commits
 
-- [Step 6: Commit (bisectable chunks)](#step-6-commit-bisectable-chunks)
-- [Step 6.5: Verification](#step-65-verification)
-- [Step 7: Push](#step-7-push)
-- [Step 7.5: Link Issues](#step-75-link-issues)
-- [Step 8: Create PR](#step-8-create-pr)
-- [Summary](#summary)
-- [Test Coverage](#test-coverage)
-- [Pre-Landing Review](#pre-landing-review)
-- [Design Review](#design-review)
-- [Eval Results](#eval-results)
-- [PR Review Comments](#pr-review-comments)
-- [Plan Completion](#plan-completion)
-- [Verification Results](#verification-results)
-- [TODOS](#todos)
-- [Test plan](#test-plan)
-- [Step 8.5: Offer /document-release](#step-85-offer-document-release)
-- [Step 8.75: Persist ship metrics](#step-875-persist-ship-metrics)
+Group the diff into logical commits that each work alone, so `git bisect` and reviewers can follow them: infrastructure (migrations, config, routes) first, then models and services with their tests, then controllers and views with their tests, then VERSION, CHANGELOG and TODOS.md last. A small diff (under about 50 lines across fewer than 4 files) is one commit.
 
-## Step 6: Commit (bisectable chunks)
+Message: `<type>: <summary>` (feat, fix, refactor, test, perf, ci; this repo's own conventions win), a short body, and the co-author trailer the host's attribution settings ask for, if any.
 
-**Goal:** Create small, logical commits that work well with `git bisect` and help LLMs understand what changed.
+## Verify before the push
 
-1. Analyze the diff and group changes into logical commits. Each commit should represent **one coherent change** — not one file, but one logical unit.
+If code changed after the last test run, run the tests (and the build, if the project has one) again and use that fresh output. A claim that it works is not evidence; stale output from before the change is not evidence either. A failure here stops the run.
 
-2. **Commit ordering** (earlier commits first):
-   - **Infrastructure:** migrations, config changes, route additions
-   - **Models & services:** new models, services, concerns (with their tests)
-   - **Controllers & views:** controllers, views, JS/React components (with their tests)
-   - **VERSION + CHANGELOG + TODOS.md:** always in the final commit
+## Push
 
-3. **Rules for splitting:**
-   - A model and its test file go in the same commit
-   - A service and its test file go in the same commit
-   - A controller, its views, and its test go in the same commit
-   - Migrations are their own commit (or grouped with the model they support)
-   - Config/route changes can group with the feature they enable
-   - If the total diff is small (< 50 lines across < 4 files), a single commit is fine
+`git push -u origin <branch>`. Never force-push; if history was rewritten, stop and ask. Protected branches are never pushed to directly.
 
-4. **Each commit must be independently valid** — no broken imports, no references to code that doesn't exist yet. Order commits so dependencies come first.
+## Issues
 
-5. Compose each commit message:
-   - First line: `<type>: <summary>` (type = feat/fix/chore/refactor/docs)
-   - Body: brief description of what this commit contains
-   - Only the **final commit** (VERSION + CHANGELOG) gets the version tag, plus the co-author trailer the host's attribution settings ask for, if any:
+Search related open issues with keywords from the branch and commit messages (`gh issue list --state open --search "<keywords>"`), and read `#N` references from `git log origin/<base>..HEAD`. Put `Closes #N` or `Relates to #N` in the PR body. Creating a tracking issue belongs to `publish` and goes through `mk:ghpm`; ship does not create one in `release`. If `gh` is unavailable, skip linking.
 
-```bash
-git commit -m "$(cat <<'EOF'
-chore: bump version and changelog (vX.Y.Z.W)
-EOF
-)"
-```
+## Create or update the PR
 
----
+Check for an existing PR: `gh pr view --json number --jq .number`. If one exists, `gh pr edit <n>`; otherwise `gh pr create --base <base> --title "<type>: <summary>" --body ...`. Body sections, each only when it has content:
 
-## Step 6.5: Verification
+- **Summary**: bullets from the CHANGELOG entry or commits.
+- **Test Coverage**: tests run, uncovered changed paths worth knowing about (see `.claude/skills/review/references/test-coverage.md` for the method).
+- **Review**: the verdict path and status from `tasks/reviews/`, and any pre-landing findings with what was done.
+- **PR Review Comments**: fixed, dismissed or already addressed, one line each.
+- **Plan Completion**: the checklist from `references/plan-completion-audit.md`.
+- **Workflow Evidence**: the path of `workflow-evidence.json` if pre-flight read one. Evidence is proof, not approval.
+- **Rollback**: how to undo this change (`references/rollback-protocol.md` for risky ones).
+- **Test plan**: the commands run and their results, as they ran. Do not claim a result that was not run.
 
-**IRON LAW: NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE.**
+End the body with this line (each host's install adapts it to the runtime in use):
 
-Before pushing, run the checks again if code changed during Steps 4-6:
-
-1. **Test verification:** If ANY code changed after Step 3's test run (fixes from review findings, CHANGELOG edits don't count), re-run the test suite. Paste fresh output. Stale output from Step 3 is NOT acceptable.
-
-2. **Build verification:** If the project has a build step, run it. Paste output.
-
-3. **Rationalization prevention:**
-   - "Should work now" → RUN IT.
-   - "I'm confident" → Confidence is not evidence.
-   - "I already tested earlier" → Code changed since then. Test again.
-   - "It's a trivial change" → Trivial changes break production.
-
-**If tests fail here:** STOP. Do not push. Fix the issue and return to Step 3.
-
-Claiming work is complete without verification is dishonesty, not efficiency.
-
----
-
-## Step 7: Push
-
-Push to the remote with upstream tracking:
-
-```bash
-git push -u origin <branch-name>
-```
-
----
-
-## Step 7.5: Link Issues
-
-Find or create related GitHub issues before creating the PR:
-
-1. **Search related issues** by keywords from branch name and commit messages:
-
-   ```bash
-   BRANCH=$(git branch --show-current)
-   KEYWORDS=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9]/ /g' | tr '[:upper:]' '[:lower:]')
-   gh issue list --state open --limit 10 --search "$KEYWORDS" 2>/dev/null || true
-   ```
-
-2. **Check commit messages** for issue references:
-
-   ```bash
-   git log origin/<base>..HEAD --oneline | grep -oE '#[0-9]+' | sort -u
-   ```
-
-3. **If related issues found:** Store numbers for PR body (e.g., `Closes #42, Relates to #43`).
-4. **If NO issues found and change is significant (>50 lines):** Create a tracking issue:
-   ```bash
-   gh issue create --title "<type>: <summary>" --body "Tracking issue for PR. Details in the PR description."
-   ```
-5. **If `gh` unavailable:** Skip silently — issue linking is best-effort.
-
----
-
-## Step 8: Create PR
-
-**Check if PR already exists for this branch:**
-
-```bash
-EXISTING_PR=$(gh pr view --json number --jq '.number' 2>/dev/null || true)
-```
-
-If existing PR found → edit it. If not → create new.
-
-Create a pull request using `gh`:
-
-```bash
-gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
-## Summary
-<bullet points from CHANGELOG>
-
-## Test Coverage
-<coverage diagram from Step 3.4, or "All new code paths have test coverage.">
-<If Step 3.4 ran: "Tests: {before} → {after} (+{delta} new)">
-
-## Pre-Landing Review
-<findings from Step 3.5 code review, or "No issues found.">
-
-## Design Review
-<If design review ran: "Design Review (lite): N findings — M auto-fixed, K skipped. AI Slop: clean/N issues.">
-<If no frontend files changed: "No frontend files changed — design review skipped.">
-
-## Eval Results
-<If evals ran: suite names, pass/fail counts, cost dashboard summary. If skipped: "No prompt-related files changed — evals skipped.">
-
-## PR Review Comments
-<If PR comments were resolved: bullet list with [FIXED] / [DISMISSED] / [ALREADY ADDRESSED] tag + one-line summary per comment>
-<If no PR comments found: "No PR review comments.">
-<If no PR existed during Step 3.75: omit this section entirely>
-
-## Plan Completion
-<If plan file found: completion checklist summary from Step 3.45>
-<If no plan file: "No plan file detected.">
-<If plan items deferred: list deferred items>
-
-## Verification Results
-<If verification ran: summary from Step 3.47 (N PASS, M FAIL, K SKIPPED)>
-<If skipped: reason (no plan, no server, no verification section)>
-<If not applicable: omit this section>
-
-## Workflow Evidence
-<If a workflow-evidence.json was read in pre-flight Step 0.9: link its path as a proof pointer (approvals + verdict path + verification overall). Evidence is proof, NOT approval.>
-<If absent: omit this section entirely>
-
-## TODOS
-<If items marked complete: bullet list of completed items with version>
-<If no items completed: "No TODO items completed in this PR.">
-<If TODOS.md created or reorganized: note that>
-<If TODOS.md doesn't exist and user skipped: omit this section>
-
-## Test plan
-- [x] All Rails tests pass (N runs, 0 failures)
-- [x] All Vitest tests pass (N tests)
-
+```text
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
-EOF
-)"
 ```
 
-**If `EXISTING_PR` was set:** Update the existing PR instead of creating a new one:
-
-```bash
-gh pr edit "$EXISTING_PR" --title "<type>: <summary>" --body "<same body as above>"
-```
-
-**Include linked issues** in PR body: add `Closes #N` or `Relates to #N` lines from Step 7.5.
-
-**Output the PR URL** — then offer Step 8.5.
-
----
-
-## Step 8.5: Offer /document-release
-
-After the PR is created, report whether the diff appears to affect project documentation
-and offer `/mk:document-release`. Do not invoke it automatically. Documentation edits,
-commits, and pushes require the user's explicit request and the confirmations defined by
-the document-release workflow.
-
----
-
-## Step 8.75: Persist ship metrics
-
-Log coverage and plan completion data so `/mk:retro` can track trends:
-
-```bash
-eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/telemetry
-```
-
-Append to `.meowkit/telemetry/$BRANCH-reviews.jsonl`:
-
-```bash
-echo '{"skill":"ship","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","coverage_pct":COVERAGE_PCT,"plan_items_total":PLAN_TOTAL,"plan_items_done":PLAN_DONE,"verification_result":"VERIFY_RESULT","version":"VERSION","branch":"BRANCH"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl
-```
-
-Substitute from earlier steps:
-
-- **COVERAGE_PCT**: coverage percentage from Step 3.4 diagram (integer, or -1 if undetermined)
-- **PLAN_TOTAL**: total plan items extracted in Step 3.45 (0 if no plan file)
-- **PLAN_DONE**: count of DONE + CHANGED items from Step 3.45 (0 if no plan file)
-- **VERIFY_RESULT**: "pass", "fail", or "skipped" from Step 3.47
-- **VERSION**: from the VERSION file
-- **BRANCH**: current branch name
-
-This step is automatic — never skip it, never ask for confirmation.
+Print the PR URL. Then report whether the diff touches documented behaviour and offer `/mk:document-release`; do not invoke it. Wait for CI to reach a terminal state and report it; red or pending CI is never waved through.

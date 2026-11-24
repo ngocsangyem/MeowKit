@@ -97,7 +97,7 @@ Write findings to `tasks/reports/security/{date}-{HHMMSS}.json` using this schem
     "phase": 2,
     "phase_name": "Secrets Archaeology",
     "category": "Secrets",
-    "fingerprint": "sha256-of-category-file-title",
+    "fingerprint": "<printf '%s|%s|%s' category file title | shasum -a 256>",
     "title": "...",
     "file": "...",
     "line": 0,

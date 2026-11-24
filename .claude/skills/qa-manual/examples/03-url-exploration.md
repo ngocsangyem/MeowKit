@@ -28,7 +28,7 @@ Flow 1 (Navigation): goto /products → click first product → verify detail pa
 Flow 2 (Search): fill search "widget" → click result → verify product page
   → PASS
 
-Flow 3 (Auth): click Login → ⚠️ Authentication required
+Flow 3 (Auth): click Login → Authentication required
   User chose: skip
   → SKIPPED
 

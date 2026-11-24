@@ -4,7 +4,7 @@
 > Referenced by: `SKILL.md` and `bin/check-careful.cjs`
 > Update this file when new destructive patterns are discovered in production — and keep the hook in sync.
 >
-> **Implementation status:** `check-careful.cjs` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
+> **Implementation status:** `check-careful.cjs` enforces the CRITICAL and HIGH rows below; rows marked "not enforced" are advice only. When `NODE_ENV`, `APP_ENV` or `ENVIRONMENT` contains `production`, `prod` or `staging`, CRITICAL patterns are refused (`block`, no override) instead of asking.
 
 ## Contents
 
@@ -78,7 +78,7 @@
 | `git checkout .` / `git restore .`      | `git checkout .`          | Uncommitted work loss   | HIGH     | `git diff` to review changes first                      |
 | `git clean -fd` / `git clean -fdx`      | `git clean -fdx`          | Deletes untracked files | HIGH     | `git clean -n` (dry run) first                          |
 | `git filter-branch` / `git filter-repo` | `git filter-branch --all` | Rewrites entire history | CRITICAL | Create a backup branch first                            |
-| `git rebase -i` (large range)           | `git rebase -i HEAD~20`   | History rewrite risk    | MEDIUM   | Limit to recent commits; backup branch first            |
+| `git rebase -i` (large range)           | `git rebase -i HEAD~20`   | History rewrite risk    | MEDIUM (not enforced) | Limit to recent commits; backup branch first |
 
 ### Kubernetes & Containers
 
@@ -86,7 +86,7 @@
 | -------------------------------------- | ------------------------------ | ------------------------ | -------- | ------------------------------------------------------ |
 | `kubectl delete`                       | `kubectl delete pod my-pod`    | Production impact        | HIGH     | `kubectl describe` first to understand dependencies    |
 | `kubectl delete namespace`             | `kubectl delete ns production` | Deletes entire namespace | CRITICAL | `kubectl get all -n <namespace>` to audit first        |
-| `docker rm -f` / `docker system prune` | `docker system prune -a`       | Container/image loss     | MEDIUM   | `docker ps -a` to review before pruning                |
+| `docker rm -f` / `docker system prune -a` | `docker system prune -a`    | Container/image loss     | HIGH (plain `docker system prune` is not enforced) | `docker ps -a` to review before pruning |
 | `helm uninstall`                       | `helm uninstall my-release`    | K8s app teardown         | HIGH     | `helm get all <release>` to review before uninstalling |
 
 ### Cloud & Infrastructure
@@ -95,7 +95,7 @@
 | ----------------------- | -------------------------------------- | --------------------------------- | -------- | ---------------------------------------------------- |
 | `terraform destroy`     | `terraform destroy -auto-approve`      | Destroys all infrastructure       | CRITICAL | `terraform plan -destroy` to review before executing |
 | `aws s3 rm --recursive` | `aws s3 rm s3://my-bucket --recursive` | Deletes entire S3 bucket contents | CRITICAL | `aws s3 ls` to review; enable versioning first       |
-| `gcloud ... delete`     | `gcloud sql instances delete my-db`    | Cloud resource loss               | CRITICAL | Check dependencies via console before deleting       |
+| `gcloud ... delete`     | `gcloud sql instances delete my-db`    | Cloud resource loss               | HIGH     | Check dependencies via console before deleting       |
 
 ---
 
@@ -155,18 +155,12 @@ On detection of a production context, CRITICAL patterns return `permissionDecisi
 
 ## Gotchas
 
-> Update this section when Claude hits new edge cases in practice.
+Known gaps in what the hook can see. Treat the guard as a safety net for honest mistakes, not as a boundary.
 
-- **Shell aliases bypass detection**: if the user has `alias del='rm -rf'`, the hook sees `del` not `rm -rf` → false negative. Document project-specific dangerous aliases in `.claude/rules/`.
-
-- **Multi-line commands may not match**: a command split across lines as `rm -rf \` + `/data` may not match a single-line regex. The hook should join continuation lines before matching.
-
-- **Subshell execution can bypass**: `$(rm -rf /data)` embedded in a larger command may not trigger if regex only checks the outer command. Match against the full resolved command string where possible.
-
-- **Safe exceptions can be overly broad**: `rm -rf dist` is safe locally but dangerous if `dist/` contains production artifacts currently being served. Consider flagging when inside a CI/CD environment variable context.
-
-- **`git rebase -i` is context-dependent**: rebasing 2 commits locally is safe; rebasing 50 commits on a shared branch is destructive. The current pattern flags all `rebase -i` equally — consider adding a commit-count heuristic.
-
-- **`terraform destroy` without `-auto-approve`**: the current pattern blocks `terraform destroy` entirely, but without `-auto-approve` it always prompts interactively. Consider only blocking the `-auto-approve` variant.
-
-- **Docker prune scope**: `docker system prune` without `-a` only removes dangling resources and is generally safe. `docker system prune -a` removes ALL unused images and is destructive. The pattern should distinguish between the two.
+- **Shell aliases bypass detection**: with `alias del='rm -rf'` the hook sees `del`, not `rm -rf`. Document project-specific dangerous aliases in `.claude/rules/`.
+- **Multi-line commands may not match**: `rm -rf \` followed by `/data` on the next line is not matched by a single-line pattern.
+- **Subshells**: `$(rm -rf /data)` inside a larger command is only caught if the pattern matches the full command string.
+- **Safe exceptions are broad**: `rm -rf dist` passes without a prompt, but is dangerous if `dist/` holds artifacts currently being served.
+- **`git rebase -i` is not enforced**: rebasing 2 local commits is safe and rebasing 50 on a shared branch is not; the hook has no pattern for either.
+- **`terraform destroy` always matches**, with or without `-auto-approve`, although without it Terraform prompts anyway.
+- **Docker prune scope**: `docker system prune` without `-a` removes only dangling resources and does not match; with `-a` it does.

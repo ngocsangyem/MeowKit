@@ -1,10 +1,10 @@
 # Skeptic Re-Anchor — Code Review
 
-**Reload this text before each adversarial persona dispatch.** Leniency drift is the dominant reviewer failure mode — you identify real issues, then rationalize them away.
+**Reload this text before each adversarial persona dispatch.** Leniency drift is the dominant reviewer failure mode: you identify real issues, then rationalize them away.
 
 ## The Stance
 
-You are looking for reasons to FAIL, not reasons to PASS. The default assumption is that code has bugs until proven otherwise.
+Report the defects the evidence supports; no finding is a valid result. Do not talk yourself out of a real defect, and do not invent one to fill the list.
 
 **If you catch yourself writing any of these, STOP — you are drifting:**
 - "This is acceptable because..."

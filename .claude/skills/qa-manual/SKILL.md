@@ -24,20 +24,13 @@ status: active
 runtime: claude-code
 ---
 
-<!-- Design decisions:
-- Dynamic routing model: each action uses the best skill (Phase 1.2 routing tree)
-- Auth protocol: prompt-always — NEVER guess credentials (absolute constraint)
-- playwright-cli preferred for DOM interaction — generates PW code as side-effect
-- agent-browser preferred for auth flows — session persistence support
-- Role-based locators mandatory (getByRole, getByLabel) — not CSS selectors
-- Script for Playwright execution — deterministic, not LLM judgment
--->
-
 # QA Manual Testing & E2E Code Generation
+
+Goal: run a spec-driven manual pass through a web flow and report pass or fail per step with evidence, or generate a Playwright `.spec.ts` from that pass. For exploratory test-and-fix use `mk:qa`; to grade a build against a rubric use `mk:evaluate`.
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-Orchestrates browser skills to act like a human tester: navigate, interact, verify, and report.
+It orchestrates browser skills like a human tester: navigate, interact, verify, report.
 
 ## When to Use
 
@@ -69,22 +62,18 @@ Each action uses the best browser skill:
 
 **On auth encounter** (login page, MFA, 401/403):
 
-1. **STOP** current flow immediately
-2. **Show user:**
+1. **STOP** the current flow.
+2. **Tell the user:**
    ```
-   ⚠️ Authentication required at: [current URL]
-   mk:qa-manual needs credentials to continue.
-   Please provide:
-   - Username/email: ___________
-   - Password: ___________
-   Type 'skip' to skip this flow or 'abort' to stop testing.
+   Authentication required at: [current URL]
+   Please sign in yourself in the browser window, or give me a saved auth state file.
+   Reply 'done' when signed in, 'skip' to skip this flow, or 'abort' to stop testing.
    ```
-3. **WAIT** for user input — do NOT proceed without it
-4. On credentials → fill form using `mk:playwright-cli`, continue flow
-5. On 'skip' → mark flow SKIPPED, move to next
-6. On 'abort' → end session, output partial report
+3. **WAIT** for the reply; do not proceed without it.
+4. On `done`, re-snapshot to confirm the session is signed in, then continue. With a saved state file, open the target with `agent-browser open <url> --state <file>` and continue.
+5. On `skip`, mark the flow SKIPPED and move on. On `abort`, end the session and output the partial report.
 
-**NEVER:** Guess credentials. Use hardcoded test credentials. Proceed past auth without input. Store credentials in any file.
+A password never goes through the chat: do not ask for one, do not type one, and do not store one in any file. If a second factor or CAPTCHA appears, the user completes it in the browser. Never guess credentials or use hardcoded ones.
 
 ## Process
 
@@ -92,7 +81,7 @@ See `references/qa-process.md` for detailed Use Case A and Use Case B processes.
 
 **Use Case A — Manual QA:** Load spec → extract flows → navigate each → verify outcomes → report
 
-**Use Case B — E2E Code Gen:** Run Use Case A → record interactions → generate .spec.ts with role-based locators
+**Use Case B — E2E Code Gen:** Run Use Case A, record the interactions, and generate a `.spec.ts`. One flow gets one spec file; a feature with more than one scenario gets the feature folder (selectors, assertions, intercepts, helpers). Locator choice: test id when the codebase has one, else role (strategy and page objects: `.claude/skills/testing/references/e2e-best-practices.md`).
 
 ## Output Format
 
@@ -113,12 +102,15 @@ See `references/output-templates.md` for full templates.
 |-----------|-------------|---------|
 | **[qa-process.md](./references/qa-process.md)** | Steps 1-4 | Detailed Use Case A + B processes |
 | **[output-templates.md](./references/output-templates.md)** | Step output | QA report + Playwright code templates |
+| `examples/01-login-flow-manual-qa.md` | A worked report | Login flow, manual QA |
+| `examples/02-checkout-e2e-generation.md` | A worked generation | Checkout flow, E2E code |
+| `examples/03-url-exploration.md` | A worked exploration | URL-driven exploration |
 
 ## Failure Handling
 
 | Failure | Detection | Recovery | Message |
 |---------|-----------|----------|---------|
-| Auth encountered | URL/form patterns | Auth protocol above | "⚠️ Authentication required..." |
+| Auth encountered | URL/form patterns | Auth protocol above | "Authentication required..." |
 | Page load timeout | 30s timeout | Retry ×2 then report | "Page load timed out at [URL]" |
 | Element not found | Selector fails | Re-snapshot, try alternate | "Element not found, re-scanning..." |
 | Spec not found | File missing | Ask user | "Spec file not found. Provide path or URL." |

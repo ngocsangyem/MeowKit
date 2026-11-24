@@ -48,7 +48,7 @@ This is the **primary mode** for developers verifying their work. When the user 
 
 ## Full (default when URL is provided)
 
-Systematic exploration. Visit every reachable page. Document 5-10 well-evidenced issues. Produce health score. Takes 5-15 minutes depending on app size.
+Systematic exploration. Visit every reachable page and document each issue with evidence. Produce health score. Takes 5-15 minutes depending on app size.
 
 ## Quick (`--quick`)
 

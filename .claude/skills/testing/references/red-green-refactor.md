@@ -1,6 +1,6 @@
-# Skill: Red-Green-Refactor TDD Cycle (canonical TDD reference)
+# Skill: Red-Green-Refactor TDD Cycle
 
-**This is the canonical TDD cycle reference.** Used by `--tdd` / `MEOWKIT_TDD=1` mode and recommended for production-quality work; NOT enforced by default.
+The how-to for the TDD cycle, used by `--tdd` / `MEOWKIT_TDD=1` mode and recommended for production-quality work; not enforced by default. Flag precedence and the regression-test rule are owned by `.claude/skills/cook/references/tdd-rules.md`.
 
 ## Contents
 
@@ -133,7 +133,7 @@ Tests:       X passed, X total
 
 ### Unit Tests
 - Test a single function/method in isolation
-- Mock all dependencies
+- Mock third-party services only; use the real project dependencies elsewhere (`.claude/rules/development-rules.md`)
 - Run in milliseconds
 - Use for: business logic, utility functions, data transformations
 

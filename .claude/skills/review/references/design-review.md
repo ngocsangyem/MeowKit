@@ -1,4 +1,4 @@
-# Design Review (Step 4.5 — conditional, diff-scoped)
+# Design Review (conditional, diff-scoped)
 
 Check if the diff touches frontend files using `workflow-diff-scope`:
 
@@ -51,4 +51,4 @@ Present subagent output under a `DESIGN VOICE (Claude subagent):` header, merged
 
 **Error handling:** If the subagent fails or times out, skip with a brief note — this pass is optional quality enhancement, not a prerequisite.
 
-Include any design findings alongside the findings from Step 4. They follow the same Fix-First flow in Step 5 — AUTO-FIX for mechanical CSS fixes, ASK for everything else.
+Include design findings alongside the other findings. With `--fix`, mechanical CSS fixes are AUTO-FIX and everything else is ASK (`fix-first-review.md`).

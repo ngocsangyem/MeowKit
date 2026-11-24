@@ -80,7 +80,7 @@ At least one PASS example AND at least one FAIL example. Format:
 **Reasoning:** {explicit grading logic — why this verdict, citing criteria}
 ```
 
-**Balance rule:** PASS and FAIL example counts MUST be equal (within ±1) per `validate-rubric.sh`. This prevents positive bias in evaluator few-shot prompting (observed: balanced examples reduce positive bias by 40-60% — Anthropic harness research).
+**Balance rule (owner):** with fewer than four anchors the PASS and FAIL counts may differ by one; from four on they must be equal. Balanced examples reduce positive bias in few-shot prompting.
 
 ## Optional Sections
 
@@ -95,7 +95,7 @@ At least one PASS example AND at least one FAIL example. Format:
 1. Frontmatter has all 5 required fields with valid values
 2. `name` matches filename
 3. All 6 required sections exist in order
-4. ≥1 PASS example AND ≥1 FAIL example (balance within ±1)
+4. ≥1 PASS example AND ≥1 FAIL example, balanced as above
 5. Anti-patterns section is non-empty
 6. File is ≤200 lines total
 
