@@ -80,7 +80,7 @@ agent-browser snapshot -i
 agent-browser fill @e1 "demo@example.com"
 agent-browser wait 500
 
-agent-browser fill @e2 "password"
+agent-browser fill @e2 "$DEMO_PASSWORD"
 agent-browser wait 500
 
 agent-browser click @e3

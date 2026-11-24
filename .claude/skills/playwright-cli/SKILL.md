@@ -20,8 +20,8 @@ runtime: claude-code
 
 # Browser Automation with playwright-cli
 
-> **Use playwright-cli when:** DOM interaction, navigation, data extraction, or generating reusable `.spec.ts` E2E test code.
-> **Use `mk:agent-browser` instead when:** session persistence (auth flows, MFA, cookie import) is required.
+> **Use playwright-cli when:** the click sequence is known or scripted: DOM interaction, data extraction, tracing, request mocking, or generating Playwright test code. Logins persist with `state-save` / `state-load`.
+> **Use `mk:agent-browser` instead when:** the work is exploratory, or needs the auth vault or an MFA hand-off, because it keeps sessions and refs for you. For a maintained `.spec.ts` E2E suite use `mk:qa-manual`.
 
 ## Quick Start
 
@@ -47,7 +47,7 @@ playwright-cli close
 playwright-cli open https://example.com/form
 playwright-cli snapshot
 playwright-cli fill e1 "user@example.com"
-playwright-cli fill e2 "password123"
+playwright-cli fill e2 "$APP_PASSWORD"
 playwright-cli click e3
 playwright-cli snapshot
 playwright-cli close
@@ -130,17 +130,16 @@ playwright-cli run-code "async page => await page.context().grantPermissions(['g
 
 ## Setup
 
-Requires Playwright MCP server. Configure in `.mcp.json`:
-```json
-{ "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] } }
-```
-Copy from `.meowkit/mcp.json.example` if not configured.
-If global binary unavailable: `npx playwright-cli <command>`
+If the global binary is unavailable: `npx playwright-cli <command>`.
+
+## Done and stop
+
+Return the evidence the task asked for (extracted text, final URL, trace or file path). If the browser hangs, run `playwright-cli kill-all` once and retry once; then stop and report the error text.
 
 ## Gotchas
 
 - **Flaky selectors on SPAs**: `data-testid` changes between renders → prefer role-based selectors (`getByRole`) over CSS selectors
-- **Auth state not persisting between tests**: each test starts with fresh context → use `state-save` / `state-load` to persist auth cookies across runs
+- **Auth state not persisting between tests**: each test starts with a fresh context; use `state-save` / `state-load`. Never type a password literal: read it from an env var
 
 ## References
 
@@ -148,9 +147,9 @@ If global binary unavailable: `npx playwright-cli <command>`
 | --- | --- |
 | [references/command-reference.md](references/command-reference.md) | Full command listing (core, tabs, storage, network, DevTools, open params) |
 | [references/session-management.md](references/session-management.md) | Named sessions, concurrent scraping, persistent profiles, cleanup |
-| [references/request-mocking.md](references/request-mocking.md) | Request mocking patterns |
-| [references/storage-state.md](references/storage-state.md) | Storage state (cookies, localStorage) |
-| [references/test-generation.md](references/test-generation.md) | Test generation |
-| [references/tracing.md](references/tracing.md) | Tracing |
+| [references/request-mocking.md](references/request-mocking.md) | Stubbing or intercepting network responses |
+| [references/storage-state.md](references/storage-state.md) | Saving and loading cookies and localStorage between runs |
+| [references/test-generation.md](references/test-generation.md) | Turning a recorded session into Playwright test code |
+| [references/tracing.md](references/tracing.md) | Capturing a trace to debug a failing flow |
 | [references/video-recording.md](references/video-recording.md) | Video recording |
-| [references/running-code.md](references/running-code.md) | Running Playwright code |
+| [references/running-code.md](references/running-code.md) | Running a Playwright snippet with `run-code` |

@@ -1,6 +1,6 @@
 # Specialized Workflows
 
-Routes for upstream agent-browser skills that should not be missed:
+Recipes for the intents below. Read the section that matches the task.
 
 ## Contents
 
@@ -10,12 +10,6 @@ Routes for upstream agent-browser skills that should not be missed:
 - [Vercel Sandbox](#vercel-sandbox)
 - [AWS Bedrock AgentCore](#aws-bedrock-agentcore)
 - [Selection Checklist](#selection-checklist)
-
-- `dogfood`
-- `electron`
-- `slack`
-- `vercel-sandbox`
-- `agentcore`
 
 Read this file when the task goes beyond ordinary web-page navigation.
 
@@ -29,10 +23,10 @@ Workflow:
 2. Copy [../templates/dogfood-report-template.md](../templates/dogfood-report-template.md) into `dogfood-output/report.md`.
 3. Start a named session: `agent-browser --session <session> open <target-url>`.
 4. Authenticate only when needed. Save state if useful.
-5. Calibrate findings against the issue taxonomy loaded with this file.
+5. Calibrate findings against `dogfood-issue-taxonomy.md`.
 6. Explore top-level navigation, forms, modals, empty/error/loading states, console, network failures.
 7. Document each issue immediately. Do not batch findings at the end.
-8. For interactive bugs, record repro video plus step screenshots. For static visible-on-load issues, one annotated screenshot is enough.
+8. For interactive bugs, record a repro video plus step screenshots (the files are the evidence; on a host that cannot see images, describe the issue from `snapshot` and `get text`). For static visible-on-load issues, one annotated screenshot is enough.
 9. Update severity counts, close the session, and summarize findings.
 
 Rules:
@@ -40,7 +34,7 @@ Rules:
 - Findings must come from browser-observed behavior, not source-code reading.
 - Verify reproducibility before collecting final evidence.
 - Never delete output files mid-session.
-- Prefer 5-10 well-documented issues over many vague notes.
+- Report what was observed; do not pad the list.
 
 ## Electron Apps
 
@@ -87,7 +81,7 @@ agent-browser open https://app.slack.com
 agent-browser snapshot -i
 ```
 
-Then follow the Slack task recipes loaded with this file.
+Then follow the recipes in `slack-workflows.md`.
 
 Rules:
 

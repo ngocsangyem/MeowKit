@@ -35,17 +35,6 @@ The helper writes each supplied line, closes the output safely, and rejects an e
 - Second error: change approach, such as template generation to hand-authored line generation.
 - Third error: stop and report the failure; do not retry the same command indefinitely.
 
-Common corrections:
-
-| Invalid | Correct |
-| --- | --- |
-| `yt-anchor` | `y="60" text-anchor="middle"` |
-| `x="390` | `x="390" y="250"` |
-| `fill=#fff` | `fill="#ffffff"` |
-| `marker-end=` | `marker-end="url(#arrow)"` |
-| `L 29450` | `L 290,220` |
-| missing end tag | `</svg>` |
-
 ## Validate and inspect
 
 Run `bash scripts/validate-svg.sh <svg-file>`. When available, also run:

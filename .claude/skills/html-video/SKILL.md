@@ -54,5 +54,6 @@ The final optional argument supplies a background colour. The script captures `f
 ## Gotchas
 
 - This is a skill, not an npm package: execute its bundled scripts directly.
-- Do not use it for live browser recording, screen recording, or AI video generation.
+- Do not use it for live browser recording or screen recording. For AI video generation use `mk:multimodal`.
+- After two failed renders, stop and report the error text and the troubleshooting entry you tried; do not loop.
 - See [troubleshooting](references/troubleshooting.md) for cleanup and file-origin limitations.

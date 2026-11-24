@@ -35,7 +35,7 @@ Labels also cache refs — you can interact immediately without a separate snaps
 
 Use annotated screenshots when:
 - Page has unlabeled icon buttons or visual-only elements
-- Canvas or chart elements are present (invisible to text snapshots)
+- Canvas or chart elements are present (invisible to text snapshots; needs a host that can read images, otherwise use `get text` or ask the user)
 - You need spatial reasoning about element positions
 - Verifying visual layout or styling
 

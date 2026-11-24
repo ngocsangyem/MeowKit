@@ -785,11 +785,6 @@
       "size": 3626
     },
     {
-      "path": ".claude/skills/agent-browser/references/migrating-from-browse.md",
-      "sha256": "d4840ebacadc5b7f1f2cdb35a4c26cdffcb922fb7634a27a89931f0e1f016792",
-      "size": 7579
-    },
-    {
       "path": ".claude/skills/agent-browser/references/profiling.md",
       "sha256": "15f1e6c7994d7471a274dc1476992d0ec178acd91f8b626e0d6f24a4dbef738f",
       "size": 3405
@@ -1760,21 +1755,6 @@
       "path": ".claude/skills/docs-finder/scripts/utils/env-loader.js",
       "sha256": "65f511a469ec4686ab199b5fe20b32404ee9b23564bf42958f04977487256ffc",
       "size": 2346
-    },
-    {
-      "path": ".claude/skills/docs-finder/workflows/internal-search.md",
-      "sha256": "5687819145178a4b87e92f3c3bf893f21249d7e163ab42338bbc5129a90a30a2",
-      "size": 1856
-    },
-    {
-      "path": ".claude/skills/docs-finder/workflows/library-search.md",
-      "sha256": "1a78b20b1dbf363a5e46e0a924e76abff417be17536af4aab56cf173a579ff29",
-      "size": 1949
-    },
-    {
-      "path": ".claude/skills/docs-finder/workflows/topic-search.md",
-      "sha256": "fe4671973e6533719926f040e37bcf304c86603748125f4ea2fd122a3d6672c4",
-      "size": 2230
     },
     {
       "path": ".claude/skills/docs-init/SKILL.md",
@@ -3127,21 +3107,6 @@
       "path": ".claude/skills/multimodal/scripts/video_generator.py",
       "sha256": "6a23e70a8a7035af729667aa18e27dad8baf8cd50febbf7d6d08f15343b7dc8d",
       "size": 2761
-    },
-    {
-      "path": ".claude/skills/multimodal/workflows/audio-transcription.md",
-      "sha256": "9cdb8682dfda5af895bcf803bdfad30a7838386d3569acf45c0253c0d9971d2a",
-      "size": 1177
-    },
-    {
-      "path": ".claude/skills/multimodal/workflows/document-extraction.md",
-      "sha256": "989df2852b31bb3fe2435fbacae58d95342c6b207792d15a902a615bb9cd2e91",
-      "size": 1237
-    },
-    {
-      "path": ".claude/skills/multimodal/workflows/image-analysis.md",
-      "sha256": "76b8d0009ec058824c22ce3fb3f84058d234a79eac1e2cae5e0dfa13477e5db5",
-      "size": 1112
     },
     {
       "path": ".claude/skills/nyquist/SKILL.md",
@@ -4942,11 +4907,6 @@
       "size": 2817
     },
     {
-      "path": ".claude/skills/tech-graph/references/svg-layout-best-practices.md",
-      "sha256": "1bf2afdbc794999bc0aa6983ca7d7eb7b34980c86699293dfae6d51d5d62d8a6",
-      "size": 3881
-    },
-    {
       "path": ".claude/skills/tech-graph/references/visual-vocabulary-and-layout.md",
       "sha256": "85200b30e9ac589e7fd0726c9dde1abe201cc2f63a77bd3177744619d91f4192",
       "size": 3584
@@ -6115,11 +6075,6 @@
       "size": 3626
     },
     {
-      "path": ".meowkit/cache/.claude/skills/agent-browser/references/migrating-from-browse.md",
-      "sha256": "d4840ebacadc5b7f1f2cdb35a4c26cdffcb922fb7634a27a89931f0e1f016792",
-      "size": 7579
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/agent-browser/references/profiling.md",
       "sha256": "15f1e6c7994d7471a274dc1476992d0ec178acd91f8b626e0d6f24a4dbef738f",
       "size": 3405
@@ -7085,21 +7040,6 @@
       "path": ".meowkit/cache/.claude/skills/docs-finder/scripts/utils/env-loader.js",
       "sha256": "65f511a469ec4686ab199b5fe20b32404ee9b23564bf42958f04977487256ffc",
       "size": 2346
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/docs-finder/workflows/internal-search.md",
-      "sha256": "5687819145178a4b87e92f3c3bf893f21249d7e163ab42338bbc5129a90a30a2",
-      "size": 1856
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/docs-finder/workflows/library-search.md",
-      "sha256": "1a78b20b1dbf363a5e46e0a924e76abff417be17536af4aab56cf173a579ff29",
-      "size": 1949
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/docs-finder/workflows/topic-search.md",
-      "sha256": "fe4671973e6533719926f040e37bcf304c86603748125f4ea2fd122a3d6672c4",
-      "size": 2230
     },
     {
       "path": ".meowkit/cache/.claude/skills/docs-init/SKILL.md",
@@ -8458,21 +8398,6 @@
       "path": ".meowkit/cache/.claude/skills/multimodal/scripts/video_generator.py",
       "sha256": "6a23e70a8a7035af729667aa18e27dad8baf8cd50febbf7d6d08f15343b7dc8d",
       "size": 2761
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/multimodal/workflows/audio-transcription.md",
-      "sha256": "9cdb8682dfda5af895bcf803bdfad30a7838386d3569acf45c0253c0d9971d2a",
-      "size": 1177
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/multimodal/workflows/document-extraction.md",
-      "sha256": "989df2852b31bb3fe2435fbacae58d95342c6b207792d15a902a615bb9cd2e91",
-      "size": 1237
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/multimodal/workflows/image-analysis.md",
-      "sha256": "76b8d0009ec058824c22ce3fb3f84058d234a79eac1e2cae5e0dfa13477e5db5",
-      "size": 1112
     },
     {
       "path": ".meowkit/cache/.claude/skills/nyquist/SKILL.md",
@@ -10258,11 +10183,6 @@
       "path": ".meowkit/cache/.claude/skills/tech-graph/references/svg-authoring-and-recovery.md",
       "sha256": "c59c0a6963c6ec0c99b928a7a1d7b645a43a2fa18191fbf4bbc70487362e4d2a",
       "size": 2817
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/tech-graph/references/svg-layout-best-practices.md",
-      "sha256": "1bf2afdbc794999bc0aa6983ca7d7eb7b34980c86699293dfae6d51d5d62d8a6",
-      "size": 3881
     },
     {
       "path": ".meowkit/cache/.claude/skills/tech-graph/references/visual-vocabulary-and-layout.md",

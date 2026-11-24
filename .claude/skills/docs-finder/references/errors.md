@@ -43,7 +43,7 @@
 
 ```
 1. Context7 MCP (if configured)
-   → mcp__context7__resolve-library-id + get-library-docs
+   → the host's Context7 tools: resolve-library-id, then query-docs
    ↓ fails
 2. Context7 script (direct HTTP)
    → node scripts/fetch-context7.js "<query>"
@@ -52,11 +52,10 @@
    → node scripts/fetch-chub.js "<query>"
    ↓ fails
 4. Direct llms.txt fetch
-   → WebFetch: {library-domain}/llms.txt
+   → the host's fetch tool, or `mk:web-to-markdown` on {library-domain}/llms.txt
    ↓ 404
 5. Web search
-   → WebSearch: "[library] llms.txt"
-   → WebSearch: "[library] official documentation [topic]"
+   → a web search for "[library] official documentation [topic]"; with no search tool, ask the user for a URL
 ```
 
 ### For Internal/Project Documentation

@@ -4,7 +4,7 @@ How `--explain`, `--diagram`, `--slides`, `--ascii` produce a `.md` artifact in 
 
 ## Contents
 
-- Step 1 — Resolve output path (with active-plan format detection)
+- Step 1 — Resolve output path
 - Step 2 — Generate per template
   - --explain
   - --diagram
@@ -17,46 +17,19 @@ Before emitting any code-fenced mermaid block, apply the Mermaid rules SKILL.md 
 
 ## Step 1 — Resolve output path
 
-CWD is the project root. Existing hooks (`pre-completion-check.cjs:51`) read from `.meowkit/state/active-plan` — match that convention. The stored value can be either an absolute path (`orientation-ritual.cjs:18` declares values "canonically absolute") or a slug (`HOOKS_INDEX.md:77` documents the value as "slug"). The two docs disagree; treat the value as opaque and detect format at read time.
+CWD is the project root.
 
 ```bash
-ACTIVE_PLAN_FILE=".meowkit/state/active-plan"
-
-if [ -f "$ACTIVE_PLAN_FILE" ]; then
-  RAW=$(tr -d '[:space:]' < "$ACTIVE_PLAN_FILE")
-  case "$RAW" in
-    /*)
-      if [ -d "$RAW" ]; then
-        OUTPUT_DIR="${RAW}/visuals"
-      else
-        echo "warn: active-plan='$RAW' is absolute but does not exist; falling back" >&2
-        OUTPUT_DIR="tasks/visuals"
-      fi
-      ;;
-    "")
-      OUTPUT_DIR="tasks/visuals"
-      ;;
-    *)
-      if [ -d "tasks/plans/$RAW" ]; then
-        OUTPUT_DIR="tasks/plans/$RAW/visuals"
-      else
-        echo "warn: active-plan slug='$RAW' has no matching dir; falling back" >&2
-        OUTPUT_DIR="tasks/visuals"
-      fi
-      ;;
-  esac
-else
-  OUTPUT_DIR="tasks/visuals"
-fi
-
+OUTPUT_DIR="tasks/visuals"
+# When the user named a plan directory under tasks/plans/, use it instead:
+# [ -d "tasks/plans/$PLAN" ] && OUTPUT_DIR="tasks/plans/$PLAN/visuals"
 mkdir -p "$OUTPUT_DIR"
 ```
 
 **Rules:**
 
-- Plan-scoped path = `tasks/plans/{slug}/visuals/`
-- Flat fallback = `tasks/visuals/`
-- Format detection guards against both documented formats; falls back loudly via stderr `warn:`
+- Plan-scoped path = `tasks/plans/{plan}/visuals/`, only when the user names the plan
+- Default = `tasks/visuals/`
 - Topic-to-slug rules live in SKILL.md → "Argument Resolution"
 
 ## Step 2 — Generate per template
@@ -109,7 +82,7 @@ Output filename: `{topic-slug}.md`
 
 Output filename: `{topic-slug}.md`
 
-One concept per slide. Separators are `---` lines. Default 8 slides; topic complexity may extend. Aim for hero / context / problem / solution / details / risks / next-steps / summary.
+One concept per slide. Separators are `---` lines. Use as many slides as the topic needs. Aim for hero / context / problem / solution / details / risks / next-steps / summary.
 
 ```markdown
 # {Topic}
@@ -171,8 +144,8 @@ Legend:
 4. Write the generated content to `OUTPUT_PATH`. Overwrite without prompting.
 5. Report:
    - Absolute path of the generated file
-   - One-line note on which directory was chosen (plan-scoped vs flat fallback)
-   - Suggested follow-up: open in editor, or `mk:web-to-markdown` to render in a browser
+   - One-line note on which directory was chosen
+   - Suggested follow-up: open in editor, or `mk:markdown-reader` to read it in a browser
 
 For `--ascii`: also print the ASCII diagram to stdout so the user sees it inline.
 
@@ -187,4 +160,4 @@ For `--ascii`: also print the ASCII diagram to stdout so the user sees it inline
 
 - Slug truncation at 80 chars: long topics produce truncated filenames. Inform the user when truncated.
 - `--ascii` is a fallback for terminal-only contexts, not a default. Prefer `--explain` or `--html --explain` for richer output.
-- For `--slides` exceeding 8 slides, ask: does the topic justify the length, or is content overflowing what one deck should hold?
+- For a long deck, ask whether the topic justifies the length or content is overflowing what one deck should hold.

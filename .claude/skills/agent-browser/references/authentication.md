@@ -14,7 +14,7 @@ Login flows, session persistence, OAuth, 2FA, and authenticated browsing.
 - [Saving Authentication State](#saving-authentication-state)
 - [Restoring Authentication](#restoring-authentication)
 - [OAuth / SSO Flows](#oauth--sso-flows)
-- [Two-Factor Authentication](#two-factor-authentication)
+- [When the user must act (CAPTCHA, MFA)](#when-the-user-must-act-captcha-mfa)
 - [HTTP Basic Auth](#http-basic-auth)
 - [Cookie-Based Auth](#cookie-based-auth)
 - [Token Refresh Handling](#token-refresh-handling)
@@ -134,7 +134,7 @@ agent-browser snapshot -i
 
 # Fill credentials
 agent-browser fill @e1 "user@example.com"
-agent-browser fill @e2 "password123"
+agent-browser fill @e2 "$APP_PASSWORD"   # from an env var, never typed in
 
 # Submit
 agent-browser click @e3
@@ -226,7 +226,7 @@ After logging in, save state for reuse:
 agent-browser open https://app.example.com/login
 agent-browser snapshot -i
 agent-browser fill @e1 "user@example.com"
-agent-browser fill @e2 "password123"
+agent-browser fill @e2 "$APP_PASSWORD"   # from an env var, never typed in
 agent-browser click @e3
 agent-browser wait --url "**/dashboard"
 
@@ -262,11 +262,11 @@ agent-browser wait --url "**/accounts.google.com**"
 agent-browser snapshot -i
 
 # Fill Google credentials
-agent-browser fill @e1 "user@gmail.com"
+agent-browser fill @e1 "$GOOGLE_USER"
 agent-browser click @e2  # Next button
 agent-browser wait 2000
 agent-browser snapshot -i
-agent-browser fill @e3 "password"
+agent-browser fill @e3 "$GOOGLE_PASSWORD"   # prefer the auth vault for recurring logins
 agent-browser click @e4  # Sign in
 
 # Wait for redirect back
@@ -274,25 +274,27 @@ agent-browser wait --url "**/app.example.com**"
 agent-browser state save ./oauth-state.json
 ```
 
-## Two-Factor Authentication
+## When the user must act (CAPTCHA, MFA)
 
-Handle 2FA with manual intervention:
+Do not attempt a CAPTCHA or an MFA prompt yourself. Open a visible window the user drives, then save state. Needs a display: on a CI runner or headless container, stop and report that pre-recorded auth state captured on a developer machine is required.
 
 ```bash
-# Login with credentials
-agent-browser open https://app.example.com/login --headed  # Show browser
-agent-browser snapshot -i
-agent-browser fill @e1 "user@example.com"
-agent-browser fill @e2 "password123"
-agent-browser click @e3
+# 1. Open a visible browser window
+agent-browser --session auth-flow --restore open "$LOGIN_URL" --headed
 
-# Wait for user to complete 2FA manually
-echo "Complete 2FA in the browser window..."
-agent-browser wait --url "**/dashboard" --timeout 120000
+# 2. The user completes the CAPTCHA / MFA step in the window and signs in.
 
-# Save state after 2FA
-agent-browser state save ./2fa-state.json
+# 3. Wait for the post-login URL to confirm success (5 minutes here)
+agent-browser wait --url "**/post-login*" --timeout 300000
+
+# 4. Save auth state to disk; add it to ignore rules
+agent-browser state save ./auth-state.json
+
+# 5. Later runs reuse the state without prompting
+agent-browser open "$APP_URL" --state ./auth-state.json
 ```
+
+If the wait times out, stop and report where the page was left; do not retry the login.
 
 ## HTTP Basic Auth
 
@@ -311,8 +313,8 @@ agent-browser open https://protected.example.com/api
 Manually set authentication cookies:
 
 ```bash
-# Set auth cookie
-agent-browser cookies set session_token "abc123xyz"
+# Import cookies from a file the user saved (JSON, cURL or Cookie header); never type a value
+agent-browser cookies set --curl ./cookies.txt --domain app.example.com
 
 # Navigate to protected page
 agent-browser open https://app.example.com/dashboard

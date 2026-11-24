@@ -72,7 +72,7 @@ agent-browser click @e6
 agent-browser fill @e10 "user@example.com"
 
 # Fill password
-agent-browser fill @e11 "password123"
+agent-browser fill @e11 "$APP_PASSWORD"
 
 # Submit the form
 agent-browser click @e12
@@ -80,7 +80,7 @@ agent-browser click @e12
 
 ## Ref Lifecycle
 
-**IMPORTANT**: Refs are invalidated when the page changes!
+Refs are invalidated when the page changes.
 
 ```bash
 # Get initial snapshot
@@ -90,7 +90,7 @@ agent-browser snapshot -i
 # Click triggers page change
 agent-browser click @e1
 
-# MUST re-snapshot to get new refs!
+# re-snapshot to get new refs
 agent-browser snapshot -i
 # @e1 [h1] "Page 2"  ← Different element now!
 ```

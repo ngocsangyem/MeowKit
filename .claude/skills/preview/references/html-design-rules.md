@@ -7,9 +7,7 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 - Required reads
 - Workflow — Think / Structure / Style / Deliver
 - Style presets (names only)
-- Theme toggle (required)
-- Zoom and pan engine (for diagrams)
-- Slide engine (for slides)
+- Theme toggle, zoom/pan and slide engine
 - CDN resources
 - Anti-slop quick checklist
 - Style preset rotation (persistent state)
@@ -21,10 +19,10 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 
 Before generating any HTML output:
 
-- `.claude/skills/frontend-design/references/anti-slop-directives.md` — required. The 6+ forbidden patterns.
+- the anti-slop-directives reference of `mk:frontend-design` — required. The forbidden patterns.
 - `references/mermaid-essentials.md` — required when the page contains a Mermaid block.
 
-These are CITED, not duplicated here. If `frontend-design`'s anti-slop list grows, this skill picks up the change automatically.
+These are cited, not duplicated here.
 
 ## Workflow — Think / Structure / Style / Deliver
 
@@ -61,222 +59,29 @@ Pick one; agent fills in the actual CSS by combining the chosen palette + typogr
 
 The preset name is a directive to the agent; full CSS is composed at generation time using the rotation strategy below.
 
-## Theme toggle (required)
+## Theme toggle, zoom/pan and slide engine
 
-Every HTML artifact MUST include a fixed top-right toggle button with persistent localStorage state. The button is the first child of `<body>`.
+Copy these from the matching `assets/` template (`architecture.html`, `mermaid-flowchart.html`, `slide-deck.html`) and keep their properties. Do not re-derive them.
 
-CSS variables follow a three-tier pattern:
-
-- `:root` defines light defaults
-- `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` honors OS preference unless overridden
-- `[data-theme="dark"]` forces dark regardless of OS
-
-CSS:
-
-```css
-.theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 300;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-dim);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  transition: background 0.15s, color 0.15s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-.theme-toggle:hover { background: var(--surface2); color: var(--text); }
-```
-
-HTML + JS:
-
-```html
-<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
-
-<script>
-(function () {
-  var toggle = document.getElementById('themeToggle');
-  var saved = localStorage.getItem('theme');
-  var initial = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  if (saved) document.documentElement.setAttribute('data-theme', initial);
-  toggle.textContent = initial === 'dark' ? '☀' : '☾';
-  toggle.addEventListener('click', function () {
-    var current = document.documentElement.getAttribute('data-theme')
-      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    var next = current === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    toggle.textContent = next === 'dark' ? '☀' : '☾';
-  });
-})();
-</script>
-```
-
-Symbols: `☀` = sun (shown in dark mode), `☾` = moon (shown in light mode). Unicode dingbats render consistently across platforms; do not use emoji.
-
-## Zoom and pan engine (for diagrams)
-
-For `--html --diagram` and any page with multiple Mermaid diagrams, attach a zoom/pan handler per diagram. Mouse wheel zooms with cursor as anchor; drag pans; `+ / - / 0` keys for keyboard control; reset button returns to 1:1.
-
-CSS:
-
-```css
-.diagram-stage {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  min-height: 320px;
-  cursor: grab;
-}
-.diagram-stage.dragging { cursor: grabbing; }
-.diagram-canvas {
-  transform-origin: 0 0;
-  transition: transform 0.05s linear;
-  padding: 24px;
-  display: inline-block;
-}
-.diagram-controls {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: flex;
-  gap: 6px;
-  z-index: 10;
-}
-.diagram-controls button {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  color: var(--text);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.diagram-controls button:hover { background: var(--surface); }
-```
-
-JS (one IIFE per stage; use `data-zoom-stage` attribute on each `.diagram-stage`):
-
-```html
-<script>
-(function () {
-  var stages = document.querySelectorAll('.diagram-stage');
-  stages.forEach(function (stage) {
-    var canvas = stage.querySelector('.diagram-canvas');
-    var scale = 1, x = 0, y = 0;
-    var dragging = false, sx = 0, sy = 0;
-    function apply() { canvas.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')'; }
-    function reset() { scale = 1; x = 0; y = 0; apply(); }
-    stage.addEventListener('wheel', function (e) {
-      e.preventDefault();
-      var rect = stage.getBoundingClientRect();
-      var mx = e.clientX - rect.left, my = e.clientY - rect.top;
-      var delta = e.deltaY < 0 ? 1.1 : 0.9;
-      var newScale = Math.max(0.3, Math.min(4, scale * delta));
-      x = mx - (mx - x) * (newScale / scale);
-      y = my - (my - y) * (newScale / scale);
-      scale = newScale;
-      apply();
-    }, { passive: false });
-    stage.addEventListener('mousedown', function (e) {
-      dragging = true; sx = e.clientX - x; sy = e.clientY - y;
-      stage.classList.add('dragging');
-    });
-    window.addEventListener('mouseup', function () { dragging = false; stage.classList.remove('dragging'); });
-    window.addEventListener('mousemove', function (e) {
-      if (!dragging) return;
-      x = e.clientX - sx; y = e.clientY - sy;
-      apply();
-    });
-    var resetBtn = stage.querySelector('[data-zoom-reset]');
-    if (resetBtn) resetBtn.addEventListener('click', reset);
-    var zoomIn = stage.querySelector('[data-zoom-in]');
-    if (zoomIn) zoomIn.addEventListener('click', function () { scale = Math.min(4, scale * 1.2); apply(); });
-    var zoomOut = stage.querySelector('[data-zoom-out]');
-    if (zoomOut) zoomOut.addEventListener('click', function () { scale = Math.max(0.3, scale * 0.83); apply(); });
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === '+' || e.key === '=') document.querySelector('[data-zoom-in]')?.click();
-    if (e.key === '-') document.querySelector('[data-zoom-out]')?.click();
-    if (e.key === '0') document.querySelector('[data-zoom-reset]')?.click();
-  });
-})();
-</script>
-```
-
-## Slide engine (for slides)
-
-For `--html --slides`, snap-scroll between sections marked `<section class="slide">`. Track current slide via IntersectionObserver; arrow keys navigate; progress dots in fixed bottom bar.
-
-CSS:
-
-```css
-html, body { scroll-snap-type: y mandatory; height: 100%; overflow-y: scroll; }
-.slide { height: 100vh; scroll-snap-align: start; padding: 40px 60px; box-sizing: border-box; }
-.slide-progress { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 200; }
-.slide-progress .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.15s; }
-.slide-progress .dot.active { background: var(--text); }
-```
-
-JS:
-
-```html
-<script>
-(function () {
-  var slides = document.querySelectorAll('.slide');
-  var progress = document.querySelector('.slide-progress');
-  if (progress) {
-    slides.forEach(function () { var d = document.createElement('span'); d.className = 'dot'; progress.appendChild(d); });
-  }
-  var dots = progress ? progress.querySelectorAll('.dot') : [];
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        var idx = Array.prototype.indexOf.call(slides, entry.target);
-        dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
-      }
-    });
-  }, { threshold: 0.5 });
-  slides.forEach(function (s) { io.observe(s); });
-  document.addEventListener('keydown', function (e) {
-    var current = Array.prototype.findIndex.call(dots, function (d) { return d.classList.contains('active'); });
-    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-      slides[Math.min(slides.length - 1, current + 1)]?.scrollIntoView({ behavior: 'smooth' });
-    }
-    if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-      slides[Math.max(0, current - 1)]?.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-})();
-</script>
-```
+- **Theme toggle:** a fixed top-right button, first child of `<body>`, with the choice persisted in `localStorage` (wrapped in try/catch, since storage can be blocked). CSS variables in three tiers: `:root` light defaults; `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` honours the OS; `[data-theme="dark"]` forces dark.
+- **Zoom and pan (diagrams):** wheel zoom, drag pan, buttons for zoom in, out and reset, and a keyboard path; the diagram stays inside its stage.
+- **Slides:** `<section class="slide">` blocks with vertical scroll-snap, current slide tracked with `IntersectionObserver`, arrow-key navigation and a fixed progress bar.
 
 ## CDN resources
 
-Pin all versions; do not load `latest`.
+Pin all versions; do not load `latest`. The version in the `assets/*.html` templates is the pinned one; use it as it is.
 
 | Library | URL | Notes |
 |---|---|---|
 | Mermaid v11 | `https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs` | Use `<script type="module">` |
 | Chart.js v4 | `https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js` | Optional; only for KPI charts |
-| Google Fonts | `https://fonts.googleapis.com/css2?family=...&display=swap` | Pair from `.claude/skills/ui-design-system/assets/typography.csv` |
+| Google Fonts | `https://fonts.googleapis.com/css2?family=...&display=swap` | Pair from the `mk:ui-design-system` typography.csv |
 
-When Mermaid releases v12, bump this URL AND `references/mermaid-essentials.md` → "Pinned version" in the same commit.
+To bump Mermaid, change the URL in the four `assets/*.html` templates and in this table together.
 
 ## Anti-slop quick checklist
 
-Full rules in `.claude/skills/frontend-design/references/anti-slop-directives.md`. Quick gut check:
+Full rules in the anti-slop-directives reference of `mk:frontend-design`. Quick gut check:
 
 - No Inter, Roboto, or system-ui alone for body font
 - No indigo/violet (`#8b5cf6`, `#7c3aed`) as accent
@@ -287,7 +92,7 @@ Full rules in `.claude/skills/frontend-design/references/anti-slop-directives.md
 
 ## Style preset rotation (persistent state)
 
-To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json` per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2.
+To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json` when the host provides a plugin data directory.
 
 ```bash
 ROTATION_DIR="${CLAUDE_PLUGIN_DATA:-}"
@@ -346,11 +151,10 @@ No `eval`, no `innerHTML` from untrusted source. Output is generated; there is n
 Before reporting the file path back to the user:
 
 - [ ] HTML5 doctype present (`<!DOCTYPE html>`)
-- [ ] Theme toggle button is first child of `<body>`
-- [ ] Theme toggle persists choice via localStorage
-- [ ] No console errors when opened in Chrome / Safari
+- [ ] Theme toggle button is first child of `<body>` and persists its choice
+- [ ] If a browser is available, the file was opened with no console errors; otherwise say that it was not opened
 - [ ] No horizontal scroll on the page (tables wrapped in scroll containers OK)
-- [ ] Mermaid diagrams render (zoom/pan working when applicable)
+- [ ] Mermaid source follows `mk:mermaidjs-v11` (rendering is not verified without a browser)
 - [ ] Anti-slop checklist passes (Inter/violet/gradient text/glow/emoji headers/3-dot chrome — none present)
 - [ ] Topic string was encoded for the right context
 - [ ] CDN URLs are version-pinned
