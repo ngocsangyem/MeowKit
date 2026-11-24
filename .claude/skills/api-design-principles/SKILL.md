@@ -62,12 +62,14 @@ Routing rules — identical in all four skills:
   invents the target.
 - **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
-- **An auth-sensitive change**: the owning skill states the *requirement*; the security
-  workflow owns the verdict.
+- **An auth-sensitive change**: the owning skill states the *requirement*; `mk:cso`
+  owns the verdict.
 - **Any production effect → `mk:ship` or a human.**
 <!-- /shared:backend-routing -->
 
 ## Workflow
+
+For a small additive change (one optional field on an existing operation), steps 1 and 3 are enough; run step 4 for new or breaking contracts.
 
 1. **Discover.** Find existing consumers, the current contract surface, versioning scheme,
    error envelope, pagination shape, and contract tests. Record what already exists before
@@ -79,9 +81,9 @@ Routing rules — identical in all four skills:
    *requirement* per operation, validation and error semantics, and only the idempotency,
    concurrency, or pagination the use case actually needs.
 4. **Review with examples.** Walk success, invalid input, forbidden, conflict/not-found, and
-   one evolution case. A contract with no failure example is unreviewed.
+   one evolution case. A new or breaking contract with no failure example is unreviewed.
 5. **Hand off.** Implementation to `mk:backend-development`, persistence to `mk:database`,
-   security verdict to the security workflow, release to the release workflow.
+   security verdict to `mk:cso`, release to `mk:ship`.
 
 Load `references/rest-principles.md` for HTTP-specific detail, `references/graphql-principles.md`
 for schema-language detail. Load neither for an RPC, event, or webhook contract.
@@ -131,23 +133,9 @@ proof (the reviewed examples), and handoffs.
 
 ## Gotchas
 
-Each default holds until its condition flips.
+Each default holds until its condition flips. Detail and reasons sit in the references.
 
-- **Plural nouns for collection resources.** Unless the discovered API already uses another
-  convention — consistency with the existing contract beats the convention.
-- **Keep nesting shallow — one level of parent context is usually enough.** Deeper nesting
-  is legitimate when the child genuinely cannot be addressed without the full path; flatten
-  when it can.
-- **Cursor pagination when the collection is large, ordered, and concurrently written.**
-  Offset is fine for a small bounded admin list, and switching an existing endpoint's
-  pagination shape is a breaking change.
-- **One error envelope across the contract.** When the API already ships two, converging
-  them is itself a breaking change — document the target and migrate deliberately rather
-  than emitting a third.
-- **Address GraphQL relationship-fetch cost before the schema ships** when a field fans out
-  per parent row. Hand the measurement and the fix to `mk:database`; batching is one
-  mechanism, not a mandate on every resolver.
-- **Status semantics carry meaning consumers depend on.** Changing the status or error code
-  for an existing case is breaking even when the body is unchanged.
-- **An error body must not leak internals** — no stack trace, driver error, file path, or
-  host detail.
+- **Consistency with the discovered API beats any convention** (plural nouns, nesting depth, pagination style, one error envelope): `references/rest-principles.md`.
+- **Changing pagination shape, an error code, or a status for an existing case is breaking**, even when the body is unchanged. Converging two error envelopes is itself breaking: document the target and migrate deliberately.
+- **Address GraphQL relationship-fetch cost before the schema ships** when a field fans out per parent row; hand the measurement and the fix to `mk:database`: `references/graphql-principles.md`.
+- **An error body must not leak internals** — no stack trace, driver error, file path, or host detail.

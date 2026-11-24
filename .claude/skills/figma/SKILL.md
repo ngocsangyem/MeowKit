@@ -52,7 +52,7 @@ Before any operation:
 
 1. Verify the Figma MCP server responds using its cheapest read tool (see
    `references/mcp-setup-and-tool-selection.md` for the connectivity check).
-2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk:multimodal` or Claude Read.
+2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk:multimodal` or read the image directly. If the host model cannot read images, ask the user for the node tree or token values as text instead.
 3. If MCP available → proceed with Figma MCP tools.
 
 Report when falling back: "Install Figma MCP for full design context: `claude mcp add figma`"
@@ -185,7 +185,6 @@ Default `mk:figma` does NOT:
 - `references/canvas-write-boundaries.md` — safe `use_figma` write rules (conditional)
 - `references/design-system-and-library-patterns.md` — DS-rules + library architecture lessons (conditional)
 - `references/official-docs-evidence.md` — claim → official-doc source matrix
-- `references/eval-checklist.md` — eval scenarios for common Figma tasks
 
 Conditional references (Code Connect / canvas writes / design-system & library) load only after their router
 conditions hold; a failed condition stops with an ask-the-user, never a partial attempt.

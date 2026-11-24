@@ -31,6 +31,9 @@ describe("ship set withholding", () => {
 			/^\.claude\/agent-memory\//,
 			/^\.claude\/eval\//,
 			/^\.claude\/skills\/[^/]+\/eval\//,
+			// Fixtures and validators that measure a skill (figma) stay in the
+			// repository and out of the kit.
+			/^\.claude\/skills\/[^/]+\/evals\//,
 			// Run output written by a hook and by pytest. Both appear only because
 			// something ran here, and neither is authored content.
 			/^\.claude\/hooks\/\.logs\//,
@@ -60,6 +63,7 @@ describe("ship set withholding", () => {
 		// go together: excluding either side alone leaves a broken `require`.
 		expect(patterns).toContain(".claude/eval/*");
 		expect(patterns).toContain(".claude/skills/*/eval/*");
+		expect(patterns).toContain(".claude/skills/*/evals/*");
 		// The brand allowlist is excluded by pattern; both scripts that read it live
 		// outside every archive root, so no exclusion can leave one of them shipping
 		// against data the artifact does not carry.

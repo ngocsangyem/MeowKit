@@ -1,7 +1,7 @@
 # Design Data Lookup
 
 > Source: open-source upstream (MIT)
-> Data files in assets/ — read the relevant CSV when making design decisions.
+> Data files in assets/. Search each CSV by type with `grep -i`; rows are wide, so do not read a whole file into context.
 
 ## Color Palettes (`assets/colors.csv` — 161 palettes)
 
@@ -11,18 +11,18 @@
 
 ```
 Example: "I need colors for a fintech dashboard"
-→ Read colors.csv, filter rows where product type contains "fintech"
+→ `grep -i fintech assets/colors.csv`, read the matching rows only
 → Get: #F59E0B gold primary + #8B5CF6 purple accent
 ```
 
-## Font Pairings (`assets/typography.csv` — 57 pairings)
+## Font Pairings (`assets/typography.csv` — 73 pairings)
 
 **When:** Selecting typography for a project.
 **How:** Filter by mood keywords or use-case. Each row includes: heading font, body font, mood, best-for, Google Fonts URL, Tailwind config snippet.
 
 ```
 Example: "I need fonts for a tech startup landing page"
-→ Read typography.csv, filter rows where mood contains "bold" or "innovative"
+→ `grep -iE "bold|innovative" assets/typography.csv`
 → Get: Space Grotesk (heading) + DM Sans (body)
 → Copy the Google Fonts URL and Tailwind config from the row
 ```
@@ -34,7 +34,7 @@ Example: "I need fonts for a tech startup landing page"
 
 ```
 Example: "Building a mental health app"
-→ Read products.csv, find "mental health" row
+→ `grep -i "mental health" assets/products.csv`
 → Get: calming style, lavender palette, soft animations, accessibility-first
 ```
 
@@ -52,7 +52,7 @@ Each row: category, issue, platform, Do/Don't pair, severity (CRITICAL/HIGH/MEDI
 
 ```
 Example: "I need to show trends over time"
-→ Read charts.csv, find "time series" or "trend"
+→ `grep -iE "time series|trend" assets/charts.csv`
 → Get: Line chart (primary), Area chart (secondary), use Recharts or D3
 ```
 

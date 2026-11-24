@@ -3,11 +3,9 @@
 Optional: connect Stitch as an MCP server for native design context in Claude Code.
 The `mk:stitch` skill works without MCP (via the `npx tsx` scripts). MCP is opt-in.
 
-Three options for connecting.
+Connect with an API key. The server package name below was not verified here; if it does not resolve, use the Stitch MCP server your host or Stitch's own docs name.
 
-## Option A: API Key (Recommended)
-
-Simplest setup. No Google Cloud dependency.
+## API-key setup
 
 ### 1. Get API Key
 
@@ -37,54 +35,18 @@ With the env-var reference the file holds no secret. A file with a raw key in it
 
 ### 3. Verify
 
-Restart Claude Code. Stitch tools should appear:
+Restart the host. Stitch tools should appear:
 - `create_project` — Create new design project
 - `generate_screen` — Generate UI from prompt
 - `export_html` — Export as HTML/Tailwind
 - `export_image` — Export screenshot
 
-## Option B: Google Cloud
-
-Uses gcloud credentials. Zero API key management.
-
-### 1. Setup gcloud
-
-```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-gcloud beta services mcp enable stitch.googleapis.com
-```
-
-### 2. Add to your MCP config (`.mcp.json` at the project root on Claude Code)
-
-```json
-{
-  "mcpServers": {
-    "stitch": {
-      "command": "npx",
-      "args": ["-y", "stitch-mcp"],
-      "env": {
-        "GOOGLE_CLOUD_PROJECT": "your-gcp-project-id"
-      }
-    }
-  }
-}
-```
-
-## Option C: Auto-Installer (Interactive)
-
-```bash
-npx stitch-mcp-auto
-# Opens browser at http://localhost:8086
-# Follow wizard to configure
-```
-
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| `AUTH_FAILED` on startup | Verify API key or re-run `gcloud auth login` |
-| Tools not appearing | Restart Claude Code after config change |
+| `AUTH_FAILED` on startup | Verify the API key |
+| Tools not appearing | Restart the host after config change |
 | Timeout on generation | Stitch is processing; wait 10–30s for complex designs |
 | `RATE_LIMITED` errors | Daily quota exceeded; wait until midnight UTC |
 
