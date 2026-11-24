@@ -32,7 +32,9 @@ requires_runtime: [python>=3.9]
 
 # Tech Graph
 
-Generate production-quality SVG technical diagrams, optionally exported as PNG.
+Generate production-quality SVG technical diagrams, optionally exported as PNG. Not for inline Mermaid in docs (`mk:mermaidjs-v11`) or an explainer page (`mk:preview`).
+
+Simple diagram: run `generate-from-template.py` with defaults and Style 1, and skip the style and icon references.
 
 ## Route by Intent
 
@@ -41,7 +43,6 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 - **Choose a style:** load [style matrix](references/style-diagram-matrix.md), then [Style 1](references/style-1-flat-icon.md), [Style 2](references/style-2-dark-terminal.md), [Style 3](references/style-3-blueprint.md), [Style 4](references/style-4-notion-clean.md), [Style 5](references/style-5-glassmorphism.md), [Style 6](references/style-6-claude-official.md), [Style 7](references/style-7-openai.md), or [Style 8](references/style-8-dark-luxury.md); default to Style 1.
 - **Use product icons:** load [icons](references/icons.md).
 - **Author SVG, prevent syntax errors, or recover from errors:** load [SVG authoring and recovery](references/svg-authoring-and-recovery.md).
-- **Need SVG syntax/layout validation detail:** load [SVG layout best practices](references/svg-layout-best-practices.md).
 
 ## Workflow
 
@@ -65,8 +66,7 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 
 Determine the destination before writing:
 
-1. If `.meowkit/state/active-plan` exists, write `tasks/plans/<active-plan>/visuals/<slug>.{svg,png}`.
-2. Otherwise write `tasks/visuals/<slug>.{svg,png}`.
+Write `tasks/visuals/<slug>.{svg,png}`, or `tasks/plans/<plan>/visuals/<slug>.{svg,png}` when the user names a plan.
 
 Use a lowercase-hyphenated `<slug>` derived from the diagram description and create the destination directory when absent. Export PNG at 1920px only when `rsvg-convert` is present:
 

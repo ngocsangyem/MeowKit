@@ -22,9 +22,9 @@ playwright-cli fill e1 "user@example.com"
 # Ran Playwright code:
 # await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
 
-playwright-cli fill e2 "password123"
+playwright-cli fill e2 "$APP_PASSWORD"
 # Ran Playwright code:
-# await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+# await page.getByRole('textbox', { name: 'Password' }).fill(process.env.APP_PASSWORD ?? '');
 
 playwright-cli click e3
 # Ran Playwright code:
@@ -42,7 +42,7 @@ test('login flow', async ({ page }) => {
   // Generated code from playwright-cli session:
   await page.goto('https://example.com/login');
   await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
-  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('textbox', { name: 'Password' }).fill(process.env.APP_PASSWORD ?? '');
   await page.getByRole('button', { name: 'Sign In' }).click();
 
   // Add assertions

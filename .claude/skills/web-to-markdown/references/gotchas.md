@@ -8,7 +8,7 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 **Why it matters:** This skill checks `robots.txt` before fetching. A rate-limit-free domain (no Crawl-delay) may still include a `Disallow: /` for all bots or for the the configured user-agent. The fetch will return `ERROR: robots.txt denies fetch` even on publicly accessible pages. Silence is not always consent — legitimate content producers opt out of crawling.
 
-**Mitigation:** Set `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0` to disable the check entirely. Use sparingly — only when you have explicit permission to fetch or the domain is known to not enforce robots. Default is ON (check respected).
+**Mitigation:** The agent never disables the check. The user may set `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0` for a domain they have permission to fetch.
 
 ---
 
@@ -24,7 +24,7 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 **Why it matters:** The skill uses `charset-normalizer` (via `requests.apparent_encoding`) for encoding detection. For pages in Cyrillic, Arabic, CJK, or other non-Latin scripts encoded in legacy charsets (Windows-1251, Shift-JIS, GB2312), detection is best-effort. Garbled text passes injection scanning and lands in the report as readable-looking garbage.
 
-**Mitigation:** No clean workaround in v1. If markdown output looks garbled, the source page likely uses a non-standard charset. Manual inspection of the raw bytes is needed. `html_to_markdown.maybe_fix_mojibake` applies NFKC normalization but cannot recover from a wrong charset guess.
+**Mitigation:** No clean workaround. If markdown output looks garbled, the source page likely uses a non-standard charset. Manual inspection of the raw bytes is needed. `html_to_markdown.maybe_fix_mojibake` applies NFKC normalization but cannot recover from a wrong charset guess.
 
 ---
 
@@ -60,7 +60,7 @@ Missing any single condition silently falls back to static fetch. If static fetc
 
 ## Gotcha: Fetch reports accumulate unbounded on disk
 
-**Why it matters:** Every successful fetch writes a report file to `.meowkit/cache/web-fetches/`. There is no TTL-based cleanup in v1. A session that fetches dozens of pages will grow the cache proportionally and permanently. The cache is never pruned automatically.
+**Why it matters:** Every successful fetch writes a report file to `.meowkit/cache/web-fetches/`. There is no TTL-based cleanup. A session that fetches dozens of pages will grow the cache proportionally and permanently. The cache is never pruned automatically.
 
 **Mitigation:** Manual cleanup:
 
@@ -69,7 +69,7 @@ rm -rf .meowkit/cache/web-fetches/*.md         # clear regular reports
 rm -rf .meowkit/cache/web-fetches/quarantine/  # clear quarantine (REVIEW FIRST)
 ```
 
-TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache directory to `.gitignore`
+The cache directory is already ignored by git; do not commit it.
 
 ---
 
@@ -93,4 +93,4 @@ TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache dire
 
 **Why it matters:** Any skill other than a direct user invocation must pass `--wtm-accept-risk` when delegating to `mk:web-to-markdown`. Without this flag, the skill refuses with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. This prevents implicit invocation from skills that haven't consciously acknowledged the injection risk of fetching arbitrary URLs.
 
-**Mitigation:** Always pass `--wtm-accept-risk` (or `wtm_accept_risk=True` in Python) when delegating from another skill. This flag is a conscious trust-boundary crossing — the caller acknowledges that the target URL may contain prompt injection and that the skill's defenses are best-effort. See `references/security.md` for full flag semantics.
+**Mitigation:** Always pass `--wtm-accept-risk` (or `wtm_accept_risk=True` in Python) when delegating from another skill. This flag is a conscious trust-boundary crossing — the caller acknowledges that the target URL may contain prompt injection and that the skill's defenses are best-effort. See `references/security.md` for the flag table.

@@ -68,7 +68,7 @@ Use `assets/data-table.html` as KPI grid + file map starting point. Use `assets/
 Sections, in order:
 
 1. **Hero** — diff title (e.g., "feature-x → main"), one-line summary
-2. **KPI grid** — files changed, lines added, lines removed, tests touched (4 cards minimum)
+2. **KPI grid** — files changed, lines added, lines removed, tests touched (the counts that apply)
 3. **Module overview** (optional Mermaid) — only when 4+ modules involved
 4. **File map** — table: path / status / lines / one-line note
 5. **Change cards** — per-significant-file: 1-2 sentence "what changed" + 1-2 sentence "why"

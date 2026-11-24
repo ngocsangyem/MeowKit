@@ -78,7 +78,7 @@ Note: `auth login` bypass action policy, but domain allowlist still applies.
 # Chrome (default)
 agent-browser open example.com
 
-# Lightpanda — 10x faster, 10x less memory, headless only
+# Lightpanda — lightweight engine, headless only
 agent-browser --engine lightpanda open example.com
 export AGENT_BROWSER_ENGINE=lightpanda
 

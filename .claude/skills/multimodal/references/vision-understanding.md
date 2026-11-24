@@ -21,24 +21,24 @@
 
 ### Screenshot Analysis
 ```bash
-python scripts/gemini_analyze.py --files screenshot.png --task analyze \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files screenshot.png --task analyze \
   --prompt "Describe the UI layout, identify components, and note any issues"
 ```
 
 ### OCR / Text Extraction
 ```bash
-python scripts/gemini_analyze.py --files receipt.jpg --task extract
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files receipt.jpg --task extract
 ```
 
 ### Multi-Image Comparison
 ```bash
-python scripts/gemini_analyze.py --files before.png after.png --task analyze \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files before.png after.png --task analyze \
   --prompt "Compare these two screenshots and describe the differences"
 ```
 
 ### PDF Extraction
 ```bash
-python scripts/gemini_analyze.py --files report.pdf --task extract
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files report.pdf --task extract
 ```
 
 ## Best Practices

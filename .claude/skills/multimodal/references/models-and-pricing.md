@@ -1,5 +1,7 @@
 # Gemini Models & Pricing Reference
 
+> Model IDs and prices here are a dated snapshot. Verify against the provider dashboard before relying on them.
+
 ## Current Models (April 2026)
 
 ### Analysis Models

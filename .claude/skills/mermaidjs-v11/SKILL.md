@@ -30,13 +30,11 @@ runtime: claude-code
 
 # Mermaid.js v11
 
-## Quick Start
+Write valid Mermaid v11 for markdown and docs. For publish-grade SVG use `mk:tech-graph`; for an explainer page or slide deck use `mk:preview`.
 
-**Basic Diagram Structure:**
-```
-{diagram-type}
-  {diagram-content}
-```
+Check that the diagram parses before returning it: `mmdc` (see CLI below) or `mermaid.parse(text)`, which validates without rendering and throws on invalid input (or returns `false` with `suppressErrors: true`). If neither is available, say the diagram was not validated.
+
+## Quick Start
 
 Common types: `flowchart`, `sequenceDiagram`, `classDiagram`, `stateDiagram`, `erDiagram`,
 `gantt`, and `journey`. Load [references/diagram-types.md](references/diagram-types.md) for
@@ -94,11 +92,11 @@ See `references/cli-usage.md` for Docker, batch processing, and advanced workflo
   flowchart TD
     A[Client] --> B[Server]
 </pre>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({ startOnLoad: true });</script>
 ```
 
-See `references/integration.md` for Node.js API and advanced integration patterns.
+Pin an exact version in the URL; do not load `latest`. See `references/integration.md` for the Node.js API and advanced patterns.
 
 ## Configuration & Theming
 
@@ -134,8 +132,9 @@ For rendered SVG layout review, load `mk:tech-graph` and follow its SVG-layout r
 
 ## Gotchas
 
-- Mermaid v11 removed some v10 aliases; always use canonical type names (e.g., `flowchart` not `graph`).
+- Prefer `flowchart` over `graph` for new diagrams; `graph` is still accepted as the older keyword.
 - The `securityLevel: "strict"` setting strips HTML from labels — use plain text in node labels when security mode is on.
-- `mmdc` requires Node 18+; skip the CLI section if the project's Node version is older.
-- Inline frontmatter config (the `---` block inside a code fence) is a v10.7+ feature; older renderers silently drop it and render the `---` as content.
+- `mmdc` has its own Node requirement; if it fails to start, check the Node version it documents and fall back to `mermaid.parse` or report the diagram unvalidated.
+- Beta diagram types in `references/diagram-types.md` (names ending in `-beta`) need a recent Mermaid.
+- Inline frontmatter config (the `---` block inside a code fence) needs a recent Mermaid; older renderers silently drop it and render the `---` as content.
 - External `@import` in `<style>` breaks `rsvg-convert` — embed fonts inline if you later export via `mk:tech-graph`.

@@ -15,12 +15,12 @@ WAV, MP3, AAC, FLAC, M4A, OGG
 
 ### Basic
 ```bash
-python scripts/gemini_analyze.py --files meeting.mp3 --task transcribe
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files meeting.mp3 --task transcribe
 ```
 
 ### With Timestamps
 ```bash
-python scripts/gemini_analyze.py --files podcast.mp3 --task transcribe \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files podcast.mp3 --task transcribe \
   --prompt "Transcribe with timestamps [HH:MM:SS -> HH:MM:SS] and speaker labels"
 ```
 
@@ -36,14 +36,14 @@ ffmpeg -i long-meeting.mp3 -f segment -segment_time 900 -c copy segment_%03d.mp3
 
 # Transcribe each segment
 for f in segment_*.mp3; do
-  python scripts/gemini_analyze.py --files "$f" --task transcribe >> full_transcript.md
+  node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files "$f" --task transcribe >> full_transcript.md
 done
 ```
 
 ## Audio Analysis (Non-Speech)
 
 ```bash
-python scripts/gemini_analyze.py --files sample.wav --task analyze \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py --files sample.wav --task analyze \
   --prompt "Identify instruments, tempo, mood, and musical style"
 ```
 

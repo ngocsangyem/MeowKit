@@ -47,7 +47,7 @@ node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py \
 
 ## Gotchas
 
-- Audio transcription >15 min: Gemini truncates silently. Split first.
+- Audio transcription over 15 minutes truncates; see `audio-processing.md`.
 - Default resolution on long videos: token cost can exceed $100 unexpectedly
 - Always use `--verbose` for cost estimation before processing expensive videos
 - File API required for >20MB videos (handled automatically by script)

@@ -31,7 +31,7 @@ agent-browser snapshot -i
 # Common field types:
 #   agent-browser fill @e1 "John Doe"           # Text input
 #   agent-browser fill @e2 "user@example.com"   # Email input
-#   agent-browser fill @e3 "SecureP@ss123"      # Password input
+#   agent-browser fill @e3 "$APP_PASSWORD"      # Password input
 #   agent-browser select @e4 "Option Value"     # Dropdown
 #   agent-browser check @e5                     # Checkbox
 #   agent-browser click @e6                     # Radio button

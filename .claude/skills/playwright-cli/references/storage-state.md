@@ -274,7 +274,7 @@ playwright-cli run-code "async page => {
 playwright-cli open https://app.example.com/login
 playwright-cli snapshot
 playwright-cli fill e1 "user@example.com"
-playwright-cli fill e2 "password123"
+playwright-cli fill e2 "$APP_PASSWORD"
 playwright-cli click e3
 
 # Save the authenticated state

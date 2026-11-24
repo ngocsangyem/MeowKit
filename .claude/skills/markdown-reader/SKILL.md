@@ -27,15 +27,14 @@ runtime: claude-code
 
 Local HTTP server rendering markdown files with a calm, book-like reading experience.
 
-**Note:** `mk:brainstorming --html` and `mk:plan-creator --html` produce self-contained
-HTML files that open directly in the browser — they do not use or need this server.
+Use it to read a long document (an RFC, a plan, a design doc) in the browser. A self-contained HTML file from `mk:brainstorming --html` opens directly and does not need this server.
 
 ## Installation (Required Before First Use)
 
 This skill requires npm dependencies. Install once from the project root:
 
 ```bash
-cd .claude/skills/markdown-reader
+cd ${CLAUDE_SKILL_DIR}
 npm install
 ```
 
@@ -46,7 +45,7 @@ Without installation you will get **Error 500: Error rendering markdown**.
 ## Usage
 
 ```bash
-# View a markdown file (opens browser automatically)
+# View a markdown file (opens the browser; with no display it prints the URL)
 node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --file ./tasks/plans/my-plan/plan.md
 
@@ -54,7 +53,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
 node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --dir ./tasks/plans
 
-# Background mode (foreground process for Claude Code task runners)
+# Keep the process attached (for hosts that run it as a foreground task)
 node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --file ./README.md \
   --foreground
@@ -68,18 +67,21 @@ other devices on the network — this is intentional.
 
 ## Lifecycle
 
-Start with `--file` or `--dir`; use `--foreground` when the host needs to keep the process
-attached. The default port is 3456 and increments through 3500 if busy. End the lifecycle with
-`--stop`; never leave a reader process running after the task.
+Start with `--file` or `--dir`; use `--foreground` when the host needs to keep the process attached. The default port is 3456 and increments through 3500 if busy. Tell the user the URL and port. If no browser can open (headless, SSH), print the URL instead.
+
+The reader exists so a person can read in the browser, so keep it running while they do. Stop it with `--stop` when the user says they are finished or asks, and do not leave it running past the end of the session.
 
 | Need | Route |
 |---|---|
-| CLI flags, routes, persistent state | [references/reader-operations.md](references/reader-operations.md) |
+| CLI flags, routes, persistent state | [references/reader-operations.md](references/reader-operations.md) (options and routes section) |
 | Reader features, plan navigation, shortcuts, Mermaid | [references/reader-experience.md](references/reader-experience.md) |
-| Architecture and troubleshooting | [references/reader-operations.md](references/reader-operations.md) |
+| Architecture and troubleshooting | [references/reader-operations.md](references/reader-operations.md) (state and recovery section) |
 
 The server binds only to `127.0.0.1`. It validates every file against its allowed directories;
 traversal attempts return 403. Referenced images must be relative to the source markdown file.
 
-Self-contained HTML from `mk:brainstorming --html` or `mk:plan-creator --html` opens directly
-and does not need this server.
+## Gotchas
+
+- **Error 500 on render**: dependencies are missing; run `npm install` in the skill directory.
+- **All ports 3456-3500 busy**: stop stale instances with `--stop`.
+- **A PID survives `--stop`**: remove the stale PID file named in `references/reader-operations.md`.
