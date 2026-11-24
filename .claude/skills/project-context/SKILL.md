@@ -4,7 +4,6 @@ description: "Generates docs/project-context.md. NOT for mk:docs-init."
 triggers:
   - generate context
   - project context
-  - init docs
 actions:
   - generate
   - update
@@ -30,7 +29,7 @@ runtime: claude-code
 
 Creates `docs/project-context.md` — the agent "constitution" that every agent loads on activation.
 
-> To generate the full documentation suite (README, architecture, code standards, etc.), use `mk:docs-init` instead. `mk:project-context` generates only the agent constitution.
+> The full documentation suite (README, architecture, code standards) is `mk:docs-init`'s job; this skill owns only `docs/project-context.md`. Report the outcome with the four-status block from `.claude/rules/agent-conduct.md` (A1).
 
 ## Purpose
 
@@ -38,40 +37,29 @@ Eliminate context drift between agents. Without a single authoritative file, age
 
 ## Actions
 
+All three actions use `templates/project-context-template.md`.
+
 ### generate
 
-Scan the codebase and create `docs/project-context.md` from scratch.
+Scan the codebase and write `docs/project-context.md` with only what a scan cannot show: rejected alternatives, anti-patterns, testing boundaries, conventions the tooling does not enforce, known issues. Do not fill in the tech stack, directory layout or dependency versions: agents read those from the code. A scan can fill the command table (from `package.json` scripts, `Makefile`, `Cargo.toml` and similar) and suggest candidates for the rest; leave every judgment section as a `[TODO]` prompt for a human unless the repo itself states the answer (a README, an ADR, a comment that gives a reason). Scan targets: manifests and lint configs for commands, test files for testing patterns, existing `docs/` for decisions already recorded, `.env.example` for variable names only.
 
-**Scan targets:**
+The result is a draft. Tell the user to prune it, because a generated context file that restates the code costs agents attention and teaches them nothing.
 
-- `package.json` / `Cargo.toml` / `go.mod` / `pyproject.toml` → tech stack
-- `tsconfig.json` / `eslint.*` / `prettier.*` → code conventions
-- `**/test/**` / `**/*.test.*` / `**/*.spec.*` / `**/*.cy.*` → testing patterns
-- Existing `docs/` → architecture decisions, prior context
-- `.env.example` → environment variables (names only, not values)
-
-**Output:** `docs/project-context.md` using `templates/project-context-template.md`
+If the scan finds almost nothing (a near-empty project), write the template with its `[TODO]` prompts and say so; that is the `init` outcome.
 
 ### update
 
-Re-scan codebase and update existing `docs/project-context.md`. Preserves manual edits in sections marked `<!-- manual -->`.
+Re-scan and update the existing file, preserving every section marked `<!-- manual -->`. If a manual section contradicts what the scan now shows, flag it rather than overwriting it.
 
 ### init
 
-Write a TODO-filled skeleton to `docs/project-context.md` for greenfield projects
-where `generate` would produce empty sections (no codebase to scan yet).
+Write the template to `docs/project-context.md`, creating `docs/` if needed. Refuse if the file already exists and point to `update`; the refusal is intentional, delete the file by hand to reset.
 
-**Behaviour:**
-- If `docs/project-context.md` already exists → **refuse with error**. Use `update` instead.
-- If absent → write `templates/skeleton.md` to `docs/project-context.md`.
-- Creates `docs/` directory if it does not exist.
-
-**When to use `init` vs `generate`:**
 | Situation | Action |
-|-----------|--------|
-| Empty or near-empty project, < 5 source files | `init` — fill manually |
-| Established project with real code | `generate` — auto-derive |
-| Existing `docs/project-context.md` is stale | `update` — re-scan, preserve manual edits |
+| --- | --- |
+| Empty or near-empty project (fewer than about 5 source files) | `init`, then fill by hand |
+| Established project with real code | `generate` |
+| Existing file is stale | `update` |
 
 ## When to Run
 
@@ -79,27 +67,13 @@ where `generate` would produce empty sections (no codebase to scan yet).
 - **After architecture changes:** New framework, new database, major refactor
 - **Periodically:** When agents produce inconsistent code (symptom of stale context)
 
-## Focus on the Unobvious
-
-The template emphasizes facts agents **cannot infer from code**:
-
-- WHY a framework was chosen (not just what it is)
-- Rejected alternatives ("use Zustand, NOT Redux")
-- Anti-patterns specific to this project
-- Testing boundaries (what to unit test vs e2e)
-
-## Template
-
-See `templates/project-context-template.md` for the full structure.
-
 ## Gotchas
 
 - Stale context is worse than no context — re-run `update` after major architecture changes
 - The template asks for "rejected alternatives" — this is the highest-value content. If you chose Zustand over Redux, say WHY
-- Don't list every file path — agents can Glob for that. Focus on RULES and CONVENTIONS
-- `<!-- manual -->` sections survive `update` action but NOT `generate` — backup before regenerating from scratch
+- Do not list file paths or stack versions: agents can search for those. Rules and reasons only
+- `<!-- manual -->` sections survive `update` but not `generate`: back the file up before regenerating
 - If project-context.md conflicts with CLAUDE.md, CLAUDE.md wins (it's the higher-priority document)
-- `init` refuses to overwrite an existing `docs/project-context.md` — this is intentional. Delete the file manually if you truly want to reset to a blank skeleton.
 
 ## Integration
 
@@ -108,5 +82,4 @@ All agents load `docs/project-context.md` in their Required Context section. If 
 ## Files in this skill
 
 - `SKILL.md` — you are here
-- `templates/project-context-template.md` — output template used by `generate` action
-- `templates/skeleton.md` — TODO-placeholder constitution template used by `init` action
+- `templates/project-context-template.md` — the one template for `init`, `generate` and `update`

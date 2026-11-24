@@ -22,16 +22,7 @@ If custom field IDs differ in the target instance, use the field name from `fiel
 
 ## Enhanced Completeness Scoring
 
-Apply these deductions ON TOP of the base 8-dimension score from `completeness-checklist.md`:
-
-| Condition                                      | Deduction | Reason                          |
-| ---------------------------------------------- | --------- | ------------------------------- |
-| Bug with no Components set                     | -5        | Cannot route to correct domain  |
-| Story with no Story Points                     | -3        | Blocks sprint planning          |
-| Epic with no start date or no due date         | -3        | Roadmap tracking breaks         |
-| No Fix Version on any ticket type              | -2        | Release tracking gap            |
-
-Cap total Jira deductions at -10 to avoid over-penalizing a single incomplete ticket.
+The Jira deductions (no Components on a bug, no Story Points, no dates on an epic, no Fix Version; capped at -10 together) are in the Adjustments table of `completeness-checklist.md`. Apply them after the base score using the fields extracted above.
 
 ## Suggested Actions Output
 
@@ -40,8 +31,8 @@ After analysis, append a `### Suggested Actions (mk:jira)` section to the report
 ```markdown
 ### Suggested Actions (mk:jira)
 
-- [ ] Evaluate complexity: /mk:jira evaluate [TICKET-ID]
-- [ ] Estimate story points: /mk:jira estimate [TICKET-ID]  ← only if no story points set
+- [ ] Evaluate complexity: /mk:jira-evaluator [TICKET-ID]
+- [ ] Estimate story points: /mk:jira-estimator [TICKET-ID]  ← only if no story points set
 - [ ] Transition [TICKET-ID] to "In Analysis"
 - [ ] Link [TICKET-ID] blocks [BLOCKER-ID]  ← only if linked issues found
 - [ ] Assign to [pic-username] ([domain] owner)

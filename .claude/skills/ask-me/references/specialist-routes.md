@@ -15,7 +15,8 @@
 | Bug or root cause | `mk:investigate` |
 | Diff or PR review | `mk:review` |
 | Grade a running build | `mk:evaluate` |
-| Security audit or threat model | `mk:cso` or `mk:vulnerability-scanner` |
+| Security audit or threat model (whole repo) | `mk:cso` |
+| Security pattern scan of one module or diff | `mk:vulnerability-scanner` |
 | Command/workflow navigation | `mk:help` |
 | Whole-repo discovery | `mk:scout` |
 | Library/framework documentation | `mk:docs-finder` |

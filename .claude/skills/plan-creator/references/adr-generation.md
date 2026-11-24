@@ -69,8 +69,8 @@ Name the file with today's date and a slug: `date +%y%m%d` gives the `YYMMDD` pr
 
 ## Steps to Execute
 
-1. Determine next sequence number (see above).
-2. Create `docs/architecture/` directory if it does not exist.
+1. Name the file with today's date and a slug (see Naming).
+2. Create `docs/architecture/adr/` directory if it does not exist.
 3. Fill in the template with the decision context.
 4. List at least 2 alternatives that were considered.
 5. Document both positive and negative consequences honestly.
@@ -79,7 +79,7 @@ Name the file with today's date and a slug: `date +%y%m%d` gives the `YYMMDD` pr
 
 ## Validation Checklist
 
-- [ ] Sequence number is correct and unique
+- [ ] File name is `YYMMDD-slug` and unique
 - [ ] Status is set to `proposed`
 - [ ] Context explains the "why" not just the "what"
 - [ ] At least 2 alternatives are listed

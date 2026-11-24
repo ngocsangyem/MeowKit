@@ -52,9 +52,7 @@ Omit sub-fields that cannot be determined. Never fabricate design details.
 
 If the ticket scope includes UI work (detected via keywords: UI, screen, page, component, layout, design, visual, frontend):
 
-- Figma link present AND analyzed → no deduction
-- Figma link present but inaccessible (requires auth, broken URL) → -2, note in gaps
-- No Figma link found → **-5** on Design/Visual dimension of completeness score
+Apply the Design/Visual deduction from the Adjustments table in `completeness-checklist.md` (analysed: none; inaccessible: -2; no Figma link: whatever visual evidence the ticket has decides the band).
 
 Add to Missing section of completeness output:
 ```

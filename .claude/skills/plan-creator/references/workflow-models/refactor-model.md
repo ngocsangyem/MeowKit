@@ -3,7 +3,7 @@
 Applies when: restructuring code without changing behavior, reducing complexity, extracting modules.
 
 ## Plan Shape
-Required: Goal, Motivation, Current State, Target State, Refactor Strategy, Backward Compatibility, Verification, Acceptance Criteria, Agent State
+Required: Goal, Motivation, Current State, Target State, Refactor Strategy, Backward Compatibility, Verification, Acceptance Criteria
 Optional: Solution Options (if multiple refactor approaches)
 
 ## Phase Flow
@@ -18,13 +18,3 @@ planner → developer (incremental changes, test after each) → reviewer → sh
 
 ## Key Rule
 Must be behavior-preserving. All existing tests must pass after every intermediate step.
-
-## Context Reminder (MANDATORY)
-
-Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `/mk:cook {path}/plan.md`. Incremental phases — cook handles each.
-
-> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
-> Then run the cook command.
-
-This is **NON-NEGOTIABLE** — always output once the plan is agreed.

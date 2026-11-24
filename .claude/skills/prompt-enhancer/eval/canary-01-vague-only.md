@@ -31,7 +31,7 @@ fix the bug in auth
 
 ### Improvement Suggestions
 
-- Each FOUND issue gets exactly one fix per `references/playbook.md`.
+- Each FOUND issue gets exactly one fix per `references/analyze-reference.md`.
 - Unknown values rendered as `[FILL-IN: <description>]`.
 
 ### Rewritten Prompt

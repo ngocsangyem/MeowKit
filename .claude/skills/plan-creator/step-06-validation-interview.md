@@ -1,155 +1,33 @@
 # Step 6: Validation Interview
 
-Critical questions to validate plan decisions with the user. Runs in hard/deep/parallel/two modes (skipped in fast).
+Hard family only. Ask the user the few questions whose answers change the plan, and write the answers into it. Done when every answer is recorded in `## Validation Log`, propagated to the section it affects, and the consistency sweep has run.
 
-## Instructions
+## 6a. Recap first
 
-### 6a. Skip Check
+Before the first question, show: the plan path, the objective in one sentence, what is in and out of scope, the phase count and names, the top two or three risks, and for each question the section its answer may change. The user is about to rewrite phase files they may not have read since drafting; an answer given against a misremembered plan propagates silently.
 
-**Skip if:** `planning_mode = fast` → read and follow `step-07-gate.md`.
+Make every question self-contained: restate the decision, the plan's current position and the options inside the question. The user may answer after a context reset.
 
-### 6b. Present Before Asking (recap — required)
+This step presents and records; you own plan mutation. A subagent or the interview never edits a phase file.
 
-**Present the plan back BEFORE the first question.** The user is about to make
-decisions that rewrite phase files they may not have read since drafting. Asking
-cold makes them reconstruct the plan from memory, and an answer given against a
-misremembered plan silently propagates into the real one.
+## 6b. Choose the questions
 
-Emit this recap once, before any question:
+Pick the questions that would change the plan, using the categories, detection keywords, format rules and section mapping in `references/validation-questions.md`. Normally 3-5; ask fewer when the plan is clear, and say so. Each has 2-4 concrete options with the recommended one marked.
 
-```
-Plan:     {plan_dir}/plan.md
-Objective: {one sentence — what this plan delivers}
-Scope:     {in scope} · NOT in scope: {out of scope}
-Phases:    {N} ({phase-01 name} → {phase-0N name})
-Top risks: {2-3 highest-severity items from the Risk Assessment / red-team findings}
+Sources, in priority order: claims the verification log marked FAILED or UNVERIFIED (state the claim, what the plan says, what the repo shows, and ask which is right); accepted red-team findings that flag an assumption or risk; then keyword-matched categories (architecture, assumptions, scope, risk, trade-offs). Group related questions, at most four per ask. Ask in plain words if the runtime has no structured question tool.
 
-I have {M} questions. Each one changes a specific section:
-  1. {question topic} → {phase-XX §section}
-  2. …
-```
+## 6c. Propagate and log
 
-Naming the section each answer may change is the point of the recap, not
-decoration: it is how the user knows what a "yes" costs before they say it.
+Write each answer to its section: architecture to the phase `## Architecture`, assumptions and trade-offs to `## Key Insights` prefixed "Validated:", scope to plan.md `## Constraints`, risk to the phase `## Risk Assessment`. Update plan.md Constraints if an answer changes scope.
 
-**Every question must be self-contained.** Restate the decision, the plan's
-current position, and the options inside the question itself. Do not write "as
-discussed above" or "per the earlier question" — the user may answer after a
-context reset, or days later, and a question that only makes sense in sequence is
-unanswerable out of sequence.
+Append to plan.md `## Validation Log`, one block per question: question, category, options presented, answer, rationale ("-" if none), sections changed.
 
-**Ownership:** this step PRESENTS and RECORDS. The planner owns plan mutation
-(6e propagates; 6f logs). The interviewer never edits a phase file directly —
-one writer per artifact, per `.claude/skills/cook/references/orchestration-rules.md` file ownership.
+If an answer shows the plan's premise is wrong, stop and tell the user rather than editing around it; offer to return to step 3 or step 0.
 
-### 6c. Generate Questions
+## 6d. Sweep
 
-Generate 3–5 critical questions from the plan content. Load the full question framework from
-`references/validation-questions.md` — it defines:
-
-- **Detection keywords** per category (scan plan content for keyword matches → prioritize matching categories)
-- **Question format rules** (2-4 concrete options, mark recommended, "Other" is automatic)
-- **Section mapping** (which phase section each category's answers propagate to)
-- **Recording rules** (Validation Log format)
-
-**Categories** (prioritize by detection keyword matches):
-
-1. **Architecture** — keywords: database, schema, API, endpoint, microservice, cache, queue, service
-2. **Assumptions** — keywords: assume, expect, should be, will be, always, never, guaranteed
-3. **Scope** — keywords: MVP, defer, future, nice-to-have, optional, out of scope
-4. **Risk** — keywords: risk, fail, break, downtime, migration, rollback, breaking change
-5. **Tradeoffs** — keywords: tradeoff, versus, vs, alternative, simpler, technical debt
-
-Note: if red-team findings were accepted in step-05, use them to inform questions —
-focus on areas where assumptions or risks were flagged.
-
-**Verification Log integration.** If `verification_tier` is set (step-04 sub-step 4d ran), read each phase's `## Verification Log` section. For each entry with verdict `FAILED` or `UNVERIFIED`, generate one candidate question using this template:
-
-```
-Verification flagged: {claim} → {verdict}.
-Plan states: {plan-cited reference}.
-Codebase observation: {what verification found, or 'not found'}.
-Which is correct: the plan, the codebase, or neither?
-```
-
-FAILED claims rank above keyword-detected questions (they are higher-signal). Cap total interview questions at 5 regardless of source mix.
-
-### 6d. Present by asking the user
-
-Present each question with 2-4 concrete options (per format rules). Mark the recommended option.
-
-```json
-{
-  "questions": [{
-    "question": "{generated question based on plan content}",
-    "header": "Plan Validation ({N} of {total})",
-    "options": [
-      { "label": "{Option A} (Recommended)", "description": "{brief rationale}" },
-      { "label": "{Option B}", "description": "{brief rationale}" }
-    ]
-  }]
-}
-```
-
-Group related questions (max 4 per user question).
-
-### 6e. Propagate Answers to Phase Files
-
-After all answers received, use the **section mapping** from `references/validation-questions.md`:
-
-- **Architecture** answers → phase `## Architecture` section
-- **Assumptions** answers → phase `## Key Insights` (with "Validated:" prefix)
-- **Scope** answers → plan.md `## Constraints` (In Scope / Out of Scope)
-- **Risk** answers → phase `## Risk Assessment`
-- **Tradeoffs** answers → phase `## Key Insights`
-
-Also:
-- Add note: `"Validated: {answer summary}"` in phase overview
-- If an answer reveals scope change, update plan.md Constraints
-
-### 6f. Write Validation Log
-
-Append `## Validation Log` section to plan.md (or update existing). Follow recording rules from `references/validation-questions.md`:
-
-```markdown
-### Q{N}: {full question text}
-**Category:** {category}
-**Options presented:** {list all options}
-**Answer:** {selected option or custom text}
-**Rationale:** {user's reasoning if provided, or "—"}
-**Impact:** {which phase sections were updated}
-```
-
-### 6g. Whole-Plan Consistency Sweep (Sweep W2)
-
-After answer propagation has edited phase files (6e) and the Validation Log has been written (6f), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-07.
-
-Algorithm: see `references/whole-plan-sweep.md` (stage-then-apply).
-
-Inputs to this run:
-- `delta_source = propagated_answers` (the list from 6e)
-- `plan_dir` (from session state)
-
-Outputs:
-- `### Pending Sweep Edits` block appended to `{plan_dir}/red-team-findings.md` if present, else inline at the bottom of plan.md `## Validation Log` (staged before any write)
-- `### Whole-Plan Consistency Sweep — <ISO>` block appended to each affected phase file's `## Validation Log` section (create section if missing); the orchestrator performs ONE Edit per phase file
-- plan.md frontmatter updated with `consistency_sweeps.validation: { reconciled, unresolved, ran_at }`
-
-If `unresolved > 0`, FIRE the W2 user-question blocker (see decision tree in `references/whole-plan-sweep.md`). Do not present the plan in step-07 until the user selects one of:
-
-- "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.
-- "Accept risk: proceed with unresolved contradictions (writes Risk rows + ## Validation Log)" — write a Risk Assessment row to each affected phase file referencing the deferred contradiction count; proceed.
-- "Cancel approval, restart from step-04" — drop pending edits, jump back to step-04 for re-planning.
-
-If `unresolved = 0`, proceed silently to step-07.
-
-## Output
-
-- Phase files updated with validated decisions
-- Risk assessments updated where applicable
-- plan.md frontmatter `consistency_sweeps.validation` updated
-- Affected phase files have `## Validation Log` with Whole-Plan Consistency Sweep block
+Run the consistency sweep in `references/whole-plan-sweep.md` with `delta_source = propagated_answers`. Do not present the plan until unresolved contradictions are settled by the user's choice.
 
 ## Next
 
-Read and follow `step-07-gate.md`
+`step-07-gate.md`

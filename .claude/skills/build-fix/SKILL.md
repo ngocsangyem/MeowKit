@@ -24,22 +24,22 @@ status: active
 runtime: claude-code
 ---
 
-# Build Fix — Universal Build Error Resolver
+# Build Fix
 
-Detects language from error output, loads the appropriate reference, classifies the error
-by fixability, applies the fix, and chains into `mk:verify` to confirm the build is green.
+Goal: get a failing build, compile or type-check command to green with the smallest change, then confirm with `mk:verify`.
+
+Detects the language from the error output, loads the matching reference, classifies each error by fixability, applies the fix, and chains into `mk:verify` to confirm the build is green.
 
 ## When to Use
 
-- Build command fails (npm run build, tsc, go build, python -m build, cargo build)
-- Type check errors (TypeScript TS\d{4}, mypy)
-- Compilation errors in any language
-- Triggers: "build failed", "fix build", "compilation error", "type error"
+- Build command fails (npm run build, tsc, go build, python -m build, cargo build), type-check errors (TypeScript TS\d{4}, mypy), or compilation errors in any language.
+- Triggers: "build failed", "fix build", "compilation error", "type error".
+- Not here: if the build passes and behavior is wrong, stop and use `mk:fix`; to find out why something fails without editing, use `mk:investigate`.
 
 ## Phase Anchor
 
 **Phase: 3 (Build GREEN)**
-**Handoff:** If `mk:verify` passes → proceed to Phase 4 (Review). If 3 attempts exhausted → escalate to user.
+**Handoff:** If `mk:verify` passes, proceed to Phase 4 (Review). If 3 attempts are exhausted, escalate to the user.
 
 ## Process
 
@@ -68,9 +68,9 @@ After loading the reference, classify the error:
 
 | Class | Description | Action |
 |-------|-------------|--------|
-| **auto-fixable** | Syntax errors, missing imports, simple type mismatches | Apply fix immediately |
-| **suggest-with-confidence** | Wrong argument types, missing interface properties | Propose fix, apply after brief explanation |
-| **report-only** | Runtime errors, architectural issues, circular dependencies | Describe the problem and root cause; do not auto-fix |
+| **auto-fixable** | Syntax errors, missing imports, simple type mismatches in the code | Apply the fix, then state the change in the report |
+| **suggest-with-confidence** | Wrong argument types, missing interface properties; anything that kills a process, installs a dependency, changes a lockfile or deletes a cache or build directory | Ask the user first, then apply; these touch more than the source file |
+| **report-only** | Runtime errors, architectural issues, circular dependencies | Describe the problem and root cause; do not edit |
 
 **Auto-fixable examples:** TS1005 Expected semicolon, TS2307 Cannot find module (missing import)
 **Suggest-with-confidence examples:** TS2322 type mismatch, TS2345 argument type mismatch
@@ -81,7 +81,7 @@ After loading the reference, classify the error:
 For auto-fixable and suggest-with-confidence:
 - Apply the minimal change that resolves the error
 - Do not refactor beyond what the error requires (YAGNI)
-- Follow security-rules.md — do NOT use `any` type as a fix
+- Typing rules (no `any` as a fix) are in `.claude/rules/security-rules.md`; use `unknown` and type guards or fix the actual type.
 
 For report-only:
 - Describe what needs to change and why
@@ -104,21 +104,23 @@ After 3 failed attempts, **escalate to user** with:
 - Suspected root cause
 - Suggested next steps (architectural review, dependency update, etc.)
 
+End the escalation report with the status block, BLOCKED when the three attempts failed:
+
+```
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+**Summary:** [1-2 sentences]
+**Concerns/Blockers:** [if applicable]
+```
+
 ## Attempt Counter
 
-Track attempts in the session. Reset counter when switching to a different error.
-Per `.claude/skills/cook/references/tdd-rules.md` Rule 4: max 3 self-healing attempts, then escalate.
+This skill's own rule: max 3 self-healing attempts, then escalate. Track attempts in the session and reset the counter when switching to a different error.
 
 ## Reference Files
 
 - `references/typescript-errors.md` — TS error codes with fix patterns
 - `references/python-errors.md` — Python exception types with fix patterns
 - `references/general-errors.md` — Framework-agnostic build error patterns
-
-## Security Constraint
-
-NEVER use TypeScript `any` as a fix for type errors. Always use `unknown` + type guards or
-fix the actual type mismatch. See `security-rules.md` — `any` type is a blocked pattern.
 
 ## Gotchas
 

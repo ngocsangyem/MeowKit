@@ -87,6 +87,35 @@ fn a_run_without_auth_is_refused() {
 }
 
 #[test]
+fn a_missing_kit_archive_is_refused_before_any_run() {
+    let p = project();
+    let o = Command::new(BIN)
+        .args([
+            "eval",
+            "run",
+            "--model",
+            "m",
+            "--max-cost-usd",
+            "1",
+            "--max-runs",
+            "1",
+            "--kit-archive",
+            "dist/missing.zip",
+        ])
+        .current_dir(p.path())
+        .env("ANTHROPIC_API_KEY", "placeholder-for-the-auth-check")
+        .env_remove("CLAUDE_CODE_OAUTH_TOKEN")
+        .output()
+        .expect("runs");
+    assert_eq!(o.status.code(), Some(2), "{}", text(&o));
+    assert!(text(&o).contains("dist/missing.zip"), "{}", text(&o));
+    assert!(
+        !p.path().join(".meowkit").exists(),
+        "nothing may be written"
+    );
+}
+
+#[test]
 fn an_outside_case_root_needs_trust() {
     let p = project();
     let other = project();

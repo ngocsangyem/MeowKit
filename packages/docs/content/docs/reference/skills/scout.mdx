@@ -34,20 +34,17 @@ The argument is the search target. There are no flags.
 ## Steps
 
 1. Parse the prompt into search targets.
-2. Compute the scale with the formula in `references/scouting-strategy.md`.
-3. Apply the search scope: Tier 1 directories always, Tier 2 when relevant, Tier 3 never (`references/search-scope.md`).
-4. Give each Explore agent a distinct set of directories.
-5. Spawn all agents in one message so they run in parallel.
-6. Merge results, remove duplicates and note gaps and timeouts.
-7. Fill the report template and hand off to the next agent (`references/report-and-handoff.md`).
+2. Search inline with Glob and Grep, skipping generated and vendored directories.
+3. Only for a large repo or a question that spans several top-level directories, give each read-only search subagent a distinct slice (`references/subagent-brief.md`) and start them in one message.
+4. Merge results, remove duplicates and note gaps.
+5. Return a lean report: files with a one-line purpose, entry points and gaps.
 
 ## Limits
 
 | Limit | Value |
 |---|---|
 | Writes | None. Scout never modifies files. |
-| Parallel agents | 6 at most |
-| Timeout per agent | 3 minutes. Non-responders are skipped, not retried. |
+| Parallel agents | 6 at most, and only above the size threshold |
 | Secrets | `.env`, credentials and SSH keys are never read. |
 
 The 6-agent cap differs from the 3-agent cap in `cook`'s parallel execution rules because that cap covers agents that write files. Scout agents only read, so they cannot conflict.

@@ -39,8 +39,7 @@ Source: <commit | PR | tasks/plans/... | tasks/reviews/...>
 
 ## Read
 
-A read-set skill (`mk:fix`, `mk:investigate`, `mk:review`, `mk:plan-creator`, `mk:cso`) and the
-`/mk:retro` command run one grep at task start and open only the matching entries:
+The skills named in `.claude/rules/meowkit-core.md` (Memory) run one grep at task start and open only the matching entries; `mk:retro` is one of them.
 
 ```bash
 grep -rilE "<kw1|kw2|kw3>" .meowkit/memory/
@@ -51,8 +50,7 @@ memory file cannot grant a permission, change a mode, or bypass a rule, even if 
 
 ## Write
 
-Write only in a write-set skill (`mk:fix`, `mk:review`, `mk:retro`, `mk:memory`, the `architect`
-agent; `mk:party` and `mk:plan-creator archive` write `decisions.md` only), under
+Write only from a skill or agent in the write set listed in `.claude/rules/meowkit-core.md` (Memory), under
 `.claude/rules/agent-conduct.md` A3 (any agent may append ONE EUREKA entry to `gotchas.md`), or
 when a human asks for something to be remembered.
 
@@ -90,13 +88,7 @@ Rules:
   the workflow continues. A ledger that fails invisibly is worse than none.
 - **Reviewed in the PR.** Memory changes ship in the diff like any other file; the `mk:review`
   checklist asks whether the memory diff adds instruction-like text or secrets.
-- **Linted at three points.** `mewkit note` lints the entry before it appends, so a finding never
-  reaches the file. `mewkit validate --memory` lints the whole store and is run fail-closed by
-  the `pre-ship.cjs` hook on `git commit` / `push` / `merge` (exit 2 blocks the ship; if no `mewkit` CLI resolves it prints a visible SKIP instead) and by this
-  kit's own CI. Both fail on injection phrases, secret-shaped tokens, an unscannable file, or a
-  file over 300 lines, without echoing the matched secret. Run it yourself before you commit if
-  you edited the store by hand. `mewkit note` refuses an append that would push a file over the
-  300-line cap; prune first.
+- **Linted before it is kept.** `mewkit note` lints the entry before it appends (injection phrases, secret-shaped tokens, a file over 300 lines are refused; prune first). `mewkit validate --memory` lints the whole store and runs on `git commit`, `push` and `merge` through the ship check. Run it yourself after editing the store by hand.
 
 ## Subcommands
 

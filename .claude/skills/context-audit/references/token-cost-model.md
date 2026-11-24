@@ -58,8 +58,7 @@ These thresholds are the **canonical source of truth** for token-overhead
 banners. They are NOT linked to the `budget.*` config keys — those track
 USD cost, not window utilization.
 
-The 10 / 25% values are v1 defaults. Calibrate against real production data
-before tuning.
+The 10 / 25% values are rough signals that always-on text is a visible share of the window. They are not calibrated against production data; treat them as prompts to look, not verdicts.
 
 ## Schema (after estimation)
 

@@ -7,7 +7,7 @@ Complete reference for linting and validation commands by ecosystem.
 | Step     | Command                                      | Notes                              |
 | -------- | -------------------------------------------- | ---------------------------------- |
 | Lint     | `npm run lint`                               | Uses project-configured ESLint     |
-| Lint fix | `npx eslint "path" --fix`                    | Auto-fix fixable issues            |
+| Lint fix | `npx eslint "path" --fix-dry-run`, then `--fix` | Dry run first; `--fix` only on files without uncommitted edits |
 | Types    | `npx tsc --noEmit`                           | Type check without emitting files  |
 | Security | `npm audit --audit-level=high`               | Skip low/moderate severity         |
 
@@ -17,7 +17,7 @@ Config files to look for: `.eslintrc`, `.eslintrc.json`, `.eslintrc.js`, `tsconf
 
 | Step     | Command                     | Notes                            |
 | -------- | --------------------------- | -------------------------------- |
-| Lint     | `ruff check "path" --fix`   | Fast, modern, replaces flake8    |
+| Lint     | `ruff check "path"`; `--diff` previews fixes, `--fix` applies them | Fast, modern, replaces flake8; apply `--fix` only to files without uncommitted edits |
 | Security | `bandit -r "path" -ll`      | Skip low-severity issues (`-ll`) |
 | Types    | `mypy "path"`               | Static type analysis             |
 
@@ -25,32 +25,11 @@ Config files to look for: `pyproject.toml`, `setup.cfg`, `.ruff.toml`
 
 ## Shared Validation Scripts
 
-Located at `scripts/` — this skill's own scripts for deterministic validation.
+This skill's own pattern scanners (invocation and exit codes are in `SKILL.md`):
 
-| Script             | Purpose                   | Command                                       |
-| ------------------ | ------------------------- | --------------------------------------------- |
-| `validate.py`      | General code validation   | `node .claude/hooks/lib/skill-python.cjs scripts/validate.py`          |
-| `security-scan.py` | Security pattern scanning | `node .claude/hooks/lib/skill-python.cjs scripts/security-scan.py`     |
+| Script | Purpose | Command |
+|---|---|---|
+| `validate.py` | Directory scan for secret, `any`, SQL and framework-guard patterns; writes a report | `node .claude/hooks/lib/skill-python.cjs scripts/validate.py` |
+| `security-scan.py` | The same kind of scan on git-changed files | `node .claude/hooks/lib/skill-python.cjs scripts/security-scan.py` |
 
-Run these in addition to ecosystem linters — they check kit-wide patterns.
-
-## Quality Loop
-
-```
-Write/Edit code
-  → npm run lint && npx tsc --noEmit   (Node.js/TS)
-  → ruff check . --fix && mypy .       (Python)
-  → node .claude/hooks/lib/skill-python.cjs scripts/validate.py (all)
-  → Fix errors → repeat until clean
-```
-
-No code is done until all three steps pass with zero errors.
-
-## Error Recovery
-
-| Error type          | Action                                          |
-| ------------------- | ----------------------------------------------- |
-| Lint fails          | Fix style/syntax immediately                    |
-| tsc fails           | Correct type mismatches before continuing       |
-| No tool configured  | Check for `.eslintrc`, `tsconfig.json`, `pyproject.toml` — suggest creating one |
-| Script not found    | Check `scripts/` — scripts may not be present in all projects |
+Run them in addition to the ecosystem linters, not instead of them.

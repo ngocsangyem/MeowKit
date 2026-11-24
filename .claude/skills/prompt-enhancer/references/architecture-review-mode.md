@@ -28,7 +28,7 @@ All of:
   "review the architecture of", "is this design sound", "evaluate the
   trade-offs in", "audit the structure of".
 - `--analyze --deep` is set (the recipe layers on those modes; it has no flag).
-- A draftable target exists (per the Step 0 route gate). "Review my architecture"
+- A draftable target exists (per the route gate in SKILL.md). "Review my architecture"
   with nothing attached → refuse/redirect per `SKILL.md`, same as any no-target input.
 
 If the request is to *design* or *plan* rather than to *review*, this is not the

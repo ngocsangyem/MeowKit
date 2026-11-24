@@ -24,8 +24,9 @@ runtime: claude-code
 
 # Nyquist — Test-to-Requirement Coverage Mapping
 
-Maps plan acceptance criteria to test files. Identifies coverage gaps where
-requirements exist but no corresponding test validates them.
+Goal: a standalone map from each acceptance criterion to the tests that name it, with the gaps listed. The map reads test names; it does not run tests or read assertions, so it says "name-matched", not "covered".
+
+Inside a diff review, `mk:review`'s Criteria Auditor does the same job; use this skill when you want the requirement-to-test map on its own.
 
 ## When to Use
 
@@ -36,11 +37,11 @@ requirements exist but no corresponding test validates them.
 
 ## Workflow
 
-1. **Load plan** — Read `tasks/plans/YYMMDD-name/plan.md`, extract acceptance criteria
+1. **Load plan** — Read `tasks/plans/YYMMDD-name/plan.md`, extract acceptance criteria. If there is no plan or it has no acceptance criteria, ask the user for them and stop; there is nothing to map
 2. **Scan tests** — Glob for test files (`**/*.test.*`, `**/*.spec.*`, `**/test_*.*`)
 3. **Map criteria → tests** — For each acceptance criterion, search test descriptions/names for matching keywords
 4. **Identify gaps** — Criteria with no matching test = coverage gap
-5. **Produce report** — Structured output with mapping table and gap list
+5. **Produce report** — Structured output with mapping table and gap list, in chat; if the user asks to keep it, save it as `tasks/reports/nyquist-{date}-{slug}.md`
 
 ## Output Format
 
@@ -51,14 +52,14 @@ requirements exist but no corresponding test validates them.
 
 | # | Acceptance Criterion | Test File | Test Name | Status |
 |---|---------------------|-----------|-----------|--------|
-| 1 | [criterion text] | src/auth.test.ts | "should authenticate user" | COVERED |
+| 1 | [criterion text] | src/auth.test.ts | "should authenticate user" | NAME-MATCHED |
 | 2 | [criterion text] | — | — | GAP |
-| 3 | [criterion text] | src/api.test.ts | "returns 404 for missing" | COVERED |
+| 3 | [criterion text] | src/api.test.ts | "returns 404 for missing" | NAME-MATCHED |
 
 ### Coverage Summary
 
 - **Total criteria:** N
-- **Covered:** N (N%)
+- **Name-matched:** N (N%) — names only; assertions not read
 - **Gaps:** N
 
 ### Gap Details
@@ -68,7 +69,7 @@ requirements exist but no corresponding test validates them.
 
 ### Recommendation
 
-[PASS — all criteria covered | WARN — N gaps found, suggest adding tests]
+[All criteria name-matched (assertions not checked) | N gaps found, suggest adding tests]
 ```
 
 ## Matching Strategy
@@ -80,7 +81,7 @@ requirements exist but no corresponding test validates them.
 
 ## Gotchas
 
-<!-- Populate from real failures. Do not predict. -->
+- **Renamed or reworded tests look like gaps**: keyword matching misses a test whose name no longer echoes the criterion. Ask the user to confirm a gap before reporting it as real.
 
 ## What This Skill Does NOT Do
 

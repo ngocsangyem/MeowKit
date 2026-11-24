@@ -66,34 +66,9 @@ const context = setupCoreTest(); // Returns { tempDir: '' }
 Project.create('name', context.tempDir); // Accessed before beforeEach!
 ```
 
-## Adding Stack Traces
+## When You Cannot Trace by Hand
 
-When can't trace manually, add instrumentation:
-
-```typescript
-async function gitInit(directory: string) {
-  const stack = new Error().stack;
-  console.error('DEBUG git init:', {
-    directory,
-    cwd: process.cwd(),
-    stack,
-  });
-
-  await execFileAsync('git', ['init'], { cwd: directory });
-}
-```
-
-**Critical:** Use `console.error()` in tests (not logger - may not show)
-
-**Run and capture:**
-```bash
-npm test 2>&1 | grep 'DEBUG git init'
-```
-
-**Analyze stack traces:**
-- Look for test file names
-- Find line number triggering call
-- Identify pattern (same test? same parameter?)
+This skill reads existing logs, stack traces and the existing reproducer; it does not edit source. If the trace needs temporary instrumentation (for example `console.error` with a stack at the suspect call), ask the user to add it or hand the case to `mk:fix`, then analyze the captured output: which test names appear, which line triggers the call, and whether the parameter repeats.
 
 ## Finding Which Test Causes Pollution
 
@@ -114,7 +89,7 @@ Runs tests one-by-one, stops at first polluter.
 When found immediate cause:
 - Can trace one level up? → Trace backwards
 - Is this the source? → Fix at source
-- Then add validation at each layer (see defense-in-depth.md)
+- Then add validation at each layer (see `.claude/skills/fix/references/prevention-gate.md`)
 
 ## Real Example
 

@@ -1,6 +1,6 @@
-# Test Coverage Diagram (Step 4.75)
+# Test Coverage Review
 
-100% coverage is the goal. Evaluate every codepath changed in the diff and identify test gaps. Gaps become INFORMATIONAL findings that follow the Fix-First flow.
+Loaded when the diff adds behavior without tests. Evaluate the codepaths the diff changes and identify test gaps. Gaps become INFORMATIONAL findings. Coverage is judged against the behavior that matters, not a percentage; the ASCII diagram in Step 4 is optional and useful for a diff with several branches.
 
 ## Contents
 
@@ -168,7 +168,7 @@ GAPS: 8 paths need tests (2 need E2E, 1 needs eval)
 ---------------------------------
 ```
 
-**Fast path:** All paths covered -> "Step 4.75: All new code paths have test coverage." Continue.
+**Fast path:** All paths covered -> "All new code paths have test coverage." Continue.
 
 ## Step 5: Generate tests for gaps (Fix-First)
 
@@ -183,6 +183,6 @@ If test framework is detected and gaps were identified:
 
 If no test framework detected -> include gaps as INFORMATIONAL findings only, no generation.
 
-**Diff is test-only changes:** Skip Step 4.75 entirely: "No new application code paths to audit."
+**Diff is test-only changes:** Skip this review entirely: "No new application code paths to audit."
 
-This step subsumes the "Test Gaps" category from Pass 2 — do not duplicate findings between the checklist Test Gaps item and this coverage diagram. Include any coverage gaps alongside the findings from Step 4 and Step 4.5. They follow the same Fix-First flow — gaps are INFORMATIONAL findings.
+Report coverage gaps as INFORMATIONAL findings alongside the other findings, without duplicating a gap the Criteria Auditor already reported. With `--fix` they follow `fix-first-review.md`.

@@ -87,9 +87,7 @@ The domain never decides the route. What the user wants **back** decides it.
 
 ## Known fence tensions
 
-Surfaced by an adversarial blind-route pass (an agent given only the five skills'
-frontmatter, with these expected answers withheld). Recorded rather than papered
-over — each is a place where a future edit can silently break a route.
+Places where a bare prompt fits two skills' fences, and where a later edit can silently break a route.
 
 | Tension | Status |
 |---|---|

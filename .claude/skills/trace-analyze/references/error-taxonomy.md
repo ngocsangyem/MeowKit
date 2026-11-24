@@ -1,19 +1,17 @@
 # Error Taxonomy
 
-Catalog of known harness failure patterns. Used by `mk:trace-analyze` step-03 (scatter analysis) to classify trace findings into actionable categories. Seeded from LangChain published patterns + Anthropic harness research.
+Catalog of known harness failure patterns that `mk:trace-analyze` classifies findings into. A signal marked *script* is applied by `trace-records.cjs detect`; the others need judgment. Seeded from published harness research.
 
 ## Contents
 
 - [Pattern Schema](#pattern-schema)
-- [Patterns from LangChain (deepagents harness research)](#patterns-from-langchain-deepagents-harness-research)
+- [Harness patterns](#harness-patterns)
   - [`premature-exit-without-verify`](#premature-exit-without-verify)
-  - [`doom-loop-edit-cycle`](#doom-loop-edit-cycle)
   - [`missing-environmental-context`](#missing-environmental-context)
   - [`time-budget-exceeded`](#time-budget-exceeded)
   - [`slop-buildup`](#slop-buildup)
-  - [`compile-break-ignored`](#compile-break-ignored)
   - [`reasoning-budget-mismatch`](#reasoning-budget-mismatch)
-- [Patterns from Anthropic harness research](#patterns-from-anthropic-harness-research)
+- [Evaluator and generator patterns](#evaluator-and-generator-patterns)
   - [`self-praise-approval`](#self-praise-approval)
   - [`stub-feature`](#stub-feature)
   - [`contract-drift`](#contract-drift)
@@ -31,49 +29,35 @@ Each entry has:
 - **Root cause** — why the failure happens
 - **Suggested mitigation** — concrete harness fix
 
-## Patterns from LangChain (deepagents harness research)
+## Harness patterns
 
 ### `premature-exit-without-verify`
 
-- **Trace signal:** session_end record with NO preceding `verdict_written` record AND NO `build_verify_result` exit_code=0 in the same session
-- **Threshold:** ≥3 sessions in last 20 runs
+- **Trace signal (script):** a run with a `session_end` record and no `verdict_written` record
+- **Threshold:** ≥3 runs in the last 20
 - **Root cause:** Agent writes code, re-reads its own code, declares done, stops. Self-verification is bolted on, not native.
-- **Mitigation:** PreCompletion hook (already in Phase 7 — verify it's firing). If still happening, tighten the hook's evidence detection; add explicit "did you actually run the build?" prompt to developer.md.
-
-### `doom-loop-edit-cycle`
-
-- **Trace signal:** ≥3 `loop_warning` records on the same `data.file` within one run_id
-- **Threshold:** ≥2 runs in last 20
-- **Root cause:** Agent making repeated small variations to the same file without progress. Flawed approach masquerading as iteration.
-- **Mitigation:** LoopDetection hook (Phase 7) is firing — if pattern persists, lower the warning threshold from N=4 to N=3, OR add explicit "halt and re-plan" guidance to developer.md.
+- **Mitigation:** Check that the pre-completion hook is firing. If it still happens, tighten the hook's evidence detection and add an explicit "did you actually run the build?" prompt to developer.md.
 
 ### `missing-environmental-context`
 
-- **Trace signal:** `file_edited` records on files matching `**/package.json` or `**/Cargo.toml` early in a run_id (within first 5 events) — agent searching for tool config instead of using LocalContext
+- **Trace signal (script):** `file_edited` records on files matching `**/package.json` or `**/Cargo.toml` within the first 5 events of a run_id: the agent is searching for tool config instead of using the local context block
 - **Threshold:** ≥3 runs
 - **Root cause:** Agent fails search + discovery, doesn't use LocalContext expansion from project-context-loader.cjs
-- **Mitigation:** Verify LocalContext block is firing (Phase 7 extension to project-context-loader.cjs). Check session-start trace for the LocalContext output. If missing, fix the hook.
+- **Mitigation:** Verify the local-context block is injected at session start (project-context-loader.cjs). If it is missing, fix the hook.
 
 ### `time-budget-exceeded`
 
-- **Trace signal:** session_end record with `duration_seconds > 21600` (6h hard timeout) AND no `verdict_written` record
+- **Trace signal (script):** `session_end` with `duration_seconds > 21600` (6h hard timeout) and no `verdict_written` record in the run
 - **Threshold:** ≥1 occurrence (catastrophic — one is enough)
 - **Root cause:** Agent ran past the 6h harness wall-clock without completing verification.
 - **Mitigation:** Document. Investigate manually — likely a doom loop OR an unrecoverable build error. If recurring, lower iteration cap from 3 to 2.
 
 ### `slop-buildup`
 
-- **Trace signal:** `verdict_written` records with `data.weighted_score < 0.6` AND `originality: FAIL` OR `design-quality: FAIL`
+- **Trace signal (script):** `verdict_written` with `data.weighted_score < 0.6` and `data.overall` not `PASS`
 - **Threshold:** ≥3 runs in last 20
 - **Root cause:** Generator producing AI slop (purple gradients, generic copy, stock illustrations).
-- **Mitigation:** Verify rubric anti-pattern lists are loaded (originality.md / design-quality.md). Add explicit anti-slop examples to the planner's product spec template.
-
-### `compile-break-ignored`
-
-- **Trace signal:** `build_verify_result` with non-zero exit_code, followed by another `file_edited` on the same file WITHOUT a subsequent successful `build_verify_result`
-- **Threshold:** ≥3 occurrences
-- **Root cause:** Build-Verify hook fires but agent doesn't fix the error before next edit.
-- **Mitigation:** Make Build-Verify error output more prominent in the agent's context. Consider Stop-event check: refuse to allow Stop if last file's Build-Verify is failing.
+- **Mitigation:** Verify the rubric anti-pattern lists are loaded (originality and design-quality). Add explicit anti-slop examples to the planner's product spec template.
 
 ### `reasoning-budget-mismatch`
 
@@ -82,14 +66,14 @@ Each entry has:
 - **Root cause:** Wrong density mode for the actual task complexity.
 - **Mitigation:** Improve `density-select.sh` heuristics; tighten the model→tier mapping.
 
-## Patterns from Anthropic harness research
+## Evaluator and generator patterns
 
 ### `self-praise-approval`
 
 - **Trace signal:** `verdict_written` with `overall: PASS` followed by user manual override OR a follow-up plan addressing the same task within 24h
 - **Threshold:** ≥2 occurrences
 - **Root cause:** Out-of-box Claude as a QA agent identifies legitimate issues, then talks itself into approving them. Leniency drift.
-- **Mitigation:** Verify skeptic persona is being reloaded per criterion (Phase 3 evaluator). Strengthen the persona prompt; add more anti-rationalization counters.
+- **Mitigation:** Check that the evaluator's skeptic stance is reloaded per criterion, and strengthen it with more anti-rationalization counters.
 
 ### `stub-feature`
 
@@ -107,14 +91,14 @@ Each entry has:
 
 ### `context-anxiety-wrap` (LEGACY)
 
-- **Trace signal:** standard-tier `session_end` records with abnormally low duration AND no failure markers
-- **Threshold:** N/A — should not appear on the capable tier
+- **Trace signal:** standard-tier `session_end` records with abnormally low duration and no failure markers
+- **Threshold:** N/A, should not appear on the capable tier
 - **Root cause:** Model gets anxious about context limits, exits early.
 - **Mitigation:** Move to the capable tier. This pattern is the main reason for the LEAN density mode.
 
 ## Suggestion Format
 
-When `mk:trace-analyze` step-05 emits suggestions, each entry must include:
+When `mk:trace-analyze` emits suggestions, each entry must include (the fields are the same in `references/run-procedure.md`):
 
 ```yaml
 - pattern: <pattern-name from this taxonomy>
@@ -127,11 +111,11 @@ When `mk:trace-analyze` step-05 emits suggestions, each entry must include:
   suggested_file: <path to file that needs editing>
 ```
 
-The HITL approval step at step-06 presents these suggestions one at a time for Approve / Modify / Reject.
+Each suggestion is presented to the user on its own for approve, modify or reject.
 
 ## Adding New Patterns
 
-Patterns evolve as new failure modes are discovered. To add a pattern:
+To add a pattern:
 
 1. Identify a recurring failure in trace-analyze findings (≥3 occurrences across ≥2 runs)
 2. Write the trace signal — exact JSONL fields/values to grep for
@@ -139,4 +123,4 @@ Patterns evolve as new failure modes are discovered. To add a pattern:
 4. Document root cause (why this happens)
 5. Propose mitigation (which hook/rule/prompt to change)
 6. Add the entry to this file
-7. Re-run `mk:trace-analyze` with the new pattern in the taxonomy
+7. If the signal is decidable from record fields, add a detector in `scripts/lib/pattern-detect.cjs`, then re-run `mk:trace-analyze`

@@ -7,8 +7,6 @@
       "canonical": "skills/investigate/references/shared-protocols.md",
       "members": [
         "skills/cso/references/shared-protocols.md",
-        "skills/office-hours/references/shared-protocols.md",
-        "skills/plan-ceo-review/references/shared-protocols.md",
         "skills/qa/references/shared-protocols.md",
         "skills/review/references/shared-protocols.md"
       ]
@@ -18,20 +16,8 @@
       "canonical": "skills/review/references/preamble.md",
       "members": [
         "skills/cso/references/preamble.md",
-        "skills/document-release/references/preamble.md",
         "skills/investigate/references/preamble.md",
-        "skills/office-hours/references/preamble.md",
-        "skills/plan-ceo-review/references/preamble.md",
-        "skills/qa/references/preamble.md",
-        "skills/retro/references/preamble.md",
-        "skills/ship/references/preamble.md"
-      ]
-    },
-    {
-      "name": "base-branch-detection",
-      "canonical": "skills/document-release/references/base-branch-detection.md",
-      "members": [
-        "skills/plan-ceo-review/references/base-branch-detection.md"
+        "skills/qa/references/preamble.md"
       ]
     },
     {

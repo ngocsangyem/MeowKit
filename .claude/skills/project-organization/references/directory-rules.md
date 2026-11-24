@@ -15,23 +15,26 @@ Every project file belongs to one of these categories:
 | Config | Root or `.config/` | Dotfiles, config files |
 | Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks) |
 
-### Kit-Specific Paths
+### Paths the kit uses
 
 ```
 .claude/
 ├── agents/          Agent definitions
-├── skills/          mk: prefixed skills
-├── rules/           Enforcement rules
+├── skills/          Skills, one directory each (no prefix on the directory)
+├── rules/           Always-on rules
 ├── hooks/           Lifecycle hooks
-├── scripts/         Validation scripts
-│   └── bin/         Shell utilities
 └── settings.json    Hook registrations
 
 tasks/
-├── plans/           Active/completed plans
-│   └── YYMMDD-name/     plan.md + phase-XX-*.md
-└── reviews/         Review verdicts
-    └── YYMMDD-name-verdict.md
+├── plans/           YYMMDD-name/ with plan.md + phase-XX-*.md
+├── reviews/         YYMMDD-name-verdict.md
+├── reports/         Reports by kind (security, retros, trace analysis, ...)
+└── contracts/       Signed sprint contracts
+
+.meowkit/
+├── memory/          decisions.md and gotchas.md
+├── state/           Run state
+└── telemetry/       Logs and trace records
 ```
 
 ## Naming Patterns
@@ -44,7 +47,7 @@ All filenames use **kebab-case**, self-documenting names.
 | Evergreen | `{slug}` | Stable docs, configs | `system-architecture.md` |
 | Variant | `{slug}-{variant}.{ext}` | Multiple versions | `logo-dark.svg` |
 
-**Slug rules:** lowercase, hyphens only, max 50 chars, self-documenting, no leading/trailing hyphens.
+**Slug rules:** lowercase, hyphens only, max 50 chars, no leading or trailing hyphen. A file name that says what the file is lets a search tool find it without opening it.
 
 ## Path Resolution Decision Tree
 
@@ -69,7 +72,4 @@ All filenames use **kebab-case**, self-documenting names.
 
 ## Safety Rules
 
-- Never move/rename files in `.git/`, `node_modules/`, `.env`
-- Never overwrite without confirmation
-- Create `.gitkeep` for empty directories
-- Respect `.gitignore` patterns
+The safety rules live in SKILL.md (Constraints); `.gitkeep` keeps an empty directory tracked.
