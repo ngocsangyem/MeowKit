@@ -932,7 +932,7 @@
       "title": "mk:benchmark",
       "description": "Manual harness canary recording scores.",
       "sourcePath": "skills/benchmark/SKILL.md",
-      "sourceHash": "04f5887faf1ae2365ac5b1b304f4bcb3241d304f81bf39d50b05da2ca847eb4b",
+      "sourceHash": "9037b263d83ecd2aab551c95fabfd166320e71d99ff650c4619c2861ec8e8310",
       "aliases": [],
       "owner": "testing",
       "phase": null,

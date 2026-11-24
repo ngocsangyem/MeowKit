@@ -29,6 +29,8 @@ runtime: claude-code
 
 # mk:benchmark — Experimental Harness Canary Suite
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 > Runs from this repository only. The published kit withholds this skill and the
 > `.claude/benchmarks/` corpus it reads: the canary specs measure the harness itself, and a
 > benchmark that scored a user's own project would be measuring a different thing under the

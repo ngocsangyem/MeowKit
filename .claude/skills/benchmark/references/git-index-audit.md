@@ -6,9 +6,9 @@ of a repo are identical, or to snapshot tracked state over time.
 
 ```bash
 # single-repo snapshot
-bash ${CLAUDE_SKILL_DIR}/scripts/git-index-audit.sh [repo-path]
+bash scripts/git-index-audit.sh [repo-path]
 # comparison (adds local/remote-only counts + recursive diff status)
-bash ${CLAUDE_SKILL_DIR}/scripts/git-index-audit.sh <local> <remote>
+bash scripts/git-index-audit.sh <local> <remote>
 ```
 
 **Artifact location:** `.claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
