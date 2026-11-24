@@ -78,7 +78,7 @@
 | chub not installed | Skip to Context7/web | "chub not installed. Using web sources." |
 | Network timeout | Skip to next source | "Timed out. Trying alternative..." |
 | All sources empty | Report failure + manual options | "Could not find docs. Try: [manual steps]" |
-| Rate limited | Use API key if available | "Rate limited. Set CONTEXT7_API_KEY in .env" |
+| Rate limited | Use API key if available | "Rate limited. Set CONTEXT7_API_KEY in .meowkit/.env or ~/.meowkit/.env" |
 
 ## Context Budget Overflow
 

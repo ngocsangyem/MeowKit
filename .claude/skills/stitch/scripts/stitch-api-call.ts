@@ -13,11 +13,15 @@
  *   npx tsx stitch-api-call.ts export <screen-id>   [--project <id>] [--project-name <name>]
  *                                                   [--format html|image|all]
  *
- * Env:  STITCH_API_KEY (required — exits 1 if missing, before any network call)
+ * Env:  read from the shell, then .meowkit/.env, .claude/.env and ~/.meowkit/.env
+ *       (see load-env-files.ts)
+ *       STITCH_API_KEY (required — exits 1 if missing, before any network call)
  *       STITCH_PROJECT_ID (optional default project ID)
  *       STITCH_QUOTA_LIMIT (optional daily credit override, default 400)
  */
 
+// Must stay the first import: it fills STITCH_API_KEY before the SDK module evaluates.
+import "./load-env-files.ts";
 import { stitch } from "@google/stitch-sdk";
 import fs from "fs";
 import path from "path";
@@ -30,7 +34,7 @@ import { execSync } from "child_process";
 if (!process.env.STITCH_API_KEY) {
   console.error("[X] STITCH_API_KEY is not set.");
   console.error("[X] Get a key at https://stitch.withgoogle.com/settings/api");
-  console.error("[X] Set STITCH_API_KEY in the project env file");
+  console.error("[X] Set STITCH_API_KEY in .meowkit/.env (project) or ~/.meowkit/.env (all projects)");
   process.exit(1);
 }
 

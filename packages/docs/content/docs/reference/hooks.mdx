@@ -53,7 +53,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 | `model-detector` | SessionStart | Writes the detected model tier and density to `.meowkit/state/detected-model.json` and prints one status line |
 | `orientation-ritual` | SessionStart | On resume, clear or compact, runs `mewkit orient --no-record` and injects the result. When the CLI is unavailable it falls back to the last checkpoint and labels it as a fallback |
 | `project-context-loader` | SessionStart | Injects the project context and resets per-session state |
-| `jira-env-loader` | SessionStart | Reports whether the three `MEOW_JIRA_*` keys are present and never prints them. The only handler that reads `.meowkit/.env` |
+| `jira-env-loader` | SessionStart | Reports whether the three `MEOW_JIRA_*` keys are present and never prints them. The only handler that reads the env files (`.meowkit/.env`, `.claude/.env`, `~/.meowkit/.env`) |
 | `capability-bootstrap` | SessionStart | Emits the committed capability-resolution guidance; silent when the file is absent |
 | `safety-sentinel-inject` | UserPromptSubmit | Emits the cached-skip marker, or forces a safety-baseline re-read after compaction |
 | `tdd-flag-detector` | UserPromptSubmit | Detects `--tdd` in the prompt and writes the sentinel `.meowkit/state/tdd-mode` |

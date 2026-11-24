@@ -92,7 +92,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 | `model-detector.cjs` | SessionStart | — | model-detector | — | Records the active model at session start |
 | `orientation-ritual.cjs` | SessionStart | — | orientation-ritual | — | Emits the orientation prompt at session start |
 | `project-context-loader.cjs` | SessionStart | — | project-context-loader | — | Injects the project's own context, resets per-session state and records the rule-file digests the marker is checked against |
-| `jira-env-loader.cjs` | SessionStart | — | jira-env-loader | — | Reports whether the issue-tracker credentials are present. The only reader of the project dotenv |
+| `jira-env-loader.cjs` | SessionStart | — | jira-env-loader | — | Reports whether the issue-tracker credentials are present. The only handler that reads the env files |
 | `capability-bootstrap.cjs` | SessionStart | — | capability-bootstrap | — | Emits the capability-resolution guidance |
 | `safety-sentinel-inject.cjs` | UserPromptSubmit | — | safety-sentinel-inject | — | Emits the cached-skip marker when this session verified the baseline and the files still match the recorded digest |
 | `tdd-flag-detector.cjs` | UserPromptSubmit | — | tdd-flag-detector | — | Turns the test-first sentinel on or off from the prompt |

@@ -1,8 +1,8 @@
 ---
 title: "Configuration"
-description: "Every MeowKit setting: the always-on rules, the project config file, hook registrations, the dotenv file and environment variables."
-sourceOfTruth: ".meowkit/.env.example"
-lastVerified: "2026-11-22"
+description: "Every MeowKit setting: the always-on rules, the project config file, hook registrations and where API keys and environment variables go."
+sourceOfTruth: ".meowkit/config.yaml"
+lastVerified: "2026-11-24"
 ---
 
 MeowKit reads settings from these places:
@@ -12,8 +12,8 @@ MeowKit reads settings from these places:
 | `.claude/rules/` | The six always-on rules | Yes |
 | `.meowkit/config.yaml` | Project settings: TDD, budget, density, hook switches | Yes |
 | `.claude/settings.json` | Hook registrations | Yes |
-| `.meowkit/.env` | API keys and personal overrides | No |
-| Shell environment | A few overrides and per-run values | No |
+| `.meowkit/.env`, `~/.meowkit/.env` | API keys and integration settings, per project or for every project | No |
+| Shell environment | Workflow switches and per-run values ([Environment Variables](/reference/environment-variables)) | No |
 
 ## .claude/rules/
 
@@ -70,57 +70,13 @@ Model routing is set per agent, not in a config block. Each `.claude/agents/*.md
 
 ## .meowkit/.env [#dotenv]
 
-`.meowkit/.env` holds project-level secrets such as API keys, without touching your shell profile. No shell sources it and hooks do not load it. Only `jira-env-loader` (SessionStart) reads it, through `lib/load-dotenv.cjs`, and it only checks that the three `MEOW_JIRA_*` keys are present. The Jira wrapper script and the `mk:multimodal` Python scripts read the file themselves.
-
-A variable already in the environment wins: the loader adds only keys that are not set, so `export VAR=x` overrides `.env` for a session. It refuses keys that change how a process launches (`PATH`, `LD_PRELOAD`, `BASH_ENV` and similar).
+`.meowkit/.env` holds this project's API keys and integration settings, and `~/.meowkit/.env` holds the ones every project shares. A shell export beats both, and the project file beats the user-wide one. Only the scripts that need a key read these files: the Jira and Confluence wrappers, the `jira-env-loader` hook, `mk:docs-finder`, `mk:multimodal` and `mk:stitch`. Workflow switches such as `MEOWKIT_TDD` are read from the shell only.
 
 ```bash
 cp .meowkit/.env.example .meowkit/.env
-# edit .meowkit/.env with your values
 ```
 
-`.env` is gitignored by default, and the `privacy-block.cjs` hook blocks the agent from reading it. `.meowkit/.env.example` lists every supported variable with a description.
-
-## Environment variables
-
-Set these in your shell profile or per session with `export`.
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `MEOWKIT_TDD` | off | Strict test-first mode. Truthy values: `1`, `true`, `yes`, `on`, `enable`, `enabled` (any case). Falsy values: `0`, `false`, `no`, `off`, `disable`, `disabled`. An unrecognized value is ignored with a warning. It outranks `tdd` in the config and the `--tdd` prompt flag |
-| `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when SessionStart input has no `model` field. Read after the SessionStart `model` field and before `CLAUDE_MODEL`, `CLAUDE_MODEL_ID` and `ANTHROPIC_MODEL`. A Claude model name behind a non-Anthropic `ANTHROPIC_BASE_URL` is not trusted: the tier is unknown and density is FULL |
-| `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` makes `learning-observer`, `post-session` and `pre-task-check` do nothing. `standard` and `strict` behave the same. The legacy alias `MEOW_HOOK_PROFILE` still works, and the new name wins when both are set |
-| `MEOWKIT_AUTOBUILD_MODE` | none | Density override for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. Also settable as `autobuild.mode` |
-| `MEOWKIT_RUN_ID` | none | A per-run id set by `mk:autobuild` and read by the trace log |
-| `MEOWKIT_PM_AUTO` | on | `off` stops the project-manager agent from running silently after a phase; `/mk:status` still works |
-| `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | `off` makes every turn re-read the safety baseline instead of using the cached-verification marker |
-| `HOOK_SESSION_ID` | none | The session id that `mewkit budget --session` reads first, before `.meowkit/state/last-session-id` |
-
-The settings that older releases read from `MEOWKIT_*` variables (budget thresholds, hook switches, the project-context size, `MEOWKIT_GATE1_PRESENCE_ONLY` and others) are read from nowhere now. `mewkit doctor` reports any of those names still exported in your shell and names the config key that replaced it, when there is one.
-
-### Jira
-
-The `mk:jira-*` skills (a router and 16 leaves) use three variables in `.meowkit/.env`. The wrapper `.claude/skills/jira/scripts/jira-as.sh` translates them into the `JIRA_*` names that `jira-as` reads. They keep the `MEOW_` prefix on purpose.
-
-| Variable | Purpose |
-| --- | --- |
-| `MEOW_JIRA_API_TOKEN` | Atlassian Cloud API token, from [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens). Required |
-| `MEOW_JIRA_EMAIL` | Atlassian account email. Required |
-| `MEOW_JIRA_SITE_URL` | For example `https://your-company.atlassian.net`. Required |
-| `JIRA_OUTPUT` | Output format for `jira-as`; the wrapper sets `json`. Override per call with `JIRA_OUTPUT=text bash .claude/skills/jira/scripts/jira-as.sh ...` |
-| `JIRA_MOCK_MODE` | When `true`, agents mark their output `**[MOCK MODE]**` and the intelligence agents avoid live writes. For sandbox and CI use |
-
-At session start `jira-env-loader` prints `[mk:jira] env OK` or `[mk:jira] <KEY> missing`. To set up:
-
-```bash
-mewkit setup               # installs jira-as into .meowkit/envs/jira/
-cp .meowkit/.env.example .meowkit/.env
-# edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
-```
-
-### Media keys
-
-`.meowkit/.env.example` also lists the keys and model overrides for `mk:multimodal` and `mk:stitch` (`MEOWKIT_GEMINI_API_KEY`, `MEOWKIT_MINIMAX_API_KEY`, `MEOWKIT_OPENROUTER_API_KEY`, `STITCH_API_KEY`, the `MEOWKIT_*_PROVIDER_CHAIN` and `MEOWKIT_*_MODEL` variables). Read the comments in that file before setting one.
+[Environment Variables](/reference/environment-variables) lists every variable, the order the files are read in and how to set each one up.
 
 ## Examples
 

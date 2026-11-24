@@ -24,7 +24,7 @@ Use only if `mewkit skill env jira` is unavailable. The wrapper resolves to the 
 
 ## Authentication — three required env vars
 
-In `.meowkit/.env` (gitignored):
+In `.meowkit/.env` (gitignored), or in `~/.meowkit/.env` to share them across projects. A shell export wins over both, and the project file wins over the user-wide one:
 
 | Var | Purpose |
 |---|---|
@@ -36,12 +36,12 @@ The wrapper `scripts/jira-as.sh` translates these to jira-as's native `JIRA_API_
 
 ## Hook validation
 
-A `SessionStart` hook (`jira-env-loader.cjs`) validates `.meowkit/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
+A `SessionStart` hook (`jira-env-loader.cjs`) checks the 3 keys across the shell, `.meowkit/.env`, `.claude/.env` and `~/.meowkit/.env`. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper reads the same files on each call, as `KEY=VALUE` lines it never executes, and exports the keys.
 
 Status messages:
 - `[mk:jira] env OK` — all 3 keys present
-- `[mk:jira] <KEY> missing in .meowkit/.env` — specific key absent
-- `[mk:jira] .meowkit/.env missing — see .meowkit/.env.example for setup`
+- `[mk:jira] <KEY> missing in <files>` — specific key absent from every file it found
+- `[mk:jira] .meowkit/.env missing — see .meowkit/.env.example for setup` — no env file found and the keys are not exported
 
 
 ## Exit codes (jira-as → user message map)

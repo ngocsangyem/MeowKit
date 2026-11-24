@@ -26,7 +26,7 @@ bash scripts/jira-as.sh <args>
 The wrapper:
 
 - Resolves to this skill's own `.meowkit/envs/jira/bin/jira-as`
-- Sources `.meowkit/.env` and translates `MEOW_JIRA_*` → `JIRA_*`
+- Reads the env files (`.meowkit/.env`, `.claude/.env`, `~/.meowkit/.env`; a shell export wins) and translates `MEOW_JIRA_*` → `JIRA_*`
 - Exports `JIRA_OUTPUT=json` as default (drop `--output json` flag noise from per-call examples)
 
 ## Verified Quick Examples
