@@ -119,9 +119,7 @@ Run: `/mk:jira` to execute these actions
 
 ## Posting Back
 
-After generating the report:
-- **MCP available**: Post as comment to originating ticket via MCP write tool
-- **No MCP**: Output to user and suggest copy-paste
+After generating the report, show it to the user. Post it to the originating ticket only after the user confirms (SKILL.md, last step); with no write adapter, output it for copy-paste.
 
 ## Minimal Output (score < 40)
 

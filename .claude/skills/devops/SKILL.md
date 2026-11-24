@@ -64,14 +64,14 @@ Routing rules — identical in all four skills:
   invents the target.
 - **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
-- **An auth-sensitive change**: the owning skill states the *requirement*; the security
-  workflow owns the verdict.
+- **An auth-sensitive change**: the owning skill states the *requirement*; `mk:cso`
+  owns the verdict.
 - **Any production effect → `mk:ship` or a human.**
 <!-- /shared:backend-routing -->
 
 ## Secret boundary
 
-Not negotiable, and not conditional on the task.
+This extends `.claude/rules/injection-rules.md` Rule 4 (sensitive files) and holds for every infrastructure task: a secret that is printed or pasted persists in the transcript and logs.
 
 - Never read, grep, print, or otherwise open a `.env` or `.env.*` file at any depth,
   including toolkit- and agent-directory dotenv files, a keystore, a credential file, or a
@@ -110,7 +110,7 @@ hosting model as a default — a guessed platform produces confidently wrong con
 
 ### 3. Safety design
 
-Before writing any change, state:
+Scale this to the blast radius. For a non-stateful, easily reversed change (a Dockerfile edit, a CI step) state the validation and the rollback only; for anything that can replace or delete a resource, state all six:
 
 - **Blast radius** — what this can affect if it is wrong, including resources not named in the diff.
 - **Stateful resources** — anything holding data. Deleting or replacing one is not a

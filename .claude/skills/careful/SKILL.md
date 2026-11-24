@@ -30,33 +30,24 @@ runtime: claude-code
 
 # /careful — Destructive Command Guardrails
 
-Safety mode is now **active**. Every bash command will be checked for destructive
-patterns before running. If a destructive command is detected, you'll be warned
-and can choose to proceed or cancel.
-
-```bash
-mkdir -p .meowkit/telemetry
-echo '{"skill":"careful","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
-```
+Goal: ask before a destructive shell command runs (`rm -rf`, `DROP TABLE`, force-push, `reset --hard`, `kubectl delete`), for the rest of the session. To confine edits to one directory instead, use `mk:freeze`; the two stack.
 
 ## What's protected
 
-See [references/destructive-patterns.md](references/destructive-patterns.md) for full pattern list.
+See [references/destructive-patterns.md](references/destructive-patterns.md) for the full pattern list and its known gaps.
 
 ## How it works
 
-The hook reads the command from the tool input JSON, checks it against the
-patterns above, and returns `permissionDecision: "ask"` with a warning message
-if a match is found. You can always override the warning and proceed.
+This skill registers a `PreToolUse` hook on Bash (`bin/check-careful.cjs`). The hook is active from the moment the skill is invoked and ends with the session. It reads the command from the tool input, matches it against the pattern table, and when one matches it asks you to confirm before the command runs. You can approve a single command; each match asks again.
 
-To deactivate, end the conversation or start a new one. Hooks are session-scoped.
+In a production-like environment the answer is stricter. When `NODE_ENV`, `APP_ENV` or `ENVIRONMENT` names production, prod or staging, a CRITICAL command is refused outright with no prompt to override; only a person changing that environment variable lifts it. HIGH patterns still ask. Recursive deletes of build outputs and dependency trees (`node_modules`, `dist`, `.next` and similar) pass without a prompt.
+
+Each match is appended to a log of override requests; it records the request, not your decision.
 
 ## Hooks
 
-- **Bash command guard**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete) — enforced by this project's configured hooks when present
-- Session-scoped — only active when `mk:careful` is invoked
-- User can override each warning individually
-- **Interaction with mk:investigate**: When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.
+- **Bash command guard**: asks before destructive commands; refuses CRITICAL ones in a production-like environment. It checks Bash only: Edit and Write are not covered (see `mk:freeze`).
+- Session-scoped: it exists only because `mk:careful` was invoked.
 
 ## Gotchas
 

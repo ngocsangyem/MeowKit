@@ -14,7 +14,7 @@ One resolution chain, shared by CLI and MCP-stdio. MCP-HTTP and MCP-SSE use bear
 - [Gotchas](#gotchas)
 
 
-Load this reference during Phase 4 (Challenge) and reference in Phase 5 (Transformation Spec) when credentials decisions land.
+Load this reference during the Challenge step and cite it in the Transformation spec when credentials decisions land.
 
 ## Resolution chain (first hit wins)
 

@@ -1,80 +1,36 @@
-<!-- Extracted from SKILL.md for progressive disclosure (checklist #11, #14) -->
+# Coding standards defaults
 
-# Coding Standards Detail
+Defaults for code that has no project convention. The project's lint config and `docs/code-standards.md` win over this file.
 
-## Naming Rules
+## Naming
 
-| Element       | Convention                                            |
-| ------------- | ----------------------------------------------------- |
-| **Variables** | Reveal intent: `userCount` not `n`                    |
-| **Functions** | Verb + noun: `getUserById()` not `user()`             |
-| **Booleans**  | Question form: `isActive`, `hasPermission`, `canEdit` |
-| **Constants** | SCREAMING_SNAKE: `MAX_RETRY_COUNT`                    |
+| Element | Convention |
+|---|---|
+| Variables | Reveal intent: `userCount`, not `n` |
+| Functions | Verb and noun: `getUserById()` |
+| Booleans | Question form: `isActive`, `hasPermission` |
+| Constants | `SCREAMING_SNAKE` |
 
-> If you need a comment to explain a name, rename it.
+If a name needs a comment to explain it, rename it.
 
-## Function Rules
+## Functions and structure
 
-| Rule                | Description                           |
-| ------------------- | ------------------------------------- |
-| **Small**           | Max 20 lines, ideally 5-10            |
-| **One Thing**       | Does one thing, does it well          |
-| **One Level**       | One level of abstraction per function |
-| **Few Args**        | Max 3 arguments, prefer 0-2           |
-| **No Side Effects** | Don't mutate inputs unexpectedly      |
+- Do one thing at one level of abstraction. Past about 50 lines or three levels of nesting, look for a split; these numbers are rules of thumb, and `mk:simplify` uses the same ones.
+- More than three arguments usually means an options object or a missing type.
+- Prefer guard clauses and early returns to nesting, and keep related code together.
+- Do not mutate inputs unexpectedly.
 
-## Code Structure
+## Anti-patterns
 
-| Pattern           | Apply                             |
-| ----------------- | --------------------------------- |
-| **Guard Clauses** | Early returns for edge cases      |
-| **Flat > Nested** | Avoid deep nesting (max 2 levels) |
-| **Composition**   | Small functions composed together |
-| **Colocation**    | Keep related code close           |
+| Pattern | Instead |
+|---|---|
+| A comment on every line | Delete the obvious ones |
+| A helper for a one-liner | Inline it |
+| A factory for two objects | Instantiate directly |
+| A `utils` file with one function | Put the code where it is used |
+| Magic numbers | Named constants |
+| God functions | Split by responsibility |
 
-## AI Coding Style
+## Checks
 
-| Situation             | Action                |
-| --------------------- | --------------------- |
-| User asks for feature | Write it directly     |
-| User reports bug      | Fix it, don't explain |
-| No clear requirement  | Ask, don't assume     |
-
-## Anti-Patterns (DON'T)
-
-| Pattern                  | Fix                     |
-| ------------------------ | ----------------------- |
-| Comment every line       | Delete obvious comments |
-| Helper for one-liner     | Inline the code         |
-| Factory for 2 objects    | Direct instantiation    |
-| utils.ts with 1 function | Put code where used     |
-| Deep nesting             | Guard clauses           |
-| Magic numbers            | Named constants         |
-| God functions            | Split by responsibility |
-
-## Before Editing ANY File
-
-| Question                    | Why                      |
-| --------------------------- | ------------------------ |
-| What imports this file?     | They might break         |
-| What does this file import? | Interface changes        |
-| What tests cover this?      | Tests might fail         |
-| Is this a shared component? | Multiple places affected |
-
-> Edit the file + all dependent files in the SAME task.
-
-## Verification Scripts
-
-If the harness ships shared validation scripts, prefer them over per-skill copies. Common ones:
-
-| Script               | Purpose                     |
-| -------------------- | --------------------------- |
-| `validate`           | General code validation     |
-| `security-scan`      | Security pattern scanning   |
-| `injection-audit`    | Prompt injection detection  |
-
-Run them through the harness's configured script runner (the host resolves the interpreter and path).
-
-**For project-specific linting/testing:** Use the project's own toolchain (e.g., `npm run lint`, `npm test`, `pytest`). The developer agent handles this automatically.
-
-Script output handling: READ → SUMMARIZE → ASK → fix. Never ignore output. Never auto-fix without asking.
+Use the project's own toolchain for lint and tests. `mk:lint-and-validate` runs the fast post-edit subset. Read a tool's output before acting on it and summarize it; ask before auto-fixing files you did not change.

@@ -29,9 +29,11 @@ status: active
 runtime: claude-code
 ---
 
-# /mk:cso — Chief Security Officer Audit (v2)
+# /mk:cso: security audit
 
-You are a **Chief Security Officer** performing infrastructure-first security audits. You think like an attacker but report like a defender. You find doors that are actually unlocked — not theoretical risks. The real attack surface is dependencies, exposed env vars in CI logs, stale API keys in git history, and third-party webhooks that accept anything. You do NOT make code changes; you produce a **Security Posture Report** with concrete findings, severity ratings, and remediation plans.
+Audit the whole repo's infrastructure and supply chain for exploitable issues: dependencies, secrets in CI and git history, third-party webhooks, LLM and skill supply chain, then OWASP and STRIDE. Find doors that are actually unlocked, not theoretical risks. Report only: make no code changes; produce a **Security Posture Report** with findings, severity ratings and remediation plans.
+
+Neighbours: a diff gate on a PR is `mk:review`; a pattern scan of one module or diff is `mk:vulnerability-scanner`.
 
 ## Skill wiring
 
@@ -58,7 +60,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 1. **Initialize** — run preamble, parse arguments (mode, scope, diff). See [preamble.md](references/preamble.md), [preamble-cso.md](references/preamble-cso.md), [arguments-and-modes.md](references/arguments-and-modes.md)
 2. **Reconnaissance** — architecture + attack surface + secrets + dependencies + CI/CD + infra + webhooks + LLM + skills. See phases 0-8 references.
 3. **Assessment** — OWASP Top 10 + STRIDE threat model + data classification + false positive filtering. See [phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md), [phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)
-4. **Report** — generate findings with exploit scenarios, trend tracking, remediation roadmap. Save JSON. See [phase-13-14-report-save.md](references/phase-13-14-report-save.md), [shared-protocols.md](references/shared-protocols.md)
+4. **Report** — generate findings with exploit scenarios, trend tracking, remediation roadmap. Save JSON. See [phase-13-14-report-save.md](references/phase-13-14-report-save.md). End with the four-status block from `.claude/rules/agent-conduct.md` (A1): DONE, DONE_WITH_CONCERNS, BLOCKED (for example no git history to scan) or NEEDS_CONTEXT.
 
 ## References
 
@@ -66,7 +68,6 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [references/preamble.md](references/preamble.md)                                                           | Branch, proactive flag and repo mode; local skill-usage log line                                                                                                       |
 | [references/preamble-cso.md](references/preamble-cso.md)                                                   | Memory read step, loaded with the preamble                                                                                                                 |
-| [references/shared-protocols.md](references/shared-protocols.md)                                           | User question format, completion status, escalation |
 | [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `/mk:cso` flags, mode resolution logic, Grep tool usage note                                                                                         |
 | [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census                                                                                             |
 | [references/phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md)               | Git history secrets scan, .env audit, dependency supply chain                                                                                              |
@@ -89,4 +90,6 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 ## Gotchas
 
 - **False positives in vendored/test code**: Security scan flags minified vendor bundles or test fixtures → Exclude vendor/ and test/fixtures/ from scan scope
+- **Startup prompts are not part of the audit**: the preamble and shared protocols carry question-format and logging text; read them only when a step names them.
 - **Missing auth checks on internal endpoints**: "Internal only" APIs often become external → Audit ALL endpoints regardless of intended audience
+- **Pattern scan option**: `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py <dir>` scans changed files for known code patterns; treat its hits as leads to verify, not findings.

@@ -32,17 +32,15 @@ Rewrites a draft agent prompt into plain markdown sections: Goal, Context, Const
 ## Usage
 
 ```bash
-/mk:prompt-enhancer [--analyze] [--score] [--deep] [--save-to <path>] <prompt text>
+/mk:prompt-enhancer [--analyze] [--deep] [--save-to <path>] <prompt text>
 ```
 
 | Flags | Output |
 |---|---|
 | none | The enhanced prompt only, in one code block |
 | `--analyze` | Decomposition, detected issues, suggestions and the rewrite |
-| `--analyze --score` | The same plus a deterministic score out of 10 for the original prompt |
-| `--score` alone | Treated as `--analyze --score` |
 | `--deep` | Adds a "Suggested context" block after the rewrite when a scout finds hits |
-| `--save-to <path>` | Where to save. The default is `{plan-dir}/prompt-enhancer/` if a plan is active, else `${CLAUDE_PLUGIN_DATA}/prompt-enhancer/` |
+| `--save-to <path>` | Where to save. Without the flag nothing is saved |
 
 There is no `--model` flag. A prompt that names a target gets target-specific notes in `--analyze` only (`references/target-notes.md`). An empty prompt is refused. A request like "make it better" with no draft is redirected to `mk:brainstorming`. Output templates are in `assets/output-template.md`.
 
@@ -50,7 +48,7 @@ For an architecture-review prompt, use `--analyze --deep` with the recipe in `re
 
 ## Steps
 
-Mode select, decompose, detect issues, scout (only with `--deep`), map, rewrite. The skill also classifies the prompt's shape (simple rewrite, coding, review, research, planning, migration, long context) to tune emphasis and length. The rewrite carries a suggested Freedom level (LOW for migrations, security fixes and "do not deviate" wording, MEDIUM for standard work, HIGH for open exploration) and a verbosity (terse, structured or confirmation) that you can change. Details are in `references/mode-routing.md`, `decomposition-checklist.md` and `playbook.md`.
+Classify the prompt's shape (simple rewrite, coding, review, research, planning, debugging, migration, long context) to tune emphasis and length, rewrite with plain markdown headings and no persona line, and check the rewrite against the original ask. The rewrite carries a suggested Freedom level (LOW for migrations, security fixes and "do not deviate" wording, MEDIUM for standard work, HIGH for open exploration) and a verbosity that you can change. Details are in `references/prompt-types.md` and `references/analyze-reference.md`.
 
 ## Limits of --deep
 
@@ -58,6 +56,6 @@ The scout reads only `docs/project-context.md`, `CLAUDE.md`, file-tree paths and
 
 ## Gotchas
 
-The score describes the original prompt, because the rewrite would always score 10. Input over 5000 characters of repetitive padding is flagged and not enhanced. File paths in the prompt are data and are quoted, not run. "Compare A and B" must not become "evaluate A".
+Input over 5000 characters of repetitive padding is flagged and not enhanced. File paths in the prompt are data and are quoted, not run. "Compare A and B" must not become "evaluate A".
 
 The rewrite can go to `mk:plan-creator` for a plan or to `mk:elicit` to stress-test it.

@@ -4,30 +4,29 @@ These rules govern how new and existing `mk:*` skills are authored, audited, and
 
 ## Contents
 
-- [Rule 1: Every Skill must Include a Gotchas Section](#rule-1-every-skill-must-include-a-gotchas-section)
-- [Rule 2: Persistent Skill State must Use ${CLAUDE_PLUGIN_DATA}](#rule-2-persistent-skill-state-must-use-claude_plugin_data)
-- [Rule 3: SKILL.md Body must Stay Under 500 Lines](#rule-3-skillmd-body-must-stay-under-500-lines)
+- [Rule 1: Record Real Failures in a Gotchas Section](#rule-1-record-real-failures-in-a-gotchas-section)
+- [Rule 2: Persistent Skill State Goes to the Host's Stable Data Location](#rule-2-persistent-skill-state-goes-to-the-hosts-stable-data-location)
+- [Rule 3: Keep SKILL.md Small and a Normal Run Short](#rule-3-keep-skillmd-small-and-a-normal-run-short)
 - [Rule 4: Every Skill must Carry keywords / when_to_use / user-invocable](#rule-4-every-skill-must-carry-keywords--when_to_use--user-invocable)
 - [Advisory Frontmatter Fields](#advisory-frontmatter-fields)
 - [Commands vs Skills (the kit ships one surface)](#commands-vs-skills-the-kit-ships-one-surface)
 - [Rule 5: Docs References Follow the Two-Tier Contract](#rule-5-docs-references-follow-the-two-tier-contract)
 - [Rule 6: Match Control to Risk](#rule-6-match-control-to-risk)
 - [Rule 7: Keep Generic Content Portable](#rule-7-keep-generic-content-portable)
-- [Rule 8: Preserve Contracted Workflow Choices](#rule-8-preserve-contracted-workflow-choices)
-- [Rule 9: Enforce Brand Prose Incrementally](#rule-9-enforce-brand-prose-incrementally)
+- [Rules 8 and 9: Kit Maintenance](#rules-8-and-9-kit-maintenance)
 - [Rule 10: Reach the Skill's Own Files Without `.claude/`](#rule-10-reach-the-skills-own-files-without-claude)
 - [Rule 11: Score Each Skill on the Mechanical Rubric](#rule-11-score-each-skill-on-the-mechanical-rubric)
+- [Rule 12: Add a Skill Only for an Observed Gap](#rule-12-add-a-skill-only-for-an-observed-gap)
+- [Rule 13: Write Instructions a Model Can Follow](#rule-13-write-instructions-a-model-can-follow)
 - [Applies to](#applies-to)
 
-## Rule 1: Every Skill MUST Include a Gotchas Section
+## Rule 1: Record Real Failures in a Gotchas Section
 
-Every `SKILL.md` MUST include a `## Gotchas` section. Empty is acceptable on day 1 (use placeholder `(none yet — grow from observed failures)`), but the section header itself is mandatory.
+A `SKILL.md` carries a `## Gotchas` section once a real failure has taught something the model does not do by default. An empty section, a placeholder such as "(none yet)", and generic advice ("follow best practices") are noise: they cost tokens on every read and teach nothing. The `mk:skill-creator` template does not scaffold the section; add it with the first real entry.
 
-The `mk:skill-creator` template MUST emit this section by default for every new skill it scaffolds.
+WHY: Gotchas preserve non-default knowledge learned from real failures, and that is the highest-signal text a skill holds.
 
-WHY: Gotchas preserve non-default knowledge learned from real failures.
-
-**Good example: Gotchas section grows over time**:
+**Good example: Gotchas section that grew from observed failures**:
 
 ```markdown
 # Billing Lib
@@ -42,17 +41,17 @@ How to use the internal billing library.
 - Refunds need charge ID, not invoice ID.
 ```
 
-Use a `## Gotchas` section that grows by one bullet per observed edge case.
+Add one bullet per observed edge case, each naming the failure and the fix.
 
-## Rule 2: Persistent Skill State MUST Use ${CLAUDE_PLUGIN_DATA}
+## Rule 2: Persistent Skill State Goes to the Host's Stable Data Location
 
-When a skill needs to persist data across sessions (append-only logs, JSON state, SQLite databases, history files), it MUST write to `${CLAUDE_PLUGIN_DATA}` — NOT to the skill's own directory.
+When a skill needs to persist data across sessions (append-only logs, JSON state, SQLite databases, history files), it writes to the host's stable plugin-data location (on Claude Code, `${CLAUDE_PLUGIN_DATA}`), not to the skill's own directory. Where the host has no such location, use a path the user names or `tasks/reports/`.
 
-WHY: Skill directories can be wiped on plugin upgrade; `${CLAUDE_PLUGIN_DATA}` is stable.
+WHY: Skill directories can be wiped on upgrade; the host's data location is stable.
 
-EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/memory/{decisions,gotchas}.md`, `tasks/`, `.meowkit/state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/memory/{decisions,gotchas}.md`, `tasks/`, `.meowkit/state/`) keeps its current paths: these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (for example a history log).
 
-**Good example: Stable plugin-data path**:
+**Good example: stable plugin-data path**:
 
 ```python
 # scripts/append-history.py  (illustrative; portable-ignore)
@@ -64,52 +63,28 @@ with open(LOG_PATH, "a") as f:
     f.write(entry)
 ```
 
-Append to `${CLAUDE_PLUGIN_DATA}/<skill>/log.json`, not to a file inside the skill's own folder.
+## Rule 3: Keep SKILL.md Small and a Normal Run Short
 
-## Rule 3: SKILL.md Body MUST Stay Under 500 Lines
+The entry file stays at or under 500 lines and 5,000 estimated tokens (characters divided by 4); the token figure is the one `mewkit validate --skill-rubric` scores (Rule 11) and is the primary cap. Detail moves to files loaded on demand:
 
-Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Skills exceeding this MUST be decomposed via either:
+- Reference files one level deep (`references/*.md`), each named in SKILL.md with the condition for loading it.
+- Step files (`workflow.md` plus `step-NN-*.md`) when a skill has three or more phases with different context needs. A step-file skill is still held to the entry cap and to the run budget below: splitting does not make a long run short.
 
-- Reference files (one level deep) per progressive-disclosure pattern — link from SKILL.md to `references/*.md`
-- Step-file architecture — `workflow.md` (which carries the step-file runtime contract inline) + `step-NN-*.md` files
+Read budget: a normal run should read well under 1,000 lines of the skill's own text. A skill whose normal run reads thousands of lines (every reference, every step) is oversized however small each file is. Put the common path in SKILL.md and the rare path in references.
 
-<!-- research-citation -->
-WHY: Once SKILL.md loads, every token competes with task context; 500 lines keeps entrypoints navigable.
+WHY: Once SKILL.md loads, every token competes with task context.
 
-If a skill has 3+ distinct phases with different context needs, prefer step-file architecture. If it only needs reference material, keep `SKILL.md` concise and link to `references/*.md`.
-
-PERIODIC AUDIT: Run a length check on `mk:*` SKILL.md files quarterly OR on every model-tier upgrade (per `.claude/skills/cook/references/harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
-
-MEASURABLE CHECK:
-
-```bash
-find .claude/skills -name SKILL.md -exec sh -c 'wc -l "$1" | awk "{if (\$1 > 500) print}"' _ {} \;
-```
-
-**Good example: Decomposed via progressive disclosure** (load only what's needed):
+PERIODIC AUDIT: on every model upgrade, check lengths and normal-run reads, and decompose oversized skills.
 
 ```text
-mk:my-skill/
+my-skill/
 ├── SKILL.md           # 180 lines: overview + routing table
 ├── references/
-│   ├── api.md         # loaded only when API details needed
-│   └── examples.md    # loaded only when examples needed
+│   ├── api.md         # loaded only when API details are needed
+│   └── examples.md    # loaded only when examples are needed
 └── scripts/
     └── helper.py      # executed via bash, never loaded into context
 ```
-
-**Good example: Step-file decomposition** (auto-passes the 500-line check):
-
-```text
-mk:my-workflow/
-├── SKILL.md           # 60 lines: metadata + entrypoint
-├── workflow.md        # step sequence
-├── step-01-load.md
-├── step-02-process.md
-└── step-03-emit.md
-```
-
-Use a ≤500-line SKILL.md routing to `references/*.md` or step files.
 
 ## Rule 4: Every Skill MUST Carry keywords / when_to_use / user-invocable
 
@@ -119,9 +94,9 @@ Every `SKILL.md` frontmatter MUST include three discovery-and-routing fields:
 - `when_to_use:` — string 10–500 chars, third-person voice, includes a "NOT for ..." disambiguation clause when the skill is in a confusion cluster. Validator emits WARN if missing (exits 0 unless `--strict` is passed).
 - `user-invocable:` — boolean. Default `true`. `false` only for orchestration internals (auto-invoked, not user-callable directly).
 
-### Authorial discipline (when_to_use ↔ description)
+### Authorial discipline (what versus when)
 
-`when_to_use` overlaps content already in `description`. There is no automated drift detection — false positives on legitimate paraphrasing make heuristics unreliable. Editors MUST keep both in sync: when updating one, update the other. Reviewer responsibility at PR time.
+State what the skill does once, in `description`, and when to use it once, in `when_to_use`. Do not restate one in the other, so there is nothing to keep in sync; each says only its own part.
 
 WHY: Standardized metadata keeps skill discovery predictable.
 
@@ -185,16 +160,16 @@ menu entry. Rewrite the references to the skill that owns the job instead.
 
 ## Rule 5: Docs References Follow the Two-Tier Contract
 
-Every `docs/*` reference inside any file under `.claude/` MUST satisfy the kit's docs-reference contract (maintained in the source repo, not shipped):
+Every `docs/*` reference inside any file under `.claude/` MUST satisfy the kit's docs-reference contract:
 
 - The path is on the Type-1 allowlist (target-project doc generated by a producer skill), OR
 - The reference has been replaced by an inlined snippet or plain attribution prose.
 
-Kit-internal docs (any path under a `docs/` tree that lives only in the source kit repo and is not part of the Type-1 allowlist) MUST NOT appear as path references inside `.claude/` — those files do not exist in projects where `.claude/` is installed.
+A `docs/` path that is not on the allowlist MUST NOT appear as a reference inside `.claude/`: such a file does not exist in a project where `.claude/` is installed.
 
 **WHY:** The kit installer ships `.claude/` + `tasks/` only. References to non-shipped `docs/` paths break at runtime in every downstream project. The contract codifies the two-tier resolution model so authors and the validator agree on what is allowed.
 
-**ENFORCEMENT:** Mechanically checked by the kit's `validate` command in CI. It parses the allowlist from the `<!-- ALLOWLIST-START -->` block in the kit's docs-reference contract (source repo); when that contract is absent, as in a user project, the check reports N/A and exits 0.
+**ENFORCEMENT:** `mewkit validate` checks it; when the contract file is absent, as in a user project, the check reports N/A and exits 0.
 
 ## Rule 6: Match Control to Risk
 
@@ -222,26 +197,9 @@ Style or taste denylists do not belong in the generic core. Describe the
 undesired outcome and use a divergence technique or a provider adapter where a
 specific model needs additional steering.
 
-## Rule 8: Preserve Contracted Workflow Choices
+## Rules 8 and 9: Kit Maintenance
 
-When repairing a caller/command mismatch, migrate callers to the supported
-contract instead of inventing an unimplemented flag. New flags require an
-explicit owner decision and a complete implementation.
-
-The canonical reports location is `tasks/reports/`; migrate legacy report-path
-references rather than preserving both locations. Host-level tool mapping is
-unverified, so a provider projection must remain conditional until the target
-host contract has been verified.
-
-The default cook workflow stops before shipping. Shipping remains an explicit,
-human-approved action. A plan Insert or Split means taking the revised plan back to
-the user; Skip or Reorder must notify the user and leave an audit-log entry.
-
-## Rule 9: Enforce Brand Prose Incrementally
-
-Brand-prose lint remains diff-mode blocking: violations in changed files fail,
-while pre-existing untouched violations remain warnings. Revisit full-tree
-blocking only after a separately approved CI scope change and a clean baseline.
+Rule 8 (preserve contracted workflow choices when repairing a caller mismatch) and Rule 9 (brand-prose lint is blocking only on changed files) govern maintaining the kit, not writing a skill. They live in the kit-maintenance reference that `SKILL.md` names, which authoring runs do not load.
 
 ## Rule 10: Reach the Skill's Own Files Without `.claude/`
 
@@ -277,13 +235,26 @@ skill to `.meowkit/telemetry/skill-rubric.json`. A skill passes a criterion when
 - **Duplicates:** no paragraph of 40 or more words is copied into another skill, except
   copies listed in `shared-families.json`.
 
-The rows warn and never fail the run. In the kit source, the published skill-audit table is
-generated from the same scores, so a new or changed skill is re-scored with it.
+The rows warn and never fail the run.
+
+## Rule 12: Add a Skill Only for an Observed Gap
+
+Create a new skill only when a failure was observed, or a gap was checked, and no existing skill covers it. Name the failure and the skill you checked. Otherwise extend the existing skill.
+
+WHY: self-generated skills that restate what the model already does score no better than no skill, and each extra skill adds routing noise and a description in every session's listing.
+
+## Rule 13: Write Instructions a Model Can Follow
+
+- No persona openers ("You are an expert ..."). A role is allowed only where it defines a boundary or an output, for example a reviewer stance.
+- Give the reason for a non-obvious rule in a clause. Reserve capitals and "never" for true gates (safety, destructive, irreversible), and say what they protect.
+- When a skill delegates, the brief carries the goal, separates fixed constraints from the current approach, and names the return shape; the skill also says when not to delegate (small, sequential or same-file work).
+- Give a named way out when the premise fails or the approach cannot meet the goal, and a retry cap. A skill that reports to a controller ends with the four-status block from `.claude/rules/agent-conduct.md` (A1).
+- Judgment work is stated as outcome, boundaries and a check. Exact steps are for fragile, destructive or security-sensitive steps (Rule 6).
 
 ## Applies to
 
-- `mk:skill-creator` (must enforce Rules 1 + 3 + 4 + 5 in templates)
-- All future skill authoring (all 11 rules)
-- Quarterly audits and model-upgrade audits (Rule 3 measurable check)
+- `mk:skill-creator` (templates follow Rules 1, 3, 4, 12 and 13)
+- All skill authoring (Rules 1, 2, 3, 4, 6, 7, 10, 11, 12, 13; Rule 5 for docs references)
+- Model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)
-- Every PR that touches `.claude/` (Rule 5 and Rule 10 mechanical checks in CI)
+- Every change under `.claude/` (Rule 5 and Rule 10 mechanical checks in CI)

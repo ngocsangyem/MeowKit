@@ -5,7 +5,7 @@
 > Codex", "targeting Gemini", "Droid/Factory"). It renders one optional
 > **"Target-specific notes"** block after Section 3 of the analysis.
 >
-> **Hard rules (from the confirmed design decisions):**
+> **Hard rules:**
 > - There is **no `--target` flag.** Target notes are analysis-only annotation.
 > - Notes **never change the rewrite** (Section 4). The Enhanced Prompt stays the
 >   universal kernel, byte-identical to what the no-target run would produce.
@@ -27,7 +27,7 @@
 
 All of:
 
-- `--analyze` (or `--analyze --score`) is set — never in default mode.
+- `--analyze` is set; never in default mode.
 - The input names a concrete target model or runtime.
 - A draftable prompt exists (same route gate as any run).
 
@@ -38,16 +38,14 @@ render no target block.
 
 ## Adapter table
 
-Techniques are surfaced as NOTES to the user, grounded in each vendor's own
-prompting guidance (see the model-specific matrix in the strategy report). They
-describe *what to consider*; they do not rewrite the kernel.
+Techniques are surfaced as notes to the user, grounded in each vendor's own prompting guidance. They describe what to consider; they do not rewrite the kernel.
 
 | Adapter | When (input names) | Added techniques (notes only) | Must NOT do | Risk |
 |---|---|---|---|---|
 | **default** | no target | universal kernel; neutral `--- DATA ---` fence | — | none (baseline) |
 | **claude** | Claude / Anthropic | may use XML sections for very complex prompts; long documents near the top, instruction after; explicit tool/safety boundaries | force XML into the default rewrite; add "think step by step"; role-as-XML | Claude-izing a portable enhancer |
 | **codex** | Codex / OpenAI / GPT | autonomy + persistence; codebase exploration; tool/patch discipline; concise progress updates | inject `apply_patch` / CLI boilerplate into a generic prompt; assume a harness | Harness leakage |
-| **gemini** | Gemini | concise direct instruction; `thinking_level` control; put the long-context question last; state media resolution | low-temperature advice; legacy `thinking_budget`; force chain-of-thought scaffolds | Misprompting Gemini |
+| **gemini** | Gemini | concise direct instruction; a lower reasoning setting for simple tasks; put the long-context question last; state media resolution | low-temperature advice; force chain-of-thought scaffolds | Misprompting Gemini |
 | **droid/factory** | Droid / Factory | structured outcome; explicit acceptance criteria; role/task framing | treat the refiner taxonomy as a mandate; assume one behavior for all models | Over-structuring |
 | **augment-style** | user asks for pre-processing / editable draft | present the rewrite as an editable draft + a bounded context-slice of `[FILL-IN]` anchors | claim a proprietary context engine, router, or any performance metric (unverified) | Overreach on unverified claims |
 
@@ -76,9 +74,7 @@ value for this prompt" rather than padding.
 
 ## Guards
 
-- **Never mutate the rewrite.** Section 4 is identical with or without a target.
-  A convergence canary asserts this (default vs analyze-with-target rewrite body
-  must match).
+- **Never mutate the rewrite.** The rewrite is identical with or without a target.
 - **One target at a time.** If the input names two, note both only if the user
   asked; otherwise pick the explicitly-stated one and ask which for the rest.
 - **No flag.** Do not invent `--target`; the block is triggered by explicit

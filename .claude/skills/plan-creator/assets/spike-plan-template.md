@@ -21,12 +21,12 @@ source: skill
 
 Investigate <X> and produce findings on <Y>. Output is a markdown document at `{findings_doc}`. NO test phase, NO ship phase. The spike is "complete" when the findings doc answers the questions below and a human reviewer accepts it.
 
-**Time-box:** `{timebox}`. If exceeded, Phase 5 hard prompt fires: "Timebox elapsed; what's the state? [Convert to delivery story | Close as research-only | Defer]".
+**Time-box:** `{timebox}`. If exceeded, ask: "Timebox elapsed; what's the state? [Convert to delivery story | Close as research-only | Defer]".
 
 ## Compatibility (per `agile-feedback-cycle.md` 2)
 
 - Run via `mk:cook` or `mk:plan-creator --fast`
-- **NEVER** run via `mk:autobuild` FULL — harness gate (Phase 2 red → Phase 3 green → Phase 4 review) breaks because spikes skip Phase 2 and Phase 5
+- **NEVER** run via `mk:autobuild` FULL — its red, green and review gate breaks because a spike has no test or ship phase
 
 ## Questions to Answer
 
@@ -53,7 +53,7 @@ Each Qn becomes a section in `{findings_doc}` with a documented answer + support
 
 1. Read existing code, docs, tickets relevant to the question
 2. Prototype throwaway code IF needed to test hypotheses (do NOT commit prototype to main)
-3. Capture observations as you go in scratch notes — these become 3 evidence in the findings doc
+3. Capture observations as you go in scratch notes — these become the evidence in the findings doc
 4. If timebox exceeded mid-investigation: STOP, escalate via prompt — "Timebox elapsed mid-investigation. Continue (extend timebox)? Close with partial findings? Abandon?"
 
 ### Phase 2 — Document Findings
@@ -87,7 +87,7 @@ Convert findings to delivery story?
 
 | Risk | Mitigation |
 |---|---|
-| Spike drifts past timebox | Phase 1 mechanism enforces timebox check; Phase 5 prompt fires automatically |
+| Spike drifts past timebox | Phase 1 checks the timebox; the closure prompt asks when it is exceeded |
 | Findings doc never written | Phase 2 has explicit AC; the spike is not "done" without it |
 | Throwaway prototype gets accidentally committed | Code from spike phase 1 lands in `.spike-scratch/` and is .gitignored |
 | Questions are vague | Each Qn must be answerable with evidence — vague Qs fail review |

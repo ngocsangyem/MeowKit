@@ -37,55 +37,35 @@ runtime: claude-code
 
 # /freeze — Restrict Edits to a Directory
 
-Lock file edits to a specific directory. Any Edit or Write operation targeting
-a file outside the allowed path will be **blocked** (not just warned).
-
-```bash
-mkdir -p .meowkit/telemetry
-echo '{"skill":"freeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
-```
+Goal: confine Edit and Write to one directory, for example while debugging, so a stray edit elsewhere is blocked rather than warned about. For destructive shell commands use `mk:careful`; the two stack.
 
 ## Setup
 
-Ask the user which directory to restrict edits to. Ask the user:
-
-- Question: "Which directory should I restrict edits to? Files outside this path will be blocked from editing."
-- Text input (not multiple choice) — the user types a path.
-
-Once the user provides a directory path:
-
-1. Resolve it to an absolute path:
+Ask the user which directory to restrict edits to (a typed path, not multiple choice), then set it:
 
 ```bash
-FREEZE_DIR=$(cd "<user-provided-path>" 2>/dev/null && pwd)
-echo "$FREEZE_DIR"
+node ${CLAUDE_SKILL_DIR}/scripts/set-freeze.cjs "<user-provided-path>"
 ```
 
-2. Ensure trailing slash and save to the freeze state file:
+The script resolves the path, requires it to be an existing directory, saves it with a trailing slash to the state file, reads it back and prints `Freeze boundary set: <dir>`. If it prints an error instead, the boundary did not change; tell the user and ask for a valid path. It refuses a missing path, a file and the filesystem root, because a boundary of `/` would allow every edit while looking active.
+
+Then tell the user: "Edits are now restricted to `<dir>`. Any Edit or Write outside it is blocked. Run `/mk:freeze` again with a new path to move the boundary."
+
+## Unfreezing
+
+The boundary lives in a state file (`${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`) and persists until it is cleared, including across sessions: a later session that loads this skill enforces the old boundary again. To remove it:
 
 ```bash
-FREEZE_DIR="${FREEZE_DIR%/}/"
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-.meowkit/state}"
-mkdir -p "$STATE_DIR"
-echo "$FREEZE_DIR" > "$STATE_DIR/freeze-dir.txt"
-echo "Freeze boundary set: $FREEZE_DIR"
+node ${CLAUDE_SKILL_DIR}/scripts/set-freeze.cjs --clear
 ```
-
-Tell the user: "Edits are now restricted to `<path>/`. Any Edit or Write
-outside this directory will be blocked. To change the boundary, run `/mk:freeze`
-again. Freeze persists for the session — end the session or start a new one to clear it."
 
 ## How it works
 
-See [references/freeze-mechanics.md](references/freeze-mechanics.md) for technical details on path resolution, symlink handling, state file persistence, and tool scope.
+This skill registers a `PreToolUse` hook on Edit and Write (`bin/check-freeze.cjs`). The hook is active from the moment the skill is invoked and reads the state file on every call. It allows anything inside the boundary and denies the rest, with a message naming the boundary. See [references/freeze-mechanics.md](references/freeze-mechanics.md) for path resolution, symlinks and tool scope.
 
-## Hooks
-
-- **Edit/Write path guard**: Blocks writes outside the frozen directory path — enforced by this project's configured hooks when present
-- Activated by `/mk:freeze <path>`. Deactivated when session ends.
-- Bash commands are NOT restricted — freeze only guards Edit and Write tools
+Bash is not restricted: `sed`, `cp` and `mv` can still change files outside the boundary. This guards against accidental edits, not against a deliberate command.
 
 ## Gotchas
 
-- **Symlinked files bypass freeze check**: Edit tool resolves symlinks, writing outside frozen directory → Check resolved path, not just the stated path
-- **Test files in frozen directory can't update fixtures**: Freeze prevents fixture updates needed for new test cases → Use --exclude pattern for test fixtures within frozen scope
+- **Symlinked files bypass the check**: the hook compares the stated path, not the resolved one. Avoid symlinks inside the boundary that point outside it.
+- **Files outside the boundary are blocked too**: a fixture, a plan, or an `mk:investigate` report under `tasks/reports/` is outside a frozen `src/`. Move the boundary up to include it, or clear the freeze first. There is no exclude option.

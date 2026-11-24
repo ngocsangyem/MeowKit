@@ -195,13 +195,13 @@ These sections are NOT added in default mode (12-section template remains unchan
 - Each phase file: ≤150 lines (≤180 with TDD or deep sections)
 - Sections can be brief but MUST exist (use "N/A" if not applicable)
 - Key Insights MUST cite research source when available
-- **Contract level by default.** Implementation Steps state behaviour, boundaries and invariants. File-level steps are added only when the executor is one that needs them: the `FULL` density in `mk:autobuild`'s density matrix (Sonnet-class and older models). At `LEAN` density, or in a plain `mk:cook` run on a current model, keep steps at contract level.
+- **Contract level by default.** Implementation Steps state behaviour, boundaries and invariants. File-level steps are added only when the executor is one that needs them: the `FULL` density in `mk:autobuild`'s density matrix (a weaker executor that needs file-level steps). At `LEAN` density, or in a plain `mk:cook` run on a current model, keep steps at contract level.
 - **Open assumptions carry their exit.** Every `[ASSUMPTION]` still unresolved when the plan is written records the sign that it broke (`Breaks if:`) and the response (`Then:`), so the executor can tell a failed assumption from a hard task.
 - Todo checkboxes map 1:1 to implementation steps
 - Success criteria must be verifiable (command to run or file to check)
 - **Runnable increment:** where applicable, the Success Criteria should confirm the phase leaves the system runnable / a demoable increment exists (e.g. a command boots, an endpoint responds, a screen renders). This pairs with vertical-slice decomposition (one end-to-end path per phase). Pure foundation phases — migrations, shared types, env/config — are exempt.
-- **Research linking (MANDATORY):** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step-03 verifies this after writing phase files.
-- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own session tasks during hydration (step-08), enabling finer-grained tracking.
+- **Research linking:** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step 3 adds the link when it is missing.
+- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own session tasks during hydration (step 8), enabling finer-grained tracking.
 
 ## Optional Machine-Written Sections
 
@@ -209,14 +209,14 @@ These sections are written by skill steps, not authored by humans. They are OPTI
 
 ### `## Verification Log`
 
-- **Written by:** `step-04-semantic-checks.md` sub-step 4d (Verification Roles)
+- **Written by:** `step-04-semantic-checks.md` (verification)
 - **Inserted:** before `## Next Steps`
 - **Format:** see `references/verification-roles.md`
 - **Do NOT hand-edit** — orchestrator overwrites on re-run.
 
 ### `## Validation Log`
 
-- **Written by:** `step-06-validation-interview.md` sub-step 6e and the Whole-Plan Consistency Sweep block from 6f
+- **Written by:** `step-06-validation-interview.md` (answers log) and the consistency sweep summary
 - **Inserted:** appended at the end of the phase file (or before `## Next Steps` if you prefer; convention is end-of-file)
 - **Format:** see `references/validation-questions.md` and `references/whole-plan-sweep.md`
 - **Do NOT hand-edit** — sweep regenerates the trailing summary block on re-run.

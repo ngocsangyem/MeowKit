@@ -1,161 +1,35 @@
-# Pre-flight: Base Branch Detection and Review Readiness
+# Pre-flight: base branch, ship mode, review readiness
 
+## Base branch
 
-## Contents
+Use the base branch for every later `git diff`, `git log`, `git merge` and `gh pr create`.
 
-- [Step 0: Detect base branch](#step-0-detect-base-branch)
-- [Step 0.5: Ship Mode Detection](#step-05-ship-mode-detection)
-- [Step 0.8: Unified Verification](#step-08-unified-verification)
-- [Step 0.9: Read workflow evidence (if present)](#step-09-read-workflow-evidence-if-present)
-- [Step 1: Pre-flight](#step-1-pre-flight)
-- [Review Readiness Dashboard](#review-readiness-dashboard)
+1. If a PR already exists for the branch: `gh pr view --json baseRefName -q .baseRefName`.
+2. Otherwise the default branch: `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`.
+3. If both fail, use `main`.
 
-## Step 0: Detect base branch
+If the current branch is the base or the repo's default branch, stop: ship from a feature branch.
 
-Determine which branch this PR targets. Use the result as "the base branch" in all subsequent steps.
+## Ship mode (`official` / `beta`)
 
-1. Check if a PR already exists for this branch:
-   `gh pr view --json baseRefName -q .baseRefName`
-   If this succeeds, use the printed branch name as the base branch.
+- `official`: target the default branch.
+- `beta`: target the first of `dev`, `beta`, `develop` that exists as `origin/<name>` (`git rev-parse --verify origin/<name>`).
+- No argument: `feature/*`, `hotfix/*`, `bugfix/*`, `fix/*` mean official; `dev/*`, `beta/*`, `experiment/*` mean beta; anything else, ask which.
 
-2. If no PR exists (command fails), detect the repo's default branch:
-   `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`
+## Working tree
 
-3. If both commands fail, fall back to `main`.
+Run `git status` (without `-uall`). If there are uncommitted changes, list the paths and ask which to include; none are included without a yes. Then `git diff <base>...HEAD --stat` and `git log <base>..HEAD --oneline` show what is being shipped.
 
-Print the detected base branch name. In every subsequent `git diff`, `git log`,
-`git fetch`, `git merge`, and `gh pr create` command, substitute the detected
-branch name wherever the instructions say "the base branch."
+With `--dry-run`, print the scope, target branch, test command and proposed version action, then stop.
 
----
+## Verification
 
-## Step 0.5: Ship Mode Detection
+Run `mk:verify` on the merged base once. A FAIL stops the run with the failing step and its errors. `--skip-tests` is allowed only with the user's confirmation that current-session evidence is enough.
 
-Determine ship mode from arguments:
+## Review readiness
 
-```
-If argument = "official" → target = default branch (main/master from Step 0)
-If argument = "beta"     → target = auto-detect dev branch:
-                           for b in dev beta develop; do
-                             git rev-parse --verify origin/$b 2>/dev/null && echo "$b" && break
-                           done
-If no argument           → infer from branch name:
-  - feature/* hotfix/* bugfix/* fix/* → official (target main)
-  - dev/* beta/* experiment/*         → beta (target dev)
-  - unclear                           → ask the user: "Ship to main (official) or dev (beta)?"
-If --dry-run             → print mode + plan for each step, then stop
-```
+The review verdict is the authority: read `tasks/reviews/*-verdict.md` for this change. Missing, or any FAIL dimension, means the change is not ready; say so and ask.
 
----
+If `workflow-evidence.json` exists (`tasks/plans/<plan>/reports/evidence/`, else `.meowkit/state/evidence/<slug>/`), report `approvals.ship`, `review.verdictPath` and `review.status`, `verification.overall` and `risk.requiresHumanApproval`. Evidence is proof, never approval, and it never overrides a `mk:verify` FAIL. Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`. If the file is absent, carry on.
 
-## Step 0.8: Unified Verification
-
-Before any pre-flight checks, run `mk:verify` to confirm everything is green.
-
-If `mk:verify` returns FAIL:
-- Display the failing step and errors
-- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `/mk:verify` to re-check."
-- Do not proceed to Step 1
-
-If `mk:verify` returns PASS: continue to Step 0.9.
-
-> Skip this step only if `--skip-verify` flag is passed explicitly by the user.
-
----
-
-## Step 0.9: Read workflow evidence (if present)
-
-`mk:verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk:verify`. A FAIL from verify still aborts regardless of what evidence says.
-
-1. Look for `workflow-evidence.json` at the planned path `tasks/plans/<plan>/reports/evidence/` first, then the standalone path `.meowkit/state/evidence/<slug>/`.
-2. **If absent** (older runs, `--quick` fixes): proceed exactly as today — no new hard dependency. Do not block on a missing file.
-3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk:verify` FAIL into a pass, and it is never the user's decision to ship.
-
-Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`.
-
----
-
-## Step 1: Pre-flight
-
-1. Check the current branch. If on the base branch or the repo's default branch, **abort**: "You're on the base branch. Ship from a feature branch."
-
-2. Run `git status` (never use `-uall`). Uncommitted changes are always included — no need to ask.
-
-3. Run `git diff <base>...HEAD --stat` and `git log <base>..HEAD --oneline` to understand what's being shipped.
-
-4. **If `--dry-run`:** Output what each step would do (mode, target branch, test command, version bump prediction) and **stop here**.
-
-5. Check review readiness:
-
-## Review Readiness Dashboard
-
-After completing the review, read the review log and config to display the dashboard.
-
-```bash
-.claude/hooks/lib/workflow-review-log
-```
-
-Parse the output. Match entries by `skill` field for real skills (`plan-ceo-review`, `review`, `adversarial-review`) and by `source` field for inline ship steps (`ship-design-check`). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, use `adversarial-review` (auto-scaled). For Design Review, use `ship-design-check` (inline lite check produced during pre-landing review). Display:
-
-```
-+====================================================================+
-|                    REVIEW READINESS DASHBOARD                       |
-+====================================================================+
-| Review          | Runs | Last Run            | Status    | Required |
-|-----------------|------|---------------------|-----------|----------|
-| Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
-| CEO Review      |  0   | —                   | —         | no       |
-| Design Review   |  0   | —                   | —         | no       |
-| Adversarial     |  0   | —                   | —         | no       |
-| Outside Voice   |  0   | —                   | —         | no       |
-+--------------------------------------------------------------------+
-| VERDICT: CLEARED — Eng Review passed                                |
-+====================================================================+
-```
-
-**Review tiers:**
-
-- **Eng Review (required by default):** The only review the ship step asks about. Covers architecture, code quality, tests, performance. Can be opted out of per project with `.claude/hooks/lib/workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
-- **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
-- **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
-- **Adversarial Review:** belongs to `mk:review`; ship does not run or scale it. The row above only reports a recent `adversarial-review` entry if `mk:review` logged one.
-- **Outside Voice (optional):** Independent plan review via Claude adversarial subagent. Offered after all review sections complete in /mk:plan-ceo-review. Never required for shipping.
-
-**Verdict logic:**
-
-- **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
-- **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
-- CEO and Design reviews are shown for context but never block shipping
-- If `skip_eng_review` is `true` in this project's session state, Eng Review shows "SKIPPED (opted out)" and verdict is CLEARED
-
-**Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
-
-- Parse the `---HEAD---` section from the bash output to get the current HEAD commit hash
-- For each review entry that has a `commit` field: compare it against the current HEAD. If different, count elapsed commits: `git rev-list --count STORED_COMMIT..HEAD`. Display: "Note: {skill} review from {date} may be stale — {N} commits since review"
-- For entries without a `commit` field (legacy entries): display "Note: {skill} review from {date} has no commit tracking — consider re-running for accurate staleness detection"
-- If all reviews match the current HEAD, do not display any staleness notes
-
-If the Eng Review is NOT "CLEAR":
-
-1. **Check for a prior override on this branch:**
-
-   ```bash
-   eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
-   grep '"skill":"ship-review-override"' .meowkit/telemetry/$BRANCH-reviews.jsonl 2>/dev/null || echo "NO_OVERRIDE"
-   ```
-
-   If an override exists, display the dashboard and note "Review previously accepted — continuing." Do NOT ask again.
-
-2. **If no override exists,** ask the user:
-   - Show that Eng Review is missing or has open issues
-   - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
-   - Options: A) Ship anyway B) Abort — run /mk:review first C) Change is too small to need eng review
-   - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
-   - For Design Review: run `source <(.claude/hooks/lib/workflow-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no `ship-design-check` entry exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The inline lite design check runs automatically during pre-landing review." Still never block.
-
-3. **If the user chooses A or C,** persist the decision so future `/mk:ship` runs on this branch skip this question:
-   ```bash
-   eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
-   echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl
-   ```
-   Substitute USER_CHOICE with "ship_anyway" or "not_relevant".
+`.claude/hooks/lib/workflow-review-log` prints recent review entries by skill. Read it for staleness: for an entry with a `commit` field, count `git rev-list --count <commit>..HEAD` and mention reviews that are many commits old. CEO and design reviews are context only and never block. When the Eng Review is missing, ask: ship anyway, abort and run `mk:review`, or the change is too small to need one (under about 20 lines, typo or config only). Record a "ship anyway" or "not relevant" answer in `.meowkit/telemetry/$BRANCH-reviews.jsonl` (`eval "$(.claude/hooks/lib/workflow-slug)"` sets `$BRANCH`) so the same branch is not asked twice.

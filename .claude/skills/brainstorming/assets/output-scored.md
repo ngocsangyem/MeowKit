@@ -94,24 +94,7 @@ Score each idea on all 4 criteria after the full set exists. See `references/sco
 
 ### Brainstorm Handoff Packet
 
-```yaml
-problem: "[confirmed problem]"
-binding_constraint: "[binding constraint]"
-success_criterion: "[success criterion]"
-excluded_scope: "[excluded scope]"
-selected_idea: "[recommended idea]"
-why_selected: "[score + evidence summary]"
-scores:
-  "[idea]": [total]
-touchpoints: []
-rejected_alternatives:
-  - idea: "[idea]"
-    reason: "[why it lost]"
-open_risks: []
-planning_questions:
-  - "[first planning question]"
-report_path: "tasks/reports/[report-name].md"
-```
+Append the packet defined in `assets/output-action-plan.md`, with `scores` filled from the table above.
 
 ### Next Steps
 

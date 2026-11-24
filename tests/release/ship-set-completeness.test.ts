@@ -40,7 +40,6 @@ describe("ship set completeness", () => {
 		for (const template of [
 			".claude/skills/plan-creator/assets/plan-template.md",
 			".claude/skills/plan-creator/assets/plan-quick.md",
-			".claude/skills/plan-creator/assets/plan-phase.md",
 			".claude/skills/plan-creator/assets/bead-template.md",
 			".claude/skills/status/assets/pm-status-template.md",
 			".claude/skills/jira-lifecycle/references/workflow-cache-layout.md",

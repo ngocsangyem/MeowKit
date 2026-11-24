@@ -46,6 +46,7 @@ Detect the build system and start it. Use the simplest invocation:
 cd "$target"
 npm run dev > /tmp/evaluator-build.log 2>&1 &
 build_pid=$!
+echo "$build_pid" > "$evidence_dir/.build-pid"
 echo "Booted PID $build_pid; logs at /tmp/evaluator-build.log"
 ```
 
@@ -70,7 +71,7 @@ if [ -z "${base_url:-}" ]; then
 fi
 ```
 
-Save `build_pid` for cleanup in step-05.
+The PID is saved in `$evidence_dir/.build-pid`, so step 5 can read it in a later shell.
 
 ### 2c. CLI binary targets
 
@@ -112,7 +113,7 @@ This is the first piece of evidence in the directory. The validate-verdict.sh en
 ## Output
 
 - `base_url` — set
-- `build_pid` — set if path target was booted (for cleanup later)
+- `$evidence_dir/.build-pid` — written if a path target was booted (for cleanup later)
 - `console_capture` — first evidence file written to `evidence_dir`
 
 Print: `"App reachable at {base_url}"`

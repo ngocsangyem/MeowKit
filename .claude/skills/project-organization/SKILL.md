@@ -35,7 +35,7 @@ Explicit: `/mk:project-organization [targets]`
 
 ## Workflow Integration
 
-Operates in **Phase 6 (Reflect)** or advisory mode (called by any skill). Output supports the `documenter` agent.
+Runs when a user invokes it, or in advisory mode when another skill asks where a file belongs. Output supports the `documenter` agent.
 
 ## Modes
 
@@ -55,9 +55,9 @@ Operates in **Phase 6 (Reflect)** or advisory mode (called by any skill). Output
 1. Determine file type from context (source? doc? plan? test? asset?)
 2. Look up correct path from directory categories
 3. Apply naming rules (timestamped / evergreen / variant)
-4. Return: `{path}/{name}.{ext}`
+4. Return the path `{path}/{name}.{ext}` and a one-line reason. Advisory mode returns only that; the report table below is for Organize mode.
 
-## Output Format
+## Output Format (Organize mode)
 
 ```
 ## Project Organization: {scope}
@@ -91,15 +91,14 @@ Operates in **Phase 6 (Reflect)** or advisory mode (called by any skill). Output
 
 ## Constraints
 
-- Never overwrite existing files without confirmation
-- Never touch `.git/`, `node_modules/`, `.env` files
-- Respect `.gitignore` patterns
-- Use `mk:` prefix conventions for .claude/skills/ directories
+- Never overwrite an existing file without confirmation: a move that lands on one destroys it.
+- Never touch `.git/`, `node_modules/` or `.env` files: they are tool state or secrets.
+- Respect `.gitignore`: ignored paths are generated or private.
+- Do not move files that other code imports without updating the imports.
 
 ## Gotchas
 
-- **Monorepo package `name` in `package.json` and the directory name can diverge silently** — a workspace package at `packages/auth-service/` with `"name": "@company/auth"` is referenced by consumers as `@company/auth`, but path aliases, Docker build contexts, and some bundlers resolve by directory name; mismatch causes "cannot find module" errors that only appear after a fresh install in CI.
-- **`tsconfig.json` path aliases are NOT honored by test runners without separate config** — `paths: { "@/*": ["src/*"] }` in `tsconfig.json` resolves in `tsc` and Vite but Vitest and Jest use their own module resolvers; tests using `@/` aliases silently fall through to `node_modules` lookup and fail with "Cannot find module '@/utils'" unless `moduleNameMapper` (Jest) or `alias` (Vitest) is configured separately.
-- **Circular path aliases break tree-shaking and cause `undefined` at runtime** — `src/utils/index.ts` re-exporting from `src/components/` which imports from `src/utils/` creates a circular dependency that bundlers resolve non-deterministically; the symptom is a component that is `undefined` when imported via the alias but defined when imported by relative path.
-- **Absolute imports (`src/`) vs relative imports (`../../`) inconsistency prevents reliable refactoring** — mixing both styles means automated refactoring tools (VS Code "move file", `ts-morph`) update only the form they recognize; half the import sites break silently on any file move; enforce one style via ESLint `import/no-relative-parent-imports` or `import/no-absolute-path`.
-- **`.gitignore` patterns not applying to already-tracked files causes `dist/` to appear in PRs** — if `dist/` was committed before being added to `.gitignore`, git continues tracking it; `git rm -r --cached dist/` is required to untrack it, and omitting this step means every build output change appears as a diff in PRs.
+- Reports and plans belong in `tasks/reports/` and `tasks/plans/`, not in `docs/`: `docs/` holds evergreen project documentation.
+- Evergreen docs carry no date in their name; timestamped names (`YYMMDD-slug`) are for plans, reviews and reports.
+- A file the code imports is not safe to move until its imports are updated; propose the import edits with the move.
+- An empty directory needs a `.gitkeep` or git will not track it.

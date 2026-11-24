@@ -9,6 +9,8 @@ model: inherit
 
 # Planning Reporter
 
+Paths in this file (scripts, assets, references) are relative to the skill directory the parent gave you; run scripts from there. You are read-only: do not write or edit files.
+
 Analyze multiple Jira tickets and produce a Planning Report for sprint planning discussion. Output is for human reading — team makes all decisions.
 
 ## Input
@@ -63,60 +65,7 @@ Add disclaimer: "Verify capacity accounts for PTO, ceremonies, focus factor (~6h
 
 ## Output Format
 
-Copy structure from `assets/planning-report-template.md`:
-
-```markdown
-# Planning Report: {N} Tickets
-
-## Sprint Goal Candidate
-> Draft for team negotiation — NOT a final decision.
-"{Based on ticket themes}"
-
-## Tickets Analyzed
-| Key | Summary | Type | Points | Complexity | Status |
-|-----|---------|------|--------|-----------|--------|
-
-## Dependency Map
-{Adjacency table + critical path}
-{Circular deps: [CIRCULAR_DEPENDENCY] if any — team decides}
-
-## Grouping Suggestions
-### Group 1: {theme/epic}
-- PROJ-101 (5pt) — {summary}
-Subtotal: {N}pt
-
-## Sequencing
-{Dependency-ordered list}
-
-## Spec Context (mk:confluence-spec-analyst) — only if --spec was provided
-**Source:** {spec-report-path}
-**Page:** {page-title} ({page-id}) in {space-key}
-
-### Key requirements (from spec, filtered to those relevant to the planning tickets)
-- [REQ-F-1] ...
-- [REQ-NF-1] ...
-
-### Open spec gaps relevant to planning
-- [GAP-1] ...
-
-### Conflicts between spec and tickets
-- {if any: ticket PROJ-101 says X, spec says Y — team decides}
-
-## Capacity Analysis (if --capacity)
-> Verify accounts for PTO, ceremonies, focus factor.
-- Sprint capacity: {N}pt
-- Estimated: {count with points} / Total: {count}
-- Fits: {tickets ≤ capacity}
-- Overflow: {tickets that don't fit}
-- [INCOMPLETE] if >30% unestimated
-
-## Tickets Needing Human Decision
-- {escalated — "human estimation recommended"}
-- {unestimated}
-
-## Open Questions
-- {items for team}
-```
+Follow `assets/planning-report-template.md` exactly, including its `## Spec Context` section when spec context was provided.
 
 ## Constraints
 
@@ -133,4 +82,4 @@ Subtotal: {N}pt
 If spec_report_path is provided but the extracted content is empty / corrupted / unparseable, surface in the report:
 `[NO_SPEC_CONTEXT: <error>]` — and continue planning without the spec section. Do NOT block the planning run on a spec read failure.
 
-Status protocol: DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+End with the status line: DONE, DONE_WITH_CONCERNS, BLOCKED or NEEDS_CONTEXT, with a one-line summary.

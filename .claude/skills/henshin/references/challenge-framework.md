@@ -1,10 +1,10 @@
 # Challenge Framework
 
-Used in Phase 4 (the user's decision) of `mk:henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. Phase 5 does not emit until these questions have answers.
+Used in the Challenge step (the user's decision) of `mk:henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. The Transformation spec is not emitted until these questions have answers.
 
 ## 7-question interview
 
-Always ask, in this order. Skip only if Phase 2 + 3 already produced a definitive answer (record the inferred answer + source instead).
+In `--ask` mode ask in this order. In `--auto` mode record a proposed answer with its source for questions 1 to 6 and still ask for question 7. Skip a question when recon and the Agentize map already answered it definitively (record the inferred answer and its source instead).
 
 1. **Why agentize this?** What unlocks when an AI agent (not a human) calls these operations? If the answer is "it would be cool", stop.
 2. **Who is the primary consumer?** AI agent, human via CLI, or both equally? Drives output shape, error prose, verbosity defaults.
@@ -25,7 +25,7 @@ Always ask, in this order. Skip only if Phase 2 + 3 already produced a definitiv
 | Output size? | Megabyte payloads typical | Pageable, filterable, default <1 KB |
 | Stateful workflows? | Requires client-side state machine | Each call self-contained |
 
-≥3 red flags: recommend refactor first (not agentization).
+Count the red flags. 0 to 2 is low risk; 3 or 4 is medium (resolve them or narrow the scope before continuing); 5 or more is high: stop (see Stop conditions). The same vocabulary and numbers apply in `mk:chom`.
 
 ## Scope-cut pass
 
@@ -46,7 +46,7 @@ If "yes" to any: cut the capability. Err on the side of fewer, sharper tools.
 - **Identifiers agent-friendly** (names) vs DB-friendly (UUIDs) → prefer names
 - **Tool descriptions pass the "when would I use this?" test** for a first-time reader → green
 
-## Phase 4 decision matrix (Phase 4 output)
+## Decision matrix (output of the Challenge step)
 
 Fill every row. An empty row means the decision has not been made yet.
 
@@ -75,9 +75,9 @@ Abort and propose alternatives if **any** of these hold:
 - No capabilities survive the cut-scope pass
 - Credentials model requires interactive OAuth that cannot run in any MCP transport
 - Legal / compliance blocks publishing (licensing of upstream deps, export restrictions, etc.)
-- `≥5` architectural red flags (signals deep refactor, not agentization)
+- 5 or more architectural red flags (signals deep refactor, not agentization)
 
-Emit a Rejection Report with which condition tripped and a concrete refactor recommendation. Do not proceed to Phase 5.
+Emit a Rejection Report with which condition tripped and a concrete refactor recommendation. Do not emit the spec.
 
 ## Gotchas
 

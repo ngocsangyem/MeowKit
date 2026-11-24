@@ -65,8 +65,8 @@ Routing rules — identical in all four skills:
   invents the target.
 - **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
-- **An auth-sensitive change**: the owning skill states the *requirement*; the security
-  workflow owns the verdict.
+- **An auth-sensitive change**: the owning skill states the *requirement*; `mk:cso`
+  owns the verdict.
 - **Any production effect → `mk:ship` or a human.**
 <!-- /shared:backend-routing -->
 
@@ -93,8 +93,9 @@ proposing syntax for the wrong engine wastes the whole answer.
 
 ### 3. State invariants before syntax
 
-Write these down before a line of schema. Mark anything unknown as unknown rather than
-filling it in:
+For a new or changed table, write down the invariants that apply before a line of schema, and mark
+anything unknown as unknown rather than filling it in. For a query or index question, state only the
+access pattern and the performance baseline.
 
 - **Entity and lifecycle** — what it represents, how it is created, changed, and ended.
 - **Identity and uniqueness** — what makes a row the same row, and what must never duplicate.
@@ -156,7 +157,7 @@ uses is the one to use.
 ## Security constraint
 
 Never build a query by string interpolation or template concatenation. Use the parameter
-mechanism the driver or ORM provides — this is a blocked pattern, not a style preference.
+mechanism the driver or ORM provides. `.claude/rules/security-rules.md` blocks interpolated SQL in new code, so this is not a style preference.
 
 Never log, print, or copy personal data while investigating. A row that reproduces a bug can
 be described by its shape.

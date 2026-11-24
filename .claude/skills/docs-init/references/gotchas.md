@@ -1,6 +1,6 @@
 # Gotchas
 
-Update when docs-init fails in new scenarios.
+Single list of docs-init failure modes. Update when it fails in a new scenario.
 
 - **Hallucinating architecture**: generating docs about code that doesn't exist → always scout FIRST with mk:scout; generate only from confirmed findings, never from assumptions
 - **Over-documenting small projects**: creating 7 doc files for a 50-line script → check project size first; small projects (<10 files) get README + codebase-summary only

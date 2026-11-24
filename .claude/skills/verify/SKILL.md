@@ -39,66 +39,20 @@ Produces a single PASS/FAIL verdict with per-step results.
 **Phase: 3→4 transition (Build → Review)**
 **Handoff:** If PASS → proceed to `mk:review`. If FAIL → developer fixes, re-run verify.
 
-## Project Detection
+## Project Detection and Scope
 
-Detect project type by checking for marker files in this order:
+Detect the project type from its marker files and choose commands per `references/project-detection.md`, which holds the command table, the marker rule (primary language; ask when mixed or when no marker is found) and the changed-file set.
 
-| Marker File      | Language | Build                    | Lint                       | Type-check                            | Test                | Coverage                            |
-| ---------------- | -------- | ------------------------ | -------------------------- | ------------------------------------- | ------------------- | ----------------------------------- |
-| `package.json`   | JS/TS    | `npm run build`          | `npm run lint`             | `npm run typecheck` or `tsc --noEmit` | `npm test`          | `.nycrc` or `jest.config` threshold |
-| `pyproject.toml` | Python   | `python -m build`        | `ruff check .` or `flake8` | `mypy .`                              | `pytest`            | `pyproject.toml` coverage threshold |
-| `go.mod`         | Go       | `go build ./...`         | `golangci-lint run`        | (built-in to build)                   | `go test ./...`     | coverage report                     |
-| `Gemfile`        | Ruby     | `bundle exec rake build` | `rubocop`                  | (N/A)                                 | `bundle exec rspec` | `.simplecov`                        |
-| `Cargo.toml`     | Rust     | `cargo build`            | `cargo clippy`             | (built-in to build)                   | `cargo test`        | `cargo tarpaulin`                   |
+By default the skill checks what changed, so a post-change run stays fast: lint and tests run on the changed files (tests only those related to them); build and type-check stay whole-program, because a partial build or type-check misses cross-file breakage; coverage is skipped and reported `SCOPED`. `--full` runs every step across the whole project, for releases and CI. With no git, or no changed files, run the whole project.
 
-**Multiple markers found:** Use the most specific one (e.g., `Cargo.toml` over `package.json` if both exist in a mixed repo).
-
-**No marker found:** Ask user — "What build and test commands should I use for this project?"
-
-See `references/project-detection.md` for detailed detection logic and edge cases.
-
-## Scope: Changed Files (default)
-
-By default this skill checks only what changed — it does NOT lint or test the whole
-project. Post-change verification stays fast and focused on the current work; the
-complete whole-project gate runs later at ship time (`pre-ship.cjs`).
-
-1. Collect the changed files from git — union of committed-since-base + staged +
-   unstaged + untracked:
-
-   ```bash
-   BASE=$(git merge-base HEAD origin/HEAD 2>/dev/null \
-       || git merge-base HEAD main 2>/dev/null \
-       || git merge-base HEAD master 2>/dev/null)
-   { [ -n "$BASE" ] && git diff --name-only "$BASE"...HEAD
-     git diff --name-only
-     git diff --name-only --cached
-     git ls-files --others --exclude-standard
-   } | sort -u
-   ```
-
-2. **Lint** runs on the changed files only (e.g. `npx eslint <files>`, `ruff check <files>`).
-3. **Tests** run only those related to the changed files (e.g. `jest --findRelatedTests`,
-   `vitest related`, the changed test files for pytest).
-4. **Build** and **type-check** stay whole-program — a partial build or `tsc --noEmit`
-   pass is unsound and would miss cross-file breakage.
-5. **Coverage** is skipped in scoped mode (a related-tests run does not reflect global
-   coverage) and reported as `SCOPED`.
-
-**Fallbacks:** if git is unavailable, or no changed files are detected, run the whole
-project (equivalent to `--full`). Pass `--full` to force a complete whole-project run —
-use it for releases and CI.
-
-See `references/project-detection.md` for per-language scoped command mappings.
+The ship check mirrors this at commit, push and merge time: lint on changed files, related tests and a type-check. It is not a whole-project gate; use `--full` for one.
 
 ## Process (Fail Fast)
 
 Execute each step in order. **Stop immediately on first failure** — do not continue to the next step.
 
-1. **Resolve scope** — collect changed files (above). Lint + tests run against the
-   changed set; build + type-check run whole-program. `--full` runs every step across
-   the whole project.
-2. **Detect** project type from marker files
+1. **Resolve scope**: collect the changed files (reference). Lint and tests run against the changed set; build and type-check run whole-program; `--full` runs every step across the whole project.
+2. **Detect** the project type from its marker files
 3. **Build** — compile/bundle the project (whole-program)
 4. **Lint** — static analysis on the changed files (whole project under `--full`)
 5. **Type-check** — static type validation, whole-program (if applicable to language)
@@ -108,7 +62,7 @@ Execute each step in order. **Stop immediately on first failure** — do not con
 ## Coverage Threshold
 
 1. Check project config for threshold (`.nycrc`, `jest.config`, `pyproject.toml [tool.coverage]`, etc.)
-2. If no project config: use default **80%**
+2. If no project config: use **80%** as a fallback
 3. If `--coverage-threshold N` flag provided: override with N%
 
 ## Output Format
@@ -174,4 +128,4 @@ Errors:
 - **Monorepo:** If multiple `package.json` found, ask user which workspace to verify or run from root
 - **Type-check for Go/Rust:** Covered by the build step — mark as PASS if build passed
 - **Coverage for Ruby:** `.simplecov` config may not exist; default to 80% threshold if missing
-- **Flaky tests:** If tests fail intermittently, re-run once before reporting FAIL
+- **Flaky tests:** re-run a failing test once to separate a flake from a regression; report the retry

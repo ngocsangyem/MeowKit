@@ -1,80 +1,66 @@
-# Skill Creation Workflow — Detailed Guide
+# Skill creation: section-by-section guidance
 
-## Step 1: Gather Intent
+Use alongside `references/skill-authoring-rules.md`. Everything here is guidance, not a required template: include a section only when the skill needs it.
 
-Ask the user (or infer from context):
-1. What should the skill do? (one sentence purpose)
-2. When should it auto-activate? (trigger keywords/patterns)
-3. What input does it accept? (arguments, flags, file paths)
-4. What output does it produce? (structured template? file? report?)
-5. Which workflow phase does it operate in? (Phase 0-6 or meta)
-6. Which agent receives the output? (planner, developer, reviewer, etc.)
+## Gather intent
 
-## Step 2: Scaffold Directory
+Ask the user, or infer from context:
+
+1. What failure or gap prompted this, and which existing skill was checked? (Rule 12)
+2. What should the skill do? One sentence.
+3. When should it trigger, and when not? Which neighbour owns the adjacent job?
+4. What input does it accept, and what does it return?
+5. If it delegates: what is the brief, and when should it not delegate?
+
+## Layout
 
 ```
-.claude/skills/{name}/
-├── SKILL.md          # Main skill definition (≤100 lines)
-└── references/       # Detailed content (if needed)
-    └── *.md
+.claude/skills/<slug>/
+├── SKILL.md          # entry: at most 500 lines and about 5,000 tokens
+├── references/       # detail loaded on demand, one level deep
+└── scripts/          # deterministic work the model should run, not re-derive
 ```
 
-## Step 3: Generate Frontmatter
+The directory carries no `mk:` prefix; the frontmatter name does.
+
+## Frontmatter
 
 ```yaml
 ---
-name: mk:{name}
-description: "{trigger keywords} + {what it does}"
+name: mk:<slug>
+description: "<what it does, in one sentence>. NOT for mk:<neighbour>."
+when_to_use: "<the trigger, once>"
+keywords: [<5 to 15 lowercase-hyphenated strings>]
+user-invocable: true
 ---
 ```
 
-Description must be specific enough for Claude to decide when to delegate. Include trigger phrases the user would say.
+The description says what the skill does; `when_to_use` says when. Neither repeats the other.
 
-## Step 4: Fill Required Sections
+## What a SKILL.md should say
 
-### Overview (2-3 sentences)
-What the skill does + when to use it. Not a marketing pitch — a factual description.
+- The goal, in terms of what a finished run leaves behind.
+- When to use it, and when not (name the neighbour skill).
+- The outcome and its boundaries, with exact steps only for fragile, destructive or security-sensitive work.
+- What it returns, and the exit path when its premise fails. If it reports to a controller, the four-status block.
+- Which reference to load for which situation.
+- A `## Gotchas` section once a real failure teaches something.
 
-### When to Invoke
-- Auto-activate patterns (keywords Claude watches for)
-- Explicit call syntax: `/mk:{name} [args]`
-- "Do NOT invoke when:" (prevent misuse)
+## Security check
 
-### Process (numbered steps)
-Each step must be independently executable. No "do the right thing" steps. If a step needs detail, create a reference file.
+If the skill reads untrusted input, copy the block from `mk:skill-template-secure` and apply the Rule of Two (at most two of: untrusted input, sensitive data, state change).
 
-### Output Format
-Template with `{placeholders}` the agent fills. Not freeform prose. Consuming agent receives consistent structure.
+## Register
 
-### Failure Handling
-| Failure | Detection | Recovery | Message |
-|---------|-----------|----------|---------|
-For every way the skill can fail: what detects it, what to do, what to tell the user.
+Add a row to `SKILLS_ATTRIBUTION.md` in the skills folder, when the project keeps one:
 
-### Workflow Integration
-"This skill operates in Phase [X] of the workflow."
-"Output is passed to: [agent name]"
-
-### Handoff Protocol
-On completion: what to pass, to whom, in what format.
-
-## Step 5: Security Check
-
-If the skill processes untrusted input, load mk:skill-template-secure and verify:
-- Rule of Two compliance (max 2 of: untrusted input, sensitive data, state change)
-- Trust model table (what's trusted vs untrusted)
-- Content processing rules
-
-## Step 6: Register
-
-Add a row to `SKILLS_ATTRIBUTION.md` in the skills folder, when the kit you are working in keeps one:
 ```
-| mk:{name} | your org (original) | — | MIT | .claude/skills/{name}/ |
+| mk:<slug> | <org> (original) | | MIT | .claude/skills/<slug>/ |
 ```
 
-## Anti-Patterns
+## Anti-patterns
 
-- Don't create skills that duplicate existing agent behavior
-- Don't create skills with vague triggers ("when appropriate")
-- Don't create skills over 200 lines without references/
-- Don't create skills that modify files outside .claude/
+- A skill that duplicates what an existing skill or agent already does.
+- Vague triggers ("when appropriate").
+- A body past the size caps with no references.
+- A skill that writes outside the project.

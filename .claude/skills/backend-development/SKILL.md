@@ -63,8 +63,8 @@ Routing rules — identical in all four skills:
   invents the target.
 - **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
-- **An auth-sensitive change**: the owning skill states the *requirement*; the security
-  workflow owns the verdict.
+- **An auth-sensitive change**: the owning skill states the *requirement*; `mk:cso`
+  owns the verdict.
 - **Any production effect → `mk:ship` or a human.**
 <!-- /shared:backend-routing -->
 
@@ -87,7 +87,7 @@ set is a finding, not an assumption to fill in.
 | Contract-only | The change is what the interface promises, not what runs | `mk:api-design-principles`; stop here |
 | Service logic | Behavior inside an existing boundary; no contract or schema delta | Stay here |
 | Data | Reads or writes change shape, volume, or invariants | `mk:database` for the schema/query part |
-| Auth | Identity, permission, tenancy, or an audited action is touched | State the requirement; security workflow owns the verdict |
+| Auth | Identity, permission, tenancy, or an audited action is touched | State the requirement; `mk:cso` owns the verdict |
 | Async / event | Work leaves the request path — job, consumer, webhook, scheduled task | Stay here; see failure semantics below |
 | Production readiness | The question is operability, not behavior | `mk:devops` |
 

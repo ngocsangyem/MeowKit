@@ -134,7 +134,7 @@ node "$(dirname "$0")/lib/write-run-manifest.cjs"
 
 echo ""
 
-# Phase 8 C2 fix (260408): emit `benchmark_result` trace record INLINE so the trace
+# Emit the `benchmark_result` trace record inline so the trace
 # store has at least one record per benchmark invocation, even if the orchestrator
 # never finishes filling in per-task results. Links back to the manifest path so
 # mk:trace-analyze can correlate.

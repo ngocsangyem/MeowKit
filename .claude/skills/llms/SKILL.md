@@ -1,7 +1,7 @@
 ---
 name: mk:llms
 description: "Generates llms.txt from project docs."
-argument-hint: '[path] [--full] [--output path] [--url base]'
+argument-hint: '[--source path] [--full] [--output dir] [--base-url url]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
 adapted_for: claude-code
@@ -24,30 +24,30 @@ requires_runtime: [python>=3.9]
 
 Generate [llms.txt](https://llmstxt.org/) files — LLM-friendly markdown indexes of project documentation.
 
-> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+> Run from the project root. The script path below is relative to this skill's directory.
 
 ## When to Use
 
 - Project needs LLM-friendly documentation index
 - User asks for "llms.txt", "LLM documentation", "AI-friendly docs"
 - Publishing docs site and want AI discoverability
-- After major documentation updates (Phase 6 Reflect)
+- After major documentation updates
 
-Explicit: `/mk:llms [path] [--full]`
+Explicit: `/mk:llms [--source path] [--full]`
 
 ## Workflow Integration
 
-Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter` agent.
+On demand, or after docs change. Output supports the `documenter` agent.
 
 ## Arguments
 
 | Flag            | Effect                                            |
 | --------------- | ------------------------------------------------- |
-| (no args)       | Scan `./docs` directory                           |
-| `path`          | Scan specific directory                           |
+| (no args)       | Scan `./docs`                                     |
+| `--source path` | Scan a specific directory (default `./docs`)      |
 | `--full`        | Also generate `llms-full.txt` with inline content |
-| `--output path` | Custom output location (default: project root)    |
-| `--url base`    | Base URL prefix for links                         |
+| `--output dir`  | Output directory (default: project root)         |
+| `--base-url url` | Base URL prefix for links                        |
 
 ## Scripts
 
@@ -69,8 +69,9 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llm
 2. **Review metadata** — check project name, description, file categorization
 3. **Generate** — run script again without `--json` to produce llms.txt
 4. **Review output** — read generated llms.txt, improve descriptions if needed
-5. **Validate** — check: H1 present, blockquote summary, valid link format, Optional section last
+5. **Validate** — run these four checks and fix what fails (the full rules are in `references/llms-txt-spec.md`): the file starts with one H1; a blockquote summary follows; every list entry is `- [title](url): description`; an `Optional` section, if present, is last
 6. If `--full`: review llms-full.txt for completeness
+7. Return the output path(s) and the four-status block from `.claude/rules/agent-conduct.md` (A1)
 
 ## Output Format
 
@@ -106,7 +107,7 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llm
 ## Constraints
 
 - Never fabricate documentation content — only index what exists
-- Follow llmstxt.org spec strictly
+- Follow the llmstxt.org format: other tools parse the file by that structure
 - Keep descriptions concise — one sentence per entry
 
 ## Gotchas

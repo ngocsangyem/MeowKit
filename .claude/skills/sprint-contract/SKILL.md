@@ -31,13 +31,13 @@ runtime: claude-code
 
 Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` before the generator writes any source code, so both agents are grading the same scope. The contract is a shared document, not a checkpoint: no hook blocks an edit while it is unsigned.
 
-> For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:autobuild` only.
+> For single-task plan validation (cook flow), use `mk:validate-plan`; to write the plan itself, `mk:plan-creator`. This skill is for product-level specs feeding `mk:autobuild`.
 
 ## When to Use
 
 Activate when:
 - User runs `/mk:sprint-contract <action> [task-slug]`
-- Harness (Phase 5) needs to negotiate a sprint before invoking the generator
+- `mk:autobuild` (FULL density) needs to negotiate a sprint before invoking the generator
 - Generator agent needs to read a signed contract before starting implementation
 - A previously signed contract needs amendment due to mid-build scope discovery
 
@@ -56,18 +56,16 @@ Skip when:
 | `sign` | both | Both agents commit to the contract via git commit messages; status: `negotiating → signed` |
 | `sprint-goal` | user | Writes/reads/aligns sprint-LEVEL goal in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` (Agile mode) |
 
-## Workflow (Inline — monolithic, < 150 lines)
+## Workflow
 
 ### `propose` (generator)
 
-1. Read active product spec from newest `tasks/plans/*/plan.md`
-2. Load rubric preset via `.claude/skills/rubric/scripts/load-rubric.sh --preset {preset}`
-3. Determine sprint `N`: max of existing `tasks/contracts/*-{slug}-sprint-*.md` + 1, default 1
-4. Copy `assets/contract-template.md` → `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md`
-5. Populate: 5–15 ACs in Given/When/Then form, each bound to one preset rubric, each with a Verification line. Every preset rubric should have ≥1 AC binding
-6. Set frontmatter: `status: negotiating`, `rounds: 0`, `created: {YYMMDD-HHMM}`
-7. Re-read the draft against `assets/contract-template.md` — every section present, every AC in Given/When/Then form with a rubric binding and a Verification line
-8. Print: `"Contract proposed at {path}. Awaiting evaluator review."`
+1. Read the active product spec from the newest `tasks/plans/*/plan.md`.
+2. Load the rubric preset: `.claude/skills/rubric/scripts/load-rubric.sh --preset {preset}`.
+3. Sprint `N` is the highest existing `tasks/contracts/*-{slug}-sprint-*.md` number plus 1 (default 1).
+4. Copy `assets/contract-template.md` to `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md` and fill it: acceptance criteria in Given/When/Then form, each bound to one preset rubric and carrying a Verification line, enough that every in-scope behaviour is checked and every preset rubric is bound at least once; frontmatter `status: negotiating`, `rounds: 0`, `created`.
+
+Done when the file exists with every template section filled. Tell the user the path and that it awaits evaluator review.
 
 ### `review` (evaluator)
 
@@ -87,32 +85,19 @@ Skip when:
 
 ### `sign` (both agents in sequence)
 
-The signature workflow uses **two commits per agent** to avoid the chicken-and-egg of "the SHA must be inside the file but the file's commit hasn't happened yet."
+The invariant: each agent commits the contract, then records the SHA of its own commit in its signature field, in a second commit. The SHA cannot live inside the file it commits, hence two commits per agent.
 
-1. **Generator (commit 1):** `git add tasks/contracts/{path}.md && git commit -m "contract: generator commits sprint {N} for {slug}"`. The contract file is committed with `generator_signed: pending`.
-2. **Generator (commit 2 — capture SHA):** `gen_sha=$(git rev-parse HEAD)`. Edit the frontmatter: `generator_signed: $gen_sha`. Then `git add` + `git commit -m "contract: generator signs sprint {N} for {slug} (sha=$gen_sha)"`. The captured SHA references the COMMIT THAT EXISTED WHEN THE GENERATOR APPROVED — its own first commit.
-3. **Evaluator (commit 1):** verify the contract is unchanged from commit 2 above. Then `git add` + `git commit -m "contract: evaluator commits sprint {N} for {slug}"`.
-4. **Evaluator (commit 2 — capture SHA):** `eval_sha=$(git rev-parse HEAD)`. Edit the frontmatter: `evaluator_signed: $eval_sha`, `status: signed`. Then `git add` + `git commit -m "contract: evaluator signs sprint {N} for {slug} (sha=$eval_sha)"`.
-5. The git log IS the audit trail — every signature commit is verifiable via `git log --oneline tasks/contracts/{path}.md`.
-6. Once both signatures are real SHAs and `status: signed`, the sprint's scope is agreed and the generator starts implementing.
+1. Generator: commit the contract (`generator_signed: pending`), set `generator_signed` to `git rev-parse HEAD` from that commit, commit again.
+2. Evaluator: check the contract is unchanged since the generator's second commit, commit it, set `evaluator_signed` to its own SHA and `status: signed`, commit again.
+3. The git log of the contract file is the audit trail. Once both fields hold real SHAs and the status is `signed`, the scope is agreed and the generator starts building.
 
-**Signature discipline:** `generator_signed` and `evaluator_signed` hold a real `git rev-parse HEAD` SHA. A placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed — read it that way rather than treating the field as decoration. Nothing checks this for you.
+Example commit messages: `contract: generator signs sprint {N} for {slug} (sha=<sha>)`.
 
-### `sprint-goal` (Agile mode — gated by `agile-sprint-commitment.md` 1)
+**Signature discipline:** a placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed; read it that way. Nothing checks it for you.
 
-Sprint-LEVEL goal management. Writes to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files.
+### `sprint-goal` (Agile mode)
 
-| Action | Form | Effect |
-|---|---|---|
-| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
-| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
-| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
-
-**Concurrent-write safety:** `sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write. YAML frontmatter append is non-atomic across shells; lock is the only mitigation. Release on completion or error.
-
-**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
-
-**Why this lives here:** `tasks/contracts/` already belongs to this skill; co-locating `sprint-goal` avoids creating a sibling skill that duplicates path discipline.
+`sprint-goal set "<text>" --sprint N` writes a goal of at most 120 characters to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md` (created from `assets/sprint-state-template.md` if absent); `show` prints it; `align --plan <path>` compares the plan's goal with it, advisory only. The sprint-state schema and the commitment rules live in `assets/sprint-state-template.md` and `.claude/skills/agent-detector/references/agile-sprint-commitment.md`; the file is parsed inline by its consumers. Take the repository's lock helper if it has one, otherwise write the file in a single edit, so two shells do not interleave a read-modify-write.
 
 ### Mid-build amendment (post-sign)
 
@@ -123,7 +108,7 @@ The amendment flow MUST null both signature fields BEFORE adding the amendment b
    - Append `### Amendment N — {YYMMDD-HHMM}` under `## Amendments` describing the change
    - DO NOT edit the original signed criteria — append the revised version as a new AC or override note
    - `git commit -m "contract: amendment N for sprint {N} ({slug})"`
-2. **Both agents re-sign** following the same two-commit pattern from `sign` action above. New SHAs replace the nulled fields.
+2. **Both agents re-sign** following the `sign` invariant above. New SHAs replace the nulled fields.
 3. **While the amendment is in flight** (status `amended`, both sigs null), the sprint has no agreed scope: hold off on source edits until both agents have re-signed. This is discipline, not a block — nothing stops the write.
 
 Original signed criteria stay visible — amendments are append-only history.
@@ -132,7 +117,7 @@ Original signed criteria stay visible — amendments are append-only history.
 
 When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
-- The contract negotiation is **skipped entirely** (per the Phase 5 adaptive density policy for the COMPLEX tier — capable models self-derive criteria from the product spec)
+- The contract negotiation is **skipped entirely** (adaptive density: capable models self-derive criteria from the product spec)
 - The generator implements against the product spec directly, and the evaluator grades against it
 - LEAN mode is a PROJECT-level setting, not a per-file override
 
@@ -152,9 +137,9 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 | `assets/sprint-state-template.md` | Sprint-LEVEL state contract template (used by `sprint-goal set`; tracks goal + committed_tickets + amendments + closure summary) |
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
-| `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
+| `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also the active-verification consumer |
 | `../rubric/` | Rubric library — provides composed presets the contract binds to |
-| `../evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
+| `../evaluate/` | Evaluator skill — reads the signed contract via `evaluate/step-01-load-rubrics.md` |
 
 ## Related Rules
 
@@ -163,4 +148,4 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 ## Start
 
 For interactive use, run `/mk:sprint-contract propose <task-slug>` to begin negotiation.
-For harness-driven use (Phase 5), the harness skill invokes propose → review → amend → sign automatically as a substep between Phase 2 (test red) and Phase 3 (build green).
+For autobuild runs, the harness invokes propose, review, amend and sign as a substep before the generator edits source.
