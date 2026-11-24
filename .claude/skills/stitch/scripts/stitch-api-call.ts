@@ -13,7 +13,7 @@
  *   npx tsx stitch-api-call.ts export <screen-id>   [--project <id>] [--project-name <name>]
  *                                                   [--format html|image|all]
  *
- * Env:  read from the shell, then .meowkit/.env, .claude/.env and ~/.meowkit/.env
+ * Env:  read from the shell, then .meowkit/.env, an older install's env file and ~/.meowkit/.env
  *       (see load-env-files.ts)
  *       STITCH_API_KEY (required — exits 1 if missing, before any network call)
  *       STITCH_PROJECT_ID (optional default project ID)

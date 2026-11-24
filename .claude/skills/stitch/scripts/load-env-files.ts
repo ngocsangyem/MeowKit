@@ -4,8 +4,8 @@
  * Imported for its side effect, first, by stitch-api-call.ts only: the quota and
  * write-output scripts must never hold the API key.
  *
- * Order, highest first: shell export, the project's `.meowkit/.env`, the pre-move
- * `.claude/.env`, then the user-wide `~/.meowkit/.env`. The first source to set a key
+ * Order, highest first: shell export, the project's `.meowkit/.env`, the env file an
+ * older install kept in the runtime folder, then the user-wide `~/.meowkit/.env`. The first source to set a key
  * wins, and nothing already set is replaced. Lines are parsed as KEY=VALUE, never run.
  */
 

@@ -6,8 +6,8 @@
 // those keys, so the blast radius of the file is the one handler that wants it.
 //
 // The order is the one every skill loader in the kit follows: a shell export,
-// then the project's `.meowkit/.env`, then the pre-move `.claude/.env`, then the
-// user-wide `~/.meowkit/.env`. The first source to define a key wins, so a
+// then the project's `.meowkit/.env`, then the env file an older install kept in
+// the runtime folder, then the user-wide `~/.meowkit/.env`. The first source to define a key wins, so a
 // dotenv can add configuration but not quietly replace what the caller chose,
 // and a project value beats the user-wide one.
 //

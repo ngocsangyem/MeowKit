@@ -3,8 +3,8 @@
 /**
  * Environment variable loader for mk:docs-finder.
  *
- * Order, highest first: shell export, the project's `.meowkit/.env`, the pre-move
- * `.claude/.env`, then the user-wide `~/.meowkit/.env`. The first source to set a key
+ * Order, highest first: shell export, the project's `.meowkit/.env`, the env file an
+ * older install kept in the runtime folder, then the user-wide `~/.meowkit/.env`. The first source to set a key
  * wins, so a project value beats the user-wide one. The project is found from the
  * runtime's project variable or the working directory, not from where this script
  * sits, so a skill installed under the home folder still reads the open project.

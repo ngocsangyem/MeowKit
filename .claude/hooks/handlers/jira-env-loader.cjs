@@ -7,8 +7,8 @@
 // in them.
 //
 // The keys are resolved the way the issue-tracker wrapper resolves them: shell
-// export, then the project's `.meowkit/.env`, then the pre-move `.claude/.env`,
-// then the user-wide `~/.meowkit/.env`. They are probed into a copy of the
+// export, then the project's `.meowkit/.env`, then the env file an older install
+// kept in the runtime folder, then the user-wide `~/.meowkit/.env`. They are probed into a copy of the
 // environment, never printed and never exported: each hook is its own process,
 // so an export would not reach anything anyway, and printing a token into
 // session context is the failure this check exists to avoid.
@@ -22,8 +22,8 @@ const REQUIRED_KEYS = ['MEOW_JIRA_API_TOKEN', 'MEOW_JIRA_EMAIL', 'MEOW_JIRA_SITE
 
 /** A found env file as the user would name it: project-relative, or under `~`. */
 function displayName(file, root, home) {
-  if (file.startsWith(root + path.sep)) return path.relative(root, file);
-  return path.join('~', path.relative(home, file));
+  const rel = file.startsWith(root + path.sep) ? path.relative(root, file) : path.join('~', path.relative(home, file));
+  return rel.split(path.sep).join('/');
 }
 
 module.exports = function jiraEnvLoader(ctx) {

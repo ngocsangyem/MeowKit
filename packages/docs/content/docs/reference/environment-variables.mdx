@@ -36,7 +36,7 @@ Every script that reads env files uses the same order. The first source that set
 
 1. A variable already exported in the shell. `export VAR=x` overrides the files for one session.
 2. The project's `.meowkit/.env`.
-3. The project's `.claude/.env`, the location older releases used. It is still read so an existing install keeps working.
+3. The project's `.claude/.env`, where older releases kept what now goes in `.meowkit/.env`. It is still read so an existing install keeps working.
 4. `~/.meowkit/.env`, shared by every project.
 
 A key set in the project file therefore beats the same key in `~/.meowkit/.env`, so one project can use a different token from the rest.
@@ -104,7 +104,7 @@ The `mk:confluence-*` skills need the first three keys. Install the CLI with `me
 
 ### Media generation and analysis
 
-`mk:multimodal` needs a Gemini key for analysis and Gemini generation. MiniMax and OpenRouter are optional providers. Each name also works without the `MEOWKIT_` prefix (`GEMINI_API_KEY`, for example), and the prefixed name wins when both are set.
+`mk:multimodal` needs a Gemini key for analysis and Gemini generation. MiniMax and OpenRouter are optional providers. Each name also works without the `MEOWKIT_` prefix (`GEMINI_API_KEY` for `MEOWKIT_GEMINI_API_KEY`, for example), and the prefixed name wins when both are set.
 
 | Variable | Purpose |
 | --- | --- |
@@ -134,7 +134,7 @@ Hooks, agents and the remaining skill scripts read the variables below from the 
 | --- | --- | --- |
 | `MEOWKIT_TDD` | off | Strict test-first mode. Truthy values are `1`, `true`, `yes`, `on`, `enable` and `enabled`, in any case. Falsy values are `0`, `false`, `no`, `off`, `disable` and `disabled`. Any other value is ignored with a warning. It outranks `tdd` in the config and the `--tdd` prompt flag |
 | `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when the SessionStart input has no `model` field. It is read before `CLAUDE_MODEL`, `CLAUDE_MODEL_ID` and `ANTHROPIC_MODEL`. A Claude model name behind a non-Anthropic `ANTHROPIC_BASE_URL` is not trusted: the tier is unknown and density is FULL |
-| `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` turns `learning-observer`, `post-session` and `pre-task-check` into no-ops. `standard` and `strict` behave the same. The old name `MEOW_HOOK_PROFILE` still works, and the new name wins when both are set |
+| `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` turns `learning-observer`, `post-session` and `pre-task-check` into no-ops. `standard` and `strict` behave the same. The legacy alias `MEOW_HOOK_PROFILE` still works, and `MEOWKIT_HOOK_PROFILE` wins when both are set |
 | `MEOWKIT_AUTOBUILD_MODE` | none | Density for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. Also settable as `autobuild.mode` in the config |
 | `MEOWKIT_PM_AUTO` | on | `off` stops the project-manager agent from running in the background after a phase. `/mk:status` still works |
 | `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | `off` makes every turn re-read the safety rules instead of trusting the marker written at session start. That costs about 9,700 tokens a turn |

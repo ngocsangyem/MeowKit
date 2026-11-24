@@ -75,8 +75,8 @@ def env_files() -> list:
 def load_env_files():
     """Load the env files into os.environ without replacing anything already set.
 
-    Order, highest first: shell export, the project's `.meowkit/.env`, the pre-move
-    `.claude/.env`, then the user-wide `~/.meowkit/.env`. No coding agent reads a dotenv
+    Order, highest first: shell export, the project's `.meowkit/.env`, the env file an
+    older install kept in the runtime folder, then the user-wide `~/.meowkit/.env`. No coding agent reads a dotenv
     natively, so these scripts do their own loading, which is why one order works across
     Claude Code, Codex and Cursor. The project comes from the runtime or the working
     directory, not from where this script sits, so a skill installed under the home

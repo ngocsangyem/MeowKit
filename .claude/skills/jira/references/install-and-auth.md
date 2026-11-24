@@ -36,7 +36,7 @@ The wrapper `scripts/jira-as.sh` translates these to jira-as's native `JIRA_API_
 
 ## Hook validation
 
-A `SessionStart` hook (`jira-env-loader.cjs`) checks the 3 keys across the shell, `.meowkit/.env`, `.claude/.env` and `~/.meowkit/.env`. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper reads the same files on each call, as `KEY=VALUE` lines it never executes, and exports the keys.
+A `SessionStart` hook (`jira-env-loader.cjs`) checks the 3 keys across the shell, `.meowkit/.env`, the env file an older install kept in the runtime folder, and `~/.meowkit/.env`. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper reads the same files on each call, as `KEY=VALUE` lines it never executes, and exports the keys.
 
 Status messages:
 - `[mk:jira] env OK` — all 3 keys present

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Wraps the jira-as binary. Reads the env files (project .meowkit/.env, the pre-move
-# .claude/.env, then ~/.meowkit/.env), translates
+# Wraps the jira-as binary. Reads the env files (project .meowkit/.env, the env file an
+# older install kept in the runtime folder, then ~/.meowkit/.env), translates
 # MEOW_JIRA_* → JIRA_* env, sets JIRA_OUTPUT=json default, then exec's.
 #
 # Resolved from THIS SKILL's own environment, never from PATH: the binary is
