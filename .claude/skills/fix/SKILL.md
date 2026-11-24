@@ -20,11 +20,15 @@ runtime: claude-code
 dependency_edges:
   - id: mk:brainstorming
     type: peer
+  - id: mk:build-fix
+    type: peer
   - id: mk:cook
     type: peer
   - id: mk:docs-finder
     type: peer
   - id: mk:investigate
+    type: peer
+  - id: mk:lint-and-validate
     type: peer
   - id: mk:memory
     type: peer
