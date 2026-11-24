@@ -35,6 +35,8 @@ Check for an existing PR: `gh pr view --json number --jq .number`. If one exists
 
 End the body with this line (each host's install adapts it to the runtime in use):
 
+```text
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
 
 Print the PR URL. Then report whether the diff touches documented behaviour and offer `/mk:document-release`; do not invoke it. Wait for CI to reach a terminal state and report it; red or pending CI is never waved through.
