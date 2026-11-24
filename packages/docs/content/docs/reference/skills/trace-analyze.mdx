@@ -39,22 +39,21 @@ Use the command for fast recall and this skill when patterns need synthesis acro
 /mk:trace-analyze [--runs N] [--pattern <type>]
 ```
 
-`--runs` defaults to 20. Run the steps through `workflow.md`. Script paths are relative to `${CLAUDE_SKILL_DIR}`.
+`--runs` counts distinct runs and defaults to 20. The procedure is in `references/run-procedure.md`; script paths are relative to `${CLAUDE_SKILL_DIR}`.
 
 ## Steps
 
-1. Ingest the last N records with `scripts/trace-records.cjs`, which needs no `jq`.
-2. Partition by `run_id` into at most 3 batches.
-3. Scatter: three `researcher` subagents analyse in parallel.
-4. Gather: the main agent combines cross-batch patterns.
-5. Draft structured fix suggestions from `references/error-taxonomy.md`.
-6. Human review: ask you about each suggestion and write the approved ones to the plan.
+1. Ingest the last N runs with `scripts/trace-records.cjs`, which needs no `jq`.
+2. Detect: the script applies the taxonomy signals that the trace still carries; the others are judged by reading (with up to 3 read-only subagents only for a large log).
+3. Keep patterns with at least 3 occurrences.
+4. Draft one structured suggestion per pattern from `references/error-taxonomy.md`.
+5. Human review: ask you about each suggestion and write the approved ones to the analysis folder.
 
 A pattern needs at least 3 occurrences before it becomes a suggestion. Trace records are append-only data, and the analyser never changes them.
 
 ## Outputs
 
-All under `plans/{date}-trace-analysis/`:
+All under `tasks/reports/{date}-trace-analysis/`:
 
 | File | Content |
 |---|---|

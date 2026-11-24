@@ -3576,24 +3576,14 @@
       "size": 7845
     },
     {
+      "path": ".claude/skills/prompt-enhancer/references/analyze-reference.md",
+      "sha256": "73dde804ddd8899b4149488ea3be5e2d7433d29e9921493b2d725cf9eb27fcae",
+      "size": 3026
+    },
+    {
       "path": ".claude/skills/prompt-enhancer/references/architecture-review-mode.md",
       "sha256": "f4f07b67822bc58644f0a0e851b18e289d77ad1713db131792c2be8384aa0635",
       "size": 3489
-    },
-    {
-      "path": ".claude/skills/prompt-enhancer/references/complexity-classifier.md",
-      "sha256": "99f17e8dadd671958310ff975d04384f0332ae0ab2e988bae2aa4bc124358597",
-      "size": 5804
-    },
-    {
-      "path": ".claude/skills/prompt-enhancer/references/context-safeguards.md",
-      "sha256": "2a50041d595a77ff886a1e3f51e1276f1ff8e46711fe34134728e0636290be3a",
-      "size": 9385
-    },
-    {
-      "path": ".claude/skills/prompt-enhancer/references/decomposition-checklist.md",
-      "sha256": "f7815ffab24e5931c3e63b5669a2223e1e5d501747ff734bc76f6a18140186d1",
-      "size": 6193
     },
     {
       "path": ".claude/skills/prompt-enhancer/references/deep-mode-scout.md",
@@ -3601,24 +3591,14 @@
       "size": 8015
     },
     {
-      "path": ".claude/skills/prompt-enhancer/references/mode-routing.md",
-      "sha256": "676716dc2aceabb89f729fbbf485ec12ab1f5c6af8d3da7c1da9160c097b568e",
-      "size": 4241
-    },
-    {
-      "path": ".claude/skills/prompt-enhancer/references/playbook.md",
-      "sha256": "fccb4f74f35ccb85f8164dfee370a84ff40dc0db5ab0bbc8f9e53f07f3aa25e6",
-      "size": 11403
+      "path": ".claude/skills/prompt-enhancer/references/prompt-types.md",
+      "sha256": "53011d9724613694feb7d76773e1c80bb46a4619bc41ee77016b06450e25636f",
+      "size": 2652
     },
     {
       "path": ".claude/skills/prompt-enhancer/references/target-notes.md",
       "sha256": "13be0e646e431859c846c9d1c30deb2cf4c29e4ba73f915665463adaaf1eb42d",
       "size": 4265
-    },
-    {
-      "path": ".claude/skills/prompt-enhancer/references/task-recipes.md",
-      "sha256": "f67c871c7693952db89d4d4da255fe8c6331f12548c66916a72eac5c32df8439",
-      "size": 4481
     },
     {
       "path": ".claude/skills/prompt-enhancer/scripts/scout-context.py",
@@ -3732,21 +3712,6 @@
       "size": 6429
     },
     {
-      "path": ".claude/skills/retro/references/ask-user-question-format.md",
-      "sha256": "921a068d5aa6687240e236ae5502b0b2bc328cc0565211b189b899bceb913b37",
-      "size": 1758
-    },
-    {
-      "path": ".claude/skills/retro/references/compare-mode.md",
-      "sha256": "c028f7351b25ef6f4db56fd181156decb75a719a3714e4fb00fdc946119b2922",
-      "size": 845
-    },
-    {
-      "path": ".claude/skills/retro/references/completion-status-protocol.md",
-      "sha256": "997ec74f808ba0ce4cbdeef8a755fbba609f184f9c1d5d6791979dbecfcd9d03",
-      "size": 1020
-    },
-    {
       "path": ".claude/skills/retro/references/data-gathering.md",
       "sha256": "a591cb7c86dbfa72922857183d2729f8f377ad650bcc7c572ed9bbe02acc32a3",
       "size": 5116
@@ -3757,59 +3722,19 @@
       "size": 12286
     },
     {
-      "path": ".claude/skills/retro/references/metrics-computation.md",
-      "sha256": "0218b932be2350d796fdddab3d338adeee20b7870637287604934279da363ec4",
-      "size": 5765
+      "path": ".claude/skills/retro/references/narrative-guide.md",
+      "sha256": "a29efb7f3ef7f264ebe79b1f9733d83fce270a0fe06c562f7c615949c409980e",
+      "size": 2290
     },
     {
-      "path": ".claude/skills/retro/references/narrative-output.md",
-      "sha256": "02c5a2cfd656ccf8a6251cab4d6729d5faaac5ff9763d6b1d543e3ec31ad9c4e",
-      "size": 5543
+      "path": ".claude/skills/retro/references/trends-and-compare.md",
+      "sha256": "ac0a4c8037ddf935890da4043a1f3508183a03f23712e6ab6f463e4f6a9c28f3",
+      "size": 2075
     },
     {
-      "path": ".claude/skills/retro/references/plan-status-footer.md",
-      "sha256": "82c601ef9b220f22b6c044f985f897f1f4a2ca9c68a2b2472d03f6a71a45e31b",
-      "size": 1231
-    },
-    {
-      "path": ".claude/skills/retro/references/preamble-retro.md",
-      "sha256": "34435b13c911f5702fe724fc3ffc9c632613e161e6bda86b84121ea0c29cf684",
-      "size": 557
-    },
-    {
-      "path": ".claude/skills/retro/references/preamble.md",
-      "sha256": "a72d3885f5f5df82ad2250df93d2bf39663fa6735dd7134f0a1dc0186261d695",
-      "size": 3673
-    },
-    {
-      "path": ".claude/skills/retro/references/repo-ownership-mode.md",
-      "sha256": "7ddb5b318750f306defd5738c4a2910db9a66cfad11269ad3014a0da63325a98",
-      "size": 1162
-    },
-    {
-      "path": ".claude/skills/retro/references/search-before-building.md",
-      "sha256": "694482e8542e38747e3565a1ed3cf34a2a87848edcc67c87c55ac18273fd4f2f",
-      "size": 1136
-    },
-    {
-      "path": ".claude/skills/retro/references/team-analysis.md",
-      "sha256": "8196910f853eac2e4081a8461ee86d9d2781d2a756ab66690f104c37ec8f11a5",
-      "size": 1905
-    },
-    {
-      "path": ".claude/skills/retro/references/telemetry.md",
-      "sha256": "eb6256a7909524eba4b9876a25969763425246f8b6b7fc776f49b2b89b6a37b1",
-      "size": 1231
-    },
-    {
-      "path": ".claude/skills/retro/references/tone-and-rules.md",
-      "sha256": "c908a4634aee273def862b259c0f01946991bbf47d7fe70b6b7ad694f24f45f8",
-      "size": 2221
-    },
-    {
-      "path": ".claude/skills/retro/references/trends-history.md",
-      "sha256": "9f12ccecaa36012d00db35ecc8a7ee05c8a95adead9937f80609317d17b4ba13",
-      "size": 4423
+      "path": ".claude/skills/retro/scripts/retro-metrics.cjs",
+      "sha256": "ca77bd4c475251061e7b6257c3f9bbcda2859b980266be6f0ffda23d402c2db6",
+      "size": 6977
     },
     {
       "path": ".claude/skills/review-pr/SKILL.md",
@@ -4272,6 +4197,11 @@
       "size": 2397
     },
     {
+      "path": ".claude/skills/skill-creator/references/maintenance-rules.md",
+      "sha256": "0e21fed754ca97c37a4da042cd5a0d94f4bb65df77efb1b311529ce0b9bef3a7",
+      "size": 1196
+    },
+    {
       "path": ".claude/skills/skill-creator/references/skill-authoring-rules.md",
       "sha256": "ef11cae8d543d4f69bdb3fec86513f478e8f516284be25f850a74982f4f3e75f",
       "size": 14868
@@ -4691,6 +4621,11 @@
       "size": 7878
     },
     {
+      "path": ".claude/skills/trace-analyze/references/run-procedure.md",
+      "sha256": "9b58f4eabaa34dedfb70abfc4235cc8077cb10c6b4e6ef9b036042a6bd1d5611",
+      "size": 3428
+    },
+    {
       "path": ".claude/skills/trace-analyze/references/trace-schema.md",
       "sha256": "9927c98e1dd2233633d82cec189cdf526f2d7b99a7b847aa3f90d7228d5d822a",
       "size": 4948
@@ -4700,6 +4635,11 @@
       "sha256": "a10ec4969aa8f55ee9af23e2bdd402880f306d9e3e17f79bd660bdf5c9304dc6",
       "size": 1639,
       "exec": true
+    },
+    {
+      "path": ".claude/skills/trace-analyze/scripts/lib/pattern-detect.cjs",
+      "sha256": "edbd927ef16b4369436f6804887f2f863cc3e14838050496dd4b19276a72f659",
+      "size": 2579
     },
     {
       "path": ".claude/skills/trace-analyze/scripts/lib/pattern-synthesis.cjs",
@@ -4712,41 +4652,6 @@
       "sha256": "b95348844facf48265acebcb6fed99fa3c1622d57fb6cd0c47be7654da3f2637",
       "size": 3937,
       "exec": true
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-01-ingest.md",
-      "sha256": "17aeeedb1bb2693e4c823ec5ddfef4268b74310133a7afdb15a89d64ecc8823c",
-      "size": 1637
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-02-partition.md",
-      "sha256": "15684aef86cf77608850e3d6b71f56b71515ec1c7ae3d66c3af557f271c63e74",
-      "size": 1045
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-03-scatter-analysis.md",
-      "sha256": "e23d944b4826287f2760e7867172567e02de42606cf691411f12a7e514685109",
-      "size": 2614
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-04-gather-synthesis.md",
-      "sha256": "65256d76a8498cafc70edb01c761a68f1fe582b880bf7b25fea793211094e9e1",
-      "size": 2262
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-05-suggestions.md",
-      "sha256": "b72dddcdd33e3b1fd66f4ed7237c9fa033399f453dccf3a80145a28301c70f53",
-      "size": 3284
-    },
-    {
-      "path": ".claude/skills/trace-analyze/step-06-hitl-gate.md",
-      "sha256": "fa65c3d6ba9ca8e0f4582fae72951f157a4759a93d78624f956a850a2db6c1c7",
-      "size": 3760
-    },
-    {
-      "path": ".claude/skills/trace-analyze/workflow.md",
-      "sha256": "686b73deabeef672bcd9ec5832f38e2068ffefc5d1483c39077fd7cea81b06af",
-      "size": 4721
     },
     {
       "path": ".claude/skills/ui-design-system/SKILL.md",
@@ -8577,24 +8482,14 @@
       "size": 7845
     },
     {
+      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/analyze-reference.md",
+      "sha256": "73dde804ddd8899b4149488ea3be5e2d7433d29e9921493b2d725cf9eb27fcae",
+      "size": 3026
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/architecture-review-mode.md",
       "sha256": "f4f07b67822bc58644f0a0e851b18e289d77ad1713db131792c2be8384aa0635",
       "size": 3489
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/complexity-classifier.md",
-      "sha256": "99f17e8dadd671958310ff975d04384f0332ae0ab2e988bae2aa4bc124358597",
-      "size": 5804
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/context-safeguards.md",
-      "sha256": "2a50041d595a77ff886a1e3f51e1276f1ff8e46711fe34134728e0636290be3a",
-      "size": 9385
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/decomposition-checklist.md",
-      "sha256": "f7815ffab24e5931c3e63b5669a2223e1e5d501747ff734bc76f6a18140186d1",
-      "size": 6193
     },
     {
       "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/deep-mode-scout.md",
@@ -8602,24 +8497,14 @@
       "size": 8015
     },
     {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/mode-routing.md",
-      "sha256": "676716dc2aceabb89f729fbbf485ec12ab1f5c6af8d3da7c1da9160c097b568e",
-      "size": 4241
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/playbook.md",
-      "sha256": "fccb4f74f35ccb85f8164dfee370a84ff40dc0db5ab0bbc8f9e53f07f3aa25e6",
-      "size": 11403
+      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/prompt-types.md",
+      "sha256": "53011d9724613694feb7d76773e1c80bb46a4619bc41ee77016b06450e25636f",
+      "size": 2652
     },
     {
       "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/target-notes.md",
       "sha256": "13be0e646e431859c846c9d1c30deb2cf4c29e4ba73f915665463adaaf1eb42d",
       "size": 4265
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/prompt-enhancer/references/task-recipes.md",
-      "sha256": "f67c871c7693952db89d4d4da255fe8c6331f12548c66916a72eac5c32df8439",
-      "size": 4481
     },
     {
       "path": ".meowkit/cache/.claude/skills/prompt-enhancer/scripts/scout-context.py",
@@ -8738,21 +8623,6 @@
       "size": 6429
     },
     {
-      "path": ".meowkit/cache/.claude/skills/retro/references/ask-user-question-format.md",
-      "sha256": "921a068d5aa6687240e236ae5502b0b2bc328cc0565211b189b899bceb913b37",
-      "size": 1758
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/compare-mode.md",
-      "sha256": "c028f7351b25ef6f4db56fd181156decb75a719a3714e4fb00fdc946119b2922",
-      "size": 845
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/completion-status-protocol.md",
-      "sha256": "997ec74f808ba0ce4cbdeef8a755fbba609f184f9c1d5d6791979dbecfcd9d03",
-      "size": 1020
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/retro/references/data-gathering.md",
       "sha256": "a591cb7c86dbfa72922857183d2729f8f377ad650bcc7c572ed9bbe02acc32a3",
       "size": 5116
@@ -8763,54 +8633,19 @@
       "size": 12286
     },
     {
-      "path": ".meowkit/cache/.claude/skills/retro/references/metrics-computation.md",
-      "sha256": "0218b932be2350d796fdddab3d338adeee20b7870637287604934279da363ec4",
-      "size": 5765
+      "path": ".meowkit/cache/.claude/skills/retro/references/narrative-guide.md",
+      "sha256": "a29efb7f3ef7f264ebe79b1f9733d83fce270a0fe06c562f7c615949c409980e",
+      "size": 2290
     },
     {
-      "path": ".meowkit/cache/.claude/skills/retro/references/narrative-output.md",
-      "sha256": "02c5a2cfd656ccf8a6251cab4d6729d5faaac5ff9763d6b1d543e3ec31ad9c4e",
-      "size": 5543
+      "path": ".meowkit/cache/.claude/skills/retro/references/trends-and-compare.md",
+      "sha256": "ac0a4c8037ddf935890da4043a1f3508183a03f23712e6ab6f463e4f6a9c28f3",
+      "size": 2075
     },
     {
-      "path": ".meowkit/cache/.claude/skills/retro/references/plan-status-footer.md",
-      "sha256": "82c601ef9b220f22b6c044f985f897f1f4a2ca9c68a2b2472d03f6a71a45e31b",
-      "size": 1231
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/preamble.md",
-      "sha256": "a72d3885f5f5df82ad2250df93d2bf39663fa6735dd7134f0a1dc0186261d695",
-      "size": 3673
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/repo-ownership-mode.md",
-      "sha256": "7ddb5b318750f306defd5738c4a2910db9a66cfad11269ad3014a0da63325a98",
-      "size": 1162
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/search-before-building.md",
-      "sha256": "694482e8542e38747e3565a1ed3cf34a2a87848edcc67c87c55ac18273fd4f2f",
-      "size": 1136
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/team-analysis.md",
-      "sha256": "8196910f853eac2e4081a8461ee86d9d2781d2a756ab66690f104c37ec8f11a5",
-      "size": 1905
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/telemetry.md",
-      "sha256": "eb6256a7909524eba4b9876a25969763425246f8b6b7fc776f49b2b89b6a37b1",
-      "size": 1231
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/tone-and-rules.md",
-      "sha256": "c908a4634aee273def862b259c0f01946991bbf47d7fe70b6b7ad694f24f45f8",
-      "size": 2221
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/retro/references/trends-history.md",
-      "sha256": "9f12ccecaa36012d00db35ecc8a7ee05c8a95adead9937f80609317d17b4ba13",
-      "size": 4423
+      "path": ".meowkit/cache/.claude/skills/retro/scripts/retro-metrics.cjs",
+      "sha256": "ca77bd4c475251061e7b6257c3f9bbcda2859b980266be6f0ffda23d402c2db6",
+      "size": 6977
     },
     {
       "path": ".meowkit/cache/.claude/skills/review-pr/SKILL.md",
@@ -9288,6 +9123,11 @@
       "size": 2397
     },
     {
+      "path": ".meowkit/cache/.claude/skills/skill-creator/references/maintenance-rules.md",
+      "sha256": "0e21fed754ca97c37a4da042cd5a0d94f4bb65df77efb1b311529ce0b9bef3a7",
+      "size": 1196
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/skill-creator/references/skill-authoring-rules.md",
       "sha256": "ef11cae8d543d4f69bdb3fec86513f478e8f516284be25f850a74982f4f3e75f",
       "size": 14868
@@ -9707,6 +9547,11 @@
       "size": 7878
     },
     {
+      "path": ".meowkit/cache/.claude/skills/trace-analyze/references/run-procedure.md",
+      "sha256": "9b58f4eabaa34dedfb70abfc4235cc8077cb10c6b4e6ef9b036042a6bd1d5611",
+      "size": 3428
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/trace-analyze/references/trace-schema.md",
       "sha256": "9927c98e1dd2233633d82cec189cdf526f2d7b99a7b847aa3f90d7228d5d822a",
       "size": 4948
@@ -9717,6 +9562,11 @@
       "size": 1639
     },
     {
+      "path": ".meowkit/cache/.claude/skills/trace-analyze/scripts/lib/pattern-detect.cjs",
+      "sha256": "edbd927ef16b4369436f6804887f2f863cc3e14838050496dd4b19276a72f659",
+      "size": 2579
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/trace-analyze/scripts/lib/pattern-synthesis.cjs",
       "sha256": "cbeb5a4d4788373a278bc92486e7d7209d7b31c2e29240b580a3394a92809f4d",
       "size": 3393
@@ -9725,41 +9575,6 @@
       "path": ".meowkit/cache/.claude/skills/trace-analyze/scripts/trace-records.cjs",
       "sha256": "b95348844facf48265acebcb6fed99fa3c1622d57fb6cd0c47be7654da3f2637",
       "size": 3937
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-01-ingest.md",
-      "sha256": "17aeeedb1bb2693e4c823ec5ddfef4268b74310133a7afdb15a89d64ecc8823c",
-      "size": 1637
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-02-partition.md",
-      "sha256": "15684aef86cf77608850e3d6b71f56b71515ec1c7ae3d66c3af557f271c63e74",
-      "size": 1045
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-03-scatter-analysis.md",
-      "sha256": "e23d944b4826287f2760e7867172567e02de42606cf691411f12a7e514685109",
-      "size": 2614
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-04-gather-synthesis.md",
-      "sha256": "65256d76a8498cafc70edb01c761a68f1fe582b880bf7b25fea793211094e9e1",
-      "size": 2262
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-05-suggestions.md",
-      "sha256": "b72dddcdd33e3b1fd66f4ed7237c9fa033399f453dccf3a80145a28301c70f53",
-      "size": 3284
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/step-06-hitl-gate.md",
-      "sha256": "fa65c3d6ba9ca8e0f4582fae72951f157a4759a93d78624f956a850a2db6c1c7",
-      "size": 3760
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/trace-analyze/workflow.md",
-      "sha256": "686b73deabeef672bcd9ec5832f38e2068ffefc5d1483c39077fd7cea81b06af",
-      "size": 4721
     },
     {
       "path": ".meowkit/cache/.claude/skills/ui-design-system/SKILL.md",

@@ -15,7 +15,7 @@ Rules for choosing what to expose and how to shape it when wrapping code for CLI
 - [Gotchas](#gotchas)
 
 
-Load this reference during Phase 3 (Agentize Map) of `mk:henshin`.
+Load this reference while building the Agentize map in `mk:henshin`.
 
 ## Select capabilities
 

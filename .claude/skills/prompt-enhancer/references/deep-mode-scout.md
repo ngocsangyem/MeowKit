@@ -1,7 +1,6 @@
 # Deep Mode Scout
 
-> Loaded by `mk:prompt-enhancer` during Step 0 (Mode Selection) and Step 2.5
-> (Bounded Scout) — only when `--deep` is active. Default mode never reads this file.
+> Loaded by `mk:prompt-enhancer` only when `--deep` is set, before the rewrite. Default mode never reads this file.
 
 > **Allow-list changes require red-team review.** Re-confirm the skill stays at
 > 2/3 of `injection-rules.md` Rule 11 (untrusted input + sensitive data + state
@@ -155,8 +154,7 @@ footer:
 > updated `<YYYY-MM-DD>`.
 ```
 
-The Phase-5 eval rubric checks this matches the baseline ref. Mismatch →
-`STALE_BASELINE` warning; eval refuses to score until the baseline is refreshed.
+If the recorded sha no longer matches the baseline ref, emit a `STALE_BASELINE` warning.
 
 `docs/project-context.md` last-updated date is checked separately — if >90 days
 old, the footer carries an additional note: "context may be stale; re-run

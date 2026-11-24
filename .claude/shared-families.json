@@ -17,8 +17,7 @@
       "members": [
         "skills/cso/references/preamble.md",
         "skills/investigate/references/preamble.md",
-        "skills/qa/references/preamble.md",
-        "skills/retro/references/preamble.md"
+        "skills/qa/references/preamble.md"
       ]
     },
     {

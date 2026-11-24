@@ -37,27 +37,17 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/validate-ski
 
 ## Steps
 
-1. Read `references/skill-authoring-rules.md`. It holds the ten authoring rules, such as the mandatory `## Gotchas` section, `${CLAUDE_PLUGIN_DATA}` for persistent state and the 500-line cap.
-2. Gather the intent: what the skill does, when it triggers and what it outputs.
-3. Scaffold with `init-skill.py`, which creates the folder and a template `SKILL.md` with TODO markers.
-4. Fill each TODO. Move detail into `references/` when the body passes about 100 lines.
-5. Load `mk:skill-template-secure` if the skill needs a trust model.
-6. Validate with `validate-skill.py`. A score below 7 of 8 means fix the failing items first.
-7. Add a row to `SKILLS_ATTRIBUTION.md`.
-8. Report the directory, files, compliance score and registration.
+1. Ask what failure or gap prompted the skill and which existing skill was checked. If an existing skill covers it, extend that one.
+2. Read the authoring rules that apply (`references/skill-authoring-rules.md`).
+3. Gather the intent: what the skill does, when it triggers, when it does not and what it returns.
+4. Scaffold with `init-skill.py`, which creates `<path>/<slug>/SKILL.md` (no `mk:` prefix on the directory) with TODO markers.
+5. Write the body as goal, outcome and boundaries; move detail into `references/`. Load `mk:skill-template-secure` if the skill reads untrusted input.
+6. Check with `mewkit validate --frontmatter` and `mewkit validate --skill-rubric`; `validate-skill.py` is a quick structural pre-check with one pass mark.
+7. Try the skill once on a real task, then add a row to `SKILLS_ATTRIBUTION.md` if the project keeps one.
 
-## Compliance checks
+## Checks
 
-| Check |
-|---|
-| The name has the `mk:` prefix |
-| A workflow phase (0 to 6) is stated |
-| A handoff names the next agent |
-| The output format is a template with placeholders |
-| Failure handling covers the known failure modes |
-| `SKILL.md` is 500 lines or fewer (step-file skills with a `workflow.md` pass automatically) |
-| A `## Gotchas` section exists (a placeholder is fine on day one) |
-| It does not conflict with `.claude/rules/` |
+`SKILL.md` stays at or under 500 lines and about 5,000 tokens, the name carries the `mk:` prefix, no TODO markers remain, and the description says what the skill does with a `NOT for` clause (the trigger goes in `when_to_use`). A `## Gotchas` section is added once a real failure earns it.
 
 ## References
 
@@ -70,7 +60,7 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/validate-ski
 
 ## Gotchas
 
-- The `## Gotchas` header is mandatory because `validate-skill.py` checks it. A day-one placeholder is allowed.
-- The line cap is 500.
-- State that must survive a plugin upgrade goes to `${CLAUDE_PLUGIN_DATA}`, not the skill folder. Framework paths such as `.meowkit/memory/` and `.meowkit/state/` are exempt.
-- A missing `mk:` prefix is added with a warning, and a duplicate name gets an alternative or an update to the existing skill.
+- The line cap is 500 lines and about 5,000 tokens, and a normal run should read far less.
+- A `## Gotchas` section is added with the first real failure, not as a placeholder.
+- State that must survive an upgrade goes to the host's stable data location (`${CLAUDE_PLUGIN_DATA}` on Claude Code), not the skill folder. Framework paths such as `.meowkit/memory/` and `.meowkit/state/` are exempt.
+- A missing `mk:` prefix on the name is added; a duplicate name gets an alternative or an update to the existing skill.

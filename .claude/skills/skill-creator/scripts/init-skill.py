@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Initialize a new skill with proper structure.
+"""Scaffold a new skill directory with a minimal SKILL.md.
 
-Offloads deterministic scaffolding (directory creation, template filling)
-so Claude only needs to review and customize the generated content.
+The directory is named after the slug, without the `mk:` prefix, like every
+installed skill (`.claude/skills/<slug>/`); only the frontmatter name carries
+the prefix.
 
 Usage:
   python3 init-skill.py <skill-name> [--path <path>]
-  python3 init-skill.py mk:my-feature --path .claude/skills
-
-Adapted from open-source upstream (MIT).
+  python3 init-skill.py my-feature --path .claude/skills
 """
 
 import re
@@ -18,166 +17,86 @@ from pathlib import Path
 
 SKILL_TEMPLATE = """---
 name: {full_name}
-description: "[TODO: Specific trigger keywords + what it does. Include WHEN to use — file types, tasks, or scenarios that trigger it.]"
+description: "[TODO: what it does in one sentence. NOT for mk:<neighbour skill>.]"
+when_to_use: "[TODO: the trigger, in a few words]"
+keywords:
+  - {slug}
+user-invocable: true
 ---
-
-<!-- Created by mk:skill-creator -->
 
 # {title}
 
-## Overview
+[TODO: the goal in one or two sentences: what a finished run leaves behind.]
 
-[TODO: 1-2 sentences — what this skill does and when to use it]
+## When to use
 
-## When to Use
+[TODO: the situations that call for it.]
 
-**Auto-activate on:**
-- [TODO: keyword patterns Claude watches for]
+Not for: [TODO: the neighbour skill that owns the adjacent job, and when to use it instead.]
 
-**Explicit:** `/mk:{slug} [args]`
+## Outcome
 
-**Do NOT invoke when:**
-- [TODO: conditions where this skill is not appropriate]
-
-## Workflow Integration
-
-Operates in **Phase [TODO: 0-6]** of the 7-phase workflow. Output supports the `[TODO: agent name]` agent.
-
-## Process
-
-1. [TODO: first step]
-2. [TODO: second step]
-3. [TODO: third step]
-
-## Output Format
-
-```
-## {title}: {{result}}
-
-**[TODO: field]:** {{value}}
-
-### Findings
-{{structured output}}
-```
-
-## Failure Handling
-
-| Failure | Recovery |
-|---------|----------|
-| [TODO: failure mode] | [TODO: recovery action] |
-
-## Handoff Protocol
-
-On completion → `[TODO: agent]` receives: [TODO: what]
-
-## Gotchas
-
-(none yet — grow from observed failures)
-
-## References
-
-| Reference | When to load | Content |
-|-----------|-------------|---------|
-| [TODO: if needed] | [TODO: when] | [TODO: what] |
+[TODO: what must be true when the skill is done, the boundaries it must respect, and how to check it. Spell out exact steps only for fragile, destructive or security-sensitive work.]
 """
 
 
 def parse_skill_name(raw_name):
-    """Parse and validate skill name. Enforce mk: prefix."""
+    """Return (full_name, slug, title, error). The mk: prefix is added if missing."""
     name = raw_name.strip().strip('"').strip("'")
-
-    # Auto-prepend mk: if missing
     if not name.startswith("mk:"):
         name = f"mk:{name}"
 
-    parts = name.split(":", 1)
-    if len(parts) != 2:
-        return None, None, None, "Invalid name format"
-
-    namespace, slug = parts
-
-    # Validate slug
-    pattern = r'^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$'
-    if not re.match(pattern, slug):
-        return None, None, None, f"Slug '{slug}' must be lowercase, hyphens, no leading/trailing hyphens"
-
+    slug = name.split(":", 1)[1]
+    if not re.match(r"^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$", slug):
+        return None, None, None, f"Slug '{slug}' must be lowercase letters, digits and hyphens, with no leading or trailing hyphen"
     if len(slug) > 40:
         return None, None, None, f"Slug '{slug}' exceeds 40 chars"
 
     title = " ".join(word.capitalize() for word in slug.split("-"))
-
     return name, slug, title, None
 
 
 def init_skill(skill_name, base_path):
-    """Create skill directory with template SKILL.md."""
+    """Create `<base>/<slug>/SKILL.md`; return the directory or None on error."""
     full_name, slug, title, error = parse_skill_name(skill_name)
     if error:
         print(f"Error: {error}", file=sys.stderr)
         return None
 
-    skill_dir = Path(base_path).resolve() / f"mk:{slug}"
-
+    skill_dir = Path(base_path).resolve() / slug
     if skill_dir.exists():
         print(f"Error: Directory already exists: {skill_dir}", file=sys.stderr)
         return None
 
-    # Create structure
     skill_dir.mkdir(parents=True)
-    (skill_dir / "references").mkdir()
-
-    # Generate SKILL.md
-    content = SKILL_TEMPLATE.format(
-        full_name=full_name,
-        title=title,
-        slug=slug,
-    )
-
     skill_md = skill_dir / "SKILL.md"
-    skill_md.write_text(content, encoding="utf-8")
+    skill_md.write_text(SKILL_TEMPLATE.format(full_name=full_name, title=title, slug=slug), encoding="utf-8")
 
-    # Print summary as JSON-like for Claude to parse
     print(f"Skill scaffolded: {full_name}")
     print(f"  Directory: {skill_dir}")
-    print(f"  SKILL.md: {skill_md} ({len(content.splitlines())} lines)")
-    print(f"  references/: created (empty)")
-    print()
-    print("TODO items for Claude to complete:")
-    print("  1. Fill description in frontmatter with specific trigger keywords")
-    print("  2. Write Overview section (1-2 sentences)")
-    print("  3. Define auto-activate patterns in When to Invoke")
-    print("  4. Set workflow phase (Phase 0-6)")
-    print("  5. Write numbered Process steps")
-    print("  6. Define Output Format template with placeholders")
-    print("  7. Fill Failure Handling table")
-    print("  8. Set Handoff Protocol (which agent receives output)")
-    print("  9. Seed Gotchas with real failures (grow from edge cases over time)")
-
+    print(f"  SKILL.md: {skill_md}")
+    print("Fill every [TODO] marker, add references/ only if the body outgrows one screen, add a")
+    print("## Gotchas section when a real failure teaches something, then run")
+    print("`mewkit validate --frontmatter` and `mewkit validate --skill-rubric`.")
     return skill_dir
 
 
 def main():
     if len(sys.argv) < 2:
         print("Usage: python3 init-skill.py <skill-name> [--path <base-path>]")
-        print()
         print("Examples:")
-        print("  python3 init-skill.py mk:my-feature")
-        print("  python3 init-skill.py my-feature --path .claude/skills")
+        print("  python3 init-skill.py my-feature")
         print("  python3 init-skill.py mk:data-validator --path .claude/skills")
-        print()
-        print("Note: mk: prefix is auto-prepended if missing")
+        print("Note: the mk: prefix is added to the name if missing; the directory has no prefix")
         sys.exit(1)
 
-    skill_name = sys.argv[1]
     base_path = ".claude/skills"
-
     if "--path" in sys.argv:
         idx = sys.argv.index("--path")
         if idx + 1 < len(sys.argv):
             base_path = sys.argv[idx + 1]
 
-    result = init_skill(skill_name, base_path)
-    sys.exit(0 if result else 1)
+    sys.exit(0 if init_skill(sys.argv[1], base_path) else 1)
 
 
 if __name__ == "__main__":
