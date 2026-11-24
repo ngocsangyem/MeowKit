@@ -1,6 +1,5 @@
 # Commit Message Formats
 
-**Read time:** 3 minutes
 
 ## Basic Format
 

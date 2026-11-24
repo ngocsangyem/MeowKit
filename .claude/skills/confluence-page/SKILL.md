@@ -44,21 +44,23 @@ Forks to the `confluence-page` agent (system prompt at `.claude/agents/confluenc
 - Update: "set title to 'Q3 Roadmap (final)' on page 12345"
 - Hierarchy: "list children of page 12345 with depth 2"
 
+## Delete
+
+Deleting a page is destructive: confirm the page id and title with the user first (`../confluence/references/safety-framework.md`, Tier 4). `page delete` moves the page to the trash; `--permanent` cannot be undone and needs the typed token described there. `--force` skips the CLI's own prompt, so use it only after the user's "yes".
+
 ## See also
 
 - Agent: `../../agents/confluence-page.md`
 - Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/page-templates.md` — RFC / Runbook / Decision Record skeletons
-  - `references/field-formats.md` — storage / view / export_view / ADF distinctions
+  - `references/field-formats.md` — storage / view / markdown body formats; which to use for a fresh body versus a macro-heavy edit
   - `references/version-restore-guide.md` — version operations + restore semantics
 - Peer leaves: `mk:confluence-search` (CQL search + space list), `mk:confluence-collaborate` (comments / attachments / labels), `mk:confluence-bulk` (10+ pages), `mk:confluence-spec-analyst` (spec analysis)
 
 ## Gotchas
 
-- Wrapper output is JSON only after the stdout filter runs. Do not parse raw `confluence-as` output — always go through the wrapper. [from research]
-- POST is in `confluence-as` retry `allowed_methods`. Create ops on flaky networks may produce duplicate pages. Before retrying a failed `page create`, list pages with the same title in the target space first. [from research]
-- ADF round-trip is **lossy** on `panel`, `expand`, `mention`, `emoji`, `media`, `decision`, `task-list` nodes. Re-saving a page with these macros via update may flatten them. See `references/field-formats.md` Round-Trip Caveats. [from research]
-- XHTML parsing in `confluence-as` is regex-based. Malformed or deeply nested storage format may fail silently. Prefer markdown via `--content` for fresh page bodies. [from research]
-- `version restore` creates a NEW version on top of head — it is not in-place rollback. See `references/version-restore-guide.md`. [from research]
-- Grow this list as new edge cases surface.
+- Wrapper output is JSON only after the stdout filter runs: go through the wrapper, never raw `confluence-as`.
+- `page restore` writes a NEW version on top of head with the old body only (title, labels and parent stay); it is not an in-place rollback. See `references/version-restore-guide.md`.
+- Retried POSTs and lossy ADF are in `../confluence/references/cli-idioms.md` Common gotchas: list same-title pages before retrying a create.
+- Prefer markdown via `--body` for a fresh page body; the storage-format parser is regex-based and malformed nesting fails silently.

@@ -22,13 +22,11 @@ After write, append a row to `tasks/reports/.confluence-spec-index.tsv` (append-
 {page-id}\t{report-filename}\t{utc-iso-timestamp}\t{source-page-hash}
 ```
 
-The index supports a future v2 `--spec <page-id>` convenience flag that auto-resolves the most recent report for that page.
-
 ## Planning-Engine `--spec` Flag
 
 `mk:planning-engine plan --tickets PROJ-101,PROJ-102 --spec <report-path>` extends the planning pipeline with spec context.
 
-**User-orchestrated, two-step flow** — skill-to-skill invocation is forbidden in Toolkit:
+**User-orchestrated, two-step flow** — the user runs each skill; skills do not invoke each other:
 
 ```
 Step 1 (user): /mk:confluence-spec-analyst 12345
@@ -58,12 +56,12 @@ If the path doesn't exist or isn't a spec-analyst report, planning-engine errors
 ```
 https://*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}/{slug}    -- canonical
 https://*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}            -- without slug
-https://*.atlassian.net/wiki/x/{shortcode}                      -- shortlink (v1 limitation: not auto-resolved)
+https://*.atlassian.net/wiki/x/{shortcode}                      -- shortlink (not auto-resolved)
 ```
 
 Plus raw page-id detection when phrase "from confluence" or similar is explicit.
 
-intake fetches raw page content via the wrapper directly (`page get --page-id <id>`), uses it as intake source, and recommends spec-analyst in its Suggested Actions section for deeper analysis. intake does NOT auto-invoke spec-analyst (no skill-to-skill chaining).
+intake fetches raw page content via the wrapper directly (`page get <id> --body`), uses it as intake source, and recommends spec-analyst in its Suggested Actions section for deeper analysis. intake does NOT auto-invoke spec-analyst (no skill-to-skill chaining).
 
 ## Boundary Rules
 
@@ -71,4 +69,3 @@ intake fetches raw page content via the wrapper directly (`page get --page-id <i
 - Skills do NOT create plan dirs — that is `mk:plan-creator`'s responsibility.
 - Reports land in `tasks/reports/` or active plan `research/` per existing convention.
 - No Confluence write-back (posting reports as Confluence pages) — out of scope.
-- `--with-commands` is opt-in; default report is suggestions-only, preserves "reports not automation" principle.

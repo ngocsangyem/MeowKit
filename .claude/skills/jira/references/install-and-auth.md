@@ -34,8 +34,6 @@ In `.meowkit/.env` (gitignored):
 
 The wrapper `scripts/jira-as.sh` translates these to jira-as's native `JIRA_API_TOKEN`, `JIRA_EMAIL`, `JIRA_SITE_URL` and exports `JIRA_OUTPUT=json` as the default.
 
-The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception per migration directive.
-
 ## Hook validation
 
 A `SessionStart` hook (`jira-env-loader.cjs`) validates `.meowkit/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
@@ -45,9 +43,6 @@ Status messages:
 - `[mk:jira] <KEY> missing in .meowkit/.env` — specific key absent
 - `[mk:jira] .meowkit/.env missing — see .meowkit/.env.example for setup`
 
-## `JIRA_PROFILE` clarification
-
-The upstream `JIRA-Assistant-Skills` README mentions a `JIRA_PROFILE` env var. That is a concern of the broader Assistant Skills plugin layer (multi-account profile selection) and is NOT consumed by `jira-as` itself or by `mk:jira`. Ignore it. Single-tenant only here.
 
 ## Exit codes (jira-as → user message map)
 

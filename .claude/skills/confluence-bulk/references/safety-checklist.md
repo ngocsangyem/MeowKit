@@ -1,6 +1,6 @@
 # Bulk Op Safety Checklist
 
-Pre-flight checklist for any `mk:confluence-bulk` operation. The agent walks this list before invoking Step 1 (dry-run).
+Optional pre-flight checklist. Use it when a Higher-Risk Trigger below applies; a small label or move needs only the dry-run.
 
 ## Contents
 
@@ -15,14 +15,14 @@ Walk through each item before running the dry-run:
 - [ ] **CQL sanitized?** Every user-derived term passed through `cql-sanitize.sh`. No raw string concatenation.
 - [ ] **`--max-pages` set?** Default 100. If higher, the user has explicitly authorized the higher cap.
 - [ ] **CQL scoped?** Confirm the `space = ...` clause is intentional. A CQL without a space restriction can match every page in the tenant.
-- [ ] **Reversibility understood?** Bulk delete is soft-delete to trash; restore is manual via Confluence UI. Bulk move is reversible by reverse move (label is reversible by remove).
+- [ ] **Reversibility understood?** Bulk delete moves pages to the trash; restore is manual in the Confluence UI. Bulk move is reversible by reverse move (label is reversible by remove).
 - [ ] **Dry-run sample inspected?** Step 2 shows the first 5 page titles. They look right? If the sample contains a wrong space or unexpected page, STOP — refine CQL.
 - [ ] **Affected count plausible?** If the dry-run reports an impacted count an order of magnitude larger than expected, the CQL is wrong. Refine before continuing.
 - [ ] **Backup considered?** For irreversible-feeling ops (bulk delete, bulk move into archived space), confirm there is a recent space backup or that loss is acceptable.
 
 ## Higher-Risk Triggers
 
-Any of these escalate the ceremony — the agent requires extra context before proceeding:
+Any of these escalate the ceremony — the agent asks for extra context before proceeding:
 
 - Operation matches > 500 pages
 - CQL contains no space restriction
@@ -32,7 +32,7 @@ Any of these escalate the ceremony — the agent requires extra context before p
 
 When triggered, the agent surfaces the elevated risk before Step 2:
 
-> "This operation matches {N} pages across {M} spaces. Please re-confirm the count and type the confirmation token to proceed."
+> "This operation matches {N} pages across {M} spaces. Please re-confirm the count to proceed."
 
 ## Post-Op Verification
 

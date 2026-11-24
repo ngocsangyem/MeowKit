@@ -35,12 +35,12 @@ Forks to the `jira-jsm` agent. Service Management (JSM) operations — service d
 - "SLA status for KEY-123"
 - "approve request KEY-123"
 - "list queue 'Tier 1 Support'"
-- "add comment to JSM request KEY-123" (agent will confirm internal vs public)
+- "add comment to JSM request KEY-123" (agent confirms visibility)
 
 ## Examples
 
 - Get service desk status: "show me the queues for service desk 'IT Support'"
-- Customer-facing comment: "add public comment to KEY-123: '<message>'" → agent confirms internal-vs-public per safety-framework.
+- Customer-facing comment: "add public comment to KEY-123: '<message>'" → agent confirms visibility first; the rule is owned by `mk:jira-collaborate`.
 
 ## Required Permissions
 
@@ -48,17 +48,17 @@ JSM-licensed tenant + agent or admin role. Insufficient permission → exit code
 
 ## Limitations
 
-- 8 sub-domains, ~45 verbs total — see `jira-as jsm <sub-domain> --help` for the authoritative flag list.
-- Internal-vs-public comments are a privacy concern; the agent enforces explicit confirmation before posting customer-facing content.
+- 9 sub-domains (`service-desk`, `request-type`, `request`, `customer`, `organization`, `queue`, `sla`, `approval`, `kb`) — see `jira-as jsm <sub-domain> --help` for the authoritative flag list.
+- A customer-facing comment is visible to the requester: use `jsm request comment ... --internal` for agent-only notes; the visibility rule lives in `mk:jira-collaborate`.
 
 ## See also
 
 - Agent: `../../agents/jira-jsm.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
-  - `references/decision-tree.md` — when to use `mk:jira-jsm` vs `mk:jira-{issue,lifecycle,collaborate}` etc.
-  - `references/itil-workflows.md` — ITIL 4 process implementations (incident / service-request / problem / change management)
-- Peer leaves: `mk:jira-collaborate` (internal-vs-public discipline applies on JSM tickets too), `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk:jira-admin` (request-type / queue config)
+  - `references/decision-tree.md` — JSM vs core-Jira leaf, one table
+  - `references/itil-workflows.md` — read only for incident, service-request, problem or change process questions
+- Peer leaves: `mk:jira-collaborate` (owns the internal-vs-public rule), `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk:jira-admin` (request-type / queue config)
 
 ## Gotchas
 

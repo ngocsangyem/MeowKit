@@ -27,7 +27,7 @@ About to close: Sprint 42 (board: Team Alpha)
 Completed: 18 issues
 Incomplete (will move to backlog): 4 issues — PROJ-201, PROJ-207, PROJ-212, PROJ-219
 
-Type "CONFIRM CLOSE SPRINT 42" to proceed.
+Reply "yes" to close the sprint.
 ```
 
 ## Add / Remove Issues

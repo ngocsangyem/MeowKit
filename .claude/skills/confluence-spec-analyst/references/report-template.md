@@ -106,4 +106,4 @@ mk:jira-issue create --project PROJ --type Task --summary "..." --priority Low
 **Source page hash:** {sha256 of fetched markdown — for staleness detection on re-runs}
 ```
 
-The hash enables `--check-stale` flag (deferred to v2): when re-run on the same page, if hash matches → skip; if differs → produce fresh report.
+The hash shows whether the page changed since the report was written; a re-run always produces a fresh report.

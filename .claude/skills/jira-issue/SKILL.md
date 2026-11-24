@@ -41,14 +41,18 @@ Forks to the `jira-issue` agent (system prompt at `.claude/agents/jira-issue.md`
 - Read with projection: "show me PROJ-123 with comments and attachments"
 - Update: "set priority to High and add label tech-debt on PROJ-123"
 
+## Delete
+
+Deleting an issue is destructive: show the issue key and summary and get the user's explicit "yes" first (`../jira/references/safety-framework.md`, Tier 4). `issue delete --force` skips the CLI's own prompt, so use it only after that "yes".
+
 ## See also
 
 - Agent: `../../agents/jira-issue.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
-  - `references/issue-templates.md` — canonical templates (Bug/Story/Epic/Task) + body markdown
-  - `references/field-formats.md` — ADF, user assignment, custom-field formats
-  - `references/decision-matrices.md` — issue-type / priority / template decision tables
+  - `references/issue-templates.md` — read when creating: canonical templates (Bug/Story/Epic/Task) + body markdown
+  - `references/field-formats.md` — read when setting custom fields or user assignment
+  - `references/decision-matrices.md` — read only when the issue type, priority or template is unclear
 - Peer leaves: `mk:jira-fields` (custom field IDs), `mk:jira-lifecycle` (post-create transitions), `mk:jira-collaborate` (comments/attachments), `mk:jira-relationships` (linking)
 
 ## Gotchas

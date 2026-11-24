@@ -61,6 +61,8 @@ dependency_edges:
     type: peer
   - id: mk:ship
     type: peer
+  - id: mk:story-sizer
+    type: peer
 ---
 
 # mk:jira — Routing Skill
@@ -75,20 +77,27 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 | -------------------------------------------- | ----------------------- |
 | Get/create/update/delete a single issue      | `mk:jira-issue`         |
 | Find issues by criteria; export; filters     | `mk:jira-search`        |
-| Transition through workflow; assign; resolve | `mk:jira-lifecycle`     |
-| Comments, attachments, watchers, notify      | `mk:jira-collaborate`   |
-| Issue links, blockers, dependencies          | `mk:jira-relationships` |
+| Transition, assign, resolve; versions, components | `mk:jira-lifecycle` |
+| Comments, attachments, watchers              | `mk:jira-collaborate`   |
+| Issue links, blockers, dependencies, clone   | `mk:jira-relationships` |
 | Worklogs, time tracking, time reports        | `mk:jira-time`          |
-| Epics, sprints, backlog, story points        | `mk:jira-agile`         |
+| Epics, sprints, backlog                      | `mk:jira-agile`         |
 | Custom field discovery + configuration       | `mk:jira-fields`        |
-| Bulk ops (10+ issues, dry-run mandatory)     | `mk:jira-bulk`          |
+| Change 10+ issues at once                    | `mk:jira-bulk`          |
 | Service Management (queues, SLAs, customers) | `mk:jira-jsm`           |
 | Project/user/group/scheme administration     | `mk:jira-admin`         |
-| Git/PR/branch-name integration               | `mk:jira-dev`           |
+| Branch name, PR body, commit links           | `mk:jira-dev`           |
 | Cache + project-context discovery            | `mk:jira-ops`           |
-| Evaluate ticket complexity + inconsistencies | `mk:jira-evaluator`     |
-| Estimate story points (heuristic)            | `mk:jira-estimator`     |
-| Analyze ticket context + media; RCA          | `mk:jira-analyst`       |
+| Score a ticket's complexity and inconsistencies | `mk:jira-evaluator`  |
+| Suggest story points for one ticket          | `mk:jira-estimator`     |
+| Read one ticket's context, media, root cause | `mk:jira-analyst`       |
+| Size draft stories that are not tickets yet  | `mk:story-sizer`        |
+
+Neighbouring leaves, told apart:
+
+- Show a ticket's fields = `mk:jira-issue`; explain its context, attachments or root cause = `mk:jira-analyst`.
+- Complexity or quality = `mk:jira-evaluator`; points = `mk:jira-estimator`; writing points to a ticket = `mk:jira-agile` or `mk:jira-issue`.
+- Bulk verbs split by CLI group: `bulk-link` runs in `mk:jira-relationships`, `bulk-log` in `mk:jira-time`; `mk:jira-bulk` owns the `bulk` group (transition, assign, set-priority, clone, delete) and `search bulk-update`. All of them run `--dry-run` first.
 
 ## Setup
 
@@ -104,15 +113,11 @@ See `references/install-and-auth.md` for one-time setup (`mewkit skill env jira`
 - `references/safety-framework.md` — 4-tier safety model
 - `references/evaluation-rubric.md` — used by `mk:jira-evaluator`
 - `references/estimation-guide.md` — used by `mk:jira-estimator`
-- `../jira-fields/references/field-discovery.md` — used by `mk:jira-fields` (moved from `jira/references/`)
+- `../jira-fields/references/field-discovery.md` — used by `mk:jira-fields`
 
 ## Handoff
 
-- `mk:intake` → recommends `mk:jira-*` leaf based on triage
-- `mk:cook` (build pipeline) → may invoke `mk:jira-issue` to create implementation tickets
-- `mk:ship` (ship pipeline) → may invoke `mk:jira-dev` for branch-name + PR-description
-- `mk:planning-engine` → consumes Jira tickets via this hub for sprint planning analysis (`mk:jira-evaluator` / `mk:jira-estimator` outputs enrich the planning report)
-- `mk:confluence` → sister hub for Confluence Cloud; `mk:planning-engine` accepts both Jira tickets (`--tickets`) and Confluence specs (`--spec <report-path>`) as input
+Report consumers (`mk:planning-engine`, `mk:intake`) are documented in their own skills.
 
 ## Gotchas
 

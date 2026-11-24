@@ -45,10 +45,9 @@ Forks to the `jira-search` agent. JQL is positional on `search query` and `searc
 - Agent: `../../agents/jira-search.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
-  - `references/jql-patterns.md` — canonical JQL templates (curated)
-  - `references/jql-reference.md` — full JQL operator + function reference
-  - `references/search-examples.md` — practical query examples per scenario
-- Peer leaves: `mk:jira-bulk` (write-side bulk by JQL — same dry-run discipline), `mk:jira-time` (time-related JQL → see `.claude/skills/jira-time/references/jql-snippets.md`)
+  - `references/jql-patterns.md` — read first: curated templates plus examples per scenario
+  - `references/jql-reference.md` — read only for operator or function syntax
+- Peer leaves: `mk:jira-bulk` (a `search bulk-update` above 10 issues goes there, with the same dry-run rule), `mk:jira-time` (time-related JQL → see `.claude/skills/jira-time/references/jql-snippets.md`)
 
 ## Gotchas
 

@@ -47,9 +47,9 @@ Forks to the `jira-fields` agent. Most reads are open; `fields create` and `fiel
 - Agent: `../../agents/jira-fields.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
-  - `references/field-discovery.md` — discovery methodology
-  - `references/agile-field-ids.md` — typical agile field IDs (Sprint, Story Points, Epic Link)
-  - `references/field-types-reference.md` — type-selection guide (text/select/multiselect/user/etc.)
+  - `references/field-discovery.md` — discovery steps; read for any field lookup
+  - `references/agile-field-ids.md` — single owner of agile field IDs (Sprint, Story Points, Epic Link)
+  - `references/field-types-reference.md` — read only when creating a field (admin): picks the type
 - Peer leaves: `mk:jira-issue` (sets field values per issue), `mk:jira-agile` (consumes agile field IDs), `mk:jira-admin` (`admin notification-scheme` etc. — broader admin surface)
 
 ## Gotchas

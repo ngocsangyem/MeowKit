@@ -55,7 +55,7 @@ Verify: `ls .meowkit/envs/confluence/bin/ | grep confluence-as`
 
 ## Binary name
 
-The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. If a CLI upgrade renames the binary, update this line.
+The CLI binary is `confluence-as`; some upstream READMEs say `confluence`. If a CLI upgrade renames the binary, update this line.
 
 ## Cloud-only constraint
 
@@ -86,9 +86,5 @@ Run `bash scripts/smoke-live.sh` once to determine which mode applies for your i
 
 ## Gotchas
 
-- `confluence-as` package on PyPI does NOT exist — install `confluence-assistant-skills` instead.
-- Both upstream READMEs name the binary `confluence`; the actual binary is `confluence-as`.
-- ADF roundtrip in confluence-as is lossy on panel / expand / mention / emoji / media / decision / task-list nodes.
-- POST is in retry `allowed_methods` upstream (`confluence_client.py:135-144`) — create ops on flaky network may produce duplicates. Verify before retrying.
-- `--quiet` global flag is declared but unimplemented upstream (`main.py:44-74`) — don't rely on it.
-- `_escape_cql_string` is a private function in upstream's `search_cmds.py`, not exported. Use `cql-sanitize.sh` for any user-derived CQL.
+- The PyPI package is `confluence-assistant-skills` (there is no `confluence-as` package); it ships the `confluence-as` binary.
+- The other shared warnings (lossy ADF, POST retry, `--quiet`, CQL escaping) are in `cli-idioms.md` Common gotchas.

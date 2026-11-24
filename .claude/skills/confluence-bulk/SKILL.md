@@ -25,18 +25,7 @@ default_enabled: false
 
 # mk:confluence-bulk
 
-Forks to the `confluence-bulk` agent. The agent enforces a hard 3-step ceremony at runtime — dry-run → confirm → execute.
-
-## Dry-Run Workflow (MANDATORY)
-
-```
-Step 1: invocation + --dry-run
-Step 2: agent shows would_* JSON keys + impacted-count + first 5 affected page titles
-Step 3: explicit user "yes" + typed confirmation token (e.g. "DELETE 47 PAGES")
-        → re-invoke without --dry-run
-```
-
-Skipping Step 1 is a hard violation. The agent will refuse if asked to skip.
+Forks to the `confluence-bulk` agent. Every bulk command runs with `--dry-run` first; the user approves the `would_*` summary and its count with a plain "yes", then it runs again with `--yes`. A bulk change can touch hundreds of pages, so the agent refuses to skip the dry-run. The full protocol is in `references/dry-run-protocol.md`.
 
 ## Triggers
 
@@ -51,14 +40,12 @@ Skipping Step 1 is a hard violation. The agent will refuse if asked to skip.
 - Agent: `../../agents/confluence-bulk.md`
 - Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
 - Domain refs:
-  - `references/safety-checklist.md` — pre-flight checklist for any bulk operation
-  - `references/dry-run-protocol.md` — the 3-step ceremony in detail with example transcripts
+  - `references/safety-checklist.md` — optional pre-flight checklist; use it when a Higher-Risk Trigger applies
+  - `references/dry-run-protocol.md` — the dry-run protocol with an example
 - Peer leaves: `mk:confluence-search` (CQL author + read-side overlap; same sanitizer), `mk:confluence-page` (single-page ops), `mk:confluence-collaborate` (comments / attachments at single-page scope)
 
 ## Gotchas
 
-- Default `--max-pages` cap is 100. Higher values require explicit override + extra confirmation. `confluence-as` may impose its own server-side limit (~200 typical).
-- `bulk delete` is **soft-delete to trash** — restore requires going through the Confluence UI manually. There is no `--restore-from-trash` op verified in v1.
-- Bulk ops are NOT transactional. Partial-failure (rate limit / per-page permission error) leaves the partial-progress count visible; remediation is re-run with `id NOT IN (<completed>)`.
-- `bulk restore` is intentionally absent from v1 — confluence-as does not expose it as a single subcommand. v2 may add it via per-page orchestration.
-- Grow this list as new edge cases surface.
+- `--max-pages` defaults to 100 and the CLI caps it at 500; a higher value needs the user's explicit OK.
+- Bulk ops are not transactional: after a rate-limit or permission failure, re-run on the remainder with `id NOT IN (<completed>)`.
+- `bulk delete` moves pages to the trash; restoring is manual in the Confluence UI (there is no restore command).

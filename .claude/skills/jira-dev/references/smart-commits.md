@@ -1,6 +1,5 @@
 # Smart Commits Guide
 
-**Read time:** 5 minutes
 
 ## Contents
 

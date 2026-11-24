@@ -18,7 +18,7 @@ Strategic guidance for managing complex issue relationships in JIRA.
 
 ### Prioritizing Blockers
 
-When analyzing blocker chains with `get_blockers.py --recursive`:
+When analyzing blocker chains with `relationships get-blockers <KEY> --recursive`:
 
 1. **Work leaves first**: Blockers with no sub-blockers can start immediately
 2. **High-impact blockers**: Issues blocking multiple downstream issues
@@ -140,7 +140,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships cl
 
 ## Dependency Visualization
 
-> Before emitting any Mermaid block, apply the Mermaid rules SKILL.md loads for dependency graphs.
+> Mermaid blocks follow `mk:mermaidjs-v11` syntax.
 
 ### Choosing the Right Format
 
@@ -188,11 +188,13 @@ dot -Tpng weekly-deps.dot -o release-deps-$(date +%Y%m%d).png
 
 **Daily:** Update blocker status in standup
 **Weekly:** Remove stale links, consolidate duplicates
-**Monthly:** Generate `link_stats.py --project PROJ` report, review issues with >10 links
+**Monthly:** Run `relationships stats --project PROJ`, review issues with >10 links
 
 ---
 
 ## JQL for Dependency Tracking
+
+The `issueFunction` queries below need the ScriptRunner plugin; without it, use `relationships get-blockers` instead.
 
 ```jql
 # Find all issues you're blocking others with

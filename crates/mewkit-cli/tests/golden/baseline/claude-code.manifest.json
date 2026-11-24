@@ -2389,11 +2389,6 @@
       "size": 2402
     },
     {
-      "path": ".claude/skills/jira-lifecycle/references/workflow-cache-layout.md",
-      "sha256": "703dba046c360c73d2cdfc09b3fbedd2c4ade0a4d734ef090b9869133ee19610",
-      "size": 5096
-    },
-    {
       "path": ".claude/skills/jira-lifecycle/references/workflow-discovery.md",
       "sha256": "fbfe7525a2422ac1d96eea3bdf32fc79c80fd26cca9cd8539e2016d81fff3fc1",
       "size": 6338
@@ -2437,11 +2432,6 @@
       "path": ".claude/skills/jira-search/references/jql-reference.md",
       "sha256": "414b764757d25557e56c014bee86114abde5a45a5dfca2ce0cce1ac8f8dc1d02",
       "size": 3561
-    },
-    {
-      "path": ".claude/skills/jira-search/references/search-examples.md",
-      "sha256": "6b62981e507b59333f1f4b182b0ed5bfc12962b3eb7a5cf5c75c8468c7232ee5",
-      "size": 3100
     },
     {
       "path": ".claude/skills/jira-time/SKILL.md",
@@ -7172,11 +7162,6 @@
       "size": 0
     },
     {
-      "path": ".meowkit/cache/.claude/skills/jira-lifecycle/references/workflow-cache-layout.md",
-      "sha256": "703dba046c360c73d2cdfc09b3fbedd2c4ade0a4d734ef090b9869133ee19610",
-      "size": 5096
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/jira-lifecycle/references/workflow-discovery.md",
       "sha256": "fbfe7525a2422ac1d96eea3bdf32fc79c80fd26cca9cd8539e2016d81fff3fc1",
       "size": 6338
@@ -7220,11 +7205,6 @@
       "path": ".meowkit/cache/.claude/skills/jira-search/references/jql-reference.md",
       "sha256": "414b764757d25557e56c014bee86114abde5a45a5dfca2ce0cce1ac8f8dc1d02",
       "size": 3561
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/jira-search/references/search-examples.md",
-      "sha256": "6b62981e507b59333f1f4b182b0ed5bfc12962b3eb7a5cf5c75c8468c7232ee5",
-      "size": 3100
     },
     {
       "path": ".meowkit/cache/.claude/skills/jira-time/SKILL.md",

@@ -1,6 +1,6 @@
-# Input Adapter — Paste Mode (v1)
+# Input Adapter — Paste Mode
 
-Single normalized contract: paste-mode markdown → `List<StoryRecord>` (v2 may add `--from-spec`, `--from-intake` adapters; both must produce this same schema).
+Single normalized contract: paste-mode markdown → `List<StoryRecord>` (any future adapter must produce this same schema).
 
 ## StoryRecord Schema
 
@@ -79,8 +79,8 @@ Rules:
 ## What This Adapter Does NOT Do
 
 - No URL fetching. No file reading except the paste body the SKILL.md layer hands in.
-- No upstream-spec/intake awareness — v1 is paste-only.
-- No `blocks:` key parsing — v1 input format does not carry blocks metadata; the dev links manually via `mk:jira-relationships` after creation.
+- No upstream-spec/intake awareness: input is paste-only.
+- No `blocks:` key parsing — the input format does not carry blocks metadata; the dev links manually via `mk:jira-relationships` after creation.
 
 ## Caller Contract
 

@@ -31,20 +31,20 @@ The wrapper:
 
 ## Verified Quick Examples
 
-| Operation            | Verified syntax                                                                     | Source                                                           |
+| Operation            | Verified syntax                                                                     |
 | -------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Get one issue        | `jira-as issue get PROJ-123`                                                        | `issue_cmds.py:453` (positional)                                 |
-| Create an issue      | `jira-as issue create --project PROJ --type Task --summary "Login fails on Safari"` | `issue_cmds.py:542` (`--project` required, `--summary` required) |
-| Create from template | `jira-as issue create --project PROJ --template bug --summary "..."`                | same                                                             |
-| Update an issue      | `jira-as issue update PROJ-123 --summary "..."`                                     | `issue_cmds.py:665` (positional key)                             |
-| Delete an issue      | `jira-as issue delete PROJ-123`                                                     | `issue_cmds.py:732`                                              |
-| Search by JQL        | `jira-as search query "project = PROJ AND status = Open"`                           | `search_cmds.py:1176` (positional)                               |
-| Validate JQL         | `jira-as search validate "project = PROJ"`                                          | `search_cmds.py:1273`                                            |
-| Transition an issue  | `jira-as lifecycle transition PROJ-123 --to "In Progress"`                          | `lifecycle_cmds.py:851` (positional key, `--to` flag)            |
-| Log work             | `jira-as time log PROJ-123 --time 2h`                                               | `time_cmds.py:1181` (positional key, `--time` flag)              |
-| Assign               | `jira-as lifecycle assign PROJ-123 --assignee john.doe`                             | `lifecycle_cmds.py:923`                                          |
-| Add comment          | `jira-as collaborate comment add PROJ-123 --body "text"`                            | `collaborate_cmds.py` (verify via `--help`)                      |
-| Link issues          | `jira-as relationships link PROJ-123 --type blocks --to PROJ-456`                   | `relationships_cmds.py` (verify via `--help`)                    |
+| Get one issue        | `jira-as issue get PROJ-123`                                                        |
+| Create an issue      | `jira-as issue create --project PROJ --type Task --summary "Login fails on Safari"` |
+| Create from template | `jira-as issue create --project PROJ --template bug --summary "..."`                |
+| Update an issue      | `jira-as issue update PROJ-123 --summary "..."`                                     |
+| Delete an issue      | `jira-as issue delete PROJ-123`                                                     |
+| Search by JQL        | `jira-as search query "project = PROJ AND status = Open"`                           |
+| Validate JQL         | `jira-as search validate "project = PROJ"`                                          |
+| Transition an issue  | `jira-as lifecycle transition PROJ-123 --to "In Progress"`                          |
+| Log work             | `jira-as time log PROJ-123 --time 2h`                                               |
+| Assign               | `jira-as lifecycle assign PROJ-123 --user john.doe`                             |
+| Add comment          | `jira-as collaborate comment add PROJ-123 --body "text"`                            |
+| Link issues          | `jira-as relationships link PROJ-123 --type blocks --to PROJ-456`                   |
 
 Most parameters beyond the primary issue/project key are flags. Always confirm via `--help` before authoring agent invocations.
 
@@ -74,26 +74,16 @@ These appear across many groups (verify per call via `--help`):
 | `issue`         | `get`, `create`, `update`, `delete`                                                                                                                             |
 | `search`        | `query`, `validate`, `build`, `suggest`, `export`, `bulk-update`, `filter`                                                                                      |
 | `lifecycle`     | `transition`, `assign`, `resolve`, `reopen`, `version`, `component`                                                                                             |
-| `collaborate`   | `comment {add,list,update,delete}`, `attachment {upload,list,download}`, `watcher`                                                                              |
+| `collaborate`   | `comment {add,list,update,delete}`, `attachment {upload,list,download}`, `watchers`, `notify`, `activity`                                                                              |
 | `relationships` | `link`, `unlink`, `get-blockers`, `get-dependencies`, `clone`, `bulk-link`                                                                                      |
 | `time`          | `log`, `worklogs`, `update-worklog`, `delete-worklog`, `estimate`, `tracking`, `report`, `export`, `bulk-log`                                                   |
 | `agile`         | `backlog`, `rank`, `estimate`, `velocity`, `subtask`, `epic`, `sprint`                                                                                          |
 | `fields`        | `list`, `create`, `check-project`, `configure-agile`                                                                                                            |
-| `bulk`          | `transition`, `assign`, `set-priority`, `clone`, `delete` (always with `--dry-run` first)                                                                       |
+| `bulk`          | `transition`, `assign`, `set-priority`, `clone`, `delete` (always with `--dry-run` first); `bulk-link` is under `relationships`, `bulk-log` under `time`                                                                     |
 | `jsm`           | `service-desk`, `request-type`, `request`, `customer`, `organization`, `queue`, `sla`, `approval`                                                               |
 | `admin`         | `project`, `config`, `category`, `user`, `group`, `automation`, `automation-template`, `permission-scheme`, `permission`, `notification-scheme`, `notification` |
 | `dev`           | `branch-name`, `pr-description`, `parse-commits`, `link-commit`, `link-pr`, `get-commits`                                                                       |
 | `ops`           | `cache-status`, `cache-clear`, `discover-project`, `cache-warm`                                                                                                 |
-
-## Per-command flag verification (mandatory during agent authoring)
-
-When authoring a `jira-{leaf}` agent's Operations table, run:
-
-```
-bash scripts/jira-as.sh <group> <verb> --help
-```
-
-Capture the actual signature. Do NOT infer flags from prose examples in this file or other docs — `--help` is authoritative.
 
 ## Conflict resolution
 

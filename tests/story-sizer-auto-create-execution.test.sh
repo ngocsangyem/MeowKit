@@ -81,8 +81,8 @@ print(s['counter'])
   exit 0
 fi
 
-if printf "%s" "$cmd" | grep -q "jira-collaborate add-comment"; then
-  key=$(printf "%s" "$cmd" | head -1 | awk '{print $3}')
+if printf "%s" "$cmd" | grep -q "jira-collaborate comment add"; then
+  key=$(printf "%s" "$cmd" | head -1 | awk '{print $4}')
   fail_keys=$(extract fail_on_comment_keys)
   if [ -n "$fail_keys" ]; then
     case ",$fail_keys," in
@@ -141,10 +141,10 @@ PLAN_OUT=$(printf "%s" "$PAYLOAD_NO_REPORT" | "$PY" "$EXEC" --plan-only 2>/dev/n
 EPIC_COUNT=$(printf "%s" "$PLAN_OUT" | "$PY" -c 'import json,sys; cmds=[p["command"] for p in json.load(sys.stdin)["planned_commands"] if p["call"]=="A"]; print(sum("--epic AUTH-100" in c for c in cmds))')
 assert_eq "--epic propagated to 3 create calls" "3" "$EPIC_COUNT"
 
-# Case 5 — every Call B uses --internal.
-INTERNAL_COUNT=$(printf "%s" "$PLAN_OUT" | "$PY" -c 'import json,sys; cmds=[p["command"] for p in json.load(sys.stdin)["planned_commands"] if p["call"]=="B"]; print(sum("--internal" in c for c in cmds))')
+# Case 5 — every Call B carries a visibility restriction.
+INTERNAL_COUNT=$(printf "%s" "$PLAN_OUT" | "$PY" -c 'import json,sys; cmds=[p["command"] for p in json.load(sys.stdin)["planned_commands"] if p["call"]=="B"]; print(sum("--visibility-role" in c for c in cmds))')
 B_COUNT=$(printf "%s" "$PLAN_OUT" | "$PY" -c 'import json,sys; print(sum(1 for p in json.load(sys.stdin)["planned_commands"] if p["call"]=="B"))')
-assert_eq "every Call B carries --internal" "$B_COUNT" "$INTERNAL_COUNT"
+assert_eq "every Call B carries --visibility-role" "$B_COUNT" "$INTERNAL_COUNT"
 
 # Case 6 — no Call B carries --public.
 PUBLIC_COUNT=$(printf "%s" "$PLAN_OUT" | "$PY" -c 'import json,sys; cmds=[p["command"] for p in json.load(sys.stdin)["planned_commands"] if p["call"]=="B"]; print(sum("--public" in c for c in cmds))')

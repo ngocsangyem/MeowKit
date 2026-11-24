@@ -28,7 +28,7 @@ requires_runtime: [python>=3.9]
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-Forks to the `story-sizer` agent (system prompt at `.claude/agents/story-sizer.md`). v1 ships paste-mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
+Forks to the `story-sizer` agent (system prompt at `.claude/agents/story-sizer.md`). Paste mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
 
 ## Triggers
 
@@ -57,7 +57,7 @@ Fibonacci sizing rules: see `references/sizing-heuristics.md` for complexity dim
 
 Report template + slot semantics: `references/report-writer.md`. Renderer is `scripts/write-sizing-report.py`. Default path: `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. Idempotency by `source_hash` — repeated runs on the identical paste body re-prompt before overwriting.
 
-Per-story suggested create commands obey the v1 field whitelist: `--project`, `--type`, `--summary`, `--story-points`, `--description`, optional `--epic`, `--components`, `--labels`. No `--assignee`, `--priority`, `--sprint`, `--blocks`, or `--custom-fields` in v1.
+Per-story suggested create commands obey a field whitelist: `--project`, `--type`, `--summary`, `--story-points`, `--description`, optional `--epic`, `--components`, `--labels`. No `--assignee`, `--priority`, `--sprint`, `--blocks`, or `--custom-fields`.
 
 ## Orchestration
 
@@ -71,8 +71,7 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 - Agent: `../../agents/story-sizer.md`
 - Peer intelligence: `mk:jira-evaluator` (post-ticket complexity), `mk:jira-estimator` (post-ticket estimation), `mk:planning-engine` (sprint capacity)
-- Peer execution (delegated): `mk:jira-issue` (create), `mk:jira-collaborate` (audit comment via `--internal`)
-- Shared: `../jira/references/estimation-guide.md` (Fibonacci heuristic conventions)
+- Peer execution (delegated): `mk:jira-issue` (create), `mk:jira-collaborate` (audit comment, visibility-restricted)
 
 ## Gotchas
 

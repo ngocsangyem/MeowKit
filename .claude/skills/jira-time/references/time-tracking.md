@@ -59,9 +59,7 @@ project = PROJ AND worklogDate = startOfDay()
 
 ## Safety
 
-- Log work: **Low risk** (additive, reversible via delete)
-- Modify estimate: **Medium risk** (show old vs new before confirming)
-- Delete worklog: **Medium risk** (requires confirmation)
+Tiers and confirmations: `../../jira/references/safety-framework.md`. `time bulk-log` takes `--dry-run`: run it first.
 
 ## Gotchas
 

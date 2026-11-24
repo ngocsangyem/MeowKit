@@ -171,7 +171,7 @@ Assignee:             Can differ from parent — parallel work
 Story Points:         Sub-task points do NOT roll up automatically in all Jira configs
 ```
 
-## **Note:** Sub-tasks should only be created when work within a story needs to be assigned to different people or tracked independently. Avoid sub-tasks for sequential steps that a single person handles.
+**Note:** Sub-tasks should only be created when work within a story needs to be assigned to different people or tracked independently. Avoid sub-tasks for sequential steps that a single person handles.
 
 ## Description Body Templates (markdown — paste into `--description`)
 

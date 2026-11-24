@@ -24,15 +24,13 @@ default_enabled: false
 
 # mk:confluence-search
 
-Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `../confluence/scripts/cql-sanitize.sh`.
+Forks to the `confluence-search` agent. CQL is positional: `search cql "<CQL>"`, `search validate "<CQL>"`, `search export "<CQL>" --output <file>`. The agent enforces CQL sanitization for any user-derived term via `../confluence/scripts/cql-sanitize.sh`.
 
 ## Triggers
 
 - "search confluence for ..."
 - "find pages where space = ENG and title ~ 'roadmap'"
-- "build a cql for ..."
 - "export the search to /tmp/out.csv"
-- "list / get / favourite a saved filter"
 - "list spaces" / "get space ENG"
 
 ## Examples
@@ -40,7 +38,6 @@ Forks to the `confluence-search` agent. CQL is positional on `search` (and on va
 - "find pages updated in the last 7 days in space ENG, top 20"
 - "validate this cql: space = ENG AND title ~ 'Q3'"
 - "list every space I can see"
-- "save a filter named 'My recent specs' with this cql: ..."
 
 ## See also
 
@@ -54,8 +51,4 @@ Forks to the `confluence-search` agent. CQL is positional on `search` (and on va
 
 ## Gotchas
 
-- `confluence-as` does NOT export `_escape_cql_string` — it lives as a private function in the search command module. The `cql-sanitize.sh` shared script is the only safety gate. Use it unconditionally for any user-derived CQL term. [from research]
-- The `--quiet` global flag is declared in `confluence-as` but unimplemented (never read in main). Don't rely on it; redirect stderr explicitly when needed. [from research]
-- Keychain entry name `"confluence-assistant"` collides with upstream Confluence-Assistant-Skills if both tools are installed. We never use keychain (env-only via wrapper) so we're not affected — but document the collision so users running both know. [from research]
-- Two-tier filesystem cache (SkillCache SQLite + `~/.confluence-skills/cache/`) is opaque. Don't depend on cache state — `confluence-as ops cache-clear` is safe to invoke if behavior looks stale. [from research]
-- Grow this list as new edge cases surface.
+- Always run user-derived terms through `../confluence/scripts/cql-sanitize.sh`: the CLI does not escape CQL, and an unescaped term can close the quote and add clauses.

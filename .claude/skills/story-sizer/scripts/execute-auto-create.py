@@ -126,8 +126,8 @@ def _render_comment(template: str, record: dict, report_path: str) -> str:
 def _build_comment_command(new_key: str, body: str) -> str:
     safe_body = body.replace('"', "'")
     return (
-        f'/mk:jira-collaborate add-comment {new_key} '
-        f'--body "{safe_body}" --internal'
+        f'/mk:jira-collaborate comment add {new_key} '
+        f'--body "{safe_body}" --visibility-role Administrators'
     )
 
 
@@ -136,8 +136,8 @@ def _validate_v1(command: str, kind: str) -> Optional[str]:
     for flag in FORBIDDEN_V1_FLAGS:
         if flag in command:
             return f"{kind} command contains forbidden v1 flag: {flag}"
-    if kind == "B" and "--internal" not in command:
-        return "Call B is missing required --internal flag"
+    if kind == "B" and "--visibility-role" not in command:
+        return "Call B is missing required --visibility-role flag"
     if kind == "B" and "--public" in command:
         return "Call B has --public which violates audit-comment safety"
     return None
@@ -274,7 +274,7 @@ def append_to_report(result: dict, report_path: Optional[str]) -> None:
             "",
             f"Reason: {result.get('stopped_reason')}",
             "",
-            "Manual cleanup hint: `/mk:jira-lifecycle delete <KEY>` per ticket above.",
+            "Manual cleanup hint: `/mk:jira-issue delete <KEY>` per ticket above.",
         ]
     if result.get("comment_failures"):
         lines += ["", "## Comment Failures", ""]

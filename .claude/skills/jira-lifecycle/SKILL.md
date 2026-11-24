@@ -27,7 +27,7 @@ default_enabled: false
 
 Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key positional + a `--to "Status Name"` flag (or `--id <transition_id>`).
 
-**Workflow discovery is mandatory** before suggesting transitions. The agent reads `tasks/jira-workflows/` (instance-discovered cache) and runs `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent. See `references/workflow-discovery.md`. The `references/patterns/*.md` files are illustrative concepts only — they are NOT your project's actual workflow.
+**Discover before suggesting transitions.** Read `tasks/jira-workflows/`; if it is empty for the project, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>`. Details: `references/workflow-discovery.md`.
 
 ## Triggers
 
@@ -35,7 +35,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 - "mark PROJ-123 as Done with resolution Fixed"
 - "assign PROJ-123 to john.doe"
 - "reopen PROJ-123"
-- "release version v1.0.0 in PROJ"
+- "release version v1.0.0 in PROJ" (versions and components are in this leaf)
 
 ## Examples
 
@@ -47,19 +47,9 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 
 - Agent: `../../agents/jira-lifecycle.md`
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
-- **Authoritative source for THIS project's workflow** (discovered, not templated):
-  - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
-  - `references/workflow-cache-layout.md` — what the cache directory holds, and whether to commit it
-  - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions
-  - `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` — project → workflow mapping
-  - Discovery script: `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`
-- Domain refs:
-  - `references/workflow-transitions.md` — common transition idioms + resolution-required patterns
-- Educational concept patterns (illustrative shapes, **NOT authoritative for your instance** — always prefer the discovered cache above):
-  - `references/patterns/standard-workflow.md` — basic 3-state lifecycle (concept)
-  - `references/patterns/software-dev-workflow.md` — engineering-team flow (concept)
-  - `references/patterns/jsm-request-workflow.md` — JSM ITIL flow (concept)
-  - `references/patterns/incident-workflow.md` — incident handling (concept)
+- `references/workflow-discovery.md` — discovery, cache layout and freshness (read first)
+- `references/workflow-transitions.md` — common transition idioms + resolution-required patterns
+- `references/patterns/*.md` — illustrative workflow shapes (standard, software-dev, JSM request, incident); load only on request, they are not this project's workflow
 - Peer leaves: `mk:jira-bulk` (bulk transition; reads same workflow cache), `mk:jira-jsm` (JSM-specific transitions), `mk:jira-collaborate` (transition `--comment` body templates)
 
 ## Gotchas

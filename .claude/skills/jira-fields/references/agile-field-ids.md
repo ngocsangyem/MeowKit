@@ -70,7 +70,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --ag
 Field IDs on Server/Data Center installations may differ significantly:
 - IDs are assigned sequentially during installation
 - Plugin installations may shift IDs
-- Always use `list_fields.py --agile` to discover IDs
+- Always use `fields list --agile` to discover IDs
 
 ---
 

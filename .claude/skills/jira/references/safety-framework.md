@@ -78,7 +78,9 @@ WHY: Field updates can disrupt team workflows if done accidentally. Showing the 
 
 Operations: Delete issue, bulk update multiple issues, close/complete sprint, delete sprint, bulk transition, bulk reassign.
 
-Confirmation: Mandatory. mk:jira implements dry-run by reading the issue/sprint first, displaying what will be affected, then executing after explicit approval. MCP tools do not have native dry-run — mk:jira orchestrates this.
+Confirmation: Mandatory. Bulk commands take the CLI's `--dry-run`: run it first, show the count and the affected issues, then run again without it once the user says "yes". A single delete or a sprint close has no dry-run: read the issue or sprint first and show what will be affected.
+
+One rule everywhere: a plain "yes" after the dry-run shows the count. Only an irreversible delete (bulk delete, project delete) needs the typed token below.
 
 **Dry-run output:**
 ```
@@ -88,7 +90,7 @@ This operation will:
   - Issues: PROJ-10, PROJ-11, PROJ-14, PROJ-18, ... (12 total)
   - Affected assignees: alice, bob, carol
 
-Type "CONFIRM BULK TRANSITION 12" to proceed, or Ctrl+C to cancel.
+Reply "yes" to proceed, or anything else to cancel.
 ```
 
 WHY: Destructive and bulk operations are hard or impossible to reverse. Sprint closure affects velocity reporting. Bulk deletes are unrecoverable without admin restore.
@@ -133,10 +135,10 @@ User must type `y` or `yes`. Any other input cancels.
 DRY RUN RESULTS:
 {dry_run_output}
 
-Type "{CONFIRMATION_TOKEN}" to confirm, or press Enter to cancel:
+Reply "yes" to confirm, or press Enter to cancel:
 ```
 
-`CONFIRMATION_TOKEN` is operation-specific, e.g. `CONFIRM DELETE PROJ-123`, `CONFIRM CLOSE SPRINT 42`, `CONFIRM BULK UPDATE 8`.
+Irreversible deletes (bulk delete, project delete) ask for a typed token instead, because a mistyped "yes" must not destroy data that cannot come back: `CONFIRM BULK DELETE 8`.
 
 ---
 

@@ -2274,11 +2274,6 @@
       "size": 2510
     },
     {
-      "path": ".cursor/skills/mk-jira-lifecycle/references/workflow-cache-layout.md",
-      "sha256": "f3b0328062ec247c711ef7bcb6609327f39b118b9d2356ad49ca30d941cd5ae6",
-      "size": 5128
-    },
-    {
       "path": ".cursor/skills/mk-jira-lifecycle/references/workflow-discovery.md",
       "sha256": "bef2b519a1305efa97c9168963ffed0d1592b7f24c49208be5b9f8fe652f2074",
       "size": 6230
@@ -2322,11 +2317,6 @@
       "path": ".cursor/skills/mk-jira-search/references/jql-reference.md",
       "sha256": "414b764757d25557e56c014bee86114abde5a45a5dfca2ce0cce1ac8f8dc1d02",
       "size": 3561
-    },
-    {
-      "path": ".cursor/skills/mk-jira-search/references/search-examples.md",
-      "sha256": "664bcba6ac4f72c0b8f4f8734e3ea71c5c84f3aa0d7d8a59e67eeb6ec3ac238b",
-      "size": 3139
     },
     {
       "path": ".cursor/skills/mk-jira-time/SKILL.md",

@@ -42,7 +42,7 @@ describe("ship set completeness", () => {
 			".claude/skills/plan-creator/assets/plan-quick.md",
 			".claude/skills/plan-creator/assets/bead-template.md",
 			".claude/skills/status/assets/pm-status-template.md",
-			".claude/skills/jira-lifecycle/references/workflow-cache-layout.md",
+			".claude/skills/jira-lifecycle/references/workflow-discovery.md",
 		]) {
 			expect(shipped).toContain(template);
 			// One copy inside the kit tree; other runtimes get theirs by projection.
