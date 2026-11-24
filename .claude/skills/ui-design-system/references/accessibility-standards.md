@@ -1,13 +1,13 @@
-# Accessibility Standards (WCAG 2.1 AA)
+# Accessibility Standards (WCAG AA)
 
-Non-negotiable. Every UI component must pass these checks.
+The target is WCAG AA. Check the project's stated version; the values below hold for 2.1 and 2.2. A component that fails one of these is not ready, because users who cannot meet the visual or pointer assumption cannot use it. Scale the pass to the change: a one-colour fix needs the contrast section only.
 
 ## Color Contrast
 
 | Element | Minimum ratio | Tool |
 |---------|:---:|------|
-| Normal text (<18px) | 4.5:1 | Check with contrast checker |
-| Large text (≥18px or ≥14px bold) | 3:1 | — |
+| Normal text (below the large-text size) | 4.5:1 | A contrast checker or `npx lighthouse --only-categories=accessibility <url>` |
+| Large text (≥24px, or ≥18.66px bold) | 3:1 | — |
 | UI components & graphical objects | 3:1 | Borders, icons, form controls |
 | Decorative elements | No requirement | — |
 
@@ -17,7 +17,7 @@ Non-negotiable. Every UI component must pass these checks.
 
 | Element | Minimum size | Minimum spacing |
 |---------|:---:|:---:|
-| Buttons, links, controls | 44×44px | 8px gap between targets |
+| Buttons, links, controls | 44×44px recommended (WCAG 2.2 AA floor is 24×24px) | 8px gap between targets |
 | Icon-only buttons | 48×48px (larger for no label) | 8px |
 | Form inputs | 44px height minimum | — |
 
@@ -40,7 +40,7 @@ Non-negotiable. Every UI component must pass these checks.
 ## Motion & Animation
 
 - Respect `prefers-reduced-motion` — disable non-essential animations
-- Animation duration: 150–300ms for micro-interactions
+- Duration: micro-interactions 100–200ms, panels and navigation 200–300ms, page transitions and modals 300–500ms; ease-out for enter, ease-in for exit
 - No auto-playing video/audio without user control
 - Loading spinners: include `aria-busy="true"` on container
 

@@ -1949,96 +1949,6 @@
       "size": 11860
     },
     {
-      "path": ".claude/skills/figma/evals/fixtures/README.md",
-      "sha256": "8fdb7bdbcf52172284264c5262ebdc6c891c494164b8f649116106d314023af0",
-      "size": 2006
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/interaction-modal/design-snapshot.md",
-      "sha256": "4b02bd5a6aed3eea034aa89ff5c8f2e3d948d6e606e2b9444884380949141dbc",
-      "size": 2430
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/interaction-modal/expected-packet.yaml",
-      "sha256": "d4cc25eab52d20f327bc8e0399e31f97236e37ad6f750e091df2756d00ac7301",
-      "size": 2812
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/interaction-modal/expected-plan-assertions.md",
-      "sha256": "592d7825e8f72d519da9e31018a0178fe124cafcd5a4d1bf953b1ecb84aecd33",
-      "size": 1647
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/interaction-modal/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/responsive-grid/design-snapshot.md",
-      "sha256": "5973d6e7ff648f9cf73d830e754de0e277bf49257720ff3b6003d33e3fe11994",
-      "size": 1696
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/responsive-grid/expected-packet.yaml",
-      "sha256": "77c549f59c556c862844e0c55afdd47f95ee2eef3cc3130b347022857440e79d",
-      "size": 2134
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/responsive-grid/expected-plan-assertions.md",
-      "sha256": "894d68c855c6834906a52179bfbcf815d21a0443d544cb3a746545c8f1c5e875",
-      "size": 924
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/responsive-grid/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/spec-conflict/design-snapshot.md",
-      "sha256": "d3019f66e5980de9f0c5716c83126a17749e2f0798d3716fdc97342d6b8c52a2",
-      "size": 2276
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/spec-conflict/expected-packet.yaml",
-      "sha256": "1dc6056ead900b52582e595ff9c2e210ce5a6affb4646899a6ace53d2592938e",
-      "size": 3389
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/spec-conflict/expected-plan-assertions.md",
-      "sha256": "f5d209b5488de71b782f9abd39c0337e02c32da2a0a38771b02f5d457862abc7",
-      "size": 2220
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/spec-conflict/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/static-card/design-snapshot.md",
-      "sha256": "e3189e1ee7170422f03758c91c3ee99e6926fa00fac293adab6726bcd974869c",
-      "size": 1627
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/static-card/expected-packet.yaml",
-      "sha256": "fff12c7004844a93deed9187cc412856d124dc2d76c78fea8869cc9569e35788",
-      "size": 2032
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/static-card/expected-plan-assertions.md",
-      "sha256": "69c9ac7f670c36b41ec84a856ac83b22a153cafc94d0c72af5ca31cc091de5c6",
-      "size": 905
-    },
-    {
-      "path": ".claude/skills/figma/evals/fixtures/static-card/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".claude/skills/figma/evals/validate-evidence-packets.py",
-      "sha256": "53fff33d472c766804197a40a382ce7b36175511e5836f52f97b80ab6762f79f",
-      "size": 11477
-    },
-    {
       "path": ".claude/skills/figma/references/canvas-write-boundaries.md",
       "sha256": "cd3cfece71432c50993280613cd6f6291fe26cfa8953812c7f51a1f4474ef866",
       "size": 4068
@@ -2057,11 +1967,6 @@
       "path": ".claude/skills/figma/references/design-token-extraction.md",
       "sha256": "b0a3308ab39224534429b694927b3869ab96e9399c894911591bdc6aab17125a",
       "size": 3975
-    },
-    {
-      "path": ".claude/skills/figma/references/eval-checklist.md",
-      "sha256": "3f33dfbb2c9b3216f6e86738637e4a85252c9ce977feca7e8722e1be63177fe2",
-      "size": 7021
     },
     {
       "path": ".claude/skills/figma/references/figma-evidence-packet.md",
@@ -7274,96 +7179,6 @@
       "size": 11860
     },
     {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/README.md",
-      "sha256": "8fdb7bdbcf52172284264c5262ebdc6c891c494164b8f649116106d314023af0",
-      "size": 2006
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/interaction-modal/design-snapshot.md",
-      "sha256": "4b02bd5a6aed3eea034aa89ff5c8f2e3d948d6e606e2b9444884380949141dbc",
-      "size": 2430
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/interaction-modal/expected-packet.yaml",
-      "sha256": "d4cc25eab52d20f327bc8e0399e31f97236e37ad6f750e091df2756d00ac7301",
-      "size": 2812
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/interaction-modal/expected-plan-assertions.md",
-      "sha256": "592d7825e8f72d519da9e31018a0178fe124cafcd5a4d1bf953b1ecb84aecd33",
-      "size": 1647
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/interaction-modal/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/responsive-grid/design-snapshot.md",
-      "sha256": "5973d6e7ff648f9cf73d830e754de0e277bf49257720ff3b6003d33e3fe11994",
-      "size": 1696
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/responsive-grid/expected-packet.yaml",
-      "sha256": "77c549f59c556c862844e0c55afdd47f95ee2eef3cc3130b347022857440e79d",
-      "size": 2134
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/responsive-grid/expected-plan-assertions.md",
-      "sha256": "894d68c855c6834906a52179bfbcf815d21a0443d544cb3a746545c8f1c5e875",
-      "size": 924
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/responsive-grid/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/spec-conflict/design-snapshot.md",
-      "sha256": "d3019f66e5980de9f0c5716c83126a17749e2f0798d3716fdc97342d6b8c52a2",
-      "size": 2276
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/spec-conflict/expected-packet.yaml",
-      "sha256": "1dc6056ead900b52582e595ff9c2e210ce5a6affb4646899a6ace53d2592938e",
-      "size": 3389
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/spec-conflict/expected-plan-assertions.md",
-      "sha256": "f5d209b5488de71b782f9abd39c0337e02c32da2a0a38771b02f5d457862abc7",
-      "size": 2220
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/spec-conflict/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/static-card/design-snapshot.md",
-      "sha256": "e3189e1ee7170422f03758c91c3ee99e6926fa00fac293adab6726bcd974869c",
-      "size": 1627
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/static-card/expected-packet.yaml",
-      "sha256": "fff12c7004844a93deed9187cc412856d124dc2d76c78fea8869cc9569e35788",
-      "size": 2032
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/static-card/expected-plan-assertions.md",
-      "sha256": "69c9ac7f670c36b41ec84a856ac83b22a153cafc94d0c72af5ca31cc091de5c6",
-      "size": 905
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/fixtures/static-card/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/evals/validate-evidence-packets.py",
-      "sha256": "53fff33d472c766804197a40a382ce7b36175511e5836f52f97b80ab6762f79f",
-      "size": 11477
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/figma/references/canvas-write-boundaries.md",
       "sha256": "cd3cfece71432c50993280613cd6f6291fe26cfa8953812c7f51a1f4474ef866",
       "size": 4068
@@ -7382,11 +7197,6 @@
       "path": ".meowkit/cache/.claude/skills/figma/references/design-token-extraction.md",
       "sha256": "b0a3308ab39224534429b694927b3869ab96e9399c894911591bdc6aab17125a",
       "size": 3975
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/figma/references/eval-checklist.md",
-      "sha256": "3f33dfbb2c9b3216f6e86738637e4a85252c9ce977feca7e8722e1be63177fe2",
-      "size": 7021
     },
     {
       "path": ".meowkit/cache/.claude/skills/figma/references/figma-evidence-packet.md",

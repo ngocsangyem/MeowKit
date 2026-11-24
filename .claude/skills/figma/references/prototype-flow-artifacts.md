@@ -16,7 +16,7 @@ user supplies a flow.
 
 ## Extraction (feasibility-limited)
 
-A feasibility spike found the Figma MCP tools do NOT expose generic prototype-flow
+The Figma MCP tools checked here do NOT expose generic prototype-flow
 (reaction/navigation) metadata: `get_metadata` returns structure only; `get_design_context`
 returns code + screenshot; `get_motion_context` returns keyframe **animation** data, not
 navigation edges. So extraction is a short check-then-fall-back, not a full procedure:
@@ -58,7 +58,7 @@ Machine-readable source of truth. Satisfies the packet's `prototype_flow_summary
 ```
 
 Rules: a `high` risk edge can never be `kind: extracted` silently → it must carry
-`status: blocked | needs-answer` until confirmed. `inferred` edges render dashed (Phase 5);
+`status: blocked | needs-answer` until confirmed. `inferred` edges render dashed;
 `extracted`/`confirmed` render solid.
 
 ## prototype-flow-report.md template

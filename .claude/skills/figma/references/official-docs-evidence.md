@@ -1,9 +1,6 @@
 # Official Docs Evidence
 
-Claim → official-doc source matrix. Every capability claim the skill makes must trace to a row here or
-to the strategy audit; unbacked behavior is labeled UNCERTAIN. Support file — load when auditing a claim.
-
-URLs were checked on the audit date recorded below.
+Claim → official-doc source matrix. Every capability claim the skill makes traces to a row here; unbacked behavior is labeled UNCERTAIN. Load when checking a claim. The URLs can change, so re-check one before relying on it.
 
 ## Contents
 
@@ -19,9 +16,6 @@ URLs were checked on the audit date recorded below.
 - Code Connect — https://developers.figma.com/docs/code-connect/
 - Dev Resources — https://developers.figma.com/docs/rest-api/dev-resources/
 - File node types — https://developers.figma.com/docs/rest-api/file-node-types/
-
-Audit date: 2026-07-04 (strategy audit). Context7 returned no usable combined doc; official Figma docs
-were used directly.
 
 ## Claim matrix
 
@@ -43,7 +37,7 @@ were used directly.
 - **Generic prototype-flow extraction** — local Plugin API references expose reaction/prototype APIs,
   but the reviewed official REST docs do not establish a generic prototype-flow extraction workflow.
   Treat prototype understanding as ADVISORY unless the MCP returns explicit interaction metadata.
-  MCP tool-contract spike (2026-07-05): none of `get_metadata` (structure only),
+  None of `get_metadata` (structure only),
   `get_design_context` (code + screenshot), or `get_motion_context` (keyframe **animation** data —
   not navigation) exposes reaction/navigation/starting-point edges. Flow defaults to
   `unavailable | user_supplied`; `extracted` is per-server-version and must be re-verified, never

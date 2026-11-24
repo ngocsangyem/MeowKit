@@ -26,52 +26,32 @@ runtime: claude-code
 
 # UI Design System
 
-Data-driven design intelligence: curated palettes, font pairings, product recommendations, UX guidelines, accessibility standards, and quality checklists.
+Data and numeric standards for UI work: curated palettes, font pairings, product-type recommendations, UX guidelines, chart choices, and the one set of spacing, breakpoint, contrast, touch-target and motion values every UI skill points to.
 
 ## When to Use
 
-- Creating or reviewing UI components
+- Choosing a palette, font pairing, chart type or overall style direction for a product
 - Setting up a design system for a new project
-- Checking WCAG accessibility compliance
-- Selecting color palettes, typography, or UI styles
-- Choosing chart types for data visualization
-- Responsive design review
+- Checking contrast, touch targets, spacing, breakpoints or motion timing against the standard values
+- Reviewing responsive behaviour
+
+Not for critiquing or implementing a specific screen (`mk:frontend-design` owns slop judgment and implementation). For a Figma link use `mk:figma`; for generated screens use `mk:stitch`. Those three feed `mk:frontend-design`; this skill supplies the data and numbers they cite.
 
 ## Process
 
-1. **Understand requirements** — what product type? audience? style direction?
-2. **Look up design data** — read `references/data-lookup.md` for how to query:
-   - Color palette → `assets/colors.csv` (161 WCAG-verified palettes by product type)
-   - Font pairing → `assets/typography.csv` (73 pairings with Google Fonts URLs)
-   - Product direction → `assets/products.csv` (161 types with style/dashboard/color recs)
-   - UX check → `assets/ux-guidelines.csv` (99 Do/Don't rules with severity)
-   - Chart type → `assets/charts.csv` (25 types with accessibility grades)
-3. **Apply design rules** — load from references/ based on task:
-   - Visual design → `references/design-patterns.md`
-   - Accessibility → `references/accessibility-standards.md`
-   - Quality check → `references/quality-checklist.md`
-4. **Validate** — run quality-checklist.md before handoff
-
-## Data Assets (NEW — v2.0)
-
-| File                       | Rows | Content                                                       |
-| -------------------------- | ---- | ------------------------------------------------------------- |
-| `assets/colors.csv`        | 160  | WCAG-verified palettes by product type (hex values)           |
-| `assets/typography.csv`    | 73   | Font pairings with mood, Google Fonts URLs, Tailwind config   |
-| `assets/products.csv`      | 161  | Product type → style, landing pattern, dashboard, color focus |
-| `assets/ux-guidelines.csv` | 98   | Do/Don't pairs with category + severity                       |
-| `assets/charts.csv`        | 25   | Data type → best chart, accessibility grade, library          |
-
-See `references/data-lookup.md` for lookup patterns and examples.
+1. **Understand the need.** Product type, audience, style direction. A small patch (one colour, one spacing fix) needs only step 3.
+2. **Look up data, do not read whole files.** The CSVs are wide, so search by product type and read the matching rows only. `references/data-lookup.md` has the columns and examples. Example:
+   `grep -i "fintech" assets/colors.csv`
+   Files: `assets/colors.csv` (palettes), `assets/typography.csv` (pairings with Google Fonts URLs), `assets/products.csv` (product type to style), `assets/ux-guidelines.csv` (Do/Don't rules), `assets/charts.csv` (data type to chart).
+3. **Apply the standard values** from `references/`:
+   - contrast, touch targets, keyboard, motion: `accessibility-standards.md`
+   - spacing, breakpoints, type scale, dark mode, style categories: `design-patterns.md`
+4. **Hand off.** `references/quality-checklist.md` is a handoff aid: walk all of it for a new component or a design system, and only the groups the change touched for a patch.
 
 ## Gotchas
 
-- **Aesthetic over accessibility**: beautiful design that fails WCAG → check contrast (4.5:1 normal, 3:1 large) before shipping
-- **Desktop-first design**: designing for large screens then cramming into mobile → start from 320px
-- **Color-only communication**: red/green for status → pair with icon or text label
-- **Ignoring the data**: guessing palette when colors.csv has WCAG-verified values → always look up first
-- **Generic product assumptions**: all SaaS looks the same → check products.csv for product-specific recommendations
-
-## Workflow Integration
-
-Loaded by `ui-ux-designer` agent during Phase 3 (Build). Also used by `developer` agent for frontend work.
+- **Aesthetic over accessibility**: a design that fails contrast is not done; check the ratios in `accessibility-standards.md` before shipping.
+- **Desktop-first design**: crammed mobile layouts; start from 320px wide.
+- **Color-only communication**: red/green for status; pair with an icon or text label.
+- **Guessing a palette** when `colors.csv` has verified values: look up first.
+- **Generic product assumptions**: all SaaS looks the same; check `products.csv` for the product type.

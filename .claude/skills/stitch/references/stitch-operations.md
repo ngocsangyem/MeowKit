@@ -1,11 +1,4 @@
-# Stitch Operations
-
-Run this check before an API call:
-
-```bash
-[ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set"; exit 1; }
-npx tsx --version 2>/dev/null || { echo "[X] tsx not found"; exit 1; }
-```
+Fail-closed key and `tsx` checks are in `SKILL.md`; run them before any API call.
 
 Generate accepts `--project`, `--project-name`, `--device mobile|desktop|tablet`, and
 `--variants <count>`. Export accepts `--project` and `--format html|image|all`. Quota accepts

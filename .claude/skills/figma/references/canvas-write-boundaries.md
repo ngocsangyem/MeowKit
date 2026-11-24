@@ -45,15 +45,6 @@ Figma: { r: 0.2, g: 0.6, b: 1.0, a: 0.8 }
 CSS:   rgba(51, 153, 255, 0.8)   // Math.round(c * 255) for r/g/b
 ```
 
-### Fills and strokes are read-only arrays
-
-Direct mutation fails silently. Clone, modify the clone, reassign.
-
-```
-WRONG: node.fills[0].color = newColor
-RIGHT: node.fills = [{ ...node.fills[0], color: newColor }]
-```
-
 ### Variable scopes
 
 Set the narrowest relevant `scopes` at creation (e.g. `['FILL_COLOR']` for color vars). Do NOT create
@@ -64,35 +55,9 @@ variable.scopes = ['FILL_COLOR']   // narrow, not ['ALL_SCOPES']
 node.setBoundVariable('fills', variable)
 ```
 
-### Variable naming conflicts
+### Rules owned by `gotchas.md`
 
-Duplicate variable names crash with an unhelpful error. Check before creating.
-
-```
-const existing = figma.variables.getLocalVariables()
-if (existing.some(v => v.name === newName)) throw new Error(`Variable "${newName}" already exists`)
-```
-
-### Component variants: properties before instances
-
-Define property definitions before creating instances; instances cannot be created with undefined
-property values.
-
-```
-component.addComponentProperty('state', 'VARIANT', 'Default')
-const instance = component.createInstance()
-instance.setProperties({ state: 'Default' })
-```
-
-### Auto-layout padding — per-side setters, no shorthand
-
-```
-frame.paddingTop = 16
-frame.paddingRight = 24
-frame.paddingBottom = 16
-frame.paddingLeft = 24
-// NOT: frame.padding = '16px 24px'  ← property does not exist
-```
+Read-only fills and strokes, font loading before text changes, duplicate variable names, component properties before instances, and per-side auto-layout padding are W1–W5 in `gotchas.md`. Follow them; they are not repeated here.
 
 ### Error recovery
 

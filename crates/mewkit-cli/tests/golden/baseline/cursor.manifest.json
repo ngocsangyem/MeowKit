@@ -1831,96 +1831,6 @@
       "size": 11589
     },
     {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/README.md",
-      "sha256": "b7e0c008030a75e54615a39c291a560b75e09b9b3552730b11c1738b9e5de263",
-      "size": 2006
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/interaction-modal/design-snapshot.md",
-      "sha256": "4b02bd5a6aed3eea034aa89ff5c8f2e3d948d6e606e2b9444884380949141dbc",
-      "size": 2430
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/interaction-modal/expected-packet.yaml",
-      "sha256": "047e7afbdc1d787e5da75767ed63c6008fb552844f19b59c6784e097ea0c2042",
-      "size": 2816
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/interaction-modal/expected-plan-assertions.md",
-      "sha256": "592d7825e8f72d519da9e31018a0178fe124cafcd5a4d1bf953b1ecb84aecd33",
-      "size": 1647
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/interaction-modal/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/responsive-grid/design-snapshot.md",
-      "sha256": "5973d6e7ff648f9cf73d830e754de0e277bf49257720ff3b6003d33e3fe11994",
-      "size": 1696
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/responsive-grid/expected-packet.yaml",
-      "sha256": "d8c8384319bb705610d746c09f5f29782cf222736aa7407e4bc24bbe2fb5b3ae",
-      "size": 2138
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/responsive-grid/expected-plan-assertions.md",
-      "sha256": "894d68c855c6834906a52179bfbcf815d21a0443d544cb3a746545c8f1c5e875",
-      "size": 924
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/responsive-grid/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/spec-conflict/design-snapshot.md",
-      "sha256": "d3019f66e5980de9f0c5716c83126a17749e2f0798d3716fdc97342d6b8c52a2",
-      "size": 2276
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/spec-conflict/expected-packet.yaml",
-      "sha256": "9ff2a2de139512ef0e610c977aba1e77c14038a76d4f6b2a49f58b869d7079ec",
-      "size": 3393
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/spec-conflict/expected-plan-assertions.md",
-      "sha256": "f5d209b5488de71b782f9abd39c0337e02c32da2a0a38771b02f5d457862abc7",
-      "size": 2220
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/spec-conflict/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/static-card/design-snapshot.md",
-      "sha256": "e3189e1ee7170422f03758c91c3ee99e6926fa00fac293adab6726bcd974869c",
-      "size": 1627
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/static-card/expected-packet.yaml",
-      "sha256": "aea22cc093ae126373a04acbf5c24f339c822d15485da7b8241596cbf1c3c5de",
-      "size": 2036
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/static-card/expected-plan-assertions.md",
-      "sha256": "69c9ac7f670c36b41ec84a856ac83b22a153cafc94d0c72af5ca31cc091de5c6",
-      "size": 905
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/fixtures/static-card/reference.png",
-      "sha256": "43be52f97ed308911037af5b5cc41f02117f6e22cc86f42c9fcb3387af06de49",
-      "size": 70
-    },
-    {
-      "path": ".cursor/skills/mk-figma/evals/validate-evidence-packets.py",
-      "sha256": "53fff33d472c766804197a40a382ce7b36175511e5836f52f97b80ab6762f79f",
-      "size": 11477
-    },
-    {
       "path": ".cursor/skills/mk-figma/references/canvas-write-boundaries.md",
       "sha256": "cd3cfece71432c50993280613cd6f6291fe26cfa8953812c7f51a1f4474ef866",
       "size": 4068
@@ -1939,11 +1849,6 @@
       "path": ".cursor/skills/mk-figma/references/design-token-extraction.md",
       "sha256": "b0a3308ab39224534429b694927b3869ab96e9399c894911591bdc6aab17125a",
       "size": 3975
-    },
-    {
-      "path": ".cursor/skills/mk-figma/references/eval-checklist.md",
-      "sha256": "31f081a105d7b774cfab5037f57bc332af74158eda74831cb9b2c92a63272f0e",
-      "size": 7018
     },
     {
       "path": ".cursor/skills/mk-figma/references/figma-evidence-packet.md",
