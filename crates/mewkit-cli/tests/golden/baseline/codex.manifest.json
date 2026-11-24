@@ -975,11 +975,6 @@
       "size": 5821
     },
     {
-      "path": ".agents/skills/mk-docs-finder/.env.example",
-      "sha256": "2065bc2b34d921669fd2bd5e5173f59c6443c722213f06fc0ecac92bf65f5c58",
-      "size": 337
-    },
-    {
       "path": ".agents/skills/mk-docs-finder/SKILL.md",
       "sha256": "9aa504c9004f2f4fd0ad6c741f4d1a3c8ddd28586c2e4a98c9ae3ed32b40b3f0",
       "size": 9978
@@ -2046,11 +2041,6 @@
       "path": ".agents/skills/mk-mermaidjs-v11/references/integration.md",
       "sha256": "5fb7b5b6e14aa87d9ec9a672d42489680b5aa59ff61a9f1509862227fcadf5e3",
       "size": 6014
-    },
-    {
-      "path": ".agents/skills/mk-multimodal/.env.example",
-      "sha256": "032d9c31da222d3647ca06361991fc99f0c23810cd44607780680fbf0a1f68bf",
-      "size": 459
     },
     {
       "path": ".agents/skills/mk-multimodal/SKILL.md",
@@ -3494,6 +3484,11 @@
       "path": ".agents/skills/mk-stitch/references/stitch-setup.md",
       "sha256": "cb04986a93dd147ec5c87398970eafb316c204f82e5d9d7ded25c698ff1b113f",
       "size": 507
+    },
+    {
+      "path": ".agents/skills/mk-stitch/scripts/load-env-files.ts",
+      "sha256": "a89a183e04484780c173c4a9b07d320c074dd7fa2bc91a2e49f6147c25ebba27",
+      "size": 2625
     },
     {
       "path": ".agents/skills/mk-stitch/scripts/package.json",
