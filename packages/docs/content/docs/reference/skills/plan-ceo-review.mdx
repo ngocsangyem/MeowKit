@@ -24,7 +24,7 @@ To check whether an idea is worth building before a plan exists, use `mk:office-
 
 ## Usage
 
-Run `/mk:plan-ceo-review`. The plan path comes from the conversation. There are no arguments; the skill asks you which mode to run.
+Run `/mk:plan-ceo-review`. The plan path comes from the conversation. There are no arguments; the skill uses the scope mode the plan recorded, or asks you which mode to run.
 
 | Mode | Behaviour | Default for |
 |---|---|---|
@@ -35,16 +35,16 @@ Run `/mk:plan-ceo-review`. The plan path comes from the conversation. There are 
 
 ## Steps
 
-1. Pre-screen: scan for placeholders such as "TBD", check that the required plan sections exist and map requirements to tasks. It never rejects the plan. You decide whether to amend or go on (`references/pre-screen.md`).
-2. Audit: read git history, diff stats, TODOs and design docs. If a `red-team-findings.md` file sits in the plan folder, load it. If no design doc exists the skill offers `mk:office-hours`.
-3. Scope challenge: premise challenge, existing code to reuse, a dream state, two or three implementation alternatives (always produced), then mode selection (`references/step0-scope-and-mode.md`).
-4. Two-lens check: Intent Alignment (is it the right problem?) and Execution Credibility (can an engineer deliver it?), each graded PASS, WARN or FAIL. A FAIL on either ends the review with NEEDS REVISION.
-5. Deep review of 11 sections, one at a time and one question per issue: architecture, error and rescue map, security, data flow and edge cases, code quality, tests, performance, observability, deployment, long-term trajectory, design and UX. Each section must report at least one finding or document why it is clean. Findings are BLOCKER, HIGH-LEVERAGE or POLISH. An optional fresh-context subagent gives an outside view.
-6. Verdict: any blocker gives NEEDS REVISION, otherwise APPROVED with notes.
+1. Pre-screen: scan for placeholders such as "TBD", check that the required plan sections exist and map requirements to phases. It never rejects the plan. You decide whether to amend or go on (`references/pre-screen.md`). If the plan path does not exist or the plan is empty, the skill says so and stops.
+2. Scope mode: the plan's recorded scope mode is used when `mk:plan-creator` set one. Otherwise the skill asks once. After that it holds the mode and raises a concern once.
+3. Premise: is this the right problem, what is the user outcome, what happens if nothing is done, and what existing code already solves part of it. If the plan has one approach and a credible alternative exists, the skill asks for two or three approaches through `mk:brainstorming`.
+4. Two-lens check: Intent Alignment (is it the right problem?) and Execution Credibility (can an engineer deliver it?), each graded PASS, WARN or FAIL. A FAIL on either stops the deep review and returns the specific failures (`references/two-lens-evaluation.md`).
+5. Deep review: one pass over the plan, grouped under the areas that apply (architecture, errors, security, data flow, tests, performance, observability, rollout, trajectory, UX). Findings are BLOCKER, HIGH-LEVERAGE or POLISH. An area that is clean is said to be clean; findings are not invented to fill it. The skill asks one question per real decision (`references/review-checklist.md`). A fresh-context outside read is available on request.
+6. Verdict: any blocker or lens FAIL gives NEEDS REVISION, otherwise APPROVED, with notes when HIGH-LEVERAGE or POLISH items exist (`references/verdict-and-output.md`).
 
 ## Outputs
 
-A `## CEO Review` block is appended to `plan.md` and never overwrites it. Every mode writes it. Expansion and selective modes also write a CEO plan to `tasks/plans/ceo-plans/{date}-{slug}.md`, which can be promoted to `docs/designs/{FEATURE}.md`. The skill ends by printing `/mk:cook [plan file path]` and stops. It does not chain into implementation, because you decide the next step (`/mk:cook` or `mk:review`). Plan files written by other agents are treated as data.
+A `## CEO Review` block is appended to `plan.md` and never overwrites it. The skill returns the verdict and the block path, and stops. It does not chain into implementation, because you decide the next step: `/mk:cook {plan path}` to build, or `/mk:review` once code exists. Plan files written by other agents are treated as data.
 
 ## Gotchas
 

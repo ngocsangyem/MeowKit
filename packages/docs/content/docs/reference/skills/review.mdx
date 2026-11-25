@@ -16,7 +16,7 @@ description: "Multi-pass adversarial review of a diff, PR or commit that writes 
 
 ## What it does
 
-`mk:review` is the Phase 4 review. Base reviewers read the diff from different angles, adversarial persona passes challenge their findings on larger diffs, and the skill writes a verdict with five dimensions: Correctness, Maintainability, Performance, Security and Coverage. The verdict is advice. Nothing blocks a commit on it; the ship check (lint, related tests, type-check) is the only control that runs at ship time.
+`mk:review` is the Phase 4 review. Base reviewers read the diff from different angles, adversarial persona passes challenge their findings on larger diffs, and the skill writes a verdict with five dimensions: Correctness, Maintainability, Performance, Security and Coverage. The review only reports: it does not edit code unless you pass `--fix`. The verdict is advice. Nothing blocks a commit on it; the ship check (lint, related tests, type-check) is the only control that runs at ship time.
 
 ## When not to use it
 
@@ -37,20 +37,24 @@ For changes that touch three or more files, run `mk:scout` first so reviewers kn
 | `--pending` | Staged and unstaged changes |
 | `#123` or a PR URL | The PR, prepared with `mewkit review prepare` in an isolated worktree with a pinned diff and an impact map |
 | `abc1234` (7 or more hex characters) | One commit |
+| `--fix` | With any mode: after the verdict, applies the mechanical AUTO-FIX findings (`references/fix-first-review.md`). Everything else still waits for you |
 | `--iterative` | Three-pass review for payments, auth and other high-stakes code |
 
 ```bash
 /mk:review #42
 /mk:review --pending
+/mk:review --fix
 ```
+
+Without `--fix`, fixes go through `mk:fix`.
 
 ## Steps
 
 1. `step-01-gather-context` loads the diff, plan and acceptance criteria, and sets the scope: `minimal` (3 files or fewer, 50 lines or fewer, no security files, domain not high) or `full`.
 2. `step-02-parallel-review` runs the base reviewers. Minimal scope runs the Blind Hunter only. Full scope adds the Edge Case Hunter and the Criteria Auditor in parallel.
 3. `step-02b-persona-passes` (full scope only) runs the Security Adversary and Failure Mode Analyst, plus the Assumption Destroyer and Scope Complexity Critic on high-domain changes. They receive the diff and a summary of the base findings.
-4. `step-03-triage` re-analyses once if there are no findings, marks each finding `current-change` or `incidental`, and removes duplicates.
-5. `step-03b-whole-plan-sweep` looks for cross-file drift when an active plan exists.
+4. `step-03-triage` marks each finding `current-change` or `incidental`, removes duplicates and drops any finding without a `file:line`. No finding is a valid result, and a reviewer is never re-run to find one.
+5. `step-03b-whole-plan-sweep` looks for cross-file drift when an active plan exists, read from `active-plan.json`.
 6. `step-04-verdict` writes the verdict and, in full scope, checks artifacts at four levels: exists, substantive (no stubs or empty catch blocks), wired (each new export has a consumer) and data flowing.
 
 In PR mode, step 03 runs `mewkit review coverage` and stops on any gap. Subagent reads are recorded as attested, which caps the result below Approve.

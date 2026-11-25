@@ -17,7 +17,7 @@ description: "Reads a Confluence spec page and its children and writes a structu
 
 `mk:confluence-spec-analyst` forks the `confluence-spec-analyst` agent to read a Confluence spec page, follow its children to a depth limit, run gap-detection checks and write a Spec Research Report for you to review. It never writes to Confluence. Its only write is the local report.
 
-The page is fetched as Atlassian Document Format and passed through the macro-aware converter `scripts/adf-to-md.sh`. Panels, decisions, task lists, mentions, expand sections and Smart Link or Figma embeds become explicit Markdown labels (`> [INFO]`, `> [DECISION]`, `- [ ]`, `<details>`, `@name`, `![alt](attachment:<id>)`), and the gap checks use those labels.
+The page is fetched as Atlassian Document Format with the wrapper mode `confluence-as.sh adf-get <page-id>` and passed through the macro-aware converter `scripts/adf-to-md.sh`. Panels, decisions, task lists, mentions, expand sections and Smart Link or Figma embeds become explicit Markdown labels (`> [INFO]`, `> [DECISION]`, `- [ ]`, `<details>`, `@name`, `![alt](attachment:<id>)`), and the gap checks use those labels.
 
 ## When not to use it
 
