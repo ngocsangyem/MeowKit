@@ -56,7 +56,3 @@ Every bulk command runs with `--dry-run` first; the user approves the would_* su
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered statuses + transitions (run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent; see `../jira-lifecycle/references/workflow-discovery.md`)
   - For `bulk transition --to "<Status>"`, validate the target status name exists in the cache. Mismatch → reject before exec.
 - Peer leaves: `mk:jira-search` (JQL author; `search bulk-update` above 10 issues comes here), `mk:jira-lifecycle` (single-issue transitions; same cache), `mk:jira-relationships` (`bulk-link`) and `mk:jira-time` (`bulk-log`) own those verbs and follow the same dry-run rule
-
-## Gotchas
-
-- (none yet)

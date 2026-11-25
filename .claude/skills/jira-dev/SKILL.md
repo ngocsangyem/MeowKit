@@ -53,7 +53,3 @@ Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and
   - `references/smart-commits.md` — smart-commit syntax for closing/transitioning from commit messages
   - `references/commit-messages.md` — Atlassian-aware commit-message conventions
 - Peer leaves: `mk:ship` (consumes `dev branch-name` + `dev pr-description`), `mk:jira-issue` (issue must exist before branch creation), `mk:jira-lifecycle` (transitions via smart-commit footer)
-
-## Gotchas
-
-- (none yet)

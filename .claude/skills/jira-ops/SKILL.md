@@ -52,7 +52,3 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-warm -
 - Domain refs:
   - `references/rate-limits.md` — Atlassian rate-limit ceilings + back-off behaviour
 - Peer leaves: any leaf hitting Atlassian-side throttling first lands here for diagnosis. `mk:jira-bulk` is the most common trigger for cache-warm + rate-limit awareness.
-
-## Gotchas
-
-- (none yet)

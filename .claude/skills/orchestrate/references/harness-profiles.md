@@ -57,24 +57,13 @@ These states are evidence inputs. Capability and risk tier selection remains in
 
 ## Evidence Collection
 
-For a CLI candidate:
-
-1. Resolve the executable without installing or updating it.
-2. Capture its live version and help output.
-3. Verify only the flags the planned job needs: headless mode, cwd, output,
-   model selection, permissions, and native budgets where applicable.
-4. Use a live model-listing command only when the installed CLI advertises it.
-5. Confirm authentication with a non-secret, non-mutating probe when possible.
-6. Consult current official documentation for behavior that live help cannot
-   establish, and record the page or command checked in the run inventory.
-7. Run no write probe against the user's shared tree.
+For a CLI candidate, follow the CLI Probe Sequence in
+[runtime-matrix.md](runtime-matrix.md). Never install or update a candidate to
+probe it.
 
 For `runtime: internal`, profile the current session's agent interface and live
 agent definitions instead of a binary. See
 [internal-routing.md](internal-routing.md).
-
-Unknown flags, aliases, or model identifiers are probe failures. Probe the
-candidate again; never guess a replacement.
 
 ## Safety Evidence
 

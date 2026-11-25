@@ -40,9 +40,7 @@ Invoke this skill during:
 
 ### 5. Service Role Key Protection
 
-- [ ] Supabase service role key is NOT used outside the admin module
-- [ ] Service role key is never exposed to client-side code
-- [ ] Anon key is used for client-facing operations
+- [ ] When the backend uses Supabase, apply Supabase §3 Key Usage below
 
 ### 6. Rate Limiting
 
@@ -139,7 +137,7 @@ Invoke this skill during:
 
 - [ ] Anon key is used for client-side operations
 - [ ] Service role key is NEVER used client-side
-- [ ] Service role key is only used in server-side admin operations
+- [ ] Service role key is only used in server-side admin operations (in NestJS, only inside the admin module)
 
 ### 4. Migration Safety
 

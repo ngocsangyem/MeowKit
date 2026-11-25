@@ -59,7 +59,3 @@ JSM-licensed tenant + agent or admin role. Insufficient permission → exit code
   - `references/decision-tree.md` — JSM vs core-Jira leaf, one table
   - `references/itil-workflows.md` — read only for incident, service-request, problem or change process questions
 - Peer leaves: `mk:jira-collaborate` (owns the internal-vs-public rule), `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk:jira-admin` (request-type / queue config)
-
-## Gotchas
-
-- (none yet)

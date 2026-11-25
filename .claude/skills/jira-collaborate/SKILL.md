@@ -48,7 +48,3 @@ Forks to the `jira-collaborate` agent. This leaf owns the visibility rule: a cor
   - `references/comment-templates.md` — copy-paste comment templates (progress, blocker, handoff, evidence)
   - `references/comment-formats.md` — text / markdown / ADF format reference, and the one place markdown-to-ADF conversion is explained
 - Peer leaves: `mk:jira-issue` (create-with-attachment), `mk:jira-jsm` (JSM requests; follows the visibility rule above), `mk:jira-analyst` (post-analysis comment patterns)
-
-## Gotchas
-
-- (none yet — grow from observed failures)

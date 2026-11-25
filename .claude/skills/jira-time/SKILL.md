@@ -50,7 +50,3 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
   - `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user/date); general JQL is in `mk:jira-search`
   - `references/estimation-guide.md` — time fields and how a worklog adjusts the remaining estimate (story points are in `mk:jira-estimator`)
 - Peer leaves: `mk:jira-search` (JQL for worklog filters), `mk:jira-agile` (sprint capacity uses time data), `mk:jira-bulk` (shares the dry-run rule for `time bulk-log`, which this leaf owns)
-
-## Gotchas
-
-- (none yet — grow from observed failures)

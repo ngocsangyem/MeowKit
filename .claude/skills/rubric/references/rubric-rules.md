@@ -18,11 +18,9 @@ Every preset file in `rubrics/composition-presets/*.md` MUST have rubric weights
 
 ## Rule 3: Hard-Fail Propagates (Any Rubric FAIL → Overall FAIL)
 
-If any rubric in a composition returns a verdict ≥ its `hard_fail_threshold`, the overall sprint verdict is FAIL — regardless of weighted score. Soft averages do not save weak dimensions.
+Any rubric verdict at or above its `hard_fail_threshold` fails the whole sprint, whatever the weighted score. The rule is owned by `.claude/skills/evaluate/step-04-grade-and-verdict.md` (4b); threshold values are in `rubrics/RUBRICS_INDEX.md`.
 
 **WHY:** Hard-fail semantics prevent averages from hiding unshippable failures.
-
-Any single FAIL on a hard-fail rubric → overall FAIL → generator loop or escalation.
 
 ## Rule 4: Calibration Requires Balanced PASS/FAIL Counts
 

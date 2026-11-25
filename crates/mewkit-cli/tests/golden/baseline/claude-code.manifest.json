@@ -3672,11 +3672,6 @@
       "size": 2879
     },
     {
-      "path": ".claude/skills/review/references/preamble-review.md",
-      "sha256": "2383d726ca20e6c89e506cfe7c1509bca6aeeb00857756a9b4a0a4db89204b50",
-      "size": 1204
-    },
-    {
       "path": ".claude/skills/review/references/preamble.md",
       "sha256": "e36d9670542bf6801718e319bc9af42434839ef20f6a5314e4d8a4e70e13af0c",
       "size": 14606

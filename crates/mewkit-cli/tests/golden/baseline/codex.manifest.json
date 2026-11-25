@@ -3001,11 +3001,6 @@
       "size": 2885
     },
     {
-      "path": ".agents/skills/mk-review/references/preamble-review.md",
-      "sha256": "2383d726ca20e6c89e506cfe7c1509bca6aeeb00857756a9b4a0a4db89204b50",
-      "size": 1204
-    },
-    {
       "path": ".agents/skills/mk-review/references/preamble.md",
       "sha256": "bc2be6cf633e0290565e7646408c0743a1687a95c35b9d25e963e242d9de8f41",
       "size": 14731
