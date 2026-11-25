@@ -4031,7 +4031,7 @@
     },
     {
       "path": ".claude/skills/showcase/scripts/package.json",
-      "sha256": "d2396ff29303831e5378edf8f9af0fa156087d80e35bef92ac0a2c108417ced6",
+      "sha256": "c2e86cc9596442d30cf0d9fdbe6c17dccc1a75a205497aa214989184f7a349c9",
       "size": 293
     },
     {
@@ -8822,7 +8822,7 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/showcase/scripts/package.json",
-      "sha256": "d2396ff29303831e5378edf8f9af0fa156087d80e35bef92ac0a2c108417ced6",
+      "sha256": "c2e86cc9596442d30cf0d9fdbe6c17dccc1a75a205497aa214989184f7a349c9",
       "size": 293
     },
     {
