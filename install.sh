@@ -24,10 +24,10 @@ die() { printf 'mewkit install: error: %s\n' "$1" >&2; exit 1; }
 # The pinned archive for a channel and target: "version url sha256 size".
 pin() {
 	case "$1:$2" in
-		stable:x86_64-unknown-linux-musl) echo "0.1.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.1/mewkit-0.1.1-x86_64-unknown-linux-musl.tar.gz 994e3acc53efdb9536325a4d1277518d340639b3668e3e0856b3b22899b633ee 4877139" ;;
-		stable:aarch64-unknown-linux-musl) echo "0.1.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.1/mewkit-0.1.1-aarch64-unknown-linux-musl.tar.gz 794bd82c4d1b2f9437f6abf9f80660abff5402358f1adeb01d576ed6bb3a7cd4 4422316" ;;
-		stable:x86_64-apple-darwin) echo "0.1.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.1/mewkit-0.1.1-x86_64-apple-darwin.tar.gz 606dc93d1eb43c2314d5214c6988f84d1b564aa794d817ee36c9c38111faf84e 4620643" ;;
-		stable:aarch64-apple-darwin) echo "0.1.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.1/mewkit-0.1.1-aarch64-apple-darwin.tar.gz bd3f91c914b270a0c8e55cf616bf9d4adcfccc06a508dd33c13a38693cfc8ecf 4222311" ;;
+		stable:x86_64-unknown-linux-musl) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-unknown-linux-musl.tar.gz be24242ac265e17d550ebe7e426d608c66c20ed11e0a916c3f3cffd2757413e4 5458764" ;;
+		stable:aarch64-unknown-linux-musl) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-unknown-linux-musl.tar.gz 7c7aaf3306a64597b4840e84feeaf13f1235795353ad0b254079d2b9e4f40a5f 4931425" ;;
+		stable:x86_64-apple-darwin) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-apple-darwin.tar.gz 485902df541e3d0d458fa39197ac10b87455cab895fb61f7daf0daefa196395b 5195884" ;;
+		stable:aarch64-apple-darwin) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-apple-darwin.tar.gz d5133dbb5cb535a466363415eb269c4c6526c1412bdf5b94d4d30479aa0d7810 4734439" ;;
 		*) return 1 ;;
 	esac
 }
