@@ -6,13 +6,15 @@
  * Fetches documentation from Context Hub CLI — a community-maintained
  * registry of versioned, LLM-optimized documentation with local annotations.
  *
- * Runs via npx — no global install required: npx chub search "query"
+ * Runs via npx — no global install required. The package is named and pinned
+ * (CHUB_PACKAGE): the bare `npx chub` resolves the unrelated npm package
+ * `chub` whenever Context Hub is not installed globally.
  *
  * Features over context7:
  *  - Local annotations persist across sessions
  *  - Language-specific docs (--lang py, --lang js)
  *  - Version-specific docs (--version 2024-12-18)
- *  - Offline capable (npx chub update --full)
+ *  - Offline capable (chub update --full)
  *  - Community feedback loop
  */
 
@@ -28,6 +30,18 @@ function shellEscape(str) {
   return "'" + str.replace(/'/g, "'\\''") + "'";
 }
 
+/** Context Hub on npm, pinned: npx then runs this package's `chub` bin and nothing else. */
+const CHUB_PACKAGE = '@aisuite/chub@0.1.4';
+
+/**
+ * The shell command for one chub invocation; `args` must already be escaped.
+ * @param {string} args - chub subcommand and escaped arguments
+ * @returns {string}
+ */
+function chubCommand(args) {
+  return `npx --yes --package=${CHUB_PACKAGE} chub ${args}`;
+}
+
 const env = loadEnv();
 const DEBUG = env.DEBUG === 'true';
 
@@ -37,7 +51,7 @@ const DEBUG = env.DEBUG === 'true';
  */
 function isChubAvailable() {
   try {
-    execSync('npx chub --version', { stdio: 'pipe', timeout: 15000 });
+    execSync(chubCommand('--version'), { stdio: 'pipe', timeout: 15000 });
     return true;
   } catch {
     return false;
@@ -52,7 +66,7 @@ function isChubAvailable() {
  */
 function runChub(command, timeoutMs = 15000) {
   try {
-    const result = execSync(`npx chub ${command}`, {
+    const result = execSync(chubCommand(command), {
       encoding: 'utf8',
       timeout: timeoutMs,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -60,7 +74,7 @@ function runChub(command, timeoutMs = 15000) {
     return result.trim();
   } catch (error) {
     if (DEBUG) {
-      console.error(`[DEBUG] npx chub ${command} failed:`, error.message);
+      console.error(`[DEBUG] ${chubCommand(command)} failed:`, error.message);
     }
     return null;
   }
@@ -186,7 +200,7 @@ function fetchChub(query, options = {}) {
       success: false,
       source: 'chub',
       error: 'Context Hub (@aisuite/chub) is not available',
-      suggestion: 'Runs via npx — no install needed. Check your network connection or run: npx chub --version',
+      suggestion: `Runs via npx — no install needed. Check your network connection or run: ${chubCommand('--version')}`,
     };
   }
 
@@ -288,4 +302,6 @@ module.exports = {
   annotateChub,
   detectLanguage,
   runChub,
+  chubCommand,
+  CHUB_PACKAGE,
 };

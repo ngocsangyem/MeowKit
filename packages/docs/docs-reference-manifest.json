@@ -1342,7 +1342,7 @@
       "title": "mk:docs-finder",
       "description": "Fetches current library docs via Context7. NOT for mk:web-to-markdown.",
       "sourcePath": "skills/docs-finder/SKILL.md",
-      "sourceHash": "ac24ee9530076e6d6955a7e2d251e5e716b45867a936846603b60de208527b64",
+      "sourceHash": "b2170502dbbb4fb47de450638dcec12b9faf98bc050c2a3d20186feca328edea",
       "aliases": [],
       "owner": "docs",
       "phase": "on-demand",
