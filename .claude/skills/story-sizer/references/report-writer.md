@@ -48,18 +48,7 @@ The summary table at the end lists every story.
 
 ## Suggested Create Command — Field Whitelist
 
-Allowed flags:
-
-- `--project <KEY>`  (placeholder `<PROJECT>` until user supplies)
-- `--type <Type>`    (defaults to `Story`)
-- `--summary "..."`
-- `--story-points <N>`
-- `--description "..."`  (truncated to 500 chars in the suggested block; full description is in the per-story section)
-- `--epic <KEY>`        (only when known at render time)
-- `--components <comma-list>`
-- `--labels <comma-list>`
-
-Not allowed: `--assignee`, `--priority`, `--sprint`, `--blocks`, `--custom-fields`. Gating and execution enforce the same whitelist at auto-create time.
+The allowed and forbidden flags are listed once, in `auto-create-execution.md` (Field Whitelist). The suggested block differs in three ways: `--project` stays the placeholder `<PROJECT>` until the user supplies a key, `--description` is truncated to 500 characters (the full text is in the per-story section), and `--epic` appears only when it is known at render time.
 
 ## Idempotency
 

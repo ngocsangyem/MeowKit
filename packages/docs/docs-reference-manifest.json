@@ -2379,7 +2379,7 @@
       "title": "mk:review",
       "description": "Multi-pass adversarial review of a diff. NOT for mk:evaluate.",
       "sourcePath": "skills/review/SKILL.md",
-      "sourceHash": "7a55efaba40b78be077b78683d0ea2805dd74cd07d34911b9312a47ae45ad555",
+      "sourceHash": "413410b4385ff1406c76d6158f9342811fcf059ee3a6e1975bf1162701ca68e7",
       "aliases": [],
       "owner": "lifecycle",
       "phase": null,
