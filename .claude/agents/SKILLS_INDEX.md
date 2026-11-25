@@ -134,7 +134,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active verification: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
 `mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits; no hook checks the signature.)
 `mk:autobuild`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. A killed run restarts from `next_step` in its run record.)
-`mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL approval step. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
+`mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**single procedure** (`references/run-procedure.md`: ingest → detect → threshold → suggestions → HITL approval. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
 `mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas. Maintainer-only: runs from the MeowKit repository and is not part of an installed kit.)
 `mk:elicit`|reviewer|review|monolithic
 `mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep review engine.)
@@ -246,8 +246,8 @@ Note: Some skills appear in multiple categories (scout, investigate). Count refl
 - **Step-file** — SKILL.md + workflow.md + step-NN-*.md. Used for skills with 3+ phases.
 
 Currently step-file enabled:
-- `mk:plan-creator` — 9 steps (00–08)
-- `mk:review` — 5 steps (includes step-02b persona passes)
+- `mk:plan-creator` — steps 00–09 (there is no step 02)
+- `mk:review` — steps 01–04 (includes step-02b persona passes and step-03b plan sweep)
 - `mk:evaluate` — 5 steps
 - `mk:autobuild` — 7 steps
-- `mk:trace-analyze` — 6 steps
+- `mk:trace-analyze` — one procedure, `references/run-procedure.md`
