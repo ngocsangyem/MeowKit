@@ -84,60 +84,14 @@ in `mk:task-queue`. Then:
 node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" --json
 ```
 
-### list
+### list, status, prune, review-pr, review-pr-cleanup
 
-```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs list --json
-```
+Each is `node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs <verb> ... --json`; options and output fields are in `references/commands.md`.
 
-### status
-
-Health audit of all active worktrees (ahead/behind divergence, dirty state):
-
-```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs status --json
-```
-
-### prune
-
-Clean stale worktree metadata. Always dry-run first:
-
-```bash
-# Safe first-pass
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --dry-run --json
-# Execute if no surprises
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --json
-```
-
-### review-pr
-
-Create an isolated, **detached**, SHA-bound worktree from a PR head for a
-high-assurance review (never mutates the user's checkout). The base remote is a
-required argument — `pull/N/head` exists only on the PR's base repo, so a fork PR is
-fetched from the base remote, never a fork remote. Writes a manifest to the persistent
-session dir `tasks/reviews/<session>/manifest.json` (survives worktree removal) and a
-`.mewkit-review.json` back-reference (ownership nonce) inside the worktree.
-
-```bash
-# Preview only (no fetch, no worktree) — validates inputs, prints the manifest
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
-# Create for real
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
-```
-
-### review-pr-cleanup
-
-Remove a review worktree. Accepts **only a manifest path** — nothing else. Removal
-proceeds only when the manifest's nonce matches the in-worktree back-reference AND the
-target is a detached `.worktrees/review-pr-*` worktree (never the main checkout, never a
-feature worktree). Force is allowed (review worktrees are legitimately dirty after
-build/test); ownership, not cleanliness, is the guard.
-
-```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
-# Stale-session sweep — dry-run by default; --apply to execute
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
-```
+- `list`: every worktree. `status`: the same plus divergence from base and dirty state.
+- `prune`: stale worktree metadata; run `--dry-run` first.
+- `review-pr`: a detached, SHA-bound worktree from a PR head, fetched from the PR's base remote (never a fork) for a review that never touches the user's checkout; writes `tasks/reviews/<session>/manifest.json`.
+- `review-pr-cleanup`: removes a review worktree given only its manifest path; `--sweep` (dry-run unless `--apply`) clears stale sessions.
 
 ## Gotchas
 

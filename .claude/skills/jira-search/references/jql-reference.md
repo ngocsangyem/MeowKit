@@ -10,7 +10,6 @@ Quick reference for JIRA Query Language syntax and common queries.
 - [Common Queries](#common-queries)
 - [Functions](#functions)
 - [Ordering](#ordering)
-- [Advanced Examples](#advanced-examples)
 - [See Also](#see-also)
 
 ## Basic Syntax
@@ -153,34 +152,7 @@ ORDER BY created ASC
 ORDER BY priority DESC, created ASC
 ```
 
-## Advanced Examples
-
-### My Work
-```jql
-assignee = currentUser() AND status != Done ORDER BY priority DESC
-```
-
-### Overdue
-```jql
-duedate < now() AND status not in (Done, Closed) ORDER BY duedate ASC
-```
-
-### Recently Updated
-```jql
-project = PROJ AND updated >= -7d ORDER BY updated DESC
-```
-
-### Unresolved High Priority
-```jql
-priority in (Highest, High) AND resolution is EMPTY ORDER BY created ASC
-```
-
-### Watching
-```jql
-watcher = currentUser() ORDER BY updated DESC
-```
-
 ## See Also
 
 - [Official JQL Documentation](https://support.atlassian.com/jira-service-management-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
-- `search_examples.md` - More query examples
+- `jql-patterns.md` - templates and examples by scenario
