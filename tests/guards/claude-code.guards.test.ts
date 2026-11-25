@@ -20,7 +20,10 @@ import { fireEvent, makeFixture, registeredHooks, runCount, runHook, scriptOf } 
 const RT = "claude-code" as const;
 const privacyHook = () =>
 	registeredHooks(RT).find(
-		(h) => h.event === "PreToolUse" && (h.matcher ?? "").split("|").includes("Read") && scriptOf(h).endsWith("privacy-block.cjs"),
+		(h) =>
+			h.event === "PreToolUse" &&
+			(h.matcher ?? "").split("|").includes("Read") &&
+			scriptOf(h).endsWith("privacy-block.cjs"),
 	)!;
 const read = (fx: ReturnType<typeof makeFixture>, file: string) =>
 	fireEvent(

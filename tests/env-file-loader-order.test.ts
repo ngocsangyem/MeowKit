@@ -95,7 +95,10 @@ afterAll(() => {
 
 const LOADERS: Record<string, () => string> = {
 	"jira wrapper (bash)": () =>
-		execFileSync("bash", [path.join(REPO, ".claude/skills/jira/scripts/jira-as.sh")], { cwd, env: baseEnv() }).toString(),
+		execFileSync("bash", [path.join(REPO, ".claude/skills/jira/scripts/jira-as.sh")], {
+			cwd,
+			env: baseEnv(),
+		}).toString(),
 	"hook dotenv lib (node)": () =>
 		runNode([
 			"-e",
@@ -143,7 +146,10 @@ describe("env-file loaders share one order", () => {
 		const jira = block(".claude/skills/jira/scripts/jira-as.sh");
 		expect(jira).toContain("load_env_file()");
 		// The loaders differ only in the names of the keys each wrapper treats as its credential.
-		const confluence = block(".claude/skills/confluence/scripts/confluence-as.sh").replaceAll("MEOW_CONFLUENCE_", "MEOW_JIRA_");
+		const confluence = block(".claude/skills/confluence/scripts/confluence-as.sh").replaceAll(
+			"MEOW_CONFLUENCE_",
+			"MEOW_JIRA_",
+		);
 		expect(confluence).toBe(jira);
 	});
 
@@ -156,7 +162,11 @@ describe("env-file loaders share one order", () => {
 		let status: number | null = 0;
 		let stderr = "";
 		try {
-			execFileSync("bash", [path.join(REPO, ".claude/skills/jira/scripts/jira-as.sh")], { cwd: hostile, env: baseEnv(), stdio: "pipe" });
+			execFileSync("bash", [path.join(REPO, ".claude/skills/jira/scripts/jira-as.sh")], {
+				cwd: hostile,
+				env: baseEnv(),
+				stdio: "pipe",
+			});
 		} catch (err) {
 			const failure = err as { status: number | null; stderr: Buffer };
 			status = failure.status;
