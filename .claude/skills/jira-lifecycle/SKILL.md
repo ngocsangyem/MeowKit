@@ -51,7 +51,3 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 - `references/workflow-transitions.md` — common transition idioms + resolution-required patterns
 - `references/patterns/*.md` — illustrative workflow shapes (standard, software-dev, JSM request, incident); load only on request, they are not this project's workflow
 - Peer leaves: `mk:jira-bulk` (bulk transition; reads same workflow cache), `mk:jira-jsm` (JSM-specific transitions), `mk:jira-collaborate` (transition `--comment` body templates)
-
-## Gotchas
-
-- (none yet — grow from observed failures)

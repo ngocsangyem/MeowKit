@@ -54,7 +54,3 @@ Deleting an issue is destructive: show the issue key and summary and get the use
   - `references/field-formats.md` — read when setting custom fields or user assignment
   - `references/decision-matrices.md` — read only when the issue type, priority or template is unclear
 - Peer leaves: `mk:jira-fields` (custom field IDs), `mk:jira-lifecycle` (post-create transitions), `mk:jira-collaborate` (comments/attachments), `mk:jira-relationships` (linking)
-
-## Gotchas
-
-- (none yet — grow from observed failures)

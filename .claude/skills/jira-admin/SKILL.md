@@ -65,7 +65,3 @@ The agent confirms each one per `../jira/references/safety-framework.md` (typed 
 - Domain refs:
   - `references/voodoo-constants.md` — magic numbers (event IDs, scheme IDs, common custom field IDs) and how to discover yours
 - Peer leaves: `mk:jira-fields` (field admin overlap; `fields create` requires admin), `mk:jira-jsm` (JSM-specific admin lives in jira-jsm). Most users invoke `mk:jira-admin` once per project setup, then never again.
-
-## Gotchas
-
-- (none yet)

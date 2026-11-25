@@ -45,7 +45,3 @@ Forks to the `jira-analyst` agent. Read-only. The agent has Write tool privilege
 - Peer intelligence: `mk:jira-evaluator` (complexity signals), `mk:jira-estimator` (point estimate)
 - Peer execution: `mk:jira-issue` (read ticket fields incl. attachments), `mk:jira-collaborate` (post analysis as comment — see `.claude/skills/jira-collaborate/references/comment-templates.md`)
 - Output: report at `tasks/reports/jira-analyze-*.md` consumable by `mk:planning-engine` and downstream skills.
-
-## Gotchas
-
-- (none yet)

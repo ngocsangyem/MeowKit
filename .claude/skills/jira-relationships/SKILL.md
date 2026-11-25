@@ -48,7 +48,3 @@ Forks to the `jira-relationships` agent. Link direction matters — `A blocks B`
 - Domain refs:
   - `references/relationship-patterns.md` — blocker-chain analysis, sprint-planning patterns, dependency strategies
 - Peer leaves: `mk:jira-bulk` (the `bulk` group and the shared dry-run rule; `bulk-link` itself is owned here), `mk:jira-agile` (epic-issue is via `agile epic add`, NOT here), `mk:jira-search` (find candidate issues via JQL before linking)
-
-## Gotchas
-
-- (none yet — grow from observed failures)

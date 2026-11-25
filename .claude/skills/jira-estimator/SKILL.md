@@ -43,7 +43,3 @@ Forks to the `jira-estimator` agent. Read-only heuristic estimation. If a prior 
 - Guide: heuristic signals and escalation triggers are in `../jira/references/estimation-guide.md` (the only estimation guide for story points)
 - Peer intelligence: `mk:jira-evaluator` (run first for complexity signals), `mk:jira-analyst` (full ticket synthesis)
 - Peer execution: `mk:jira-issue` writes the estimate to the story-points field that `mk:jira-fields` discovers, `mk:planning-engine` (capacity analysis)
-
-## Gotchas
-
-- (none yet)
