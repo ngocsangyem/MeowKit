@@ -442,6 +442,18 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/lib/core/privacy-paths.cjs",
+      "sha256": "6e53df56e9261035545731bbf323785a3f6bf7184d7ab9a34102718d0d844228",
+      "size": 4889,
+      "exec": true
+    },
+    {
+      "path": ".claude/hooks/lib/core/privacy-shell-reads.cjs",
+      "sha256": "56c86f363195f1dd675757deafa11bd70ec2c04aee21ffe0a590d5ea7d6238da",
+      "size": 7916,
+      "exec": true
+    },
+    {
       "path": ".claude/hooks/lib/core/privacy.cjs",
       "sha256": "9d0fd8805098741db0f999bf493517be77ae6d9f0f1bda4864e86f0140b02bbf",
       "size": 4058,
@@ -2703,6 +2715,12 @@
       "exec": true
     },
     {
+      "path": ".claude/skills/markdown-reader/scripts/lib/request-security-guards.cjs",
+      "sha256": "363c930e1400026ab4a068bdb671ba6ae7b4502a039831c337bf208253c066cd",
+      "size": 3755,
+      "exec": true
+    },
+    {
       "path": ".claude/skills/markdown-reader/scripts/server.cjs",
       "sha256": "64f4a097274c40324a76623dcf240c25781c2c0fa71e453f55ae10190adaa049",
       "size": 9803,
@@ -4013,7 +4031,7 @@
     },
     {
       "path": ".claude/skills/showcase/scripts/package.json",
-      "sha256": "d2396ff29303831e5378edf8f9af0fa156087d80e35bef92ac0a2c108417ced6",
+      "sha256": "c2e86cc9596442d30cf0d9fdbe6c17dccc1a75a205497aa214989184f7a349c9",
       "size": 293
     },
     {
@@ -5127,6 +5145,16 @@
       "path": ".meowkit/cache/.claude/hooks/lib/core/pre-ship.cjs",
       "sha256": "71a03ca67215692c1a626ff26579a093aa98625339d7fa87a65cec25a192dc22",
       "size": 2575
+    },
+    {
+      "path": ".meowkit/cache/.claude/hooks/lib/core/privacy-paths.cjs",
+      "sha256": "6e53df56e9261035545731bbf323785a3f6bf7184d7ab9a34102718d0d844228",
+      "size": 4889
+    },
+    {
+      "path": ".meowkit/cache/.claude/hooks/lib/core/privacy-shell-reads.cjs",
+      "sha256": "56c86f363195f1dd675757deafa11bd70ec2c04aee21ffe0a590d5ea7d6238da",
+      "size": 7916
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/core/privacy.cjs",
@@ -7460,6 +7488,11 @@
       "size": 3816
     },
     {
+      "path": ".meowkit/cache/.claude/skills/markdown-reader/scripts/lib/request-security-guards.cjs",
+      "sha256": "363c930e1400026ab4a068bdb671ba6ae7b4502a039831c337bf208253c066cd",
+      "size": 3755
+    },
+    {
       "path": ".meowkit/cache/.claude/skills/markdown-reader/scripts/server.cjs",
       "sha256": "64f4a097274c40324a76623dcf240c25781c2c0fa71e453f55ae10190adaa049",
       "size": 9803
@@ -8789,7 +8822,7 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/showcase/scripts/package.json",
-      "sha256": "d2396ff29303831e5378edf8f9af0fa156087d80e35bef92ac0a2c108417ced6",
+      "sha256": "c2e86cc9596442d30cf0d9fdbe6c17dccc1a75a205497aa214989184f7a349c9",
       "size": 293
     },
     {

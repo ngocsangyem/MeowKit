@@ -50,10 +50,11 @@ pub fn read_json(path: &Path) -> Option<Value> {
 }
 
 /// `JSON.stringify(value, null, 2)` plus the trailing newline every record the
-/// npm CLI writes ends with.
-pub fn write_json_pretty(path: &Path, value: &Value) -> std::io::Result<()> {
+/// npm CLI writes ends with. `cwd` bounds the write: a session file committed
+/// as a symlink is refused rather than followed out of the project.
+pub fn write_json_pretty(cwd: &Path, path: &Path, value: &Value) -> std::io::Result<()> {
     let text = serde_json::to_string_pretty(value).unwrap_or_else(|_| "null".into());
-    std::fs::write(path, format!("{text}\n"))
+    crate::fsx::write_in(cwd, path, format!("{text}\n"))
 }
 
 /// Every parsable line of a `.jsonl` file. A line that does not parse is

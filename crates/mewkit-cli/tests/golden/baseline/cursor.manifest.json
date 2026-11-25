@@ -244,6 +244,18 @@
       "size": 1960
     },
     {
+      "path": ".cursor/hooks/lib/core/privacy-paths.cjs",
+      "sha256": "6e53df56e9261035545731bbf323785a3f6bf7184d7ab9a34102718d0d844228",
+      "size": 4889,
+      "exec": true
+    },
+    {
+      "path": ".cursor/hooks/lib/core/privacy-shell-reads.cjs",
+      "sha256": "56c86f363195f1dd675757deafa11bd70ec2c04aee21ffe0a590d5ea7d6238da",
+      "size": 7916,
+      "exec": true
+    },
+    {
       "path": ".cursor/hooks/lib/core/privacy.cjs",
       "sha256": "9d0fd8805098741db0f999bf493517be77ae6d9f0f1bda4864e86f0140b02bbf",
       "size": 4058,
@@ -2580,6 +2592,11 @@
       "path": ".cursor/skills/mk-markdown-reader/scripts/lib/process-mgr.cjs",
       "sha256": "ae59970ce74a0492c24fa7917c1abb7e91d2691092b16c4c31968b7c733d7cbe",
       "size": 3781
+    },
+    {
+      "path": ".cursor/skills/mk-markdown-reader/scripts/lib/request-security-guards.cjs",
+      "sha256": "363c930e1400026ab4a068bdb671ba6ae7b4502a039831c337bf208253c066cd",
+      "size": 3755
     },
     {
       "path": ".cursor/skills/mk-markdown-reader/scripts/server.cjs",

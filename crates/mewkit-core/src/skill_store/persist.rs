@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use super::StorePaths;
 use super::record::StoreError;
 use crate::backup;
-use crate::fsx::{RelPath, check_parents};
+use crate::fsx::{RelPath, check_no_links};
 use crate::journal::Journal;
 use crate::layout::Layout;
 use crate::lock::ScopeLock;
@@ -37,7 +37,7 @@ pub fn apply(
             .map_err(|e| StoreError::Refused(e.to_string()))?;
     }
     for own in [&paths.lock, &paths.backups] {
-        check_parents(layout.root(), own).map_err(|e| StoreError::Refused(e.to_string()))?;
+        check_no_links(layout.root(), own).map_err(|e| StoreError::Refused(e.to_string()))?;
     }
     let _lock = ScopeLock::acquire(&paths.lock.under(layout.root()))
         .map_err(|e| StoreError::Refused(e.to_string()))?;

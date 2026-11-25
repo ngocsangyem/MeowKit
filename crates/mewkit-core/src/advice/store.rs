@@ -125,11 +125,12 @@ where
 {
     let target = dossier_path(project_root, run_id).map_err(StoreError::Refused)?;
     let reports = project_root.join("tasks").join("reports");
-    std::fs::create_dir_all(&reports).map_err(io)?;
+    crate::fsx::create_dir_all_in(project_root, &reports).map_err(io)?;
     let _lock = SidecarLock::acquire(&lock_path(project_root, run_id))
         .map_err(|e| StoreError::Io(e.to_string()))?;
 
-    let (existing, history) = match std::fs::read(&target) {
+    // A linked dossier would carry its target's text into the rewritten record.
+    let (existing, history) = match crate::fsx::read_in(project_root, &target) {
         Ok(bytes) => {
             let raw = String::from_utf8_lossy(&bytes).into_owned();
             // Fail closed inside the lock too: a damaged record must not be

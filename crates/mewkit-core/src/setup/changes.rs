@@ -3,9 +3,12 @@
 //!
 //! A step cannot report a change it did not make, or make one it did not report:
 //! the recorded item IS the write, so the `--dry-run` preview cannot drift from
-//! what a real run does.
+//! what a real run does. Every write refuses a symlinked target or parent
+//! under the root, so a project file cannot redirect setup outside it.
 use std::io;
 use std::path::Path;
+
+use crate::fsx::{append_in, create_dir_all_in, read_in, write_in};
 
 /// One line of a change list: what a run would do, or did, to one path.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -55,7 +58,7 @@ impl<'a> Changes<'a> {
         if self.dry_run {
             return Ok(());
         }
-        std::fs::write(file, content)
+        write_in(self.root, file, content)
     }
 
     pub fn copy(&mut self, from: &Path, to: &Path) -> io::Result<()> {
@@ -64,7 +67,9 @@ impl<'a> Changes<'a> {
         if self.dry_run {
             return Ok(());
         }
-        std::fs::copy(from, to).map(|_| ())
+        // The source is read without following a link too: a linked example
+        // file would copy whatever it points at into the project.
+        write_in(self.root, to, read_in(self.root, from)?)
     }
 
     pub fn append(&mut self, file: &Path, content: &str) -> io::Result<()> {
@@ -73,11 +78,7 @@ impl<'a> Changes<'a> {
             return Ok(());
         }
         use std::io::Write;
-        std::fs::OpenOptions::new()
-            .append(true)
-            .create(true)
-            .open(file)?
-            .write_all(content.as_bytes())
+        append_in(self.root, file)?.write_all(content.as_bytes())
     }
 
     pub fn mkdir(&mut self, dir: &Path) -> io::Result<()> {
@@ -88,6 +89,6 @@ impl<'a> Changes<'a> {
         if self.dry_run {
             return Ok(());
         }
-        std::fs::create_dir_all(dir)
+        create_dir_all_in(self.root, dir)
     }
 }

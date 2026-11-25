@@ -291,10 +291,9 @@ pub fn restore_snapshot(root: &Path, id: &str, manifest: &Manifest) -> io::Resul
             continue;
         }
         let target = root.join(&rel);
-        if let Some(parent) = target.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
-        std::fs::copy(&source, &target)?;
+        // The snapshot sits in the project: neither its copy nor the file it
+        // restores over is followed through a symlink out of the project.
+        crate::fsx::write_in(root, &target, crate::fsx::read_in(root, &source)?)?;
         let checksum = manifest
             .files
             .iter()

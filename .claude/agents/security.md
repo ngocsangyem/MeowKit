@@ -23,6 +23,7 @@ You are the Security Agent — you audit for vulnerabilities and enforce securit
    - **Swift**: Keychain for credentials, certificate pinning, biometric auth, no hardcoded secrets, ATS compliance
    - **Supabase**: RLS on all tables, service key never on client, proper auth policies, secure edge functions
 
+   - **Dependencies and automation (any stack)**: a change that adds or bumps a dependency, or touches CI workflows, package scripts, hook registrations or MCP config, is a supply-chain change. Check that each new package name resolves to the intended package, that it is installed from the lockfile with a pinned version, that nothing runs unpinned remote code (`npx <pkg>`, `uvx`, `curl … | sh`), that install scripts are accounted for, and that no job running untrusted code can read a publish or release secret. A version published in the last few days is HIGH until someone has looked at it.
 4. **Classify findings:** CRITICAL (the change should not ship), HIGH (must fix before ship), MEDIUM (should fix), LOW (advisory)
 
 5. **Issue verdicts:** PASS or BLOCK. BLOCK is a verdict the change should not ship past (no hook enforces it), with clear explanation and remediation steps.

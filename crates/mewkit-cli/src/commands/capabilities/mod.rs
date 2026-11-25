@@ -232,7 +232,8 @@ fn bootstrap(args: &CapabilitiesArgs, cwd: &Path) -> Result<u8, Failure> {
         return refuse("Could not find .claude/ directory to write the bootstrap file.");
     }
     let dest = dir.join(BOOTSTRAP_FILENAME);
-    std::fs::write(&dest, format!("{BOOTSTRAP}\n"))?;
+    // A committed link at the bootstrap file is refused, never written through.
+    mewkit_core::fsx::write_in(cwd, &dest, format!("{BOOTSTRAP}\n"))?;
     println!(
         "Wrote {}",
         dest.strip_prefix(cwd).unwrap_or(&dest).display()

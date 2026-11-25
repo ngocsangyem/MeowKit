@@ -38,7 +38,7 @@ open_list = [   # <- unclosed bracket across lines
 **Message:** `ModuleNotFoundError: No module named 'X'`
 **Class:** auto-fixable
 **Fix:**
-1. Install missing package: `pip install X` (or check venv is active)
+1. Package declared in the project's requirements but not installed → install from them (`uv sync`, `pip install -r requirements.txt`), or check the venv is active. Package not declared → it is a new dependency, which is not auto-fixable: the import name is often not the package name, so check it on the index (`pip index versions X`), then ask before `pip install X==<version>`
 2. Check if it's a local module → verify `__init__.py` exists in the package dir
 3. Check PYTHONPATH if it's a custom path module
 4. For skills: run through `node .claude/hooks/lib/skill-python.cjs <script.py>`, which resolves the skill's own environment

@@ -41,6 +41,11 @@ fi
 # parsed as KEY=VALUE lines, never sourced: sourcing would run any shell code in them.
 ENV_FILES=("$ROOT/.meowkit/.env" "$ROOT/.claude/.env" "${HOME:-}/.meowkit/.env")
 REFUSED_KEYS=" PATH LD_PRELOAD LD_LIBRARY_PATH DYLD_INSERT_LIBRARIES DYLD_FRAMEWORK_PATH IFS BASH_ENV ENV "
+# The site URL, email and token are one credential: a token is only ever sent to the
+# site saved beside it. Each file that supplies one of them is recorded, so a project
+# file naming only a site cannot borrow the user-wide token.
+CONNECTION_KEYS="MEOW_CONFLUENCE_SITE_URL MEOW_CONFLUENCE_EMAIL MEOW_CONFLUENCE_API_TOKEN"
+for key in $CONNECTION_KEYS; do unset "SRC_$key"; done
 
 load_env_file() {
   local line key value
@@ -64,6 +69,7 @@ load_env_file() {
       value="${value%%[[:space:]]#*}"
     fi
     export "$key=$value"
+    case " $CONNECTION_KEYS " in *" $key "*) printf -v "SRC_$key" '%s' "$1" ;; esac
   done < "$1"
 }
 
@@ -71,20 +77,38 @@ for ENV_FILE in "${ENV_FILES[@]}"; do
   if [ -f "$ENV_FILE" ]; then load_env_file "$ENV_FILE"; fi
 done
 
+# Refuse a credential assembled from two files. A shell export is the user's own
+# choice and is not counted.
+FIRST_KEY="" FIRST_SRC=""
+for key in $CONNECTION_KEYS; do
+  src_var="SRC_$key"; src="${!src_var:-}"
+  [ -n "$src" ] || continue
+  if [ -z "$FIRST_SRC" ]; then FIRST_KEY="$key"; FIRST_SRC="$src"; continue; fi
+  if [ "$src" != "$FIRST_SRC" ]; then
+    echo "[mk:confluence] $FIRST_KEY comes from $FIRST_SRC but $key comes from $src" >&2
+    echo "[mk:confluence] Put MEOW_CONFLUENCE_SITE_URL, MEOW_CONFLUENCE_EMAIL and MEOW_CONFLUENCE_API_TOKEN together in one of these files, so a token is only sent to the site it was saved with." >&2
+    exit 78
+  fi
+done
+
 : "${MEOW_CONFLUENCE_API_TOKEN:?MEOW_CONFLUENCE_API_TOKEN missing — see .meowkit/.env.example}"
 : "${MEOW_CONFLUENCE_EMAIL:?MEOW_CONFLUENCE_EMAIL missing}"
 : "${MEOW_CONFLUENCE_SITE_URL:?MEOW_CONFLUENCE_SITE_URL missing}"
 
-# Cloud-only gate — refuse Server/DC URLs at exec time
-case "$MEOW_CONFLUENCE_SITE_URL" in
-  *.atlassian.net|*.atlassian.net/*) ;;
-  *)
-    echo "[mk:confluence] Cloud-only — site URL must end in .atlassian.net" >&2
-    echo "[mk:confluence] Detected: $MEOW_CONFLUENCE_SITE_URL" >&2
-    echo "[mk:confluence] For Server/DC, use MCP Atlassian per references/install-and-auth.md" >&2
-    exit 3
-    ;;
-esac
+# Cloud-only gate — refuse Server/DC URLs at exec time. The host is parsed out of
+# scheme://[user@]host[:port][/?#...] and matched whole, because a pattern over the full
+# URL also accepts https://evil.example/x.atlassian.net or https://evil.example?.atlassian.net.
+SITE_REST="$MEOW_CONFLUENCE_SITE_URL"
+if [[ "$SITE_REST" =~ ^[A-Za-z][A-Za-z0-9+.-]*://(.*)$ ]]; then SITE_REST="${BASH_REMATCH[1]}"; fi
+SITE_HOST="${SITE_REST%%[/?#]*}"
+SITE_HOST="${SITE_HOST##*@}"
+SITE_HOST="$(printf '%s' "${SITE_HOST%%:*}" | tr '[:upper:]' '[:lower:]')"
+if ! [[ "$SITE_HOST" =~ ^([a-z0-9-]+\.)+atlassian\.net$ ]]; then
+  echo "[mk:confluence] Cloud-only — the site host must end in .atlassian.net" >&2
+  echo "[mk:confluence] Detected host: ${SITE_HOST:-<none>} (from $MEOW_CONFLUENCE_SITE_URL)" >&2
+  echo "[mk:confluence] For Server/DC, use MCP Atlassian per references/install-and-auth.md" >&2
+  exit 3
+fi
 
 export CONFLUENCE_API_TOKEN="$MEOW_CONFLUENCE_API_TOKEN"
 export CONFLUENCE_EMAIL="$MEOW_CONFLUENCE_EMAIL"

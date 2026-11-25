@@ -43,32 +43,36 @@ Log in to your target site(s) in this Chrome window as you normally would.
 
 **Step 2: Grab the auth state**
 
+State files hold live session tokens, so the examples here keep them outside the project, in `~/.agent-browser/state/`, where no commit can pick them up. Create it once:
+
 ```bash
+mkdir -p ~/.agent-browser/state && chmod 700 ~/.agent-browser/state
+
 # Auto-discover the running Chrome and save its cookies + localStorage
-agent-browser --auto-connect state save ./my-auth.json
+agent-browser --auto-connect state save ~/.agent-browser/state/my-auth.json
 ```
 
 **Step 3: Reuse in automation**
 
 ```bash
 # Load auth at launch
-agent-browser --state ./my-auth.json open https://app.example.com/dashboard
+agent-browser --state ~/.agent-browser/state/my-auth.json open https://app.example.com/dashboard
 
 # Or load into an already-launched session
 agent-browser open about:blank
-agent-browser state load ./my-auth.json
+agent-browser state load ~/.agent-browser/state/my-auth.json
 agent-browser open https://app.example.com/dashboard
 ```
 
 This works for any site, including those with complex OAuth flows, SSO, or 2FA, as long as Chrome already has valid session cookies.
 
-> **Security note:** State files contain session tokens in plaintext. Add them to `.gitignore`, delete when no longer needed, and set `AGENT_BROWSER_ENCRYPTION_KEY` for encryption at rest. See [Security Best Practices](#security-best-practices).
+> **Security note:** State files contain session tokens in plaintext. Keep them outside the project (as above) or ignore them (see [Security Best Practices](#security-best-practices)), delete when no longer needed, and set `AGENT_BROWSER_ENCRYPTION_KEY` for encryption at rest. See [Security Best Practices](#security-best-practices).
 
 **Tip:** Combine with `--session <id> --restore` so the imported auth auto-persists across restarts:
 
 ```bash
 SESSION="$(agent-browser session id --scope worktree --prefix myapp)"
-agent-browser --session "$SESSION" --restore --state ./my-auth.json open https://app.example.com/dashboard
+agent-browser --session "$SESSION" --restore --state ~/.agent-browser/state/my-auth.json open https://app.example.com/dashboard
 # From now on, state is auto-saved/restored for this session
 ```
 
@@ -231,7 +235,7 @@ agent-browser click @e3
 agent-browser wait --url "**/dashboard"
 
 # Save authenticated state
-agent-browser state save ./auth-state.json
+agent-browser state save ~/.agent-browser/state/auth-state.json
 ```
 
 ## Restoring Authentication
@@ -240,7 +244,7 @@ Skip login by loading saved state:
 
 ```bash
 # Load saved auth state
-agent-browser state load ./auth-state.json
+agent-browser state load ~/.agent-browser/state/auth-state.json
 
 # Navigate directly to protected page
 agent-browser open https://app.example.com/dashboard
@@ -271,7 +275,7 @@ agent-browser click @e4  # Sign in
 
 # Wait for redirect back
 agent-browser wait --url "**/app.example.com**"
-agent-browser state save ./oauth-state.json
+agent-browser state save ~/.agent-browser/state/oauth-state.json
 ```
 
 ## When the user must act (CAPTCHA, MFA)
@@ -287,11 +291,11 @@ agent-browser --session auth-flow --restore open "$LOGIN_URL" --headed
 # 3. Wait for the post-login URL to confirm success (5 minutes here)
 agent-browser wait --url "**/post-login*" --timeout 300000
 
-# 4. Save auth state to disk; add it to ignore rules
-agent-browser state save ./auth-state.json
+# 4. Save auth state outside the project
+agent-browser state save ~/.agent-browser/state/auth-state.json
 
 # 5. Later runs reuse the state without prompting
-agent-browser open "$APP_URL" --state ./auth-state.json
+agent-browser open "$APP_URL" --state ~/.agent-browser/state/auth-state.json
 ```
 
 If the wait times out, stop and report where the page was left; do not retry the login.
@@ -328,7 +332,7 @@ For sessions with expiring tokens:
 #!/bin/bash
 # Wrapper that handles token refresh
 
-STATE_FILE="./auth-state.json"
+STATE_FILE="$HOME/.agent-browser/state/auth-state.json"
 
 # Try loading existing state
 if [[ -f "$STATE_FILE" ]]; then
@@ -356,9 +360,10 @@ fi
 
 ## Security Best Practices
 
-1. **Never commit state files** - They contain session tokens
+1. **Never commit state files** - They contain session tokens. Keep them in `~/.agent-browser/state/`; if one must live in the project, ignore the names used here (`auth-state.json`, `oauth-state.json`, `my-auth.json`, and any `<name>.auth-state.json`):
    ```bash
-   echo "*.auth-state.json" >> .gitignore
+   printf '%s\n' '*auth-state.json' '*-auth.json' >> .gitignore
+   git check-ignore -v auth-state.json   # confirm before saving state
    ```
 
 2. **Use environment variables for credentials**
@@ -370,7 +375,7 @@ fi
 3. **Clean up after automation**
    ```bash
    agent-browser cookies clear
-   rm -f ./auth-state.json
+   rm -f ~/.agent-browser/state/auth-state.json
    ```
 
 4. **Use short-lived sessions for CI/CD**

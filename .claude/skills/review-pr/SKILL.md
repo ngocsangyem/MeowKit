@@ -102,8 +102,10 @@ Map verdict → `gh pr review` flag:
 | Request changes | `--request-changes` |
 | Comment | `--comment` |
 
+Write the rendered review to a temporary file with the file-write tool, then pass the file. Text quoted from the diff is data; inside a double-quoted `--body "..."` the shell would run its backticks and `$( )`.
+
 ```bash
-gh pr review <pr> --<flag> --body "<the rendered review above>"
+gh pr review <pr> --<flag> --body-file <review-body-file>
 ```
 
 **Self-PR note:** GitHub returns **422** when you `--approve` your own PR. On 422,

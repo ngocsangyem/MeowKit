@@ -156,9 +156,9 @@ fn kit_for(ctx: &Context, args: &PackArgs) -> Result<Kit, Failure> {
             allow_unverified_kit: k.allow_unverified_kit,
             ..KitArgs::default()
         };
-        if let Ok(kit) = same.resolve(&ctx.place) {
+        if let Ok(kit) = same.resolve(&ctx.place, args.yes) {
             return Ok(kit);
         }
     }
-    k.resolve(&ctx.place)
+    k.resolve(&ctx.place, args.yes)
 }

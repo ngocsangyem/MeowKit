@@ -205,14 +205,12 @@ pub fn append_trace_record(project_root: &Path, record: &TraceRecord) -> Result<
     let line = build(&resolved, millis).to_string();
     let lock_path = trace_lock_path(project_root);
     if let Some(dir) = lock_path.parent() {
-        std::fs::create_dir_all(dir)?;
+        crate::fsx::create_dir_all_in(project_root, dir)?;
     }
     let _held = SidecarLock::acquire(&lock_path)?;
     let log = trace_log_path(project_root);
-    let mut file = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&log)?;
+    // A committed link at the log would append every record wherever it points.
+    let mut file = crate::fsx::append_in(project_root, &log)?;
     writeln!(file, "{line}")?;
     drop(file);
     // Rotation is best effort: a failed rotate must never lose the line just
@@ -229,14 +227,14 @@ fn rotate(log: &Path, millis: i64) -> std::io::Result<()> {
     let dir = log.parent().unwrap_or(Path::new("."));
     let rotated = dir.join(format!("trace-log.{}.jsonl", rotation_stamp(millis)));
     std::fs::rename(log, &rotated)?;
-    let mut encoder = flate2::write::GzEncoder::new(
-        std::fs::File::create(rotated.with_extension("jsonl.gz"))?,
-        flate2::Compression::default(),
-    );
+    let gz = rotated.with_extension("jsonl.gz");
+    crate::fsx::refuse_symlinks(dir, &gz)?;
+    let mut encoder =
+        flate2::write::GzEncoder::new(std::fs::File::create(gz)?, flate2::Compression::default());
     encoder.write_all(&std::fs::read(&rotated)?)?;
     encoder.finish()?;
     std::fs::remove_file(&rotated)?;
-    std::fs::write(log, b"")
+    crate::fsx::write_in(dir, log, b"")
 }
 
 #[cfg(test)]

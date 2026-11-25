@@ -35,7 +35,7 @@ It has one mode, `analyze`, with a page ID or URL and these flags.
 
 ## Process
 
-1. Fetches the root page once as ADF (Atlassian Document Format) and converts it with `adf-to-md.sh`. Macros such as panel, decision list, task list, expand, mention, media and inline card survive as labels. A root-page failure aborts the run.
+1. Fetches the root page once as ADF (Atlassian Document Format) with the wrapper's `adf-get` mode and converts it with `adf-to-md.sh`. Macros such as panel, decision list, task list, expand, mention, media and inline card survive as labels. A root-page failure aborts the run.
 2. Fetches children and runs the same pipeline. A failed child does not abort the run and is listed as `[INCOMPLETE: N of M children failed: <ids>]`.
 3. Analyzes images through `mk:multimodal` when it is present. Otherwise it flags `[NO_MULTIMODAL]` or `[MULTIMODAL_AVAILABLE_BUT_FAILED: <error>]` and continues with text only.
 4. Applies gap heuristics from `references/spec-analysis-patterns.md`: weasel words and unmeasurable criteria (`AMB-*`), unresolved dependencies, numbers without units and references to other docs without a link (`GAP-*`), and conflicting requirements (`CONFLICT-*`). Page content is wrapped in `===PAGE_DATA_START===` markers and treated as data. Unhandled ADF nodes appear in Open Questions as `[UNHANDLED_NODE: <type>]` with attribute keys only.

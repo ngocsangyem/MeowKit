@@ -50,7 +50,7 @@ pub(super) fn run(project_root: &Path, args: &AdviceArgs) -> Result<(), AdviceEr
     let record = receipt::assemble(args, &dossier, &marker, disposition, reason);
     receipt::check(&record, receipt::outcome_of(args), reason)?;
     let relative = receipt::path_for(args, &dossier, run_id)?;
-    let written = receipt::write(&project_root.join(&relative), &record);
+    let written = receipt::write(project_root, &project_root.join(&relative), &record);
 
     commit_to_dossier(
         project_root,

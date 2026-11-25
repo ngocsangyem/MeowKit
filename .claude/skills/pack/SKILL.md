@@ -65,7 +65,7 @@ Output lands at `.meowkit/packs/{YYYYMMDD-HHMM}-{slug}.{ext}`.
 1. **Parse source** — classify as remote (`owner/repo`, GitHub URL) or local path.
 2. **Self-pack guard** — run `bash ${CLAUDE_SKILL_DIR}/scripts/self-pack-guard.sh "$source" "$self_flag"`. If the script exits non-zero, stop and show its message to the user.
 3. **Compute output path** — `.meowkit/packs/$(date +%Y%m%d-%H%M)-<slug>.<ext>` where `<ext>` maps from `--style` (markdown → md, xml → xml, json → json, plain → txt).
-4. **Invoke repomix** — `npx --yes repomix@^1.11 [computed flags] -o "<output>"` (the caret pin limits breaking changes while allowing patch updates). Use `--remote <source>` for remote inputs; pass the local path directly otherwise.
+4. **Invoke repomix** — `npx --yes repomix@1.19.0 [computed flags] -o "<output>"` (an exact pin: `--yes` runs whatever the registry serves, so a range would run code nobody reviewed). Use `--remote <source>` for remote inputs; pass the local path directly otherwise.
 5. **Surface secret-scan results** — parse repomix stdout/stderr for security warnings and show them to the user. If `--no-security-check` was passed, emit: "SECURITY SCAN DISABLED — review output manually before sharing."
 6. **Check the output** — confirm the file exists and is not empty. If it is empty, show the repomix error and stop.
 7. **Handoff** — print the output path and this reminder: "Do NOT Read this file back into the current host-runtime session — it defeats the purpose. Paste into an external LLM, share with a reviewer, or archive."

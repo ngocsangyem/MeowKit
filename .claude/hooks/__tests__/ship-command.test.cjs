@@ -49,6 +49,33 @@ test('literal forms, wrappers and chains are ship commands', () => {
   assert.equal(kind('gh -R owner/repo pr create'), 'pr-create');
 });
 
+test('shell keywords, grouping words and wrapper options in front of git do not hide a ship command', () => {
+  const cases = [
+    ['if true; then git commit -m x; fi', 'commit'],
+    ['if git commit -m x; then echo ok; fi', 'commit'],
+    ['while true; do git push; done', 'push'],
+    ['{ git commit -m x; }', 'commit'],
+    ['! git commit -m x', 'commit'],
+    ['( git commit -m x )', 'commit'],
+    ['time -p git push', 'push'],
+    ['env -u X git push', 'push'],
+    ['env -i PATH=/bin git push', 'push'],
+    ['nice -n 5 git push', 'push'],
+    ['sudo -u bob git push', 'push'],
+    ['sudo -E -- git push', 'push'],
+    ['xargs git commit', 'commit'],
+    ['echo m | xargs -I {} git commit -m {}', 'commit'],
+    ['xargs -n 1 gh pr merge', 'pr-merge'],
+  ];
+  for (const [command, expected] of cases) assert.equal(kind(command), expected, command);
+});
+
+test('a ship command inside bash -c, eval, env -S or backticks is not seen, as documented', () => {
+  for (const c of ['bash -c "git push"', 'eval "git push"', 'env -S "git push"', 'echo `git push`', 'command -v git']) {
+    assert.equal(kind(c), null, c);
+  }
+});
+
 test('a shell alias is parsed as a command line', () => {
   const { dir, git } = repo();
   git('config', 'alias.ship', '!git add -A && git commit -m wip');

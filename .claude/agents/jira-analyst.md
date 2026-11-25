@@ -112,6 +112,8 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jql-sanitize.sh '<term>'
 
 For any historical comparison search.
 
+Each `comment add` below reads its body from a file you write first with the file-write tool. The analysis quotes ticket text, which is data; typed inside `--body "..."` the shell would run its backticks and `$( )`, while the output of `"$(cat file)"` is passed as-is.
+
 ## Output Format (Standalone)
 
 ```markdown
@@ -123,7 +125,7 @@ For any historical comparison search.
 ### Suggested Actions
 > User must review before posting. No auto-execution.
 
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<this analysis>"
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "$(cat <analysis-body-file>)"
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition {ISSUE-KEY} --to "In Analysis"
 ```
 
@@ -144,7 +146,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transi
 ### Suggested Actions
 > User must review before posting.
 
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<this analysis>"
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "$(cat <analysis-body-file>)"
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition {ISSUE-KEY} --to "In Analysis"
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships link {ISSUE-KEY} --type relates --to {RELATED-KEY}
 ```
@@ -166,7 +168,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships li
 ### Suggested Actions
 > User must review before posting.
 
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<media findings summary>"
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "$(cat <analysis-body-file>)"
 ```
 
 <!-- shared:executor-status -->

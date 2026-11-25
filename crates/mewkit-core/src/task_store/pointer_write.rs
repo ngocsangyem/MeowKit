@@ -40,7 +40,7 @@ pub fn write_active_task_pointer(
 ) -> Result<(), RecordWriteError> {
     check_task_id(task_id).map_err(RecordWriteError::Invalid)?;
     let dir = pointer_dir(project_root);
-    std::fs::create_dir_all(&dir)?;
+    crate::fsx::create_dir_all_in(project_root, &dir)?;
     let mut payload = Map::new();
     payload.insert(
         "schemaVersion".into(),

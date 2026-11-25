@@ -450,6 +450,34 @@ test('review-pr-cleanup --sweep --dry-run lists candidates without applying', ()
   assert(Array.isArray(json.worktrees), 'sweep should return a worktrees array');
 });
 
+// ─── Shell metacharacters in branch names ─────────────────────────────────────
+console.log('\n🛡  Branch-name Injection Tests');
+
+test('status --json never runs shell code from a branch name', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'wt-branch-inject-'));
+  const repo = path.join(scratch, 'repo');
+  const gitIn = (args) => require('child_process').execFileSync('git', args, { cwd: repo, stdio: 'pipe' });
+  try {
+    fs.mkdirSync(repo);
+    gitIn(['init', '-q', '-b', 'main']);
+    gitIn(['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'init']);
+    // git accepts `$(` and `${IFS}` in ref names; the name must stay data
+    const branch = 'x$(touch${IFS}PWNED_WT)';
+    gitIn(['branch', branch]);
+    gitIn(['worktree', 'add', '-q', path.join(scratch, 'wt-evil'), branch]);
+    const result = run('status --json', { cwd: repo });
+    assert(result.success, `status should succeed. stderr: ${result.stderr}`);
+    const json = assertJSON(result.output);
+    assert(json.worktrees.some(w => w.branch === branch), 'branch name should be reported verbatim');
+    const planted = ['repo', 'wt-evil', '.'].some(d => fs.existsSync(path.join(scratch, d, 'PWNED_WT')));
+    assert(!planted, 'branch name was executed by a shell');
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
 // ─── Summary ──────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`Results: ${passed} passed, ${failed} failed`);

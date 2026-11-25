@@ -45,7 +45,7 @@ import { X } from './x-module';
 **Message:** `Cannot find module 'X' or its corresponding type declarations`
 **Class:** auto-fixable
 **Fix:**
-1. Package missing → `npm install X` (or `@types/X` for type declarations)
+1. Package declared in `package.json` but not installed → run the lockfile install (`npm ci`, `pnpm install --frozen-lockfile`). Package not declared → it is a new dependency, which is not auto-fixable: check the name on the registry (`npm view X`), then ask before `npm install X@<version>` (or `@types/X`)
 2. Local path wrong → check relative path `./` vs `../`
 3. tsconfig paths misconfigured → check `compilerOptions.paths` in `tsconfig.json`
 

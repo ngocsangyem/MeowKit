@@ -26,7 +26,7 @@ Visual/UI (layout breaks, broken images, z-index, theme issues), Functional (dea
 
 Quick mode only visits the homepage and the top five navigation targets and asks: does it load, are there console errors, are links broken.
 
-Deeper checks, when the app warrants them: smoke test (loads, no console errors, no 5xx; the Core Web Vitals LCP under 2.5s, CLS under 0.1, INP under 200ms if you can measure them), keyboard tab order with visible focus, a skip link and landmarks, and an automated accessibility scan (`npx axe <url>`) for WCAG AA violations.
+Deeper checks, when the app warrants them: smoke test (loads, no console errors, no 5xx; the Core Web Vitals LCP under 2.5s, CLS under 0.1, INP under 200ms if you can measure them), keyboard tab order with visible focus, a skip link and landmarks, and an automated accessibility scan (`npx --yes @axe-core/cli@4.14.0 <url>`; the unscoped `axe` package is an unrelated logger) for WCAG AA violations.
 
 ## Health score
 

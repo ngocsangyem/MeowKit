@@ -39,13 +39,13 @@ The two combine: freeze stops stray edits and careful warns on destructive Bash 
 ## Steps
 
 1. You run `/mk:freeze` with a path, or give one when asked.
-2. The path is resolved to an absolute directory with a trailing slash. The slash stops `/src` from matching `/src-old`.
-3. The boundary is saved to `${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`.
+2. `scripts/set-freeze.cjs` resolves the path to an absolute directory with a trailing slash. The slash stops `/src` from matching `/src-old`. It refuses a missing path, a file and the filesystem root, and leaves the saved boundary unchanged when it refuses.
+3. The boundary is saved to `${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt` and read back.
 4. On each Edit or Write the hook compares `file_path` with the boundary and returns allow or deny, with a message naming the boundary.
 
 ## Ending a freeze
 
-The freeze lasts for the session. Running `/mk:freeze` with another path replaces the boundary. Deleting `freeze-dir.txt` clears it.
+The boundary lives in a state file and lasts until it is cleared, including across sessions: a later session that loads the skill enforces the old boundary again. Running `/mk:freeze` with another path replaces it. To clear it, run `node .claude/skills/freeze/scripts/set-freeze.cjs --clear`.
 
 ## Gotchas
 

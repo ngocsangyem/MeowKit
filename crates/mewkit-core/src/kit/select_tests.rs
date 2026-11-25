@@ -98,3 +98,13 @@ fn available_lists_installable_releases_newest_first() {
     assert_eq!(names(false), ["2.16.0+", "2.15.0"]);
     assert_eq!(names(true), ["2.17.0-beta.1", "2.16.0+", "2.15.0"]);
 }
+
+#[test]
+fn an_older_kit_version_is_told_from_a_newer_one() {
+    use crate::kit::is_older_kit;
+    assert!(is_older_kit("2.9.0", "v2.10.0"));
+    assert!(is_older_kit("v3.0.0-beta.1", "3.0.0"));
+    assert!(!is_older_kit("3.0.0", "3.0.0"));
+    assert!(!is_older_kit("3.1.0", "3.0.9"));
+    assert!(!is_older_kit("local", "3.0.0"));
+}

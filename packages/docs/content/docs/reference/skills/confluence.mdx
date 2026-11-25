@@ -50,6 +50,7 @@ The wrapper exits 3 on a URL that is not `*.atlassian.net`. The hub does not fal
 | `scripts/confluence-as.sh` | Wrapper that maps `MEOW_CONFLUENCE_*` to `CONFLUENCE_*`, sets JSON output, refuses a settings.local.json fallback and blocks non-Cloud URLs |
 | `scripts/cql-sanitize.sh` | CQL injection guard for user-derived input |
 | `scripts/adf-to-md.sh`, `scripts/adf_to_md.py` | Macro-aware ADF to Markdown converter |
+| `scripts/fetch_adf.py` | Behind the wrapper mode `confluence-as.sh adf-get <page-id>`, which reads a page as ADF. The CLI's `page get` has no ADF format, so the wrapper calls the Cloud v2 pages endpoint after its credential and Cloud-only checks |
 | `scripts/requirements.txt` | Pip dependencies read by `mewkit skill env confluence` |
 | `scripts/smoke-live.sh` | Manual smoke test with live credentials |
 | `references/install-and-auth.md`, `cli-idioms.md`, `safety-framework.md` | Setup, invocation patterns, safety tiers |

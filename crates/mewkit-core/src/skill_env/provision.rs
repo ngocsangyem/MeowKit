@@ -43,18 +43,17 @@ fn lexical(path: &Path) -> PathBuf {
 fn validate_env_path(project: &Path, target: &Path) -> Result<(), String> {
     let root = lexical(&project.join(envs_rel()));
     let resolved = lexical(&std::env::current_dir().unwrap_or_default().join(target));
-    // A string prefix, not a component prefix: the npm CLI's check is one.
-    if !resolved
-        .to_string_lossy()
-        .starts_with(root.to_string_lossy().as_ref())
-    {
+    // Whole components: `.meowkit/envs-evil` shares a string prefix with
+    // `.meowkit/envs` but lies outside it.
+    if !resolved.starts_with(&root) {
         return Err(format!(
             "Path escapes {}: {}",
             envs_rel().display(),
             target.display()
         ));
     }
-    Ok(())
+    // A linked `.meowkit` or `envs` would put the environment somewhere else.
+    crate::fsx::refuse_symlinks(&lexical(project), &resolved).map_err(|e| e.to_string())
 }
 
 /// Make one environment exist and hold an interpreter. "Repair" and "create"

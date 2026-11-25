@@ -184,7 +184,7 @@ pub fn submit(options: &SubmitOptions<'_>, exec: &dyn Exec) -> SubmitResult {
         "event": event,
         "at": options.now,
     });
-    if let Err(e) = super::session::write_json_pretty(&marker, &record) {
+    if let Err(e) = super::session::write_json_pretty(options.cwd, &marker, &record) {
         return SubmitResult::bail(e.to_string());
     }
     SubmitResult {

@@ -349,7 +349,7 @@ function cmdCreate() {
       outputError('MKDIR_FAILED', `Failed to create .worktrees/ directory`, { suggestion: 'Check write permissions' });
     }
 
-    const createResult = git(`worktree add -b ${branchName} "${worktreePath}" ${baseBranch}`, { cwd: gitRoot });
+    const createResult = git(['worktree', 'add', '-b', branchName, worktreePath, baseBranch], { cwd: gitRoot });
     if (!createResult.success) {
       outputError('WORKTREE_CREATE_FAILED', 'Failed to create parallel worktree', {
         suggestion: createResult.stderr || createResult.error,
@@ -518,7 +518,7 @@ function cmdCreate() {
   }
 
   if (branchStatus === 'remote') {
-    const fetchResult = git(`fetch origin ${branchName}`, { silent: true, cwd: workDir });
+    const fetchResult = git(['fetch', 'origin', branchName], { silent: true, cwd: workDir });
     if (!fetchResult.success) {
       outputError('FETCH_FAILED', `Failed to fetch branch from remote: ${branchName}`, {
         suggestion: 'Check network connection and remote repository access'
@@ -527,8 +527,8 @@ function cmdCreate() {
   }
 
   const createResult = branchStatus
-    ? git(`worktree add "${worktreePath}" ${branchName}`, { cwd: workDir })
-    : git(`worktree add -b ${branchName} "${worktreePath}" ${baseBranch}`, { cwd: workDir });
+    ? git(['worktree', 'add', worktreePath, branchName], { cwd: workDir })
+    : git(['worktree', 'add', '-b', branchName, worktreePath, baseBranch], { cwd: workDir });
 
   if (!createResult.success) {
     outputError('WORKTREE_CREATE_FAILED', 'Failed to create worktree', {
@@ -560,7 +560,7 @@ function cmdCreate() {
   }
 
   if (checkoutSubmodules) {
-    const submoduleResult = git('submodule update --init --checkout --recursive', { silent: true, cwd: worktreePath });
+    const submoduleResult = git(['submodule', 'update', '--init', '--checkout', '--recursive'], { silent: true, cwd: worktreePath });
     if (!submoduleResult.success) {
       outputError('SUBMODULE_CHECKOUT_FAILED', 'Worktree created but submodule checkout failed', {
         suggestion: submoduleResult.stderr || 'Run git submodule update manually in the new worktree',
@@ -645,7 +645,7 @@ function cmdRemove() {
     return;
   }
 
-  const removeResult = git(`worktree remove "${worktreePath}" --force`, { silent: true });
+  const removeResult = git(['worktree', 'remove', worktreePath, '--force'], { silent: true });
   if (!removeResult.success) {
     outputError('WORKTREE_REMOVE_FAILED', `Failed to remove worktree: ${worktreePath}`, {
       suggestion: removeResult.stderr || 'Check if the worktree has uncommitted changes',
@@ -656,7 +656,7 @@ function cmdRemove() {
   let branchDeleted = false;
   let branchDeleteWarning = null;
   if (branchName) {
-    const deleteResult = git(`branch -d "${branchName}"`, { silent: true });
+    const deleteResult = git(['branch', '-d', branchName], { silent: true });
     if (deleteResult.success) {
       branchDeleted = true;
     } else {
@@ -682,7 +682,7 @@ function cmdPrune() {
   if (dryRun) pruneArgs.push('--dry-run');
   pruneArgs.push('--verbose');
 
-  const pruneResult = git(pruneArgs.join(' '), { silent: true });
+  const pruneResult = git(pruneArgs, { silent: true });
   if (!pruneResult.success) {
     outputError('WORKTREE_PRUNE_FAILED', 'Failed to prune worktree metadata', {
       suggestion: pruneResult.stderr || pruneResult.error

@@ -25,6 +25,20 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+// gray-matter evaluates `---js` / `---javascript` / `---coffee` front-matter
+// as code by default. Only YAML and JSON may parse; every executable engine
+// (and its aliases, which gray-matter maps onto these names) throws instead.
+function refuseExecutableFrontmatter() {
+  throw new Error('executable front-matter is not supported');
+}
+const FRONTMATTER_ENGINES = {
+  javascript: refuseExecutableFrontmatter,
+  js: refuseExecutableFrontmatter,
+  coffee: refuseExecutableFrontmatter,
+  coffeescript: refuseExecutableFrontmatter,
+  cson: refuseExecutableFrontmatter
+};
+
 /**
  * Initialize markdown dependencies
  */
@@ -97,6 +111,12 @@ function initDependencies() {
           // Auto-detect language or plain text
           const highlighted = hljs.highlightAuto(code).value;
           return `<pre><code class="hljs">${highlighted}</code></pre>`;
+        },
+
+        // Raw HTML blocks and inline tags are shown as text, never as markup:
+        // the page is served on an origin that can read local files.
+        html({ text }) {
+          return escapeHtml(text || '');
         }
       }
     });
@@ -258,7 +278,12 @@ function addPhaseTableAnchors(html) {
  */
 function parseFrontmatter(content) {
   initDependencies();
-  return matter(content);
+  try {
+    return matter(content, { engines: FRONTMATTER_ENGINES });
+  } catch {
+    // Unparseable or refused front-matter: render the file as plain markdown
+    return { data: {}, content };
+  }
 }
 
 /**
@@ -292,10 +317,11 @@ function renderMarkdownFile(filePath, options = {}) {
   const toc = generateTOC(html);
 
   // Extract title from frontmatter or first h1
-  let title = frontmatter.title;
+  // Title is returned HTML-escaped: the h1 text already is, the others are not
+  let title = typeof frontmatter.title === 'string' ? escapeHtml(frontmatter.title) : '';
   if (!title) {
     const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
-    title = h1Match ? h1Match[1] : path.basename(filePath, '.md');
+    title = h1Match ? h1Match[1] : escapeHtml(path.basename(filePath, '.md'));
   }
 
   return {
@@ -331,5 +357,6 @@ module.exports = {
   addPhaseTableAnchors,
   parseFrontmatter,
   renderTOCHtml,
-  initDependencies
+  initDependencies,
+  escapeHtml
 };

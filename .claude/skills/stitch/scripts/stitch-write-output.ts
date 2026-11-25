@@ -42,6 +42,8 @@ const INJECTION_PATTERNS = [
   /pretend\s+you\s+are/i,
 ];
 
+const SAFE_PATH_SEGMENT = /^[A-Za-z0-9_-]+$/;
+
 function validateResponseSchema(data: unknown): asserts data is StitchResponseSchema {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("Response must be a JSON object");
@@ -51,6 +53,11 @@ function validateResponseSchema(data: unknown): asserts data is StitchResponseSc
   // Required fields
   if (typeof obj.screenId !== "string" || !obj.screenId.trim()) {
     throw new Error("Response missing required field: screenId (non-empty string)");
+  }
+  // screenId becomes a directory name under tasks/designs/, so it may not carry
+  // separators or dots that would let the API response choose another path.
+  if (!SAFE_PATH_SEGMENT.test(obj.screenId)) {
+    throw new Error("Rejected field \"screenId\": must match ^[A-Za-z0-9_-]+$");
   }
   if (typeof obj.projectId !== "string" || !obj.projectId.trim()) {
     throw new Error("Response missing required field: projectId (non-empty string)");
@@ -250,7 +257,13 @@ async function main(): Promise<void> {
   validateResponseSchema(parsed);
   const response = parsed; // now typed as StitchResponseSchema
 
-  const planOrRepo = resolvePlanOrRepo();
+  // The plan/repo segment comes from a local directory or remote name that may
+  // legitimately hold dots ("next.js"); it is folded to the safe set rather than refused.
+  const planOrRepo = resolvePlanOrRepo().replace(/[^A-Za-z0-9_-]/g, "-").replace(/^-+|-+$/g, "") || "designs";
+  if (!SAFE_PATH_SEGMENT.test(planOrRepo)) {
+    console.error("[X] Could not derive a safe tasks/designs/ directory name.");
+    process.exit(1);
+  }
   const outputDir = path.join("tasks", "designs", planOrRepo, response.screenId);
   fs.mkdirSync(outputDir, { recursive: true });
   console.error(`[i] Output dir: ${outputDir}`);

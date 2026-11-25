@@ -32,13 +32,23 @@ static STATUS_IN_BLOCK: LazyLock<Regex> =
 static STATUS_LINE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?m)^status:[^\r\n]*").expect("static status-line pattern"));
 
+/// A plan file committed as a symlink is neither read for the rewrite nor
+/// written through: following it would edit a file outside the plan directory.
+fn read_in_plan_dir(file: &Path) -> std::io::Result<String> {
+    crate::fsx::read_to_string_in(file.parent().unwrap_or(file), file)
+}
+
+fn write_in_plan_dir(file: &Path, text: String) -> std::io::Result<()> {
+    crate::fsx::write_in(file.parent().unwrap_or(file), file, text)
+}
+
 /// Set `status:` to `completed` inside the FIRST frontmatter block only.
 ///
 /// The frontmatter sits at the top of the file, so the first line-anchored
 /// `status:` IS the frontmatter's — an identical `status:` in the body is never
 /// reached. Returns true when a change was made.
 pub(super) fn set_frontmatter_status_completed(md_path: &Path, write: bool) -> bool {
-    let Ok(content) = std::fs::read_to_string(md_path) else {
+    let Ok(content) = read_in_plan_dir(md_path) else {
         return false;
     };
     let Some(block) = FIRST_BLOCK
@@ -56,7 +66,7 @@ pub(super) fn set_frontmatter_status_completed(md_path: &Path, write: bool) -> b
     if next == content {
         return false;
     }
-    if write && std::fs::write(md_path, next).is_err() {
+    if write && write_in_plan_dir(md_path, next).is_err() {
         return false;
     }
     true
@@ -65,7 +75,7 @@ pub(super) fn set_frontmatter_status_completed(md_path: &Path, write: bool) -> b
 /// Mark every `phases[*].status` completed in `.plan-state.json`, preserving
 /// every other key. Returns true when a change was made.
 pub(super) fn mark_plan_state_completed(plan_state: &Path, write: bool) -> bool {
-    let Ok(text) = std::fs::read_to_string(plan_state) else {
+    let Ok(text) = read_in_plan_dir(plan_state) else {
         return false;
     };
     // A malformed checkpoint is left alone — the markdown is authoritative.
@@ -86,7 +96,7 @@ pub(super) fn mark_plan_state_completed(plan_state: &Path, write: bool) -> bool 
     }
     if changed && write {
         let serialized = serde_json::to_string_pretty(&data).unwrap_or_default();
-        let _ = std::fs::write(plan_state, format!("{serialized}\n"));
+        let _ = write_in_plan_dir(plan_state, format!("{serialized}\n"));
     }
     changed
 }

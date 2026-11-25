@@ -13,7 +13,7 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
-## 3.1.0 (unreleased)
+## 3.1.0 (2026-11-26)
 
 Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgrade`: the CLI changes below are in the binary.
 
@@ -23,10 +23,12 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - Skills you customise survive upgrades. `mewkit skill overlay`, `fork` and `rollback` keep your version of a kit skill, and a separated edit to a Claude Code skill with eval cases merges with the kit's change.
 - The eval harness measures a skill. `mewkit eval run` and `mewkit eval compare` drive Claude Code or Codex over the kit's cases in a checkout of the MeowKit repository.
 - Antigravity is a seventh target. Its guards are installed as unverified.
+- Every skill was rewritten around its goal. Each `SKILL.md` now opens with what the skill is for, when to use it and when to use a sibling, and states judgment work as outcomes with a done check. Rules that `.claude/rules/`, another skill or the `mewkit` CLI own are pointed to, not restated, and every path, flag, skill and agent a skill names exists in an install.
+- One env-file order for every script: a shell export, then `.meowkit/.env`, then `.claude/.env`, then a new user-wide `~/.meowkit/.env`. See [Environment Variables](/reference/environment-variables).
 
 ### New Commands
 
-- `mewkit plan sync <dir> [--check] [--json]` derives phase status, the Overview line, the plan.md table and `.plan-state.json` from the Todo List checkboxes. It never ticks a box or archives.
+- `mewkit plan sync <dir> [--check] [--json]` derives phase status, the Overview line, the plan.md table and an existing `.plan-state.json` from the Todo List checkboxes. It never ticks a box or archives.
 - `mewkit skill status`, `skill overlay`, `skill fork` and `skill rollback`. See [Customising and Upgrading Skills](/guide/customising-skills).
 - `mewkit eval run` and `mewkit eval compare`. See [Cost and Telemetry](/cli/telemetry#eval).
 - Eval cases gain `toolNotCalled` and `toolInputNotMatches` assertions and a `gitInit` option that starts a run in a one-commit git repository. A `v2` suite (core lifecycle skills) and a `v2-ext` suite (the other rewritten skills) test both lost guidance and over-applied instructions.
@@ -55,6 +57,11 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - **Skill audit.** `mewkit validate --skill-rubric` and the [Skill Audit](/guide/skill-audit) page publish each skill's scores.
 - **Opt-in skills.** A skill whose `SKILL.md` sets `install_default: false` installs only when selected in `.meowkit/state/skill-selection.json`. No shipped skill sets it yet.
 - **Verified marker.** The "verified" rule marker is written only when the always-on rules match a session-start digest. `doctor` reports a marker whose digest no longer matches.
+- **Skill rewrite.** The shared preamble and protocol text is trimmed to what later steps read. Reference files that nothing loaded, or that repeated another file, are deleted: the `mk:ship` and `mk:document-release` step and boilerplate files, the `mk:fix` workflow files, the `mk:plan-creator` `workflow-fast.md` and persona prompts, the `mk:plan-ceo-review` and `mk:office-hours` phase files, the `mk:retro` and `mk:trace-analyze` step files, the `mk:multimodal` and `mk:docs-finder` workflow pages and eight unloaded `mk:agent-detector` references. New skill scripts: `retro-metrics.cjs` for `mk:retro`, `set-freeze.cjs` for `mk:freeze`, `recompute-score.py` for `mk:evaluate`, and a `detect` subcommand in `trace-records.cjs` for `mk:trace-analyze`.
+- **Unified env loader.** `jira-as.sh` and `confluence-as.sh` read `KEY=VALUE` lines instead of sourcing the env files, so shell code in an env file never runs. `mk:docs-finder` and `mk:multimodal` use the same order and no longer keep a per-skill `.env`; `mk:multimodal` no longer needs `python-dotenv`. `mk:stitch` reads the env files too, where it used to read only the shell. The `jira-env-loader` hook accepts keys from any source and names the files it searched. `MEOWKIT_TDD` and the other workflow switches stay shell-only.
+- **Confluence pages as ADF.** `confluence-as.sh adf-get <page-id>` reads a page as Atlassian Document Format through the Cloud v2 API, because `page get` in `confluence-as` 0.2.0 has no ADF format. The spec analyst and `adf-to-md.sh` use it, with the v2 metadata fields and `hierarchy descendants --max-depth <N> --limit 5` for children. `mk:intake` reads a page with `page get <id> --body --format markdown`.
+- **Pinned Context Hub.** `mk:docs-finder` runs Context Hub as `npx --yes --package=@aisuite/chub@0.1.4 chub`. The bare `npx chub` resolves an unrelated npm package on a machine without a global install.
+- **Other runtimes' text.** When `mewkit` installs for Codex, Cursor, Grok, Pi, OMP or Antigravity, skill and agent prose no longer names a Claude-only tool or variable. `AskUserQuestion`, `TodoWrite`, `TaskCreate` and `SendMessage` become plain phrases, and `CLAUDE_*` variables become what they stand for. The change lives in the binary, so an older `mewkit` keeps writing the old names; nothing breaks.
 
 ### Improvements
 
@@ -69,6 +76,19 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - On Claude Code a check that could not run answers with the permission prompt (`ask`), so you decide; a failed check is still refused. Cursor asks too. Codex has no prompt for hooks, so it refuses and tells you to run the command in your own terminal. The Claude Code registration sets `onFailure: "block"` (Claude Code 2.1.295 or later) and the Cursor entry `failClosed: true`, so a ship-check hook that cannot start or reaches its timeout blocks.
 - Nothing in the command or the environment skips the ship check. `--no-verify`, `-n` on a commit, a skip-style variable and `MEWKIT_CURSOR_HOOKS_KILL_SWITCH` are named in the output as refused. The Cursor kill switch no longer stands the ship check down.
 - Each ship check writes one `ship_check` trace record: outcome `passed`, `failed` or `could_not_run`, the cause and the action, never the command text.
+- `mk:review` only reports. Fixes go through `mk:fix`, or here with `--fix`, which applies the mechanical findings after the verdict. The forced "look harder" pass is gone, so no finding is a valid result.
+- `mk:qa-manual` stops at a login page. You sign in in the browser or give it a saved auth state; a password never goes through chat. `mk:qa` follows the same rule, and its test-framework bootstrap (package installs, edits to `CLAUDE.md` and CI) is removed.
+- `mk:plan-creator` no longer writes `.plan-state.json`. `mewkit plan sync` only updates one that exists. `mk:validate-plan` no longer claims `mk:cook` runs it.
+- `mk:intake` asks before posting a comment to the ticket and goes past the completeness score only at 60 or more and on request.
+- `mk:party` writes its decision record only when a decision was reached or you ask. It has no fixed rounds or token caps.
+- `mk:freeze` sets its boundary through `scripts/set-freeze.cjs`, which refuses a missing path, a file and the filesystem root, and has `--clear`. Before, a failed `cd` left a `/` boundary that allowed every edit.
+- `mk:cook` counts as done only with verify evidence, a review verdict read and every acceptance criterion checked. `--fast` and `quick` are one profile.
+- `mk:build-fix` asks before a process kill, an install, a lockfile change or a cache delete. The Jira and Confluence leaves share one confirmation rule: a plain "yes" after a `--dry-run` shows the count, and a typed token is for irreversible deletes only. `mk:jira-issue` and `mk:confluence-page` confirm a delete.
+- `mk:agent-browser` and `mk:playwright-cli` take credentials from an env var, a vault or a cookie file, never as a literal in a command.
+- Ten skills that had no "NOT for" clause in their description now name the sibling they are not for, so routing can tell `help` from `status`, and `jira-evaluator` from `planning-engine`.
+- Example addresses in reference files use `@example.com`, and a trace example no longer carries a personal home path.
+- Placeholder `## Gotchas` sections that held only "(none yet)" are removed from 16 `jira-*` skills, and passages that two files stated twice are kept in one.
+- Eval fixtures under `.claude/skills/*/evals/` stay in the repository and are no longer part of the release archive.
 
 ### Removals
 
@@ -77,8 +97,30 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - The framework and language skills `mk:angular`, `mk:react-patterns`, `mk:vue`, `mk:vue-best-practices`, `mk:vue-testing-best-practices` and `mk:typescript`. Releases outdated them quickly, and each framework and language now ships its own official agent skill; install that one instead. They also leave the `development` skill pack.
 - The Vue 3 section of `mk:development`'s `code-patterns.md`. The skill keeps its NestJS and Swift patterns.
 - The opt-in eval pack. Releases carry no eval cases or fixtures, `--skill-packs eval` and `mewkit pack add eval` are refused as unknown packs, and `mewkit eval run` reads cases only from a MeowKit checkout. `upgrade` and `uninstall` remove an installed `.meowkit/eval/`, keeping any file edited since install.
+- Flags and commands that were never implemented or that named nothing: `mk:autobuild` `--resume` and `--teams`, the `mk:prompt-enhancer` `--score` flag, the `workflow:handoff` and `workflow:resume` triggers of `mk:session-continuation`, and the `--agents N` hint of `mk:team-config`. The `session-continuation` TOON format and auto-save timer are gone; it uses `mewkit plan sync`, `mewkit task-state` and `mewkit orient`.
+- The telemetry opt-in prompts, the essay link and the session counter in the shared skill preamble. The local skill-usage line that `mk:retro` reads stays.
+- The `mk:skill-creator` `init-skill.py` no longer creates an `mk:` directory; it creates `<slug>/`.
 
 ### Bug Fixes
+
+Security fixes from the pre-release audit. Each was reproduced before the fix and replayed after it.
+
+- `mewkit note`, `setup` and the other commands that write project files followed a symlink committed in a cloned repository, so a write could land outside the project (a shell startup file, for one). They now refuse a symlinked target or parent and name it. `init` no longer reads a merge target such as `.claude/settings.json` through a link, which copied the user's global settings into the project.
+- A forged `.meowkit/state/mewkit-interrupted.json` could make `init` copy a file from outside the project in, or delete project files. A record whose backup is not a `mewkit` backup, or whose paths leave the install, is ignored with a notice.
+- A kit cache entry planted in a repository was installed as if it were the verified release. A cache git tracks is refused, an online run always re-extracts the verified archive, and an offline entry that cannot be re-verified needs `--allow-unverified-kit` and is recorded as unverified.
+- `mk:markdown-reader` ran JavaScript front-matter (`---js`) and raw `<script>` from the file it rendered. Front-matter is YAML or JSON only, raw HTML is escaped, and the local server checks the `Host` header, stays inside the project by real path and refuses dotfiles.
+- A project env file that set only `MEOW_JIRA_SITE_URL` or `MEOW_CONFLUENCE_SITE_URL` sent the token from `~/.meowkit/.env` to that site. The three connection keys are now one credential (see Migration Notes). The Confluence Cloud check reads the host of the URL; it used to accept `https://example.com/x.atlassian.net`.
+- The build check after an edit and the ship check ran `npx tsc` and `npx eslint`. With no terminal attached `npx` installs a missing package without asking, and `npx tsc` resolves to the npm package named `tsc`, not TypeScript. Both checks now run only the project's own `node_modules/.bin` and skip a tool that is not installed.
+- The credential guard judged only the file a tool named. It now also refuses a shell command that prints or copies out a credential file (`cat .env`, `grep TOKEN .env`, `curl -F x=@.env`, `tar`, `source`) and a Grep whose glob selects one, and it knows more files: `.netrc`, `.pypirc`, `.htpasswd`, Docker, `gh`, gcloud and Azure config, Terraform state, service-account keys, keystores and SSH keys with a suffix. It no longer refuses a skill's markdown file for having `secrets` in its name.
+- The web-fetch address check missed `172.16.0.0/12`, IPv6 loopback and local ranges, `0.0.0.0`, decimal and hex hosts and upper-case `LOCALHOST`, and looked at the first URL only. `mk:web-to-markdown`'s browser mode now applies the address check to every request a page makes, not only to navigations.
+- The ship check did not see `git commit` after `if … then`, inside `{ }`, after `!`, or behind `time -p`, `env -u`, `nice -n`, `sudo -u` and `xargs`.
+- `mk:worktree` built git commands as shell strings from branch names, so a branch named with `$( )` ran a command. Git is now called with an argument list.
+- `mk:review-pr`, `mk:respond-pr`, `mk:story-sizer` and the `jira-analyst` agent put review and ticket text inside a double-quoted shell argument, where a backtick runs. The text goes through a file.
+- `mk:agent-browser` gave an ignore pattern that did not match the session-state files its own examples create; the examples save them under `~/.agent-browser/state/`. `mk:docs-finder` sent `CONTEXT7_API_KEY` to the fallback documentation hosts. `mk:stitch` built its output folder from an unchecked screen id.
+- `npx playwright-cli` and `npx axe` named packages that are not the intended tools; they are now `@playwright/cli` and `@axe-core/cli`, with versions. `jira-as`, the `mk:multimodal`, `mk:web-to-markdown` and `mk:markdown-reader` dependencies, `repomix` and `agent-browser` are pinned to exact versions.
+- `mk:chrome-profile` asks which origins it may act on before it attaches to your signed-in Chrome, and only reads anywhere else.
+- `mk:cso`, the `security` agent, the pattern scanner and `mk:build-fix` cover compromised package releases: a release-age window, install scripts, remote code with no pinned version, package-name checks before an install, publish tokens, CI token scope, MCP servers and hidden text in agent files.
+- The release workflow publishes only a tag whose commit is on `main`, attests each binary archive (`gh attestation verify`), and pins every action by commit. `scripts/release.sh` no longer replaces an asset of a published release.
 
 - A tool result was priced at the output rate, which overstated the cost estimate about fivefold. It is priced as input now, and the model is detected in one order shared by the hooks.
 - A plan whose boxes were ticked still read as `pending` everywhere. `plan sync` and the stop hook bring the status in line with the checkboxes.
@@ -88,6 +130,12 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 
 ### Migration Notes
 
+- Jira and Confluence: keep the site URL, email and API token in one env file. A split across the project file and `~/.meowkit/.env` now stops with exit code 78 and names both files.
+- A project file that is a symlink (for example a `CLAUDE.md` or `.meowkit/` file linked from elsewhere) is refused by the commands that write it. Replace the link with a real file.
+- `--kit-dir` needs `--allow-unverified-kit`, and is refused with `--global` when `--yes` is given or no terminal is attached. A `--kit-version` older than the installed kit needs `--force`.
+- The first `--offline` run after this upgrade reports the cached kit as unverified, because older cache entries carry no tree digest. Run `init` or `upgrade` online once.
+- A project with a `tsconfig.json` and no local TypeScript no longer gets a type-check at ship time (`SKIP: typescript not installed locally`). Install TypeScript in the project to get it back.
+- Re-create a skill environment to pick up the pinned versions: `mewkit skill env jira`, and the same for `multimodal` and `web-to-markdown`.
 - `mewkit setup` now writes `# Environment Variables` at the top of `.meowkit/.env` and starts the `.gitignore` block with `# mewkit`; an existing block is left as it is.
 - An older `mewkit doctor --hard-gates` run against the 3.1.0 kit reports one false failure on the injection-scan row, because it looks for the old message; upgrade the binary to 0.2.0.
 - Installed text changed. A script or hook that matched `MeowKit ship check` or a `# MeowKit` heading needs the new wording: `# MeowKit Core` is now `# Core Rules`, the shared `AGENTS.md` heading is now `# Working rules`, and hook messages drop the prefix (`Ship check: …`, `Injection scan flagged …`). A file you edited keeps your edit, and `upgrade` exits 6 on it, as before.
@@ -98,6 +146,11 @@ Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgr
 - A `hooks.<name>` key for a handler that a release removed now warns instead of failing the config. Delete the key when you see the warning.
 - `upgrade` removes the files of the six removed skills, keeping any file you edited since install; a skill folder with an edited file stays with only that file. Without the old kit in the cache, offline, every file is kept and `upgrade` says so. Until you upgrade, an install keeps its copies. `mewkit` 0.1.1 removes them the same way.
 - An older `mewkit` that changes the ownership ledger marks the affected skills `unverified` in the skill store. `mewkit skill rollback <name>` settles one.
+- Env files are read in one order: shell, `.meowkit/.env`, `.claude/.env`, `~/.meowkit/.env`, and the first source to set a key wins. `mk:docs-finder` and `mk:multimodal` no longer read a `.env` inside the skill folder; move those keys to `.meowkit/.env` or `~/.meowkit/.env`. `jira-as.sh` and `confluence-as.sh` no longer execute an env file, so a value that relied on shell expansion or a command in the file must be written out. `PATH`, `LD_PRELOAD`, `IFS` and a few similar keys are ignored, and a quoted value keeps a `#`.
+- `mewkit upgrade` removes the files of the six removed framework skills when they still match what the old kit installed. A file you edited is kept. Without the old kit in the cache every file is kept and `upgrade` prints a notice. A skill selection file that names a removed skill is ignored.
+- A script or note of yours that names a deleted reference file, such as `mk:fix` `references/workflow-quick.md` or `mk:review` `references/adversarial-review.md`, needs the new path. `mewkit validate` fails on a dead skill path.
+- A project that relied on `mk:review` editing files must pass `--fix`, or run `mk:fix`.
+- The eval baseline case-set hash changed because the `v2` suites were added. A baseline report from before cannot be compared with one from after.
 
 ## 3.0.1 (2026-11-21)
 

@@ -14,9 +14,10 @@
 // retrying rather than working around the refusal.
 //
 // Scope limit worth knowing: the sensitive-path patterns are matched against the
-// payload's file path. A shell command that reads the same file through Bash
-// carries no file path and is not caught here; the permission system is the
-// control for that case.
+// payload's file path, a Grep search glob, and the files a Bash command's own
+// words show it reading or copying out. That last one is best effort: a path
+// built from a variable or a glob, or a command inside `bash -c` or `eval`, is
+// not seen; the permission system is the control for that case.
 
 const MARKER = '@@PRIVACY_BLOCK@@';
 
@@ -67,7 +68,9 @@ async function main() {
   const toolInput = input.data && typeof input.data.tool_input === 'object' && input.data.tool_input ? input.data.tool_input : {};
   const searchPath = typeof toolInput.path === 'string' ? toolInput.path : '';
   const pattern = input.toolName === 'Glob' && typeof toolInput.pattern === 'string' && isArchivedPlanPath(toolInput.pattern) ? toolInput.pattern : '';
-  const result = decidePrivacy({ paths: [filePath, searchPath, pattern], command: input.command, toolName: input.toolName });
+  // A Grep `glob` picks the files whose content is searched, so `.env` there reads `.env`.
+  const globs = input.toolName === 'Grep' && typeof toolInput.glob === 'string' ? [toolInput.glob] : [];
+  const result = decidePrivacy({ paths: [filePath, searchPath, pattern], command: input.command, toolName: input.toolName, globs });
   emit(result.stderr);
   process.exit(result.exit);
 }

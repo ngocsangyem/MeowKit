@@ -38,6 +38,7 @@ Use it for any defect that should be fixed: bugs, type errors, lint failures, CI
 | `--quick` | Quick profile for a known cause in two files or fewer. |
 | `--parallel` | One `developer` agent per independent issue. |
 | `--tdd` | Writes the regression test before the fix and the `.meowkit/state/tdd-mode` sentinel. Without it a regression test is recommended, not required. |
+| `--no-capture` | Skips the memory entry and the report file. |
 | `--advice` | One run supervised by the `athena` agent at checkpoints (at most 5 calls). Standard and deep profiles only. It is evidence, never approval. |
 
 ```bash
@@ -58,7 +59,7 @@ Without a mode flag the standard profile runs. A supplied diagnostic report is e
 | Standard (default) | Most bugs | Full evidence chain, root-cause proof, regression test, relevant suite, review. |
 | Deep | Contract or architecture changes | Standard plus a plan agreed with you. |
 
-Complexity is classified as Simple, Moderate, Complex or Parallel (two or more independent issues) and routed to `references/workflow-quick.md`, `workflow-standard.md` or `workflow-deep.md`.
+Pick one profile; escalation rules are in `references/choosing-a-profile.md`. Symptom-specific moves are in `references/by-symptom.md`.
 
 ## Steps
 
@@ -83,4 +84,5 @@ If a risk flag such as AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CO
 - Do not guess a cause. Test hypotheses against evidence.
 - Trace from symptom to root cause. A passing test with the cause intact is a symptom fix.
 - A missing regression test leaves the fix incomplete unless the omission is recorded (lint, format or config-only changes).
-- More details are in `references/gotchas.md`.
+- Change one thing at a time, then verify, so you can tell which change worked.
+- Fix the reported bug and open a separate task for any "while I'm here" refactor.

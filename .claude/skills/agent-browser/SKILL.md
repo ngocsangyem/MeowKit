@@ -1,7 +1,7 @@
 ---
 name: mk:agent-browser
 description: "Drives a browser via CLI. NOT for mk:chrome-profile."
-allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*)
+allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser@0.43.0:*)
 source: vercel-labs/agent-browser
 version: 0.2.0
 argument-hint: "[url or browser task]"
@@ -87,7 +87,7 @@ Refs (`@e1`, `@e2`, ...) are fresh per snapshot. Re-snapshot after clicks, navig
 ## Quick Install / Diagnose
 
 ```bash
-npm i -g agent-browser
+npm i -g agent-browser@0.43.0
 agent-browser install
 agent-browser install --with-deps
 agent-browser upgrade

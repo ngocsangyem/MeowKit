@@ -17,14 +17,14 @@ This reads THIS skill's `scripts/requirements.txt` and nothing else, and install
 ## Manual fallback
 
 ```
-.meowkit/envs/jira/bin/pip install jira-as 'jira-as[keyring]'
+.meowkit/envs/jira/bin/pip install 'jira-as==2.1.0' 'jira-as[keyring]==2.1.0'
 ```
 
 Use only if `mewkit skill env jira` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
 
 ## Authentication — three required env vars
 
-In `.meowkit/.env` (gitignored), or in `~/.meowkit/.env` to share them across projects. A shell export wins over both, and the project file wins over the user-wide one:
+In `.meowkit/.env` (gitignored), or in `~/.meowkit/.env` to share them across projects. Keep all three in the same file: the wrapper refuses (exit 78) when they come from different files, naming both, so a project file that sets only a site URL cannot receive the user-wide token. A shell export wins over every file and is not part of that check; otherwise the first file that sets the keys — project `.meowkit/.env`, then the older runtime-folder env file, then `~/.meowkit/.env` — supplies them:
 
 | Var | Purpose |
 |---|---|
@@ -57,6 +57,7 @@ Status messages:
 | 6 | Conflict | "jira-as: conflict — concurrent edit or stale state; refresh and retry" |
 | 7 | Server | "jira-as: Atlassian server error — try again, then escalate to Atlassian Status if persistent" |
 | 130 | Interrupt | "jira-as: interrupted (Ctrl+C)" |
+| 78 | Wrapper config | "[jira] MEOW_JIRA_* keys come from two env files — put site URL, email and token in one file" |
 
 ## DC PAT / mTLS — Tier 2 escape hatch (documented only)
 

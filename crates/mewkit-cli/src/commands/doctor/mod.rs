@@ -61,6 +61,9 @@ pub struct DoctorArgs {
     #[arg(long)]
     pub explain: bool,
     /// Live-probe the hard guards (privacy, injection, ship) in a scratch project.
+    ///
+    /// This executes the hook commands this project's Claude Code settings
+    /// name, so run it only in a project whose settings you trust.
     #[arg(long)]
     pub hard_gates: bool,
     /// Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse.

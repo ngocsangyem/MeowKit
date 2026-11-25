@@ -180,7 +180,7 @@ fn a_brief_names_the_wrapper_command_for_each_assigned_read() {
 fn writing_the_roster_materializes_one_brief_per_reviewer() {
     let dir = tempfile::tempdir().expect("a temp dir");
     let roster = build_roster(&map(50, 60, Vec::new()));
-    write_roster(dir.path(), &roster, "s1").expect("write the roster");
+    write_roster(dir.path(), dir.path(), &roster, "s1").expect("write the roster");
     let text = std::fs::read_to_string(dir.path().join("roster.json")).expect("read roster.json");
     assert!(text.starts_with("{\n  \"tier\": \"small\","));
     assert!(text.ends_with("}\n"));

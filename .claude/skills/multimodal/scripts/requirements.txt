@@ -2,7 +2,7 @@
 # Python 3.10+ required
 
 # Google Gemini API (required)
-google-genai>=1.0.0
+google-genai==2.33.0
 
 # Image processing (required)
-Pillow>=10.0.0
+Pillow==12.3.0

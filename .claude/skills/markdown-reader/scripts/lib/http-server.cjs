@@ -15,8 +15,17 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const {
+  isHostAllowed,
+  realAllowedDirs,
+  containedRealPath,
+  isSensitivePath,
+  createNonce,
+  STRICT_CSP,
+  viewerCsp
+} = require('./request-security-guards.cjs');
 
-// Allowed base directories for file access (set at runtime)
+// Real paths of the allowed base directories (set at runtime)
 let allowedBaseDirs = [];
 
 /**
@@ -24,30 +33,29 @@ let allowedBaseDirs = [];
  * @param {string[]} dirs - Array of allowed directory paths
  */
 function setAllowedDirs(dirs) {
-  allowedBaseDirs = dirs.map(d => path.resolve(d));
+  allowedBaseDirs = realAllowedDirs(dirs);
+}
+
+/**
+ * Resolve a requested path to its real path when it is inside an allowed
+ * directory and is neither a dotfile nor a credential-like name.
+ * @param {string} filePath - Path to validate
+ * @param {string[]} allowedDirs - Allowed base directories (real paths)
+ * @returns {string|null} - Real path when safe, otherwise null
+ */
+function safeRealPath(filePath, allowedDirs = allowedBaseDirs) {
+  if (allowedDirs.length === 0) return null;
+  const real = containedRealPath(filePath, allowedDirs);
+  if (!real || isSensitivePath(real, allowedDirs)) return null;
+  return real;
 }
 
 /**
  * Validate path is within allowed directories (prevents path traversal)
- * @param {string} filePath - Path to validate
- * @param {string[]} allowedDirs - Allowed base directories
  * @returns {boolean} - True if path is safe
  */
 function isPathSafe(filePath, allowedDirs = allowedBaseDirs) {
-  const resolved = path.resolve(filePath);
-
-  // Check for path traversal attempts
-  if (resolved.includes('..') || filePath.includes('\0')) {
-    return false;
-  }
-
-  // If no allowed dirs set, allow only project paths
-  if (allowedDirs.length === 0) {
-    return true;
-  }
-
-  // Must be within one of the allowed directories
-  return allowedDirs.some(dir => resolved.startsWith(dir));
+  return safeRealPath(filePath, allowedDirs) !== null;
 }
 
 /**
@@ -86,8 +94,12 @@ function getMimeType(filePath) {
 /**
  * Send response with content
  */
-function sendResponse(res, statusCode, contentType, content) {
-  res.writeHead(statusCode, { 'Content-Type': contentType });
+function sendResponse(res, statusCode, contentType, content, csp = STRICT_CSP) {
+  res.writeHead(statusCode, {
+    'Content-Type': contentType,
+    'Content-Security-Policy': csp,
+    'X-Content-Type-Options': 'nosniff'
+  });
   res.end(content);
 }
 
@@ -112,12 +124,16 @@ function sendError(res, statusCode, message) {
  * Serve static file with path validation
  */
 function serveFile(res, filePath, skipValidation = false) {
-  if (!skipValidation && !isPathSafe(filePath)) {
-    sendError(res, 403, 'Access denied');
-    return;
+  if (!skipValidation) {
+    const real = safeRealPath(filePath);
+    if (!real) {
+      sendError(res, 403, 'Access denied');
+      return;
+    }
+    filePath = real;
   }
 
-  if (!fs.existsSync(filePath)) {
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
     sendError(res, 404, 'File not found');
     return;
   }
@@ -293,6 +309,13 @@ function createHttpServer(options) {
   }
 
   const server = http.createServer((req, res) => {
+    // A page on another origin that rebinds its hostname to 127.0.0.1 still
+    // sends its own name in Host, so only this server's names are answered.
+    if (!isHostAllowed(req.headers.host, req.socket.localPort)) {
+      sendError(res, 403, 'Access denied');
+      return;
+    }
+
     const parsedUrl = url.parse(req.url, true);
     const pathname = decodeURIComponent(parsedUrl.pathname);
 
@@ -313,38 +336,29 @@ function createHttpServer(options) {
       // Extract path after '/file/' prefix (slice(6) removes '/file/')
       // Path is already URL-decoded by decodeURIComponent above
       const filePath = pathname.slice(6);
-
-      if (!isPathSafe(filePath)) {
-        sendError(res, 403, 'Access denied');
-        return;
-      }
-
       serveFile(res, filePath);
       return;
     }
 
     // Route: /view?file=<path> - render markdown (query param)
     if (pathname === '/view') {
-      const filePath = parsedUrl.query?.file;
+      const requested = parsedUrl.query?.file;
 
-      if (!filePath) {
+      if (!requested || typeof requested !== 'string') {
         sendError(res, 400, 'Missing ?file= parameter. Use /view?file=/path/to/file.md');
         return;
       }
 
-      if (!isPathSafe(filePath)) {
+      const filePath = safeRealPath(requested);
+      if (!filePath) {
         sendError(res, 403, 'Access denied');
         return;
       }
 
-      if (!fs.existsSync(filePath)) {
-        sendError(res, 404, 'File not found');
-        return;
-      }
-
       try {
-        const html = renderMarkdown(filePath);
-        sendResponse(res, 200, 'text/html', html);
+        const nonce = createNonce();
+        const html = renderMarkdown(filePath, nonce);
+        sendResponse(res, 200, 'text/html', html, viewerCsp(nonce));
       } catch (err) {
         console.error('[http-server] Render error:', err.message);
         sendError(res, 500, 'Error rendering markdown');
@@ -354,19 +368,20 @@ function createHttpServer(options) {
 
     // Route: /browse?dir=<path> - directory browser (query param)
     if (pathname === '/browse') {
-      const dirPath = parsedUrl.query?.dir;
+      const requestedDir = parsedUrl.query?.dir;
 
-      if (!dirPath) {
+      if (!requestedDir || typeof requestedDir !== 'string') {
         sendError(res, 400, 'Missing ?dir= parameter. Use /browse?dir=/path/to/directory');
         return;
       }
 
-      if (!isPathSafe(dirPath)) {
+      const dirPath = safeRealPath(requestedDir);
+      if (!dirPath) {
         sendError(res, 403, 'Access denied');
         return;
       }
 
-      if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
+      if (!fs.statSync(dirPath).isDirectory()) {
         sendError(res, 404, 'Directory not found');
         return;
       }
@@ -426,6 +441,7 @@ module.exports = {
   sendError,
   serveFile,
   isPathSafe,
+  safeRealPath,
   setAllowedDirs,
   sanitizeErrorMessage,
   MIME_TYPES,

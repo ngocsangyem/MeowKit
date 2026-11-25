@@ -19,12 +19,20 @@ use std::process::Output;
 use temp_home::TempHome;
 
 impl TempHome {
-    /// `mewkit` with this checkout's kit (`--kit-dir`) after `args`.
+    /// `mewkit` with this checkout's kit after `args`: as a directory
+    /// (`--kit-dir`) for a project, and as a verified archive for `--global`,
+    /// where a local directory needs a person at a terminal to confirm it.
     pub fn with_kit(&self, args: &[&str]) -> Output {
         let kit = kit::kit();
         let dir = kit.dir.to_string_lossy().into_owned();
+        let (zip, sha) = gate_kit::current_archive();
+        let zip = zip.to_string_lossy().into_owned();
         let mut all: Vec<&str> = args.to_vec();
-        all.extend(["--kit-dir", &dir, "--allow-unverified-kit"]);
+        if args.contains(&"--global") {
+            all.extend(["--kit-archive", &zip, "--kit-sha256", sha]);
+        } else {
+            all.extend(["--kit-dir", &dir, "--allow-unverified-kit"]);
+        }
         self.mewkit(&all)
     }
 

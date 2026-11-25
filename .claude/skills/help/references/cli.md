@@ -96,19 +96,41 @@ Check the toolchain, the installs here and their hooks
 Usage: mewkit doctor [OPTIONS] [SUBCOMMAND]
 
 Arguments:
-  [SUBCOMMAND]  `provenance`: what the install baseline can and cannot prove
+  [SUBCOMMAND]
+          `provenance`: what the install baseline can and cannot prove
 
 Options:
-      --report            Append a shareable report block to the text output
-      --providers         Also report what each provider adapter can enforce
-      --state             Also report the state taxonomy
-      --explain           `provenance`: name the files behind each count
-      --hard-gates        Live-probe the hard guards (privacy, injection, ship) in a scratch project
-      --adopt             Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse
-      --target <TARGETS>  Only these runtimes (comma-separated); default: all
-      --global            Check your home directory's installs first instead of this project's
-      --json              Print one JSON document instead of text
-  -h, --help              Print help
+      --report
+          Append a shareable report block to the text output
+
+      --providers
+          Also report what each provider adapter can enforce
+
+      --state
+          Also report the state taxonomy
+
+      --explain
+          `provenance`: name the files behind each count
+
+      --hard-gates
+          Live-probe the hard guards (privacy, injection, ship) in a scratch project.
+          
+          This executes the hook commands this project's Claude Code settings name, so run it only in a project whose settings you trust.
+
+      --adopt
+          Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse
+
+      --target <TARGETS>
+          Only these runtimes (comma-separated); default: all
+
+      --global
+          Check your home directory's installs first instead of this project's
+
+      --json
+          Print one JSON document instead of text
+
+  -h, --help
+          Print help (see a summary with '-h')
 ```
 
 ## mewkit providers

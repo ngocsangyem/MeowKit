@@ -11,7 +11,7 @@ use std::process::{Command, Stdio};
 
 use serde_json::{Map, Value, json};
 
-use crate::fsx::{atomic_write, sha256_hex};
+use crate::fsx::sha256_hex;
 use crate::snapshot::iso_millis;
 use crate::time_utc::now_millis;
 
@@ -189,7 +189,12 @@ pub fn write_install_metadata(root: &Path, meta: &Metadata) -> std::io::Result<(
         "{}\n",
         serde_json::to_string_pretty(&Value::Object(doc)).unwrap_or_default()
     );
-    atomic_write(&root.join(".meowkit/metadata.json"), body.as_bytes(), None)?;
+    crate::fsx::atomic_write_in(
+        root,
+        &root.join(".meowkit/metadata.json"),
+        body.as_bytes(),
+        None,
+    )?;
     // Only after the canonical file is published: removing the old one first
     // would leave no baseline at all if the write failed.
     let _ = std::fs::remove_file(root.join(".claude/metadata.json"));
@@ -249,9 +254,16 @@ fn cached_kit_file(root: &Path, rel: &str) -> Option<PathBuf> {
 
 /// Whether git reports anything under the cache as tracked, checked per run.
 fn cache_is_tracked(root: &Path) -> bool {
+    git_tracks_files_under(root, CACHE_REL)
+}
+
+/// Whether git, run in `cwd`, reports any file matching `pathspec` as tracked.
+/// A tracked cache arrived with the repository (a clone or a pull request), so
+/// nothing in it can be trusted as a kit mewkit downloaded and verified.
+pub(crate) fn git_tracks_files_under(cwd: &Path, pathspec: &str) -> bool {
     Command::new("git")
-        .args(["ls-files", "--", CACHE_REL])
-        .current_dir(root)
+        .args(["ls-files", "--", pathspec])
+        .current_dir(cwd)
         .stderr(Stdio::null())
         .output()
         .is_ok_and(|o| o.status.success() && !String::from_utf8_lossy(&o.stdout).trim().is_empty())

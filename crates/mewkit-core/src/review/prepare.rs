@@ -136,7 +136,7 @@ pub fn prepare(options: &PrepareOptions<'_>, exec: &dyn Exec) -> PrepareResult {
         ));
     }
 
-    if let Err(e) = std::fs::create_dir_all(dir.join("untrusted")) {
+    if let Err(e) = crate::fsx::create_dir_all_in(cwd, &dir.join("untrusted")) {
         return PrepareResult::bail(e.to_string());
     }
     let worktree_abs = cwd.join(super::session::str_field(&manifest, "worktreePath"));
@@ -150,13 +150,13 @@ pub fn prepare(options: &PrepareOptions<'_>, exec: &dyn Exec) -> PrepareResult {
         context_unavailable.push("diff".to_string());
     }
     let diff_text = if diff.ok { diff.out } else { String::new() };
-    if let Err(e) = std::fs::write(dir.join("diff.patch"), &diff_text) {
+    if let Err(e) = crate::fsx::write_in(cwd, &dir.join("diff.patch"), &diff_text) {
         return PrepareResult::bail(e.to_string());
     }
     let diff_sha256 = sha256_hex(diff_text.as_bytes());
 
     let untrusted = dir.join("untrusted");
-    if let Err(e) = std::fs::write(untrusted.join("README.txt"), UNTRUSTED_README) {
+    if let Err(e) = crate::fsx::write_in(cwd, &untrusted.join("README.txt"), UNTRUSTED_README) {
         return PrepareResult::bail(e.to_string());
     }
     let slug = format!("{}/{}", matched.owner, matched.repo);
@@ -174,13 +174,13 @@ pub fn prepare(options: &PrepareOptions<'_>, exec: &dyn Exec) -> PrepareResult {
         cwd,
     );
     if meta.ok {
-        let _ = std::fs::write(untrusted.join("pr-metadata.json"), &meta.out);
+        let _ = crate::fsx::write_in(cwd, &untrusted.join("pr-metadata.json"), &meta.out);
     } else {
         context_unavailable.push("pr-metadata".to_string());
     }
     let checks = exec.run("gh", &argv(&["pr", "checks", &pr, "--repo", &slug]), cwd);
     if checks.ok {
-        let _ = std::fs::write(untrusted.join("ci-checks.txt"), &checks.out);
+        let _ = crate::fsx::write_in(cwd, &untrusted.join("ci-checks.txt"), &checks.out);
     } else {
         context_unavailable.push("ci-checks".to_string());
     }
@@ -203,10 +203,10 @@ pub fn prepare(options: &PrepareOptions<'_>, exec: &dyn Exec) -> PrepareResult {
             .collect()
     });
     let impact_value = serde_json::to_value(&impact).unwrap_or(Value::Null);
-    if let Err(e) = write_json_pretty(&dir.join("impact-map.json"), &impact_value) {
+    if let Err(e) = write_json_pretty(cwd, &dir.join("impact-map.json"), &impact_value) {
         return PrepareResult::bail(e.to_string());
     }
-    if let Err(e) = write_roster(&dir, &build_roster(&impact), &session) {
+    if let Err(e) = write_roster(cwd, &dir, &build_roster(&impact), &session) {
         return PrepareResult::bail(e.to_string());
     }
 
@@ -225,7 +225,7 @@ pub fn prepare(options: &PrepareOptions<'_>, exec: &dyn Exec) -> PrepareResult {
             errors.join("; ")
         ));
     }
-    if let Err(e) = write_json_pretty(&dir.join("manifest.json"), &manifest) {
+    if let Err(e) = write_json_pretty(cwd, &dir.join("manifest.json"), &manifest) {
         return PrepareResult::bail(e.to_string());
     }
 

@@ -188,3 +188,22 @@ fn the_project_root_is_the_nearest_version_control_root() {
     // The walk is bounded: a depth of zero answers nothing rather than spinning.
     assert_eq!(resolve_project_root_bounded(&nested, 0), None);
 }
+
+#[cfg(unix)]
+#[test]
+fn a_store_file_committed_as_a_symlink_is_refused_and_its_target_is_untouched() {
+    let dir = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let rc = outside.path().join(".zshrc");
+    std::fs::write(&rc, "export PATH=/usr/bin\n").unwrap();
+    std::fs::create_dir_all(store(dir.path()).parent().unwrap()).unwrap();
+    std::os::unix::fs::symlink(&rc, store(dir.path())).unwrap();
+
+    let err = append_note(dir.path(), NoteFile::Gotchas, ENTRY).unwrap_err();
+    assert!(err.to_string().contains("gotchas.md"), "{err}");
+    assert!(err.to_string().contains("is a symlink"), "{err}");
+    assert_eq!(
+        std::fs::read_to_string(&rc).unwrap(),
+        "export PATH=/usr/bin\n"
+    );
+}

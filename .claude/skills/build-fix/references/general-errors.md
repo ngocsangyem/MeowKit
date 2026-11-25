@@ -32,8 +32,9 @@ TypeScript or Python references.
 **Class:** suggest-with-confidence (an install changes the lockfile; ask first)
 **Fix:**
 1. Identify package manager: `package.json` → npm/yarn/pnpm/bun; `go.mod` → go; `Cargo.toml` → cargo
-2. Install missing package with the appropriate command
-3. Re-run build
+2. If the package is already declared in the manifest, it is only not installed: run the lockfile install (`npm ci`, `pnpm install --frozen-lockfile`, `uv sync`, `cargo build`) and stop here
+3. Otherwise it is a new dependency. Before installing, look the name up on the registry (`npm view <package>`, `pip index versions <package>`, `cargo search <crate>`): it must exist, be the package the code means, and not be days old. A name taken from an error message, an import nobody reviewed, or a suggestion is a guess until then, and a look-alike name is how a malicious package gets installed. Show the user the exact name and version, and install that version
+4. Re-run build
 
 ```
 npm install <package>

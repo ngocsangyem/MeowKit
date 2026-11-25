@@ -77,8 +77,7 @@ The reader exists so a person can read in the browser, so keep it running while 
 | Reader features, plan navigation, shortcuts, Mermaid | [references/reader-experience.md](references/reader-experience.md) |
 | Architecture and troubleshooting | [references/reader-operations.md](references/reader-operations.md) (state and recovery section) |
 
-The server binds only to `127.0.0.1`. It validates every file against its allowed directories;
-traversal attempts return 403. Referenced images must be relative to the source markdown file.
+The server binds only to `127.0.0.1` and answers only requests whose Host is `127.0.0.1:<port>` or `localhost:<port>`. It resolves symlinks before checking a path against its allowed directories and never serves dotfiles or credential-like names; any of these returns 403. Markdown is untrusted: raw HTML in it is shown as text, `---js` front-matter is not run, and pages allow only the reader's own scripts. Referenced images must be relative to the source markdown file.
 
 ## Gotchas
 

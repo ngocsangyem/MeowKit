@@ -1,6 +1,6 @@
 ---
 title: "mk:qa-manual"
-description: "Runs manual test passes from a spec or URL and generates Playwright specs, always asking you for credentials."
+description: "Runs manual test passes from a spec or URL and generates Playwright specs, stopping at a login so you sign in yourself."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -48,7 +48,7 @@ Generated tests go in `tests/e2e/{feature-name}/` with a `common/` folder holdin
 
 ## Authentication
 
-When the flow reaches a login page, MFA or a 401 or 403, the skill stops, shows the URL and asks you for credentials. You can also type `skip` to mark the flow SKIPPED or `abort` to end with a partial report. It never guesses credentials, uses hardcoded ones, continues without your input or stores them in a file.
+When the flow reaches a login page, MFA or a 401 or 403, the skill stops and shows the URL. You sign in yourself in the browser window, or give it a saved auth state file. Reply `done` once signed in, `skip` to mark the flow SKIPPED, or `abort` to end with a partial report. It never asks for a password in chat, guesses credentials, uses hardcoded ones, continues without your reply or stores credentials in a file.
 
 ## Failures
 

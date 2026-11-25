@@ -9,6 +9,13 @@ use std::fmt;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+#[path = "fsx_no_follow.rs"]
+mod no_follow;
+pub use no_follow::{
+    NoFollowError, append_in, atomic_write_in, create_dir_all_in, no_follow_error, read_in,
+    read_to_string_in, refuse_symlinks, write_in,
+};
+
 /// Why a path was refused.
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum PathError {
@@ -22,6 +29,8 @@ pub enum PathError {
     Ambiguous(String),
     #[error("path {path:?} passes through symlinked directory {link:?}")]
     SymlinkedParent { path: String, link: String },
+    #[error("path {0:?} is a symlink; mewkit does not read, lock or write through it")]
+    SymlinkedFile(String),
     #[error("path {0:?} is outside every root this target may write")]
     OutsideRoots(String),
     #[error("path {0:?} is user or machine state; mewkit never writes or deletes it")]
@@ -124,6 +133,18 @@ pub fn check_parents(root: &Path, path: &RelPath) -> Result<(), PathError> {
         }
     }
     Ok(())
+}
+
+/// [`check_parents`], and refuse a symlinked final component as well. For the
+/// files mewkit itself opens in place (its lock, its backups directory, its
+/// ownership index): opening one through a link would create or read a file
+/// outside the scope.
+pub fn check_no_links(root: &Path, path: &RelPath) -> Result<(), PathError> {
+    check_parents(root, path)?;
+    match std::fs::symlink_metadata(path.under(root)) {
+        Ok(meta) if meta.file_type().is_symlink() => Err(PathError::SymlinkedFile(path.0.clone())),
+        _ => Ok(()),
+    }
 }
 
 /// Write `bytes` to `dest` through a temp file in the same directory and a

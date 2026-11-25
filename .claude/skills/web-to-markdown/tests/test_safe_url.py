@@ -104,3 +104,58 @@ def test_safe_redirect_allows_relative_same_domain_after_revalidation(monkeypatc
 def test_safe_redirect_rejects_downgrades_cross_domain_and_private_targets(monkeypatch, current_url, location):
     monkeypatch.setattr(socket, "getaddrinfo", lambda *_args: _addresses("127.0.0.1"))
     assert safe_redirect(current_url, location) is None
+
+
+class _FakeRoute:
+    def __init__(self):
+        self.outcome = None
+
+    def abort(self, error_code=None):
+        self.outcome = ("abort", error_code)
+
+    def continue_(self):
+        self.outcome = ("continue", None)
+
+
+class _FakeRequest:
+    def __init__(self, url, resource_type):
+        self.url = url
+        self.resource_type = resource_type
+
+
+class _FakeWebSocket:
+    def __init__(self, url):
+        self.url = url
+        self.outcome = None
+
+    def close(self):
+        self.outcome = "closed"
+
+    def connect_to_server(self):
+        self.outcome = "connected"
+
+
+def _split_resolver(host, *_args):
+    return _addresses("127.0.0.1") if host == "internal.example" else _addresses("93.184.216.34")
+
+
+@pytest.mark.parametrize("resource_type", ["document", "script", "image", "fetch", "xhr", "stylesheet"])
+def test_playwright_guard_blocks_private_targets_for_every_request_type(monkeypatch, resource_type):
+    from scripts.fetch_as_markdown import _guard_request
+
+    monkeypatch.setattr(socket, "getaddrinfo", _split_resolver)
+    blocked, allowed = _FakeRoute(), _FakeRoute()
+    _guard_request(blocked, _FakeRequest("http://internal.example/admin", resource_type))
+    _guard_request(allowed, _FakeRequest("https://public.example/asset", resource_type))
+    assert blocked.outcome == ("abort", "blockedbyclient")
+    assert allowed.outcome == ("continue", None)
+
+
+def test_playwright_web_socket_guard_never_connects_to_ws_urls(monkeypatch):
+    from scripts.fetch_as_markdown import _guard_web_socket
+
+    monkeypatch.setattr(socket, "getaddrinfo", _split_resolver)
+    for url in ("ws://internal.example/socket", "wss://public.example/socket"):
+        ws = _FakeWebSocket(url)
+        _guard_web_socket(ws)
+        assert ws.outcome == "closed"

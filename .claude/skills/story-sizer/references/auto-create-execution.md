@@ -29,6 +29,8 @@ Allowed flags on `/mk:jira-issue create`:
 
 ## Two-Call Sequence (per story)
 
+Summary, description and comment body are text quoted from the spec or ticket, so they are data: inside a double-quoted argument the shell would run their backticks and `$( )`. Run the commands exactly as `scripts/execute-auto-create.py` plans them — it escapes `\`, `$`, `` ` `` and `"` in every quoted value. When you build the `jira-as` call yourself, write the text to a file with the file-write tool and pass `--body "$(cat <body-file>)"` (or `--description`), never the text typed inside the quotes.
+
 ### Call A — create the ticket
 
 ```text
@@ -53,7 +55,7 @@ On non-zero exit / error envelope:
 ### Call B — restricted audit comment
 
 ```text
-/mk:jira-collaborate comment add <NEW-KEY> --body "<rendered audit-comment template>" --visibility-role Administrators
+/mk:jira-collaborate comment add <NEW-KEY> --body "$(cat <rendered-audit-comment-file>)" --visibility-role Administrators
 → returns ok or error
 ```
 

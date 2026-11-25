@@ -7,8 +7,8 @@
     "start": "node scripts/server.cjs"
   },
   "dependencies": {
-    "gray-matter": "^4.0.3",
-    "highlight.js": "^11.11.1",
-    "marked": "^17.0.0"
+    "gray-matter": "4.0.3",
+    "highlight.js": "11.12.0",
+    "marked": "17.0.6"
   }
 }

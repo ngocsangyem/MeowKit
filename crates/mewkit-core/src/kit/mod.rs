@@ -11,6 +11,7 @@ pub mod contract;
 mod extract;
 pub mod http;
 pub(crate) mod select;
+mod tree_digest;
 
 use std::path::{Path, PathBuf};
 
@@ -71,6 +72,9 @@ pub enum Source {
 pub struct KitRequest<'a> {
     pub source: Source,
     pub allow_unverified: bool,
+    /// The scope root the cache sits under; no directory between it and the
+    /// cache may be a symlink.
+    pub scope_root: &'a Path,
     pub cache_dir: &'a Path,
     /// This binary's version, checked against the kit's `mewkitMin`.
     pub binary_version: &'a str,
@@ -95,7 +99,15 @@ pub fn resolve(req: &KitRequest, http: &dyn Http) -> Result<Kit, KitError> {
         Source::Latest { beta } => fetch(req, http, None, *beta)?,
         Source::Tag(tag) => fetch(req, http, Some(tag), true)?,
         Source::Offline { version } => {
-            let e = cache::newest(req.cache_dir, version.as_deref())?;
+            let e = cache::newest(req.scope_root, req.cache_dir, version.as_deref())?;
+            if !e.reverified && !req.allow_unverified {
+                return Err(KitError::Unverified(format!(
+                    "the cached kit {} does not match the tree recorded when it was verified \
+                     (or was cached before mewkit recorded one); run once online to re-fetch it, \
+                     or pass --allow-unverified-kit to use it",
+                    e.meta.version
+                )));
+            }
             if e.meta.origin == Origin::Unverified && !req.allow_unverified {
                 return Err(KitError::Unverified(format!(
                     "the cached kit {} was never verified; pass --allow-unverified-kit to use it",
@@ -112,7 +124,15 @@ pub fn resolve(req: &KitRequest, http: &dyn Http) -> Result<Kit, KitError> {
                 source,
             })?;
             let digest = checksum::verify(&zip, sha256, &file.display().to_string())?;
-            let e = cache::store(req.cache_dir, None, &digest, Origin::Archive, &zip, &accept)?;
+            let e = cache::store(
+                req.scope_root,
+                req.cache_dir,
+                None,
+                &digest,
+                Origin::Archive,
+                &zip,
+                &accept,
+            )?;
             (e, digest)
         }
         Source::Dir(dir) => {
@@ -154,6 +174,45 @@ pub fn resolve(req: &KitRequest, http: &dyn Http) -> Result<Kit, KitError> {
         contract: entry.contract,
         notices,
     })
+}
+
+/// The cached kit `version`, to compare an existing install against; never a
+/// source to install from (that is [`Source::Offline`], which refuses an entry
+/// that does not re-verify).
+///
+/// Here an entry that does not re-verify (edited, or cached by an older mewkit
+/// before tree digests were recorded) is still returned, reported with origin
+/// [`Origin::Unverified`]. That is safe because every caller only compares
+/// these bytes, and acts only where they also equal what the ownership ledger
+/// recorded as installed: an upgrade merge refuses a base whose hash is not the
+/// ledger's, and a removal needs the file on disk to equal both the ledger and
+/// this kit. A forged entry can therefore withhold a merge or a removal, never
+/// cause one the ledger does not already allow. The symlink and tracked-cache
+/// refusals still apply.
+pub fn cached_for_comparison(
+    scope_root: &Path,
+    cache_dir: &Path,
+    version: &str,
+    allow_unverified: bool,
+    binary_version: &str,
+) -> Result<Kit, KitError> {
+    let e = cache::newest(scope_root, cache_dir, Some(version))?;
+    contract::accept(e.contract.as_ref(), allow_unverified, binary_version)?;
+    Ok(Kit {
+        dir: e.kit_dir,
+        version: e.meta.version,
+        digest: Some(e.meta.digest),
+        origin: e.meta.origin,
+        contract: e.contract,
+        notices: Vec::new(),
+    })
+}
+
+/// Whether kit version `requested` sorts below `installed` (both with or
+/// without a leading `v`). `false` when either is not a kit version.
+pub fn is_older_kit(requested: &str, installed: &str) -> bool {
+    let parse = |v: &str| select::Version::parse(&format!("v{}", v.trim_start_matches('v')));
+    matches!((parse(requested), parse(installed)), (Some(r), Some(i)) if r < i)
 }
 
 /// Kit releases that can be installed, newest first (network).
@@ -205,6 +264,7 @@ fn fetch(
     let accept =
         |c: Option<&KitContract>| contract::accept(c, req.allow_unverified, req.binary_version);
     let entry = cache::store(
+        req.scope_root,
         req.cache_dir,
         Some(&chosen.version),
         &digest,

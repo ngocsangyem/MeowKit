@@ -65,12 +65,13 @@ pub fn strip_superseded_meowkit_ignores(content: &str) -> (String, Vec<String>) 
 /// Write the deny-all ignore file unless the project's copy already matches.
 fn write_kit_dir_gitignore(dir: &Path, dry_run: bool) -> io::Result<bool> {
     let target = dir.join(".meowkit").join(".gitignore");
+    // Checked even on a dry run, so the preview refuses what the run would.
+    crate::fsx::refuse_symlinks(dir, &target)?;
     if std::fs::read_to_string(&target).is_ok_and(|c| c == KIT_DIR_GITIGNORE) {
         return Ok(false);
     }
     if !dry_run {
-        std::fs::create_dir_all(dir.join(".meowkit"))?;
-        std::fs::write(&target, KIT_DIR_GITIGNORE)?;
+        crate::fsx::write_in(dir, &target, KIT_DIR_GITIGNORE)?;
     }
     Ok(true)
 }
@@ -85,7 +86,7 @@ pub(super) fn run(dir: &Path, options: &StepOptions<'_>) -> io::Result<StepResul
     }
 
     if gitignore.exists() {
-        let mut content = std::fs::read_to_string(&gitignore)?;
+        let mut content = crate::fsx::read_to_string_in(dir, &gitignore)?;
         // Before the "already present" skip: a stale or superseded line has to
         // go even when everything else is in place.
         let (text, memory_stripped) = strip_stale_memory_ignore(&content);
@@ -121,8 +122,9 @@ pub(super) fn run(dir: &Path, options: &StepOptions<'_>) -> io::Result<StepResul
     }
 
     // The shipped template when it exists, otherwise the built-in entries.
-    let additions = std::fs::read_to_string(dir.join(".meowkit").join("gitignore.meowkit"))
-        .unwrap_or_else(|_| DEFAULT_GITIGNORE.to_string());
+    let additions =
+        crate::fsx::read_to_string_in(dir, &dir.join(".meowkit").join("gitignore.meowkit"))
+            .unwrap_or_else(|_| DEFAULT_GITIGNORE.to_string());
     w.append(&gitignore, &format!("\n{additions}"))?;
     notes.push("Appended MeowKit entries to .gitignore".to_string());
     Ok(StepResult::new(StepStatus::Pass, notes.join("; ")).with_changes(w.changes))

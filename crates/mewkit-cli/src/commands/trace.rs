@@ -246,12 +246,7 @@ fn propose(project_root: &Path, records: &[Value], args: &TraceArgs) -> Result<(
         ));
     }
     text.push('\n');
-    std::fs::create_dir_all(backlog.parent().unwrap_or(project_root))?;
-    std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&backlog)?
-        .write_all(text.as_bytes())?;
+    mewkit_core::fsx::append_in(project_root, &backlog)?.write_all(text.as_bytes())?;
     println!(
         "\nAppended {} item(s) to {}",
         items.len(),

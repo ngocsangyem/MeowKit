@@ -97,6 +97,7 @@ fn req(cache: &Path, source: Source, allow_unverified: bool) -> KitRequest<'_> {
     KitRequest {
         source,
         allow_unverified,
+        scope_root: cache,
         cache_dir: cache,
         binary_version: "0.1.0",
     }
@@ -319,4 +320,106 @@ fn asset_urls_outside_this_repository_are_refused() {
     let err = resolve(&latest(cache.path()), &http).unwrap_err();
     assert!(err.to_string().contains("not a release download"), "{err}");
     assert!(!http.calls.borrow().iter().any(|u| u.contains("evil")));
+}
+
+/// A cache entry a cloned repository could commit: a fake kit whose
+/// `meta.json` claims a verified release.
+fn plant_entry(cache: &Path, digest: &str, tree: Option<&str>) -> std::path::PathBuf {
+    let entry = cache.join(format!("2.16.0-{}", &digest[..16]));
+    std::fs::create_dir_all(entry.join("kit/.claude/hooks")).unwrap();
+    std::fs::write(entry.join("kit/.claude/kit-contract.json"), CONTRACT).unwrap();
+    std::fs::write(entry.join("kit/.claude/hooks/gate.cjs"), "evil").unwrap();
+    let mut meta = json!({"version": "2.16.0", "digest": digest, "origin": "release"});
+    if let Some(tree) = tree {
+        meta["tree"] = json!(tree);
+    }
+    std::fs::write(entry.join("meta.json"), meta.to_string()).unwrap();
+    entry
+}
+
+#[test]
+fn a_pre_seeded_cache_entry_is_replaced_online_by_the_verified_archive() {
+    let cache = tempfile::tempdir().unwrap();
+    let zip = good_zip();
+    plant_entry(cache.path(), &sha256_hex(&zip), None);
+    let kit = resolve(&latest(cache.path()), &server(&zip, sums(&zip))).unwrap();
+    assert_eq!(kit.origin, Origin::Release);
+    assert_eq!(
+        std::fs::read_to_string(kit.dir.join(".claude/hooks/gate.cjs")).unwrap(),
+        "gate"
+    );
+}
+
+#[test]
+fn a_pre_seeded_cache_entry_is_refused_offline_and_never_recorded_as_a_release() {
+    let cache = tempfile::tempdir().unwrap();
+    let fake_digest = "f".repeat(64);
+    plant_entry(cache.path(), &fake_digest, Some("not-the-tree"));
+    let offline = |allow| {
+        resolve(
+            &req(cache.path(), Source::Offline { version: None }, allow),
+            &FakeHttp::default(),
+        )
+    };
+    let err = offline(false).unwrap_err();
+    assert!(
+        matches!(err, KitError::Unverified(_)) && err.to_string().contains("online"),
+        "{err}"
+    );
+    let allowed = offline(true).unwrap();
+    assert_eq!(allowed.origin, Origin::Unverified);
+}
+
+#[test]
+fn a_cache_git_tracks_is_refused_offline_and_online() {
+    let project = tempfile::tempdir().unwrap();
+    let git = |args: &[&str]| {
+        std::process::Command::new("git")
+            .args(args)
+            .current_dir(project.path())
+            .output()
+            .unwrap()
+    };
+    if !git(&["init", "-q"]).status.success() {
+        return; // no git on this machine: nothing can be tracked
+    }
+    let cache = project.path().join(".meowkit/cache/kits");
+    let zip = good_zip();
+    plant_entry(&cache, &sha256_hex(&zip), None);
+    assert!(git(&["add", "-f", "."]).status.success());
+    let request = |source| KitRequest {
+        source,
+        allow_unverified: true,
+        scope_root: project.path(),
+        cache_dir: &cache,
+        binary_version: "0.1.0",
+    };
+    for source in [
+        Source::Offline { version: None },
+        Source::Latest { beta: false },
+    ] {
+        let err = resolve(&request(source), &server(&zip, sums(&zip))).unwrap_err();
+        assert!(err.to_string().contains("tracked"), "{err}");
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn a_symlinked_cache_directory_is_refused_before_anything_is_written() {
+    let project = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(project.path().join(".meowkit")).unwrap();
+    std::os::unix::fs::symlink(outside.path(), project.path().join(".meowkit/cache")).unwrap();
+    let cache = project.path().join(".meowkit/cache/kits");
+    let zip = good_zip();
+    let request = KitRequest {
+        source: Source::Latest { beta: false },
+        allow_unverified: false,
+        scope_root: project.path(),
+        cache_dir: &cache,
+        binary_version: "0.1.0",
+    };
+    let err = resolve(&request, &server(&zip, sums(&zip))).unwrap_err();
+    assert!(err.to_string().contains("is a symlink"), "{err}");
+    assert!(std::fs::read_dir(outside.path()).unwrap().next().is_none());
 }
