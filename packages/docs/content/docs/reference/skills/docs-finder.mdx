@@ -46,7 +46,7 @@ Usage: `/mk:docs-finder [library-name] [topic]`
 
 ## Setup
 
-The Context7 server is configured in `.mcp.json` (example in `.meowkit/mcp.json.example`). Context Hub runs through `npx chub`. With neither, the skill falls back to llms.txt and WebSearch. The scripts need Node.js 18 or later.
+The Context7 server is configured in `.mcp.json` (example in `.meowkit/mcp.json.example`). Context Hub runs through `npx --yes --package=@aisuite/chub@0.1.4 chub`, pinned because the bare `npx chub` resolves an unrelated npm package. With neither, the skill falls back to llms.txt and WebSearch. The scripts need Node.js 18 or later.
 
 ## Gotchas
 

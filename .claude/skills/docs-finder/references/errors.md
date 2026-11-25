@@ -21,8 +21,8 @@
 
 ### Context Hub (chub) Errors
 
-**npx chub unavailable**
-- Network issue (npx needs to download the package)
+**Context Hub unavailable**
+- Network issue (npx needs to download `@aisuite/chub`)
 - npm/npx not installed
 
 **No results**

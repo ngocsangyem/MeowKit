@@ -127,4 +127,4 @@ What to preserve verbatim when Claude Code compacts a session is listed once, in
 
 ## Docs Retrieval
 
-Use `mk:docs-finder` for any library or API lookup. Never rely on training data for API signatures. MCP chain: Context7 → Context Hub (`npx chub`) → WebSearch.
+Use `mk:docs-finder` for any library or API lookup. Never rely on training data for API signatures. MCP chain: Context7 → Context Hub (`@aisuite/chub`) → WebSearch.

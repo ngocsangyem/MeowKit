@@ -19,72 +19,73 @@
 
 ## Usage
 
-Runs via `npx` — no global install required:
+Runs via `npx` with the package named and pinned, so no global install is required:
 
 ```bash
-npx chub search "stripe"
-npx chub get stripe/api --lang js
+npx --yes --package=@aisuite/chub@0.1.4 chub search "stripe"
 ```
+
+Never run the bare `npx chub`: without a global Context Hub install it resolves the unrelated npm package `chub`. The commands below write `chub` for that full prefix (or for the `chub` bin of a global `npm i -g @aisuite/chub@0.1.4`).
 
 ## Core Commands
 
 ### Search for documentation
 
 ```bash
-npx chub search                          # List everything available
-npx chub search "stripe"                 # Fuzzy search
-npx chub search stripe/payments          # Exact ID → full detail
-npx chub search "stripe" --json          # Structured JSON output (for agents)
-npx chub search --tags docs,openai       # Filter by tags
+chub search                          # List everything available
+chub search "stripe"                 # Fuzzy search
+chub search stripe/payments          # Exact ID → full detail
+chub search "stripe" --json          # Structured JSON output (for agents)
+chub search --tags docs,openai       # Filter by tags
 ```
 
 ### Fetch documentation by ID
 
 ```bash
-npx chub get stripe/api                  # Print doc to terminal
-npx chub get stripe/api --lang py        # Python-specific docs
-npx chub get stripe/api --lang js        # JavaScript-specific docs
-npx chub get stripe/api -o doc.md        # Save to file
-npx chub get stripe/api --full           # Fetch all files, not just entry
-npx chub get openai/chat stripe/api      # Fetch multiple at once
-npx chub get pw-community/login-flows    # Fetch a skill
+chub get stripe/api                  # Print doc to terminal
+chub get stripe/api --lang py        # Python-specific docs
+chub get stripe/api --lang js        # JavaScript-specific docs
+chub get stripe/api -o doc.md        # Save to file
+chub get stripe/api --full           # Fetch all files, not just entry
+chub get openai/chat stripe/api      # Fetch multiple at once
+chub get pw-community/login-flows    # Fetch a skill
 ```
 
 ### Local annotations (persist across sessions)
 
 ```bash
-npx chub annotate stripe/api "Webhook needs raw body"
-npx chub annotate --list                 # See all saved notes
-npx chub annotate stripe/api --clear     # Remove a note
+chub annotate stripe/api "Webhook needs raw body"
+chub annotate --list                 # See all saved notes
+chub annotate stripe/api --clear     # Remove a note
 ```
 
 ### Feedback to maintainers
 
 ```bash
-npx chub feedback stripe/api up          # Worked well
-npx chub feedback stripe/api down --label outdated   # Needs updating
+chub feedback stripe/api up          # Worked well
+chub feedback stripe/api down --label outdated   # Needs updating
 ```
 
 ### Registry and cache management
 
 ```bash
-npx chub update                          # Refresh the cached registry
-npx chub cache status                    # Check cache state
-npx chub cache clear                     # Clear local cache
+chub update                          # Refresh the cached registry
+chub cache status                    # Check cache state
+chub cache clear                     # Clear local cache
 ```
 
 ## Agent Piping Patterns
 
 ```bash
 # Get the top result ID
-npx chub search "stripe" --json | jq -r '.results[0].id'
+chub search "stripe" --json | jq -r '.results[0].id'
 
 # Search → pick → fetch → save
-ID=$(npx chub search "stripe" --json | jq -r '.results[0].id')
-npx chub get "$ID" --lang js -o .context/stripe.md
+ID=$(chub search "stripe" --json | jq -r '.results[0].id')
+chub get "$ID" --lang js -o .context/stripe.md
 
 # Fetch multiple at once
-npx chub get openai/chat stripe/api -o .context/
+chub get openai/chat stripe/api -o .context/
 ```
 
 ## Flags Reference
