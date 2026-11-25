@@ -57,7 +57,7 @@ fn an_absent_or_broken_json_file_reads_as_none() {
 fn a_written_record_is_two_space_indented_and_newline_terminated() {
     let dir = tempfile::tempdir().expect("a temp dir");
     let file = dir.path().join("manifest.json");
-    write_json_pretty(&file, &json!({ "a": 1 })).expect("write");
+    write_json_pretty(dir.path(), &file, &json!({ "a": 1 })).expect("write");
     assert_eq!(
         std::fs::read_to_string(&file).expect("read"),
         "{\n  \"a\": 1\n}\n"
@@ -68,4 +68,18 @@ fn a_written_record_is_two_space_indented_and_newline_terminated() {
 fn a_missing_string_field_reads_as_empty() {
     assert_eq!(str_field(&json!({ "a": 1 }), "a"), "");
     assert_eq!(str_field(&json!({ "a": "b" }), "a"), "b");
+}
+
+#[cfg(unix)]
+#[test]
+fn a_session_record_committed_as_a_symlink_is_refused_and_its_target_is_untouched() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    let outside = tempfile::tempdir().expect("a temp dir");
+    let victim = outside.path().join("victim.json");
+    std::fs::write(&victim, "keep").expect("write");
+    let file = dir.path().join("manifest.json");
+    std::os::unix::fs::symlink(&victim, &file).expect("link");
+    let err = write_json_pretty(dir.path(), &file, &json!({ "a": 1 })).expect_err("refused");
+    assert!(err.to_string().contains("is a symlink"), "{err}");
+    assert_eq!(std::fs::read_to_string(&victim).expect("read"), "keep");
 }

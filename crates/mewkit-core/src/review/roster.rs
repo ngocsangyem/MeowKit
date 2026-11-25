@@ -236,17 +236,20 @@ pub fn render_brief(entry: &RosterEntry, session: &str) -> String {
 }
 
 /// Materialize `roster.json` plus one brief per reviewer.
+/// `cwd` bounds every write, so a linked brief or roster file is refused.
 pub fn write_roster(
+    cwd: &std::path::Path,
     session_dir: &std::path::Path,
     roster: &Roster,
     session: &str,
 ) -> std::io::Result<()> {
-    std::fs::create_dir_all(session_dir.join("briefs"))?;
+    crate::fsx::create_dir_all_in(cwd, &session_dir.join("briefs"))?;
     let text = serde_json::to_string_pretty(roster).unwrap_or_else(|_| "null".into());
-    std::fs::write(session_dir.join("roster.json"), format!("{text}\n"))?;
+    crate::fsx::write_in(cwd, &session_dir.join("roster.json"), format!("{text}\n"))?;
     for entry in &roster.entries {
-        std::fs::write(
-            session_dir.join(&entry.brief_file),
+        crate::fsx::write_in(
+            cwd,
+            &session_dir.join(&entry.brief_file),
             render_brief(entry, session),
         )?;
     }

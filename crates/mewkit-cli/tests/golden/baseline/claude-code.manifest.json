@@ -442,6 +442,18 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/lib/core/privacy-paths.cjs",
+      "sha256": "6e53df56e9261035545731bbf323785a3f6bf7184d7ab9a34102718d0d844228",
+      "size": 4889,
+      "exec": true
+    },
+    {
+      "path": ".claude/hooks/lib/core/privacy-shell-reads.cjs",
+      "sha256": "56c86f363195f1dd675757deafa11bd70ec2c04aee21ffe0a590d5ea7d6238da",
+      "size": 7916,
+      "exec": true
+    },
+    {
       "path": ".claude/hooks/lib/core/privacy.cjs",
       "sha256": "9d0fd8805098741db0f999bf493517be77ae6d9f0f1bda4864e86f0140b02bbf",
       "size": 4058,
@@ -2700,6 +2712,12 @@
       "path": ".claude/skills/markdown-reader/scripts/lib/process-mgr.cjs",
       "sha256": "9c15e22b3a20b91521e5bce945d9e7fe8353e35f2167163406766a59bde09deb",
       "size": 3816,
+      "exec": true
+    },
+    {
+      "path": ".claude/skills/markdown-reader/scripts/lib/request-security-guards.cjs",
+      "sha256": "363c930e1400026ab4a068bdb671ba6ae7b4502a039831c337bf208253c066cd",
+      "size": 3755,
       "exec": true
     },
     {
@@ -5129,6 +5147,16 @@
       "size": 2575
     },
     {
+      "path": ".meowkit/cache/.claude/hooks/lib/core/privacy-paths.cjs",
+      "sha256": "6e53df56e9261035545731bbf323785a3f6bf7184d7ab9a34102718d0d844228",
+      "size": 4889
+    },
+    {
+      "path": ".meowkit/cache/.claude/hooks/lib/core/privacy-shell-reads.cjs",
+      "sha256": "56c86f363195f1dd675757deafa11bd70ec2c04aee21ffe0a590d5ea7d6238da",
+      "size": 7916
+    },
+    {
       "path": ".meowkit/cache/.claude/hooks/lib/core/privacy.cjs",
       "sha256": "9d0fd8805098741db0f999bf493517be77ae6d9f0f1bda4864e86f0140b02bbf",
       "size": 4058
@@ -7458,6 +7486,11 @@
       "path": ".meowkit/cache/.claude/skills/markdown-reader/scripts/lib/process-mgr.cjs",
       "sha256": "9c15e22b3a20b91521e5bce945d9e7fe8353e35f2167163406766a59bde09deb",
       "size": 3816
+    },
+    {
+      "path": ".meowkit/cache/.claude/skills/markdown-reader/scripts/lib/request-security-guards.cjs",
+      "sha256": "363c930e1400026ab4a068bdb671ba6ae7b4502a039831c337bf208253c066cd",
+      "size": 3755
     },
     {
       "path": ".meowkit/cache/.claude/skills/markdown-reader/scripts/server.cjs",

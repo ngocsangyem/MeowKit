@@ -44,8 +44,11 @@ fn unique_dir(backups_dir: &Path) -> io::Result<PathBuf> {
     let base = format!("{secs}-{}", std::process::id());
     std::fs::create_dir_all(backups_dir)?;
     let ignore = backups_dir.join(".gitignore");
-    if !ignore.exists() {
-        std::fs::write(&ignore, IGNORE_ALL)?;
+    // A link left at the ignore file would be written through; refuse it.
+    if std::fs::symlink_metadata(&ignore).is_err() {
+        crate::fsx::write_in(backups_dir, &ignore, IGNORE_ALL)?;
+    } else {
+        crate::fsx::refuse_symlinks(backups_dir, &ignore)?;
     }
     for n in 0u32.. {
         let name = if n == 0 {

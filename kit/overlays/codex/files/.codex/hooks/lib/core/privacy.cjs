@@ -6,68 +6,16 @@
 // `{ exit, stdout, stderr }`, where exit 2 is a block and the first stderr line is the marker.
 // The only I/O is resolving a named path that exists, to see through a symlink.
 //
-// Scope limit worth knowing: the sensitive-path patterns match the paths a call names. A shell
-// command that reads the same file carries no path and is not caught here; the permission
-// system is the control for that case.
+// Scope limit worth knowing: a shell command is read word by word, so a credential file is
+// refused when a read, search or copy-out command names it, or an input redirect does. That
+// is best effort: a path built from a variable or a glob, a command inside `bash -c`, `eval`
+// or a script file, and a file a directory-wide search happens to reach are not seen. The
+// permission system is the control for those cases.
 
-const fs = require('node:fs');
+const { isSensitive, isArchivedPlanPath, globTargetsSensitive } = require('./privacy-paths.cjs');
+const { pathReadInCommand } = require('./privacy-shell-reads.cjs');
 
 const MARKER = '@@PRIVACY_BLOCK@@';
-
-/**
- * Credential-bearing files, matched against the path with `\` turned into `/`: dotenv and
- * direnv files, keys, certificates, credential stores, package-registry tokens, private
- * key files, and the ssh, aws, gnupg and kube config directories. `secret` must stand as a
- * word in a file or directory name (`client_secret.json`, `secrets/`), so `secretary.ts` is
- * not a credential.
- */
-const SENSITIVE_PATH = new RegExp([
-  String.raw`\.env(?:$|\.)`,
-  String.raw`(?:^|/)\.envrc$`,
-  String.raw`(?:^|/)\.npmrc$`,
-  String.raw`(?:^|/)id_(?:rsa|ed25519|ecdsa|dsa)$`,
-  String.raw`\.key$`,
-  String.raw`\.pem$`,
-  'credentials',
-  String.raw`(?:^|[/._-])secrets?(?:[/._-]|$)`,
-  'keystore',
-  String.raw`\.ssh/`,
-  String.raw`(?:^|/)\.(?:aws|gnupg)/`,
-  String.raw`(?:^|/)\.kube/config$`,
-].join('|'), 'i');
-
-/** Template dotenv files carry placeholders, not secrets; only these exact names are exempt. */
-const EXEMPT_BASENAME = /^\.env\.example$/i;
-
-/** The path as the patterns read it: forward slashes, `.` and `..` segments resolved. */
-function normalise(filePath) {
-  const parts = [];
-  for (const part of String(filePath).replace(/\\/g, '/').split('/')) {
-    if (part === '.' || (part === '' && parts.length)) continue;
-    if (part === '..' && parts.length && parts[parts.length - 1] !== '..' && parts[parts.length - 1] !== '') parts.pop();
-    else parts.push(part);
-  }
-  return parts.join('/');
-}
-
-function matches(filePath) {
-  const norm = normalise(filePath);
-  const base = norm.slice(norm.lastIndexOf('/') + 1);
-  return !EXEMPT_BASENAME.test(base) && SENSITIVE_PATH.test(norm);
-}
-
-/**
- * True for a credential path, by the name it is called or, when it exists, by the file it
- * resolves to, so a harmless-looking symlink to `.env` is refused as `.env` is.
- */
-function isSensitive(filePath) {
-  if (matches(filePath)) return true;
-  try {
-    return matches(fs.realpathSync(filePath));
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Web-fetch artifacts. The manifest is a browsing history, and a quarantined file holds content
@@ -80,22 +28,23 @@ const FETCH_ARTIFACT = /(?:\.meowkit|\.claude)\/cache\/web-fetches\/index\.jsonl
 /** Commands that invoke the fetch tooling, where a URL argument is worth inspecting. */
 const FETCH_COMMAND = /fetch_as_markdown\.py|web-to-markdown|mk:web-to-markdown/;
 
-const URL_IN_COMMAND = /https?:\/\/[^\s"'`]+/;
+/** Every URL-shaped word, any scheme, including the scheme-only forms a browser accepts. */
+const URL_IN_COMMAND = /\b(?:[a-z][a-z0-9+.-]*:\/\/|(?:about|data|javascript):)[^\s"'`]*/gi;
 
-/** Hosts a fetch must not reach: loopback, private ranges, link-local, metadata. */
-const UNSAFE_HOST = /^(localhost|127\..*|10\..*|192\.168\..*|169\.254\..*|metadata\.google\.internal|metadata\..*)$/;
+const UNSAFE_SCHEME = /^(?:file:\/\/|chrome:\/\/|about:|data:|javascript:)/i;
 
-const UNSAFE_SCHEME = /^(file:\/\/|chrome:\/\/|about:|data:|javascript:)/;
+/** Host names a fetch must not reach: loopback and cloud metadata endpoints. */
+const UNSAFE_NAME = /^(?:localhost|.+\.localhost|metadata\.google\.internal|metadata\..*)$/;
 
 const ASK_FIRST = 'Use AskUserQuestion to get explicit user approval before accessing.';
 
 const block = (lines) => ({ exit: 2, stdout: [], stderr: [MARKER, ...lines] });
 const ALLOW = Object.freeze({ exit: 0, stdout: [], stderr: [] });
 
+const sensitiveBlock = (filePath) => block([`File '${filePath}' matches sensitive file pattern (injection-rules.md R4).`, ASK_FIRST]);
+
 function checkPath(filePath) {
-  if (isSensitive(filePath)) {
-    return block([`File '${filePath}' matches sensitive file pattern (injection-rules.md R4).`, ASK_FIRST]);
-  }
+  if (isSensitive(filePath)) return sensitiveBlock(filePath);
   if (FETCH_ARTIFACT.test(filePath)) {
     return block([
       `File '${filePath}' is a web-to-markdown cache artifact.`,
@@ -107,110 +56,75 @@ function checkPath(filePath) {
   return null;
 }
 
-/** Host as a fetch would resolve it: drop the scheme, any userinfo, and the path. */
+/**
+ * Host as a fetch would resolve it. `new URL` already turns integer, hex and octal IPv4 forms
+ * into dotted quads and lower-cases the name; the trailing root dot and IPv6 brackets go here.
+ * A URL it cannot parse falls back to a plain cut, so a malformed target is still judged.
+ */
 function hostOf(url) {
-  return url.replace(/^https?:\/\//, '').replace(/[:/].*$/, '').replace(/.*@/, '');
+  let host;
+  try { host = new URL(url).hostname; } catch { host = url.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/[/?#].*$/, '').replace(/.*@/, '').replace(/:\d*$/, ''); }
+  return host.toLowerCase().replace(/^\[|\]$/g, '').replace(/\.+$/, '');
 }
+
+/** Loopback, unspecified, private, carrier-grade NAT and link-local IPv4 ranges. */
+function unsafeIPv4(host) {
+  const m = host.match(/^(\d{1,3})\.(\d{1,3})\.\d{1,3}\.\d{1,3}$/);
+  if (!m) return false;
+  const [a, b] = [Number(m[1]), Number(m[2])];
+  return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31)
+    || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127);
+}
+
+/** Loopback, unspecified, unique-local (fc00::/7), link-local (fe80::/10) and IPv4-mapped IPv6. */
+function unsafeIPv6(host) {
+  if (!host.includes(':')) return false;
+  if (host === '::1' || host === '::') return true;
+  if (/^f[cd][0-9a-f]{2}:/.test(host) || /^fe[89ab][0-9a-f]:/.test(host)) return true;
+  const mapped = host.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (mapped) {
+    const [hi, lo] = [parseInt(mapped[1], 16), parseInt(mapped[2], 16)];
+    return unsafeIPv4(`${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`);
+  }
+  return /^::ffff:\d/.test(host) && unsafeIPv4(host.slice(7));
+}
+
+const unsafeHost = (host) => UNSAFE_NAME.test(host) || unsafeIPv4(host) || unsafeIPv6(host);
 
 /**
  * Defence in depth only. The fetch tool does its own URL validation; this is a second refusal
- * at the boundary so an unsafe target is stopped before the fetcher ever starts.
+ * at the boundary so an unsafe target is stopped before the fetcher ever starts. Every URL in
+ * the command is judged, so a safe URL written first cannot cover an unsafe one after it.
  */
 function checkCommand(command) {
   if (!command || !FETCH_COMMAND.test(command)) return null;
-  // Best-effort: the agent may quote the URL in any number of ways.
-  const match = command.match(URL_IN_COMMAND);
-  if (!match) return null;
-  const url = match[0];
-  const host = hostOf(url);
-  if (UNSAFE_HOST.test(host)) {
-    return block([
-      `Web fetch target '${host}' is a private/loopback/metadata address.`,
-      'SSRF risk. Use AskUserQuestion for explicit user approval before proceeding.',
-    ]);
-  }
-  if (UNSAFE_SCHEME.test(url)) {
-    return block([
-      `Web fetch target scheme in '${url}' is not http/https.`,
-      'Unsafe scheme — use AskUserQuestion for explicit user approval before proceeding.',
-    ]);
+  for (const [url] of command.matchAll(URL_IN_COMMAND)) {
+    if (UNSAFE_SCHEME.test(url)) {
+      return block([
+        `Web fetch target scheme in '${url}' is not http/https.`,
+        'Unsafe scheme — use AskUserQuestion for explicit user approval before proceeding.',
+      ]);
+    }
+    if (!/^https?:/i.test(url)) continue;
+    const host = hostOf(url);
+    if (unsafeHost(host)) {
+      return block([
+        `Web fetch target '${host}' is a private/loopback/metadata address.`,
+        'SSRF risk. Use AskUserQuestion for explicit user approval before proceeding.',
+      ]);
+    }
   }
   return null;
-}
-
-/**
- * Archived plans. A finished plan describes intent the shipped code has since settled; read
- * back into context it competes with the code as a source of truth, so reads are refused
- * (the user can still approve one). Moving a plan in and writing there stay allowed.
- */
-const ARCHIVE_PATH = /(?:^|\/)tasks\/plans\/(?:ceo-plans\/)?archive(?:\/|$)/;
-
-/** True for a path inside an archived-plan directory, by its name or the file it resolves to. */
-function isArchivedPlanPath(filePath) {
-  if (!filePath) return false;
-  if (ARCHIVE_PATH.test(normalise(filePath))) return true;
-  try {
-    return ARCHIVE_PATH.test(normalise(fs.realpathSync(filePath)));
-  } catch {
-    return false;
-  }
 }
 
 /** Tool names that put content into a file rather than read one; archive paths stay writable. */
 const WRITE_TOOL = /edit|write|replace|create|patch|update|insert|move|rename|mkdir|delete|remove|notebook/i;
 
-/** Shell commands that print, list or search what they name. */
-const READ_VERBS = new Set(['cat', 'head', 'tail', 'less', 'more', 'grep', 'egrep', 'fgrep', 'rg', 'ag', 'ls', 'find', 'sed', 'awk', 'gawk', 'bat', 'tree', 'nl', 'strings', 'xxd', 'od']);
-const WRAPPERS = new Set(['sudo', 'command', 'env', 'nice', 'time', 'exec', 'nohup']);
+/** The archive path a shell command reads, lists or searches, or null; `mv`, `cp` and `mkdir` into it pass. */
+const archiveReadInCommand = (command) => pathReadInCommand(command, isArchivedPlanPath, { lists: true });
 
-/** Quote-aware split of a shell command into segments of words, cut at `|`, `;`, `&`, `(`, `)` and newlines. */
-function shellSegments(command) {
-  const segments = [[]];
-  let word = null;
-  let quote = '';
-  const end = () => { if (word !== null) segments[segments.length - 1].push(word); word = null; };
-  for (let i = 0; i < command.length; i += 1) {
-    const ch = command[i];
-    if (quote) { if (ch === quote) quote = ''; else word = (word || '') + ch; continue; }
-    if (ch === '"' || ch === "'") { quote = ch; word = word || ''; continue; }
-    if (ch === '\\' && i + 1 < command.length) { word = (word || '') + command[i += 1]; continue; }
-    if (/[|;&()\n`]/.test(ch)) { end(); if (segments[segments.length - 1].length) segments.push([]); continue; }
-    if (ch === '<' || ch === '>') { end(); segments[segments.length - 1].push(ch); continue; }
-    if (/\s/.test(ch)) { end(); continue; }
-    word = (word || '') + ch;
-  }
-  end();
-  return segments.filter((s) => s.length);
-}
-
-/**
- * The archive path a shell command reads, or null. Only a read, list or search command (or an
- * input redirect) counts, so `mv`, `cp`, `mkdir`, `git mv` and `mewkit plan archive` aimed at
- * the archive pass, and a search rooted outside it (`grep -r . x`) passes too.
- */
-function archiveReadInCommand(command) {
-  for (const words of shellSegments(command)) {
-    for (let i = 0; i < words.length - 1; i += 1) if (words[i] === '<' && isArchivedPlanPath(words[i + 1])) return words[i + 1];
-    let at = 0;
-    while (at < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[at]) || WRAPPERS.has(words[at]))) at += 1;
-    const verb = (words[at] || '').replace(/^.*\//, '');
-    if (!READ_VERBS.has(verb)) continue;
-    // An output redirect target is written, not read (`cat > archive/x/notes.md`).
-    const args = [];
-    for (let i = at + 1; i < words.length; i += 1) {
-      if (words[i] === '>') { while (words[i + 1] === '>') i += 1; i += 1; continue; }
-      if (words[i] !== '<') args.push(words[i]);
-    }
-    if (verb === 'sed' && args.some((a) => /^-[a-zA-Z]*i|^--in-place/.test(a))) continue;
-    let positional = args.filter((a) => !a.startsWith('-'));
-    // A search's first positional word is its pattern unless -e/-f gave one.
-    if (/^(?:e|f)?grep$|^rg$|^ag$/.test(verb) && !args.some((a) => /^-(?:e|f|-regexp|-file)/.test(a))) positional = positional.slice(1);
-    // Option values are left out: `--exclude-dir=archive` names the archive to skip it.
-    const hit = positional.find(isArchivedPlanPath);
-    if (hit) return hit;
-  }
-  return null;
-}
+/** The credential path a shell command reads or copies out, or null. Listing names is not a read. */
+const sensitiveReadInCommand = (command) => pathReadInCommand(command, isSensitive, { copies: true });
 
 const archiveBlock = (filePath) => block([
   `'${filePath}' is an archived plan. Archived plans are kept out of context; the shipped code is the source of truth.`,
@@ -232,14 +146,21 @@ function checkArchive({ paths, command, toolName }) {
   return hit ? archiveBlock(hit) : null;
 }
 
-/** @param {{ paths: string[], command?: string, toolName?: string }} input */
-function decidePrivacy({ paths, command = '', toolName = '' }) {
+/**
+ * @param {{ paths: string[], command?: string, toolName?: string, globs?: string[] }} input
+ * `globs` are search globs (Grep's `glob`) whose matches the call reads.
+ */
+function decidePrivacy({ paths, command = '', toolName = '', globs = [] }) {
   const named = paths.filter(Boolean);
   for (const filePath of named) {
     const blocked = checkPath(filePath);
     if (blocked) return blocked;
   }
+  const glob = globs.find(globTargetsSensitive);
+  if (glob) return block([`Search glob '${glob}' selects files matching a sensitive file pattern (injection-rules.md R4).`, ASK_FIRST]);
+  const shellHit = command ? sensitiveReadInCommand(command) : null;
+  if (shellHit) return sensitiveBlock(shellHit);
   return checkCommand(command) || checkArchive({ paths: named, command, toolName }) || ALLOW;
 }
 
-module.exports = { decidePrivacy, isSensitive, isArchivedPlanPath, archiveReadInCommand };
+module.exports = { decidePrivacy, isSensitive, isArchivedPlanPath, archiveReadInCommand, sensitiveReadInCommand, globTargetsSensitive };

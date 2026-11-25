@@ -18,7 +18,9 @@ mewkit init --global --target all
 mewkit init --target codex --dry-run
 ```
 
-`init` downloads the newest kit release and checks it against the release's `checksums.txt` and its `kit-contract.json`. It then writes the kit for each runtime. `--beta` allows a prerelease and `--kit-version v2.16.0` pins one release. `--offline` uses the newest kit already in the cache. `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit with no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself.
+`init` downloads the newest kit release and checks it against the release's `checksums.txt` and its `kit-contract.json`. It then writes the kit for each runtime. `--beta` allows a prerelease and `--kit-version v2.16.0` pins one release. `--offline` uses the newest kit already in the cache. `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit with no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself. A `--kit-version` older than the kit already installed needs `--force`, because an older kit carries older guards.
+
+`init`, `setup`, `note` and the other commands that write project files refuse a target that is a symlink, or that sits under a symlinked folder, and name it. A cloned repository can commit such a link to send a write outside the project. Replace the link with a real file if it is yours. A kit cache that git tracks is refused for the same reason: `.meowkit/cache/` is written by `mewkit`, never committed.
 
 `--target` takes `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp`, `antigravity`, a comma-separated list of them, or `all`. `all` is every runtime that installs at the chosen scope: seven at project scope, and Claude Code, Codex and Cursor with `--global`. Without `--target`, a terminal shows a picker with Claude Code preselected. With no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 and names `--target`. An unrecognized `--target` is refused by name.
 
@@ -111,7 +113,7 @@ Without flags `doctor` changes nothing. It checks Node.js (the kit's hooks need 
 | `--report` | Append a shareable report block |
 | `--providers` | Add what each runtime's adapter can enforce |
 | `--state` | Add the state taxonomy |
-| `--hard-gates` | Run the kit's privacy block, injection scan and ship check in a scratch project and report which ones block |
+| `--hard-gates` | Run the kit's privacy block, injection scan and ship check in a scratch project and report which ones block. It executes the hook commands the project's `.claude/settings.json` names, so run it only in a project whose settings you trust |
 | `--explain` | With `provenance`: name the files behind each count |
 | `--adopt` | Rebuild the npm CLI's ownership baseline (`.meowkit/metadata.json`) from the local kit cache, or refuse |
 | `--target`, `--global`, `--json` | Narrow to some runtimes, check your home directory, print JSON |

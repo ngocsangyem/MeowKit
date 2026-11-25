@@ -77,14 +77,33 @@ def _js_gate_open() -> bool:
 # Layer 1.6: Three-condition Playwright fetch
 # ---------------------------------------------------------------------------
 
+def _guard_request(route, request) -> None:
+    """Context route handler: every request (document, subresource, fetch/XHR
+    from page script, popup) must pass safe_url, so a fetched page cannot reach
+    loopback, LAN or metadata hosts through the browser."""
+    if safe_url(request.url) is None:
+        route.abort("blockedbyclient")
+        return
+    route.continue_()
+
+
+def _guard_web_socket(ws) -> None:
+    """WebSockets bypass context.route; connect only when safe_url passes (it
+    allows http/https only, so ws:// and wss:// are closed unconnected)."""
+    if safe_url(ws.url) is None:
+        ws.close()
+        return
+    ws.connect_to_server()
+
+
 def _playwright_fetch(url: str, wait_ms: int = 3000) -> tuple[str | None, int, str]:
     """
     Headless Chromium fetch. Condition (c) — called only when js=True.
-    C-2 hardening: route interception re-validates every document nav via safe_url (SSRF);
+    Every request in the browser context is re-validated via safe_url (SSRF);
     page.content() capped at MEOWKIT_WEB_FETCH_MAX_BYTES; specific exceptions caught.
     Returns (html_or_None, http_status, content_type).
     """
-    from scripts.http_fetch import safe_url as _safe_url, _max_bytes, PLAYWRIGHT_REJECTED_SCHEMES as _PRS
+    from scripts.http_fetch import _max_bytes, PLAYWRIGHT_REJECTED_SCHEMES as _PRS
     parsed_scheme = urlparse(url).scheme
     if parsed_scheme in _PRS:
         return None, 0, f"rejected_scheme:{parsed_scheme}"
@@ -94,21 +113,12 @@ def _playwright_fetch(url: str, wait_ms: int = 3000) -> tuple[str | None, int, s
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(user_agent=WORKFLOW_UA)
+            # Service workers are blocked: their requests are not seen by context.route.
+            context = browser.new_context(user_agent=WORKFLOW_UA, service_workers="block")
+            context.route("**/*", _guard_request)
+            if hasattr(context, "route_web_socket"):  # Playwright >= 1.48
+                context.route_web_socket("**/*", _guard_web_socket)
             page = context.new_page()
-
-            # Intercept every document-level navigation and re-validate the URL
-            # against safe_url (private IP / SSRF guard). Subresources are not
-            # intercepted to avoid overhead; only main-frame navigations matter for SSRF.
-            def _route_handler(route, request) -> None:
-                if request.resource_type == "document":
-                    nav_url = request.url
-                    if _safe_url(nav_url) is None:
-                        route.abort("blockedbyclient")
-                        return
-                route.continue_()
-
-            page.route("**/*", _route_handler)
 
             # Per-domain rate limit (task 3.5) — after safe_url validation, before network call.
             _throttle(urlparse(url).hostname or url)

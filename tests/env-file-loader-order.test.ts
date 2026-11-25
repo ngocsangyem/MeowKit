@@ -68,8 +68,6 @@ beforeAll(() => {
 		"export K6=exported",
 		"PATH=/refused",
 		`$(touch ${path.join(tmp, "ran")})`,
-		"MEOW_JIRA_API_TOKEN=placeholder-not-a-real-token",
-		"MEOW_JIRA_EMAIL=corpus@example.invalid",
 	]);
 	// CRLF line endings, as an editor on Windows writes them.
 	fs.mkdirSync(path.join(project, ".claude"), { recursive: true });
@@ -79,7 +77,11 @@ beforeAll(() => {
 		"K2=global-loses",
 		"K3=global-loses",
 		"K7=global",
+		// The three connection keys sit in one file: the wrapper refuses a credential
+		// assembled from two files.
 		"MEOW_JIRA_SITE_URL=https://global.invalid",
+		"MEOW_JIRA_API_TOKEN=placeholder-not-a-real-token",
+		"MEOW_JIRA_EMAIL=corpus@example.invalid",
 	]);
 	// A stand-in for the issue-tracker binary the wrapper execs: it prints what it was given.
 	const bin = path.join(project, ".meowkit", "envs", "jira", "bin", "jira-as");
@@ -140,7 +142,28 @@ describe("env-file loaders share one order", () => {
 		};
 		const jira = block(".claude/skills/jira/scripts/jira-as.sh");
 		expect(jira).toContain("load_env_file()");
-		expect(block(".claude/skills/confluence/scripts/confluence-as.sh")).toBe(jira);
+		// The loaders differ only in the names of the keys each wrapper treats as its credential.
+		const confluence = block(".claude/skills/confluence/scripts/confluence-as.sh").replaceAll("MEOW_CONFLUENCE_", "MEOW_JIRA_");
+		expect(confluence).toBe(jira);
+	});
+
+	it("the jira wrapper refuses a site URL from the project file when the token comes from the user-wide file", () => {
+		const hostile = fs.mkdtempSync(path.join(tmp, "split-"));
+		write(path.join(hostile, ".meowkit", ".env"), ["MEOW_JIRA_SITE_URL=https://other.invalid"]);
+		const bin = path.join(hostile, ".meowkit", "envs", "jira", "bin", "jira-as");
+		write(bin, [`#!${process.execPath}`, PRINT_ENV]);
+		fs.chmodSync(bin, 0o755);
+		let status: number | null = 0;
+		let stderr = "";
+		try {
+			execFileSync("bash", [path.join(REPO, ".claude/skills/jira/scripts/jira-as.sh")], { cwd: hostile, env: baseEnv(), stdio: "pipe" });
+		} catch (err) {
+			const failure = err as { status: number | null; stderr: Buffer };
+			status = failure.status;
+			stderr = failure.stderr.toString();
+		}
+		expect(status).toBe(78);
+		expect(stderr).toContain("MEOW_JIRA_SITE_URL comes from");
 	});
 
 	it("the session hook accepts credentials split between the shell and the user-wide file", () => {

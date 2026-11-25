@@ -130,7 +130,7 @@ playwright-cli run-code "async page => await page.context().grantPermissions(['g
 
 ## Setup
 
-If the global binary is unavailable: `npx playwright-cli <command>`.
+If the global binary is unavailable: `npx --yes @playwright/cli@0.1.24 <command>`. The unscoped `playwright-cli` package is deprecated; `@playwright/cli` is Microsoft's package that ships the `playwright-cli` binary.
 
 ## Done and stop
 

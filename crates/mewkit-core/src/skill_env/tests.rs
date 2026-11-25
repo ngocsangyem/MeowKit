@@ -192,3 +192,12 @@ fn environment_paths_follow_the_platform() {
         assert!(env_pip_path(env).ends_with("bin/pip"));
     }
 }
+
+#[test]
+fn an_env_path_beside_the_envs_dir_with_a_shared_prefix_is_refused() {
+    let project = tempfile::tempdir().unwrap();
+    let sibling = project.path().join(".meowkit").join("envs-evil").join("x");
+    let err = ensure_env(project.path(), &sibling, &mut |_| {}).unwrap_err();
+    assert!(err.starts_with("Path escapes"), "{err}");
+    assert!(!sibling.exists());
+}

@@ -4,7 +4,7 @@
  * Tests for fetch-context7.js (unit tests — no network calls)
  */
 
-const { buildContext7Url, getUrlVariations, OFFICIAL_LLMS_TXT } = require('../fetch-context7');
+const { buildContext7Url, getUrlVariations, authHeadersFor, OFFICIAL_LLMS_TXT } = require('../fetch-context7');
 
 let passed = 0;
 let failed = 0;
@@ -77,6 +77,20 @@ assert(OFFICIAL_LLMS_TXT['astro'] !== undefined, 'Astro mapped');
 assert(OFFICIAL_LLMS_TXT['next.js'] !== undefined, 'Next.js mapped');
 assert(OFFICIAL_LLMS_TXT['remix'] !== undefined, 'Remix mapped');
 assert(OFFICIAL_LLMS_TXT['sveltekit'] !== undefined, 'SvelteKit mapped');
+
+// ─── authHeadersFor ─────────────────────────────────────────────────
+console.log('\n## authHeadersFor() — the API key reaches only context7.com');
+
+const KEY = 'test-key';
+assertEqual(authHeadersFor('https://context7.com/vercel/next.js/llms.txt', KEY).Authorization, 'Bearer test-key', 'key sent to context7.com');
+assertEqual(authHeadersFor('https://api.context7.com/x', KEY).Authorization, 'Bearer test-key', 'key sent to a context7.com subdomain');
+for (const url of Object.values(OFFICIAL_LLMS_TXT)) {
+  assertEqual(authHeadersFor(url, KEY).Authorization, undefined, `no key for official fallback ${url}`);
+}
+assertEqual(authHeadersFor('https://evilcontext7.com/x', KEY).Authorization, undefined, 'no key for a look-alike host');
+assertEqual(authHeadersFor('https://context7.com.evil.example/x', KEY).Authorization, undefined, 'no key for a suffix-spoofed host');
+assertEqual(authHeadersFor('http://context7.com/x', KEY).Authorization, undefined, 'no key over plain http');
+assertEqual(authHeadersFor('https://context7.com/x', undefined).Authorization, undefined, 'no header without a key');
 
 // ─── Summary ────────────────────────────────────────────────────────
 console.log('\n## Test Summary');

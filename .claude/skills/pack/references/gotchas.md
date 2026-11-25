@@ -42,7 +42,7 @@ Known failure modes and their fixes.
 ### Offline — `npx` fails with "no internet"
 
 **Cause:** repomix is not yet cached locally and `npx` needs the registry.
-**Fix:** Once online, run `npx repomix --version` to warm the cache. After that, offline works.
+**Fix:** Once online, run `npx --yes repomix@1.19.0 --version` to warm the cache. After that, offline works.
 
 ## Self-Pack Guard
 

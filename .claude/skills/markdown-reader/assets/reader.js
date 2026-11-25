@@ -375,7 +375,8 @@
     mermaid.initialize({
       startOnLoad: false,
       theme: isDark ? 'dark' : 'default',
-      securityLevel: 'loose',
+      // Diagram source comes from the rendered file: no HTML labels or click callbacks
+      securityLevel: 'strict',
       fontFamily: 'Inter, sans-serif'
     });
 
@@ -426,7 +427,8 @@
     window.mermaidModule.initialize({
       startOnLoad: false,
       theme: isDark ? 'dark' : 'default',
-      securityLevel: 'loose',
+      // Diagram source comes from the rendered file: no HTML labels or click callbacks
+      securityLevel: 'strict',
       fontFamily: 'Inter, sans-serif'
     });
 

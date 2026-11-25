@@ -91,11 +91,11 @@ fn resolve(flags: &KitArgs, place: &Place) -> Result<Kit, Failure> {
             allow_unverified_kit: flags.allow_unverified_kit,
             ..KitArgs::default()
         };
-        if let Ok(kit) = cached.resolve(place) {
+        if let Ok(kit) = cached.resolve(place, false) {
             return Ok(kit);
         }
     }
-    flags.resolve(place)
+    flags.resolve(place, false)
 }
 
 fn row(target: &str, scope: &str, kit: &Kit, packs: &[String], plan: &Plan) -> Value {

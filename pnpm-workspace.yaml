@@ -1,6 +1,11 @@
 packages:
   - "packages/*"
 
+# A version must have been public for 7 days (in minutes) before it can be resolved, so a
+# hijacked release is usually reported and pulled before it can land here. Installs from the
+# lockfile are unaffected.
+minimumReleaseAge: 10080
+
 # Build-script decisions for native/postinstall deps (pnpm gates these).
 # esbuild is required for Vitest/Vite TypeScript transform → allow it.
 # The rest belong to packages/landing (Nuxt) and are not needed to run the

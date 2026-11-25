@@ -41,6 +41,8 @@ Every script that reads env files uses the same order. The first source that set
 
 A key set in the project file therefore beats the same key in `~/.meowkit/.env`, so one project can use a different token from the rest.
 
+Jira and Confluence credentials are the exception: the site URL, the email and the API token are read as one credential. When the files supply them from two different places, for example a project file that names only a site while the token sits in `~/.meowkit/.env`, the wrapper stops with exit code 78 and names both files. This keeps a cloned repository from pointing your user-wide token at a site of its choosing. Put all three in the same file. A value exported in the shell is yours and is not counted.
+
 The project is the folder the runtime names in `MEOWKIT_PROJECT_DIR`, `CLAUDE_PROJECT_DIR` or `CURSOR_PROJECT_DIR`, checked in that order. Without one of them, it is the nearest folder above the working directory that contains `.meowkit/`. The folder the skill is installed in plays no part, so a skill installed under your home folder still reads the open project's file.
 
 The files are read line by line as `KEY=VALUE` and never executed:

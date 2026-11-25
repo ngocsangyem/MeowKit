@@ -16,7 +16,7 @@ use super::{
     skill_store, stamp, unconfirmed_force,
 };
 use crate::failure::{Failure, PENDING};
-use crate::kit_args::{KitArgs, installed_kit_or_fetch};
+use crate::kit_args::{KitArgs, previous_kit_for_comparison};
 use crate::output;
 use crate::place::Place;
 
@@ -102,7 +102,8 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
         );
         targets.push(runtime);
     }
-    let kit = args.kit.resolve(&place)?;
+    args.kit.check_downgrade(&place, args.common.force)?;
+    let kit = args.kit.resolve(&place, args.yes)?;
     for n in &kit.notices {
         eprintln!("note: {n}");
     }
@@ -116,7 +117,7 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
         let packs = index.packs.clone();
         // An old kit that no longer plans cleanly is treated as missing: its
         // files are kept rather than the upgrade refused.
-        let old_plan = installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
+        let old_plan = previous_kit_for_comparison(&place, &index, args.kit.may_fetch())
             .and_then(|k| prepare(&place, e, &k, &packs).ok());
         let old = old_plan.as_ref().map(written_hashes).unwrap_or_default();
         // The base an edited skill file is merged against: what the old kit

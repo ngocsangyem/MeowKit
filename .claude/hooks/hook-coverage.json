@@ -9,7 +9,7 @@
         "where": ".codex/hooks/privacy-block.cjs (PreToolUse Bash)",
         "note": "Codex has no file-read hook; the decision runs on the shell command and the paths it names. The archived-plan read gate runs on the command: a read, list or search command naming a path under tasks/plans/archive/."
       },
-      "cursor": { "status": "ported", "where": ".cursor/hooks/privacy-read-gate.cjs (beforeReadFile)", "note": "The archived-plan read gate also runs in shell-gate.cjs (beforeShellExecution) and in tool-gate.cjs for search and list tools, where the kill switch downgrades it." },
+      "cursor": { "status": "ported", "where": ".cursor/hooks/privacy-read-gate.cjs (beforeReadFile)", "note": "The credential-file and archived-plan read rules also run in shell-gate.cjs (beforeShellExecution) on the files a command names, and the archived-plan rule in tool-gate.cjs for search and list tools; in those two gates the kill switch downgrades them." },
       "grok": { "status": "ported", "where": ".grok/meowkit/hooks/privacy-block.cjs (PreToolUse, every tool)", "note": "A hook Grok stops at its timeout lets the call through, and so does a shell command carried under a field name the guard does not know." },
       "pi": { "status": "ported", "where": ".agents/meowkit/hooks/guard.cjs (extension .pi/extensions/meowkit.ts, tool_call)", "note": "Pi lets a call run when an extension throws, so the extension catches every failure and blocks." },
       "omp": { "status": "ported", "where": ".agents/meowkit/hooks/guard.cjs (hook module .omp/hooks/pre/meowkit.ts, tool_call)" },

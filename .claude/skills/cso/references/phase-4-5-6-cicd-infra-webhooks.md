@@ -8,8 +8,16 @@ Check who can modify workflows and what secrets they can access.
 - Script injection via `${{ github.event.* }}` in `run:` steps
 - Secrets as env vars (could leak in logs)
 - CODEOWNERS protection on workflow files
+- `workflow_run` and `issue_comment` triggers that check out or execute PR-controlled content with secrets in scope (the same hazard as `pull_request_target`, less often noticed)
+- Token scope: a top-level `permissions:` block, least privilege per job, and `id-token: write` / `contents: write` only on the job that publishes
+- Cache crossing a trust boundary: a cache written by a PR-triggered job and restored by a release or publish job lets PR code reach the release
+- Release path: which job builds the artifact, which writes its checksums, and whether one compromised step could change both; whether a published tag or asset can be replaced afterwards
+- Self-hosted runners reachable from fork PRs (a persistent runner keeps what a PR left behind)
+- Branch-name and PR-title injection: `github.head_ref` and `github.event.pull_request.title` in `run:` are attacker-controlled the same way the body is
 
-**Severity:** CRITICAL for `pull_request_target` + checkout of PR code / script injection via `${{ github.event.*.body }}` in `run:` steps. HIGH for unpinned third-party actions / secrets as env vars without masking. MEDIUM for missing CODEOWNERS on workflow files.
+A stolen CI token is the usual way a single compromised dependency spreads: the malicious install script reads the publish or repo token from the job's environment and uses it to publish further malicious versions or push to other repos. So for every secret, list which jobs can read it and whether any of them runs code from a PR or installs dependencies with scripts enabled.
+
+**Severity:** CRITICAL for `pull_request_target` / `workflow_run` + checkout of PR code / script injection via `${{ github.event.*.body }}`, `head_ref` or the PR title in `run:` steps / a publish or release secret readable by a job that runs PR code. HIGH for unpinned third-party actions / secrets as env vars without masking / cache shared between PR and release jobs / write-scoped default token with no `permissions:` block. MEDIUM for missing CODEOWNERS on workflow files.
 
 **FP rules:** First-party `actions/*` unpinned = MEDIUM not HIGH. `pull_request_target` without PR ref checkout is safe (precedent #11). Secrets in `with:` blocks (not `env:`/`run:`) are handled by runtime.
 

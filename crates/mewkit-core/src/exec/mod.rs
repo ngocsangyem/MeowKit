@@ -13,12 +13,12 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use crate::backup;
-use crate::fsx::{PathError, RelPath, check_parents, check_within, is_never_delete};
+use crate::fsx::{PathError, RelPath, check_no_links, check_within, is_never_delete};
 use crate::journal::Journal;
 use crate::layout::{Layout, Mount};
 use crate::lock::{LockError, ScopeLock};
 use crate::ownership::OwnershipIndex;
-use crate::plan::Plan;
+use crate::plan::{Op, Plan};
 use crate::report::EmitReport;
 use decide::{Action, Record, decide};
 
@@ -106,7 +106,7 @@ pub fn execute_merging(
         }
     }
     for own in [&scope.index_file, &scope.lock_file, &scope.backups_dir] {
-        check_parents(&scope.root, own)?;
+        check_no_links(&scope.root, own)?;
     }
     let _lock = if opts.dry_run {
         None
@@ -127,9 +127,7 @@ pub fn execute_merging(
                     .to_owned(),
             );
         }
-    } else if let Some(restored) =
-        interrupted::recover(&layout, &record).map_err(io("recovering an interrupted run"))?
-    {
+    } else if let Some(restored) = recover_interrupted(&layout, scope, &record, &mut notices)? {
         for path in &restored {
             prune_empty_parents(&layout, path);
         }
@@ -158,7 +156,11 @@ pub fn execute_merging(
     for op in &plan.ops {
         let current = match pending.get(op.path()) {
             Some(bytes) => bytes.clone(),
-            None => read_opt(&layout.resolve(op.path()))?,
+            None => read_current(
+                op,
+                merges.contains_key(op.path()),
+                &layout.resolve(op.path()),
+            )?,
         };
         let d = decide(
             op,
@@ -259,6 +261,33 @@ pub fn execute_merging(
     Ok(report)
 }
 
+/// Restore what an interrupted run changed. A record naming paths or a backup
+/// outside this scope is not acted on; the notice says so.
+fn recover_interrupted(
+    layout: &Layout,
+    scope: &Scope,
+    record: &Path,
+    notices: &mut Vec<String>,
+) -> Result<Option<Vec<RelPath>>, ExecError> {
+    let bounds = interrupted::Bounds {
+        roots: &scope.roots,
+        index_file: &scope.index_file,
+        backups_dir: &scope.backups_dir.under(&scope.root),
+    };
+    let found = interrupted::recover(layout, record, &bounds).map_err(|source| ExecError::Io {
+        action: "recovering an interrupted run".into(),
+        source,
+    })?;
+    Ok(match found {
+        interrupted::Recovery::Nothing => None,
+        interrupted::Recovery::Ignored(note) => {
+            notices.push(note);
+            None
+        }
+        interrupted::Recovery::Restored(paths) => Some(paths),
+    })
+}
+
 /// After a removal, take out the directories it left empty, innermost first,
 /// stopping at the first one that still holds anything and never reaching
 /// [`Layout::prune_floor`]. Best effort: the install is already committed,
@@ -299,6 +328,20 @@ fn apply_record(index: &mut OwnershipIndex, path: &RelPath, record: &Record) {
             }
         }
     }
+}
+
+/// What is on disk at `op`'s path. A whole-file write or removal acts on a
+/// symlink itself (the rename replaces the link), so its target is only
+/// compared. A merge or strip (or a write carrying an upgrade merge) keeps the
+/// current content, and reading through a link would copy the target (a
+/// global settings file with its tokens) into a project file, so a linked
+/// merge target is refused instead.
+fn read_current(op: &Op, merged: bool, path: &Path) -> Result<Option<Vec<u8>>, ExecError> {
+    let merges_content = merged || !matches!(op, Op::WriteFile { .. } | Op::RemoveFile { .. });
+    if merges_content && std::fs::symlink_metadata(path).is_ok_and(|m| m.file_type().is_symlink()) {
+        return Err(PathError::SymlinkedFile(op.path().to_string()).into());
+    }
+    read_opt(path)
 }
 
 fn read_opt(path: &Path) -> Result<Option<Vec<u8>>, ExecError> {

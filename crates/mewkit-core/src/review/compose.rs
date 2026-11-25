@@ -161,7 +161,7 @@ pub fn compose(cwd: &Path, session: &str, exec: &dyn Exec) -> ComposeResult {
 
     let bundle = proof_bundle(session, &manifest, &report, &verdict, &findings, &diff_text);
     let verdict_file = dir.join(format!("{session}-verdict.json"));
-    if let Err(e) = write_json_pretty(&verdict_file, &bundle) {
+    if let Err(e) = write_json_pretty(cwd, &verdict_file, &bundle) {
         return ComposeResult::bail(e.to_string());
     }
     let payload = json!({
@@ -173,7 +173,7 @@ pub fn compose(cwd: &Path, session: &str, exec: &dyn Exec) -> ComposeResult {
         "event": verdict.event.as_str(),
         "body": body_line(&verdict),
     });
-    if let Err(e) = write_json_pretty(&dir.join("submit-payload.json"), &payload) {
+    if let Err(e) = write_json_pretty(cwd, &dir.join("submit-payload.json"), &payload) {
         return ComposeResult::bail(e.to_string());
     }
     let caps = if verdict.reasons.is_empty() {
@@ -189,8 +189,9 @@ pub fn compose(cwd: &Path, session: &str, exec: &dyn Exec) -> ComposeResult {
                 .join("\n")
         )
     };
-    if let Err(e) = std::fs::write(
-        dir.join("verdict.md"),
+    if let Err(e) = crate::fsx::write_in(
+        cwd,
+        &dir.join("verdict.md"),
         format!(
             "# Review verdict — {}\n\nEvent: {}\nEvidence level: {}\n{caps}",
             verdict.decision.as_str(),

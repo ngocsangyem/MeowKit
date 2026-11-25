@@ -6,6 +6,8 @@
       "shell": "privacy-block.cjs",
       "lib": [
         "core/hook-payload.cjs",
+        "core/privacy-paths.cjs",
+        "core/privacy-shell-reads.cjs",
         "core/privacy.cjs",
         "parse-stdin.cjs",
         "project-root.cjs"
@@ -39,6 +41,8 @@
     "core/completion-check.cjs",
     "core/plan-state-sync.cjs",
     "core/pre-ship.cjs",
+    "core/privacy-paths.cjs",
+    "core/privacy-shell-reads.cjs",
     "core/privacy.cjs",
     "hook-runtime.cjs",
     "memory-store-lint.cjs",

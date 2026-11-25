@@ -160,6 +160,54 @@ def check_supabase_rls(filepath: Path, content: str) -> list[Finding]:
 
 
 # ---------------------------------------------------------------------------
+# Supply-chain checks: code fetched and run at use time, with no pinned version
+# ---------------------------------------------------------------------------
+
+# A runner word, its option flags, then the package it would fetch.
+_REMOTE_RUNNER = re.compile(
+    r'(?<![\w./-])(npx|bunx|uvx|pnpm\s+dlx|yarn\s+dlx|pipx\s+run)((?:\s+-{1,2}[\w-]+(?:=\S+)?)*)\s+([@\w][\w./@^~:=-]*)'
+)
+_PIPE_TO_SHELL = re.compile(r'\b(curl|wget)\b[^|\n]*\|\s*(sudo\s+)?(ba|z|da)?sh\b')
+# Flags that stop the runner from fetching anything that is not already installed.
+_NO_FETCH = re.compile(r'--no(-install)?\b|--offline\b')
+_LIFECYCLE_SCRIPT = re.compile(r'^\s*"(preinstall|install|postinstall)"\s*:')
+
+
+def _has_version(package: str) -> bool:
+    """True for `pkg@1.2.3` / `@scope/pkg@1.2.3` / `pkg==1.2.3`; a range or a tag is not a pin."""
+    spec = package[1:] if package.startswith("@") else package
+    match = re.search(r'(?:@|==)(\d[\w.+-]*)$', spec)
+    return bool(match)
+
+
+def check_remote_exec(filepath: Path, content: str) -> list[Finding]:
+    """Unpinned remote execution in scripts, CI config and package manifests."""
+    findings = []
+    for i, line in enumerate(content.splitlines(), 1):
+        for match in _REMOTE_RUNNER.finditer(line):
+            runner, flags, package = match.group(1), match.group(2), match.group(3)
+            if _NO_FETCH.search(flags) or _has_version(package):
+                continue
+            findings.append(Finding(
+                "WARN", f"'{runner} {package}' has no pinned version — fetches whatever is newest at run time",
+                str(filepath), i))
+        if _PIPE_TO_SHELL.search(line):
+            findings.append(Finding("WARN", "Download piped to a shell — runs unreviewed remote code", str(filepath), i))
+    return findings
+
+
+def check_package_manifest(filepath: Path, content: str) -> list[Finding]:
+    """package.json only: install-time scripts run on every machine that installs the package."""
+    if filepath.name != "package.json":
+        return []
+    findings = check_remote_exec(filepath, content)
+    for i, line in enumerate(content.splitlines(), 1):
+        if _LIFECYCLE_SCRIPT.search(line):
+            findings.append(Finding("WARN", "Install-time lifecycle script — review what it runs", str(filepath), i))
+    return findings
+
+
+# ---------------------------------------------------------------------------
 # Main scanner
 # ---------------------------------------------------------------------------
 
@@ -169,6 +217,11 @@ EXTENSION_CHECKERS = {
     ".vue": [check_vue, check_vue_route_guards],
     ".swift": [check_swift],
     ".sql": [check_sql, check_supabase_rls],
+    ".sh": [check_remote_exec],
+    ".bash": [check_remote_exec],
+    ".yml": [check_remote_exec],
+    ".yaml": [check_remote_exec],
+    ".json": [check_package_manifest],
 }
 
 

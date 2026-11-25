@@ -13,17 +13,18 @@ const path = require('path');
 const crypto = require('crypto');
 
 const { configValue } = require('../lib/read-config.cjs');
+const { localBin, spawnPlan } = require('../lib/preship-checks.cjs');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
 // File extension → compile/lint commands (run sequentially, short-circuit on failure)
 const COMMANDS_BY_EXT = {
-  ts: ['npx tsc --noEmit', 'npx eslint'],
-  tsx: ['npx tsc --noEmit', 'npx eslint'],
-  js: ['npx eslint'],
-  jsx: ['npx eslint'],
-  mjs: ['npx eslint'],
-  cjs: ['npx eslint'],
+  ts: ['tsc --noEmit', 'eslint'],
+  tsx: ['tsc --noEmit', 'eslint'],
+  js: ['eslint'],
+  jsx: ['eslint'],
+  mjs: ['eslint'],
+  cjs: ['eslint'],
   py: ['ruff check', 'mypy'],
   go: ['go build ./...'],
   rs: ['cargo check'],
@@ -33,6 +34,11 @@ const COMMANDS_BY_EXT = {
 // Commands that check the whole project and take no file argument: `cargo check <path>` and
 // `go build ./... <path>` are usage errors that would reach the model as a build failure.
 const WHOLE_PROJECT = new Set(['go build ./...', 'cargo check']);
+
+// Node tools run from the project's own node_modules/.bin and nowhere else. `npx` with no
+// terminal installs a missing package without asking — and the registry package named `tsc`
+// is not TypeScript — so a project without the tool skips the check, as a missing ruff does.
+const PROJECT_LOCAL = new Set(['tsc', 'eslint']);
 
 const TIMEOUT_BY_EXT = {
   rs: 60000,
@@ -98,18 +104,23 @@ module.exports = function buildVerify(ctx, state) {
   let output = '';
   let failed = false;
   for (const cmd of commands) {
-    const tool = cmd.split(/\s+/)[0];
-    // Check if tool exists (skip npx — it's always available if node is)
-    if (tool !== 'npx' && !whichSync(tool)) continue;
+    const parts = cmd.split(/\s+/);
+    const tool = parts[0];
+    const executable = PROJECT_LOCAL.has(tool) ? localBin(ROOT, tool) : tool;
+    // An absent tool is no verdict, so the check is skipped rather than failed.
+    if (PROJECT_LOCAL.has(tool) ? !fs.existsSync(executable) : !whichSync(tool)) continue;
+    const args = WHOLE_PROJECT.has(cmd) ? parts.slice(1) : [...parts.slice(1), filePath];
+    // Windows cannot start a node_modules/.bin shim directly; the plan runs its script with node.
+    const plan = spawnPlan(executable, args);
+    if (!plan) continue;
 
     try {
-      const parts = cmd.split(/\s+/);
-      const args = WHOLE_PROJECT.has(cmd) ? parts.slice(1) : [...parts.slice(1), filePath];
-      execFileSync(parts[0], args, {
+      execFileSync(plan.command, plan.args, {
         cwd: ROOT,
         timeout: timeoutMs,
         stdio: ['pipe', 'pipe', 'pipe'],
         env: process.env,
+        ...plan.options,
       });
     } catch (err) {
       output = (err.stdout?.toString() || '') + (err.stderr?.toString() || '');

@@ -25,7 +25,11 @@
 set -euo pipefail
 
 LOGIN_URL="${1:?Usage: $0 <login-url> [state-file]}"
-STATE_FILE="${2:-./auth-state.json}"
+# State files hold live session tokens: the default lives outside the project so
+# no commit can pick it up.
+STATE_FILE="${2:-$HOME/.agent-browser/state/auth-state.json}"
+mkdir -p "$(dirname "$STATE_FILE")"
+chmod 700 "$HOME/.agent-browser/state" 2>/dev/null || true
 
 echo "Authentication workflow: $LOGIN_URL"
 

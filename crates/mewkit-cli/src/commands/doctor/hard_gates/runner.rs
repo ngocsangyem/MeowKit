@@ -6,6 +6,9 @@
 //! shell. Shell form is one `command` string whose first double-quoted token
 //! is the script. Reconstructing only one would silently skip every hook
 //! registered the other way, which is how a probe set ends up probing nothing.
+//!
+//! Whatever command the settings file names is executed, so `--hard-gates`
+//! runs code the project chose; its help text says so.
 use std::io::{Read, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};

@@ -103,7 +103,7 @@ function openBrowser(url) {
 /**
  * Render the full viewer page from a markdown file.
  */
-function generateFullPage(filePath, assetsDir) {
+function generateFullPage(filePath, assetsDir, nonce) {
   const { html, toc, frontmatter, title } = renderMarkdownFile(filePath);
   const tocHtml = renderTOCHtml(toc);
   const navSidebar = generateNavSidebar(filePath);
@@ -137,16 +137,22 @@ function generateFullPage(filePath, assetsDir) {
     headerNav = `<div class="header-nav">${prevBtn}${nextBtn}</div>`;
   }
 
+  // Front-matter JSON sits inside an inline <script>; "<" is escaped so a
+  // value containing "</script>" cannot close it.
+  const frontmatterJson = JSON.stringify(frontmatter || {}).replace(/</g, '\\u003c');
+
+  // Function replacements: rendered text may contain "$&"-style patterns.
   template = template
-    .replace(/\{\{title\}\}/g, title)
-    .replace('{{toc}}', tocHtml)
-    .replace('{{nav-sidebar}}', navSidebar)
-    .replace('{{nav-footer}}', navFooter)
-    .replace('{{content}}', html)
+    .replace(/\{\{nonce\}\}/g, () => nonce)
+    .replace(/\{\{title\}\}/g, () => title)
+    .replace('{{toc}}', () => tocHtml)
+    .replace('{{nav-sidebar}}', () => navSidebar)
+    .replace('{{nav-footer}}', () => navFooter)
+    .replace('{{content}}', () => html)
     .replace('{{has-plan}}', planInfo.isPlan ? 'has-plan' : '')
-    .replace('{{frontmatter}}', JSON.stringify(frontmatter || {}))
-    .replace('{{back-button}}', backButton)
-    .replace('{{header-nav}}', headerNav);
+    .replace('{{frontmatter}}', () => frontmatterJson)
+    .replace('{{back-button}}', () => backButton)
+    .replace('{{header-nav}}', () => headerNav);
 
   return template;
 }
@@ -233,7 +239,7 @@ async function main() {
 
   const server = createHttpServer({
     assetsDir: assetsResolvedDir,
-    renderMarkdown: (fp) => generateFullPage(fp, assetsResolvedDir),
+    renderMarkdown: (fp, nonce) => generateFullPage(fp, assetsResolvedDir, nonce),
     allowedDirs,
   });
 

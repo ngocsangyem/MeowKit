@@ -157,7 +157,8 @@ pub(super) fn sync_plan(plan_dir: &Path, write: bool) -> std::io::Result<(Vec<Sy
     }
     if write {
         for (name, text) in &files {
-            std::fs::write(plan_dir.join(name), text)?;
+            // A linked plan or phase file is refused, never written through.
+            crate::fsx::write_in(plan_dir, &plan_dir.join(name), text)?;
         }
     }
     Ok((changes, complete))

@@ -13,7 +13,6 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use mewkit_adapters::contract::Kit;
-use mewkit_core::fsx::atomic_write;
 use mewkit_core::validate::{has_pack_manifest, load_pack_manifest, resolve_packs};
 use serde_json::{Value, json};
 
@@ -96,10 +95,8 @@ pub fn record_installed(place: &Place, kit: &Kit) -> Result<(), Failure> {
     let mut bytes = serde_json::to_vec_pretty(&doc).expect("a selection serializes");
     bytes.push(b'\n');
     let path = place.selection_file();
-    if let Some(dir) = path.parent() {
-        std::fs::create_dir_all(dir)?;
-    }
-    atomic_write(&path, &bytes, None)?;
+    // A linked state directory would move the selection out of the scope.
+    mewkit_core::fsx::atomic_write_in(&place.scope.root, &path, &bytes, None)?;
     Ok(())
 }
 

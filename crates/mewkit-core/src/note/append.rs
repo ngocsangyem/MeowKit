@@ -3,6 +3,7 @@
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+use crate::fsx::{append_in, create_dir_all_in, read_to_string_in};
 use crate::memory::{MEMORY_FILE_MAX_LINES, count_lines};
 use crate::sidecar_lock::{SidecarLock, SidecarLockError};
 use crate::state_paths::{StateClass, resolve_state_dir};
@@ -71,16 +72,18 @@ pub fn append_note(project_root: &Path, file: NoteFile, entry: &str) -> Result<S
     let target = memory_dir.join(format!("{}.md", file.as_str()));
     let lock_path = note_lock_path(project_root, file);
     if let Some(dir) = lock_path.parent() {
-        std::fs::create_dir_all(dir)?;
+        create_dir_all_in(project_root, dir)?;
     }
-    std::fs::create_dir_all(&memory_dir)?;
+    // A committed link at the store file or its directory would put the
+    // appended text (and the line-cap read) wherever the link points.
+    create_dir_all_in(project_root, &memory_dir)?;
 
     // Exactly one trailing newline, so the separator logic below is
     // deterministic for every writer.
     let body = format!("{}\n", js_trim(entry));
 
     let _held = SidecarLock::acquire(&lock_path)?;
-    let existing = match std::fs::read_to_string(&target) {
+    let existing = match read_to_string_in(project_root, &target) {
         Ok(text) => text,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => String::new(),
         Err(e) => return Err(e.into()),
@@ -108,10 +111,7 @@ pub fn append_note(project_root: &Path, file: NoteFile, entry: &str) -> Result<S
     // Opened with O_APPEND, so the write is positioned at end-of-file by the
     // kernel at write time: a concurrent holder's append cannot be overwritten
     // even if one slipped past the lock.
-    let mut handle = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&target)?;
+    let mut handle = append_in(project_root, &target)?;
     handle.write_all(prefix.as_bytes())?;
     handle.write_all(body.as_bytes())?;
 

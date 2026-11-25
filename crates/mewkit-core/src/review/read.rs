@@ -171,7 +171,8 @@ pub fn read(options: &ReadOptions<'_>) -> Result<ReadOutcome, ReadRefusal> {
         "reviewer": reviewer,
         "source": "cli",
     });
-    let evidence_error = append_line(&dir.join("evidence.jsonl"), &event.to_string()).err();
+    let evidence_error =
+        append_line(options.cwd, &dir.join("evidence.jsonl"), &event.to_string()).err();
 
     Ok(ReadOutcome {
         content,
@@ -180,13 +181,9 @@ pub fn read(options: &ReadOptions<'_>) -> Result<ReadOutcome, ReadRefusal> {
     })
 }
 
-fn append_line(path: &Path, line: &str) -> Result<(), String> {
+fn append_line(cwd: &Path, path: &Path, line: &str) -> Result<(), String> {
     use std::io::Write;
-    let mut file = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(path)
-        .map_err(|e| e.to_string())?;
+    let mut file = crate::fsx::append_in(cwd, path).map_err(|e| e.to_string())?;
     file.write_all(format!("{line}\n").as_bytes())
         .map_err(|e| e.to_string())
 }

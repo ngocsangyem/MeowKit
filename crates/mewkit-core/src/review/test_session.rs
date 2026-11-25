@@ -124,7 +124,7 @@ pub fn seed_session(seed: &Seed<'_>) -> tempfile::TempDir {
     .expect("write the manifest");
 
     let roster = build_roster(&impact);
-    write_roster(&dir, &roster, seed.session).expect("write the roster");
+    write_roster(project.path(), &dir, &roster, seed.session).expect("write the roster");
 
     let mut cli = String::new();
     let mut hook = String::new();

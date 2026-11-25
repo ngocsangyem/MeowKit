@@ -131,8 +131,18 @@ mewkit upgrade
 \`\`\`"
 
 if gh release view "v$VERSION" >/dev/null 2>&1; then
-  echo "  Release v$VERSION already exists — uploading assets with --clobber."
-  gh release upload "v$VERSION" dist/meowkit-release.zip dist/checksums.txt --clobber
+  # A published asset is never replaced: `mewkit init` trusts the checksums.txt that sits
+  # beside the zip, so swapping both would hand every later install a different kit under
+  # the same version. A re-run only adds an asset that is still missing.
+  EXISTING_ASSETS="$(gh release view "v$VERSION" --json assets --jq '.assets[].name')"
+  for ASSET in meowkit-release.zip checksums.txt; do
+    if printf '%s\n' "$EXISTING_ASSETS" | grep -qx "$ASSET"; then
+      echo "  Release v$VERSION already has $ASSET — leaving it as published."
+    else
+      echo "  Release v$VERSION is missing $ASSET — uploading it."
+      gh release upload "v$VERSION" "dist/$ASSET"
+    fi
+  done
   gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES"
 else
   gh release create "v$VERSION" dist/meowkit-release.zip dist/checksums.txt \

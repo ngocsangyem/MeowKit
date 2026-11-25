@@ -107,14 +107,11 @@ pub(super) fn path_for(
 /// Write it, reporting whether it landed.
 ///
 /// A failed write is advisory and never silent: the checkpoint still commits,
-/// because losing cap accounting is worse than losing the record.
-pub(super) fn write(absolute: &Path, receipt: &Receipt) -> bool {
+/// because losing cap accounting is worse than losing the record. A receipt
+/// path committed as a symlink is refused, never written through.
+pub(super) fn write(project_root: &Path, absolute: &Path, receipt: &Receipt) -> bool {
     let body = render_receipt(receipt);
-    let written = absolute
-        .parent()
-        .map(std::fs::create_dir_all)
-        .unwrap_or(Ok(()))
-        .and_then(|()| std::fs::write(absolute, body));
+    let written = mewkit_core::fsx::write_in(project_root, absolute, body);
     match written {
         Ok(()) => true,
         Err(error) => {

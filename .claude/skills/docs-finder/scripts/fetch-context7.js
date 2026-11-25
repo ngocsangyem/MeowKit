@@ -27,12 +27,30 @@ const OFFICIAL_LLMS_TXT = {
 };
 
 /**
- * HTTPS GET request with timeout
+ * Headers for a request: the Context7 key goes only to context7.com (or a
+ * subdomain) over https, never to the official-site llms.txt fallbacks.
+ */
+function authHeadersFor(url, apiKey = API_KEY) {
+  if (!apiKey) return {};
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return {};
+  }
+  const host = parsed.hostname.toLowerCase();
+  const isContext7 = host === 'context7.com' || host.endsWith('.context7.com');
+  return parsed.protocol === 'https:' && isContext7 ? { 'Authorization': `Bearer ${apiKey}` } : {};
+}
+
+/**
+ * HTTPS GET request with timeout. Redirects are not followed (a 3xx rejects),
+ * so the key is never re-sent to whatever host a redirect names.
  */
 function httpsGet(url, timeoutMs = 30000) {
   return new Promise((resolve, reject) => {
     const options = {
-      headers: API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {},
+      headers: authHeadersFor(url),
       timeout: timeoutMs,
     };
 
@@ -220,5 +238,6 @@ module.exports = {
   buildContext7Url,
   getUrlVariations,
   httpsGet,
+  authHeadersFor,
   OFFICIAL_LLMS_TXT,
 };

@@ -6,12 +6,16 @@
 // substitution: the throwaway project path becomes a placeholder, because that
 // path is different on every run by construction.
 //
-// Two groups are handled apart from the parity set:
+// These are handled apart from the parity set:
 //
 //   stdin-unreadable    Unreadable input used to pass silently. A write guard that
 //               cannot read what is being written must not allow it, so these
 //               four now block. The recording is kept as the before-state and
 //               asserted against the new behavior rather than deleted.
+//
+//   shell-read  A Bash command that reads a credential file used to pass, because the
+//               guard matched only named paths. It now blocks; the recording is kept as
+//               the before-state and the block is asserted against it.
 //
 //   self-path   A diagnostic that quotes the implementation file it is about
 //               differs by that filename after the port, while the decision, exit
@@ -95,6 +99,13 @@ function guardDecision(text: string): GuardDecision {
  */
 const MODEL_CONTEXT_FIXTURES = new Set(["pretaskcheck-injection-blocked"]);
 
+/**
+ * A shell command that reads a credential file used to pass: the guard matched only the paths
+ * a call named, and a Bash call names none. It now reads the command's own words and refuses
+ * the read. The recording is kept as the before-state and the block is asserted instead.
+ */
+const SHELL_READ_FIXTURES = new Set(["privacy-bash-reads-dotenv"]);
+
 const fixtures = loadFixtures();
 const inGroups = (f: Fixture, groups: string[]) => groups.includes(f.group);
 
@@ -153,7 +164,9 @@ describe("golden corpus is non-empty and self-describing", () => {
 });
 
 describe("every recorded fixture replays against the node tree", () => {
-	for (const fixture of fixtures.filter((f) => inGroups(f, PARITY_GROUPS) && !MODEL_CONTEXT_FIXTURES.has(f.name))) {
+	for (const fixture of fixtures.filter(
+		(f) => inGroups(f, PARITY_GROUPS) && !MODEL_CONTEXT_FIXTURES.has(f.name) && !SHELL_READ_FIXTURES.has(f.name),
+	)) {
 		it(`${fixture.group} · ${fixture.name}`, () => assertParity(fixture));
 	}
 });
@@ -174,6 +187,24 @@ describe("unreadable hook input blocks instead of passing silently", () => {
 			expect(actual.stderr, `reason for ${fixture.name}`).toContain(
 				fixture.name.includes("empty") ? "empty" : "not-json",
 			);
+		});
+	}
+});
+
+describe("a shell read of a credential file is refused", () => {
+	const recorded = fixtures.filter((f) => SHELL_READ_FIXTURES.has(f.name));
+
+	it("keeps the before-state recording, a silent pass", () => {
+		expect(recorded).toHaveLength(1);
+		expect(recorded[0].expect.exit).toBe(0);
+	});
+
+	for (const fixture of recorded) {
+		it(`${fixture.name} now exits 2 with the privacy marker`, () => {
+			const actual = replay(fixture);
+			expect(actual.exit, `exit code for ${fixture.name}`).toBe(2);
+			expect(actual.marker, `marker for ${fixture.name}`).toBe("@@PRIVACY_BLOCK@@");
+			expect(actual.stderr).toContain("matches sensitive file pattern");
 		});
 	}
 });

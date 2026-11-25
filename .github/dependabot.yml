@@ -1,0 +1,31 @@
+# Version updates for the three places a compromised upstream could reach a release:
+# the workflow actions (pinned by commit SHA, so a pin has to be moved on purpose),
+# the Rust crates the binary is built from, and the npm tooling.
+#
+# `cooldown` holds an update back until the new version has been public for a week,
+# which is usually long enough for a hijacked release to be reported and pulled.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5

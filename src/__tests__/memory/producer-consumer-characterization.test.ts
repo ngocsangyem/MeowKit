@@ -29,7 +29,7 @@ describe("Audit-lock: telemetry classification", () => {
 	it("learning-observer churn record is debug-gated; file_edited trace stays unconditional", () => {
 		const obs = read(".claude/hooks/handlers/learning-observer.cjs");
 		// The churn printf is guarded by MEOWKIT_HOOK_DEBUG.
-		expect(obs).toMatch(/MEOWKIT_HOOK_DEBUG[\s\S]*"type":"churn"/);
+		expect(obs).toMatch(/MEOWKIT_HOOK_DEBUG[\s\S]*record\('churn'/);
 		// The canonical file_edited trace emission is NOT behind the debug gate.
 		expect(obs).toContain("trace-log.cjs");
 		expect(obs).toContain("file_edited");

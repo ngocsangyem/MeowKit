@@ -128,11 +128,16 @@ describe("the golden privacy, pre-ship and guard fixtures replay unchanged with 
 		expect([...new Set(fixtures.map((f) => f.group))].sort()).toEqual([...HOSTILE_REPLAY_GROUPS].sort());
 	});
 
+	// Recorded as a silent pass before a Bash read of a credential file was refused; the
+	// before-state is kept (see golden-replay.test.ts) and the block is what must survive here.
+	const nowBlocked = new Set(["privacy-bash-reads-dotenv"]);
+
 	for (const fixture of fixtures) {
 		it(`${fixture.group} · ${fixture.name}`, () => {
 			const actual = replay(fixture, { seed: seedHostile });
-			expect(actual.exit, `exit code for ${fixture.name}`).toBe(fixture.expect.exit);
-			expect(actual.marker, `marker for ${fixture.name}`).toBe(fixture.expect.marker);
+			const blocked = nowBlocked.has(fixture.name);
+			expect(actual.exit, `exit code for ${fixture.name}`).toBe(blocked ? 2 : fixture.expect.exit);
+			expect(actual.marker, `marker for ${fixture.name}`).toBe(blocked ? "@@PRIVACY_BLOCK@@" : fixture.expect.marker);
 			if (GUARD_GROUPS.has(fixture.group)) {
 				expect(decisionOf(actual.stdout), `decision for ${fixture.name}`).toEqual(decisionOf(fixture.expect.stdout));
 			}

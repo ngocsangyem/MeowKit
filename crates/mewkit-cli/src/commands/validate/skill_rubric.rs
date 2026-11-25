@@ -29,8 +29,14 @@ pub(super) fn skill_rubric_run(
         std::fs::create_dir_all(dir)
             .map_err(|e| Failure::failed(format!("could not create {}: {e}", dir.display())))?;
     }
-    std::fs::write(&path, format!("{body}\n"))
-        .map_err(|e| Failure::failed(format!("could not write {}: {e}", path.display())))?;
+    // The default report lands in the project, so a link there is refused; an
+    // explicit --report path is the caller's own choice.
+    let written = if report_path.is_none() {
+        mewkit_core::fsx::write_in(project_root, &path, format!("{body}\n"))
+    } else {
+        std::fs::write(&path, format!("{body}\n"))
+    };
+    written.map_err(|e| Failure::failed(format!("could not write {}: {e}", path.display())))?;
     println!(
         "Skill rubric report: {} ({} skills)",
         path.display(),

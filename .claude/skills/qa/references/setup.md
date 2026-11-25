@@ -82,7 +82,7 @@ fi
 
 If `NEEDS_SETUP`:
 1. Tell the user: "The agent-browser CLI is not installed. OK to install it now?" Then STOP and wait.
-2. Run: `npm i -g agent-browser` (or `brew install agent-browser`, or `cargo install agent-browser`).
+2. Run: `npm i -g agent-browser@0.43.0` (or `brew install agent-browser`, or `cargo install agent-browser`).
 3. After install, run `agent-browser install` once to download Chrome.
 
 ## Test framework

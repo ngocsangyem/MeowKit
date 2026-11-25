@@ -112,7 +112,8 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
 
     let unconfirmed = unconfirmed_force("init", args.common.force, args.yes);
     let dry_run = args.dry_run || unconfirmed;
-    let kit = args.kit.resolve(&place)?;
+    args.kit.check_downgrade(&place, args.common.force)?;
+    let kit = args.kit.resolve(&place, args.yes)?;
     for n in &kit.notices {
         eprintln!("note: {n}");
     }

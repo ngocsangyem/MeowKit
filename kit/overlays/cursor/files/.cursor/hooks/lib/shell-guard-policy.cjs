@@ -3,7 +3,7 @@
 // shape (docs report §4): in: `command`; out: `permission (allow|deny|ask),
 // user_message, agent_message`.
 "use strict";
-const { archiveReadInCommand } = require("./core/privacy.cjs");
+const { archiveReadInCommand, sensitiveReadInCommand } = require("./core/privacy.cjs");
 
 // Deny outright: patterns with a high-confidence destructive/irreversible blast
 // radius (data loss, disk wipe, forced history rewrite, remote-script execution).
@@ -37,8 +37,12 @@ function evaluateShellPolicy(payload) {
 	for (const { id, re } of DENY_PATTERNS) {
 		if (re.test(command)) return { blocked: true, ask: false, reason: `destructive command pattern (${id})` };
 	}
-	// The archived-plan read rule the other runtimes run through the shared privacy decision:
-	// Cursor's shell path has no privacy hook, so it is applied here.
+	// The credential-file and archived-plan read rules the other runtimes run through the shared
+	// privacy decision: Cursor's shell path has no privacy hook, so they are applied here.
+	const sensitive = sensitiveReadInCommand(command);
+	if (sensitive) {
+		return { blocked: true, ask: false, reason: `'${sensitive}' matches a sensitive file pattern (injection-rules.md R4); reading or copying it out needs explicit user approval.` };
+	}
 	const archived = archiveReadInCommand(command);
 	if (archived) {
 		return { blocked: true, ask: false, reason: `'${archived}' is an archived plan. Archived plans are kept out of context; the shipped code is the source of truth.` };

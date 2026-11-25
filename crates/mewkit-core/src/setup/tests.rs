@@ -137,3 +137,38 @@ fn skill_envs_refuses_an_undeclared_skill() {
         "Not a skill that needs an environment: ghost. Eligible: (none)"
     );
 }
+
+#[cfg(unix)]
+#[test]
+fn gitignore_refuses_a_kit_ignore_file_committed_as_a_symlink() {
+    let tmp = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let victim = outside.path().join("victim");
+    fs::write(&victim, "keep me\n").unwrap();
+    fs::create_dir_all(tmp.path().join(".meowkit")).unwrap();
+    std::os::unix::fs::symlink(&victim, tmp.path().join(".meowkit/.gitignore")).unwrap();
+
+    let err = run_step("gitignore", tmp.path(), &options(false), &mut |_| {})
+        .unwrap()
+        .unwrap_err();
+    assert!(err.to_string().contains("is a symlink"), "{err}");
+    assert_eq!(fs::read_to_string(&victim).unwrap(), "keep me\n");
+}
+
+#[cfg(unix)]
+#[test]
+fn mcp_does_not_copy_an_example_file_that_is_a_symlink() {
+    let tmp = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let secret = outside.path().join("settings.json");
+    fs::write(&secret, "{\"token\":\"t\"}").unwrap();
+    fs::create_dir_all(tmp.path().join(".meowkit")).unwrap();
+    std::os::unix::fs::symlink(&secret, tmp.path().join(".meowkit/mcp.json.example")).unwrap();
+
+    assert!(
+        run_step("mcp", tmp.path(), &options(false), &mut |_| {})
+            .unwrap()
+            .is_err()
+    );
+    assert!(!tmp.path().join(".mcp.json").exists());
+}

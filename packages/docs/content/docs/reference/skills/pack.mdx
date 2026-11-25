@@ -50,7 +50,7 @@ Do not pack the current project to re-read it in the same session. `mk:scout` re
 1. Classify the source as remote (`owner/repo` or a GitHub URL) or a local path.
 2. Run `scripts/self-pack-guard.sh`. It exits non-zero when the target is the current git root and `--self` was not given, and the skill shows its message.
 3. Compute the output path.
-4. Run `npx --yes repomix@^1.11` with the flags, using `--remote` for remote sources. No global install is needed.
+4. Run `npx --yes repomix@1.19.0` with the flags, using `--remote` for remote sources. No global install is needed.
 5. Show any secret-scan warnings from repomix. With `--no-security-check` the skill prints that the scan is disabled and the output needs manual review.
 6. Print the output path and a reminder not to read the file back into the session.
 

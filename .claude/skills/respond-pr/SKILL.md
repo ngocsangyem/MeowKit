@@ -96,9 +96,11 @@ Below the table, list the **accepted action items**. State explicitly: implement
 Post each reply in its own thread (inline review comment → use the replies endpoint, NOT a
 new top-level comment):
 
+Write each reply to a temporary file with the file-write tool and pass it with `-F body=@<file>`. A reply quotes reviewer text, which is data; inside `-f body="..."` the shell would run its backticks and `$( )`.
+
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies \
-  -f body="<your in-thread reply>"
+  -F body=@<reply-body-file>
 ```
 
 ## Fallbacks (never hard-fail — exit 0, so the triage is never lost)

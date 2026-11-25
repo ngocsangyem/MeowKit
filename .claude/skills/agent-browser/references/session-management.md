@@ -165,11 +165,15 @@ agent-browser --session scrape close
 ### 3. Handle State Files Securely
 
 ```bash
-# Don't commit state files (contain auth tokens!)
-echo "*.auth-state.json" >> .gitignore
+# State files hold auth tokens: keep them outside the project
+mkdir -p ~/.agent-browser/state && chmod 700 ~/.agent-browser/state
+agent-browser state save ~/.agent-browser/state/auth-state.json
+
+# If one must live in the project, ignore it (matches auth-state.json, oauth-state.json, my-auth.json)
+printf '%s\n' '*auth-state.json' '*-auth.json' >> .gitignore
 
 # Delete after use
-rm /tmp/auth-state.json
+rm ~/.agent-browser/state/auth-state.json
 ```
 
 ### 4. Timeout Long Sessions

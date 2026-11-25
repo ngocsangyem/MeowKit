@@ -15,14 +15,28 @@ const { sessionStateDir } = require('../lib/meowkit-paths.cjs');
 const LEDGER_BASENAME = 'learning-observer.jsonl';
 const CHURN_THRESHOLD = 3;
 
-/** How many times this ledger already names the file. */
+/** One ledger record. Serialised, never interpolated, so a quote or newline in a path stays inside its field. */
+const record = (type, file, count, ts) => `${JSON.stringify({ type, file, count, ts })}\n`;
+
+/** How many records in this ledger already name the file, read field by field. */
 function priorEdits(stateFile, filePath) {
+  let lines;
   try {
-    const needle = `"file":"${filePath}"`;
-    return fs.readFileSync(stateFile, 'utf8').split('\n').filter((l) => l.includes(needle)).length;
+    lines = fs.readFileSync(stateFile, 'utf8').split('\n');
   } catch {
     return 0;
   }
+  let count = 0;
+  for (const line of lines) {
+    if (!line) continue;
+    try {
+      const entry = JSON.parse(line);
+      if (entry && entry.file === filePath) count += 1;
+    } catch {
+      // A torn or foreign line names no file.
+    }
+  }
+  return count;
 }
 
 module.exports = function learningObserver(ctx) {
@@ -44,9 +58,9 @@ module.exports = function learningObserver(ctx) {
 
   const count = priorEdits(stateFile, filePath) + 1;
   try {
-    fs.appendFileSync(stateFile, `{"type":"edit","file":"${filePath}","count":${count},"ts":"${ts}"}\n`);
+    fs.appendFileSync(stateFile, record('edit', filePath, count, ts));
     if (process.env.MEOWKIT_HOOK_DEBUG === '1' && count >= CHURN_THRESHOLD) {
-      fs.appendFileSync(stateFile, `{"type":"churn","file":"${filePath}","count":${count},"ts":"${ts}"}\n`);
+      fs.appendFileSync(stateFile, record('churn', filePath, count, ts));
     }
   } catch {
     // A lost ledger line costs a count, not the edit.

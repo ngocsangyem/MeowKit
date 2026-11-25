@@ -247,3 +247,51 @@ fn global_init_and_uninstall_leave_home_as_it_was() {
         .collect();
     assert_eq!(after, before);
 }
+
+#[test]
+fn a_kit_dir_without_allow_unverified_kit_is_refused_and_writes_nothing() {
+    let env = TempHome::new();
+    let dir = support::kit::kit().dir.to_string_lossy().into_owned();
+    let out = env.mewkit(&["init", "--target", "codex", "--kit-dir", &dir]);
+    assert_eq!(code(&out), 2, "{}", text(&out));
+    assert!(
+        text(&out).contains("--allow-unverified-kit"),
+        "{}",
+        text(&out)
+    );
+    assert!(sha_tree(&env.project()).is_empty());
+}
+
+#[test]
+fn a_global_kit_dir_install_is_refused_with_yes_or_without_a_terminal() {
+    let env = TempHome::new();
+    let dir = support::kit::kit().dir.to_string_lossy().into_owned();
+    let base = [
+        "init",
+        "--global",
+        "--target",
+        "claude-code",
+        "--kit-dir",
+        &dir,
+        "--allow-unverified-kit",
+    ];
+    for extra in [&["--yes"][..], &[][..]] {
+        let args: Vec<&str> = base.iter().copied().chain(extra.iter().copied()).collect();
+        let out = env.mewkit(&args);
+        assert_eq!(code(&out), 2, "{extra:?}: {}", text(&out));
+        assert!(text(&out).contains("--global"), "{}", text(&out));
+        assert!(!env.home().join(".claude/settings.json").exists());
+    }
+}
+
+#[test]
+fn an_older_kit_version_than_the_installed_one_needs_force() {
+    let env = TempHome::new();
+    let out = env.with_kit(&["init", "--target", "codex"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    let before = sha_tree(&env.project());
+    let out = env.mewkit(&["init", "--target", "codex", "--kit-version", "v0.0.1"]);
+    assert_eq!(code(&out), 2, "{}", text(&out));
+    assert!(text(&out).contains("--force"), "{}", text(&out));
+    assert_eq!(sha_tree(&env.project()), before);
+}

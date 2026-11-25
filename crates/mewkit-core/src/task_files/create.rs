@@ -55,7 +55,7 @@ pub fn new_task(cwd: &Path, args: &NewTask<'_>) -> TaskOutput {
         Some(dir) => dir,
         None => {
             let dir = cwd.join("tasks").join("active");
-            if let Err(e) = std::fs::create_dir_all(&dir) {
+            if let Err(e) = crate::fsx::create_dir_all_in(cwd, &dir) {
                 return TaskOutput::refused(format!("Fatal: {e}\n"));
             }
             dir
@@ -65,7 +65,9 @@ pub fn new_task(cwd: &Path, args: &NewTask<'_>) -> TaskOutput {
     let slug = to_kebab(description);
     let suffix = task_type.suffix();
     let dest = active_dir.join(format!("{}-{slug}.{suffix}.md", today_yymmdd()));
-    if dest.exists() {
+    // `symlink_metadata`, not `exists`: a dangling link is still something there,
+    // and writing through it would create a file wherever it points.
+    if std::fs::symlink_metadata(&dest).is_ok() {
         return TaskOutput::refused(format!("File already exists: {}\n", dest.display()));
     }
 
@@ -79,7 +81,7 @@ pub fn new_task(cwd: &Path, args: &NewTask<'_>) -> TaskOutput {
             &slug
         )
     );
-    if let Err(e) = std::fs::write(&dest, document) {
+    if let Err(e) = crate::fsx::write_in(&active_dir, &dest, document) {
         return TaskOutput::refused(format!("Fatal: {e}\n"));
     }
 

@@ -48,13 +48,13 @@ function readPackage(root) {
 const isMissingExecutable = (result) => Boolean(result.error && result.error.code === 'ENOENT');
 
 /**
- * Windows cannot spawn `npm`/`npx` by bare name without a shell: they are `.cmd` shims, and
- * Node refuses to run a `.cmd` directly. Find the shim on PATH ourselves so a missing tool still
- * reads as ENOENT, then run it through cmd.exe. Only npm and npx come here, and their arguments
- * are fixed words from this file, so nothing a repository controls reaches the command line.
+ * Windows cannot spawn `npm` by bare name without a shell: it is a `.cmd` shim, and Node
+ * refuses to run a `.cmd` directly. Find the shim on PATH ourselves so a missing tool still
+ * reads as ENOENT, then run it through cmd.exe. Only npm comes here, and its arguments are
+ * fixed words from this file, so nothing a repository controls reaches the command line.
  */
 function findOnWindowsPath(name) {
-  // npm and npx ship as .cmd shims; a fixed list keeps PATHEXT out of the environment a guard reads.
+  // npm ships as a .cmd shim; a fixed list keeps PATHEXT out of the environment a guard reads.
   const exts = ['.cmd', '.exe'];
   for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
     for (const ext of exts) {
@@ -86,7 +86,7 @@ function resolveLocalBinScript(command) {
 /** The spawnSync arguments for a command, adapted so Windows can start it. Identical elsewhere. */
 function spawnPlan(command, args) {
   if (process.platform !== 'win32') return { command, args, options: {} };
-  if (command === 'npm' || command === 'npx') {
+  if (command === 'npm') {
     const shim = findOnWindowsPath(command);
     if (!shim) return null;
     return {
@@ -154,6 +154,7 @@ function createRunner(root, out, deadline, deadlineMs) {
   return { state, runCheck, runIfInstalled };
 }
 
+/** A project's own copy of a Node tool; nothing here runs one through npx, which can fetch it. */
 const localBin = (root, name) => path.join(root, 'node_modules', '.bin', name);
 
 function nodeChecks(root, scope, out, { runCheck }) {
@@ -177,8 +178,12 @@ function nodeChecks(root, scope, out, { runCheck }) {
   else if (/\bjest\b/.test(testScript) && fs.existsSync(localBin(root, 'jest'))) runCheck('jest --findRelatedTests', localBin(root, 'jest'), ['--findRelatedTests', '--passWithNoTests', ...scope.files]);
   else out.push(testScript ? NO_RELATED_TESTS : 'SKIP: No test script in package.json');
 
-  if (exists(root, 'tsconfig.json')) runCheck('tsc --noEmit', 'npx', ['tsc', '--noEmit']);
-  else out.push('SKIP: No tsconfig.json found');
+  // The project's own compiler only: `npx tsc` with no terminal installs whatever registry
+  // package is named `tsc` without asking. Absent, it is an optional tool like eslint: a SKIP.
+  const tsc = localBin(root, 'tsc');
+  if (!exists(root, 'tsconfig.json')) out.push('SKIP: No tsconfig.json found');
+  else if (fs.existsSync(tsc)) runCheck('tsc --noEmit', tsc, ['--noEmit']);
+  else out.push('SKIP: typescript not installed locally');
 }
 
 function pythonChecks(root, scope, out, { runIfInstalled }) {
@@ -240,4 +245,4 @@ function runPreShipChecks(root, scope, { deadlineMs = DEFAULT_DEADLINE_MS } = {}
   return { exit: 0, stdout: out, stderr: [], outcome: 'passed', cause: '' };
 }
 
-module.exports = { isMissingExecutable, runPreShipChecks, NO_RELATED_TESTS };
+module.exports = { isMissingExecutable, localBin, runPreShipChecks, spawnPlan, NO_RELATED_TESTS };

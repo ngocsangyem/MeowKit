@@ -15,7 +15,7 @@ use super::{
     run_jobs, stamp,
 };
 use crate::failure::Failure;
-use crate::kit_args::{KitArgs, installed_kit_or_fetch};
+use crate::kit_args::{KitArgs, installed_kit_or_fetch, previous_kit_for_comparison};
 use crate::output;
 use crate::place::Place;
 
@@ -57,7 +57,7 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
         || args.kit.kit_version.is_some();
     // Resolved once: the kit flags name one kit for every target.
     let named = if named_kit {
-        Some(args.kit.resolve(&place)?)
+        Some(args.kit.resolve(&place, args.yes)?)
     } else {
         None
     };
@@ -74,7 +74,7 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
         let e = emitter_for(runtime)?;
         let mut index = place.index(runtime)?.expect("listed as installed");
         let cached = if named.is_none() {
-            installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
+            previous_kit_for_comparison(&place, &index, args.kit.may_fetch())
         } else {
             None
         };
@@ -208,6 +208,7 @@ fn rewrite_for_those_staying(
         let e = emitter_for(*runtime)?;
         let mut index = index.clone();
         let packs = index.packs.clone();
+        // Replanned and written from this kit, so the cached copy must re-verify.
         let cached = installed_kit_or_fetch(place, &index, may_fetch);
         let Some(kit) = named.or(cached.as_ref()) else {
             eprintln!(

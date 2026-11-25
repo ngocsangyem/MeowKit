@@ -39,7 +39,7 @@ To review someone else's PR use `mk:review-pr`. To implement an accepted comment
 1. List the comments with `gh api repos/{owner}/{repo}/pulls/{pr}/comments` (inline comments, which carry id, path and line) and, when relevant, `issues/{pr}/comments` (top-level discussion).
 2. For each comment, read it, restate the requirement in one neutral sentence, verify it with Grep or Read and cite `file:line`, and evaluate whether it is sound for this repo.
 3. Decide one outcome: accept (record an action item), push back (state the technical reasoning) or clarify (ask a specific question). Ambiguity is resolved before acting, and replies skip praise and thanks and state the decision and the evidence.
-4. With `--reply`, post in the thread through `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies -f body="..."`. A reply is never a top-level comment, and issue-level comments cannot be threaded.
+4. With `--reply`, post in the thread through `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies -F body=@<reply-body-file>`. The reply is passed as a file because it can quote the diff, and a backtick inside a double-quoted shell argument would run. A reply is never a top-level comment, and issue-level comments cannot be threaded.
 
 ## Outputs
 

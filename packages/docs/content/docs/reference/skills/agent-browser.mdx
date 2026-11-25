@@ -95,4 +95,4 @@ Dogfood runs use `references/dogfood-issue-taxonomy.md` and `templates/dogfood-r
 
 ## Safety
 
-Before any authenticated, third-party, production, Slack or user-data task, the skill reads `references/trust-boundaries.md`. Keep auth-state files, HARs, screenshots and videos out of version control when they may hold secrets, stay on the target origin, and confirm before intercepting network traffic on a non-dev target.
+Before any authenticated, third-party, production, Slack or user-data task, the skill reads `references/trust-boundaries.md`. Session-state files hold your cookies in plain text, so the examples save them under `~/.agent-browser/state/`, outside the project. Keep HARs, screenshots and videos out of version control when they may hold secrets, stay on the target origin, and confirm before intercepting network traffic on a non-dev target.

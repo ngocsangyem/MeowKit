@@ -6,7 +6,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -79,9 +79,13 @@ function flattenForDirectoryName(branchSegment) {
 
 // ─── Git command wrapper ─────────────────────────────────────────────────────
 
-function git(command, options = {}) {
+// Takes an argv array and runs git with no shell: branch and path names come from
+// `git worktree list` and user input, and git allows `$(`, `;` and `|` in ref names,
+// so no value may ever be spliced into a command string.
+function git(argv, options = {}) {
+  if (!Array.isArray(argv)) throw new TypeError('git() takes an argv array');
   try {
-    const result = execSync(`git ${command}`, {
+    const result = execFileSync('git', argv, {
       encoding: 'utf-8',
       stdio: options.silent ? 'pipe' : ['pipe', 'pipe', 'pipe'],
       cwd: options.cwd || process.cwd()
@@ -100,7 +104,7 @@ function git(command, options = {}) {
 // ─── Repo introspection ──────────────────────────────────────────────────────
 
 function checkGitRepo(outputError) {
-  const result = git('rev-parse --show-toplevel', { silent: true });
+  const result = git(['rev-parse', '--show-toplevel'], { silent: true });
   if (!result.success) {
     outputError('NOT_GIT_REPO', 'Not in a git repository', {
       suggestion: 'Run this command from within a git repository'
@@ -110,7 +114,7 @@ function checkGitRepo(outputError) {
 }
 
 function checkGitVersion(outputError) {
-  const result = git('worktree list', { silent: true });
+  const result = git(['worktree', 'list'], { silent: true });
   if (!result.success && result.stderr.includes('not a git command')) {
     outputError('GIT_VERSION_ERROR', 'Git version too old (worktree requires git 2.5+)', {
       suggestion: 'Upgrade git to version 2.5 or newer'
@@ -121,9 +125,9 @@ function checkGitVersion(outputError) {
 function detectBaseBranch(cwd) {
   const branches = ['dev', 'develop', 'main', 'master'];
   for (const branch of branches) {
-    const local = git(`show-ref --verify --quiet refs/heads/${branch}`, { silent: true, cwd });
+    const local = git(['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], { silent: true, cwd });
     if (local.success) return branch;
-    const remote = git(`show-ref --verify --quiet refs/remotes/origin/${branch}`, { silent: true, cwd });
+    const remote = git(['show-ref', '--verify', '--quiet', `refs/remotes/origin/${branch}`], { silent: true, cwd });
     if (remote.success) return branch;
   }
   return 'main';
@@ -136,7 +140,7 @@ function findTopmostSuperproject(gitRoot) {
   let topmost = gitRoot;
   let depth = 0;
   while (depth < MAX_SUPERPROJECT_DEPTH) {
-    const result = git('rev-parse --show-superproject-working-tree', { silent: true, cwd: current });
+    const result = git(['rev-parse', '--show-superproject-working-tree'], { silent: true, cwd: current });
     if (!result.success || !result.output) break;
     topmost = result.output;
     current = result.output;
@@ -213,13 +217,13 @@ function getWorktreeRoot(gitRoot, isMonorepo, explicitRoot, orchestratedDir, out
 // ─── Dirty state ─────────────────────────────────────────────────────────────
 
 function checkDirtyState(cwd = process.cwd()) {
-  const diff = git('diff --quiet', { silent: true, cwd });
-  const diffCached = git('diff --cached --quiet', { silent: true, cwd });
+  const diff = git(['diff', '--quiet'], { silent: true, cwd });
+  const diffCached = git(['diff', '--cached', '--quiet'], { silent: true, cwd });
   return !diff.success || !diffCached.success;
 }
 
 function getDirtyStateDetails(cwd = process.cwd()) {
-  const status = git('status --porcelain', { silent: true, cwd });
+  const status = git(['status', '--porcelain'], { silent: true, cwd });
   if (!status.success) return null;
   const lines = status.output.split('\n').filter(Boolean);
   const modified = lines.filter(l => l.startsWith(' M') || l.startsWith('M ')).length;
@@ -231,21 +235,21 @@ function getDirtyStateDetails(cwd = process.cwd()) {
 // ─── Branch / worktree queries ────────────────────────────────────────────────
 
 function branchExists(branchName, cwd) {
-  const local = git(`show-ref --verify --quiet refs/heads/${branchName}`, { silent: true, cwd });
+  const local = git(['show-ref', '--verify', '--quiet', `refs/heads/${branchName}`], { silent: true, cwd });
   if (local.success) return 'local';
-  const remote = git(`show-ref --verify --quiet refs/remotes/origin/${branchName}`, { silent: true, cwd });
+  const remote = git(['show-ref', '--verify', '--quiet', `refs/remotes/origin/${branchName}`], { silent: true, cwd });
   if (remote.success) return 'remote';
   return false;
 }
 
 function isBranchCheckedOut(branchName, cwd) {
-  const result = git('worktree list --porcelain', { silent: true, cwd });
+  const result = git(['worktree', 'list', '--porcelain'], { silent: true, cwd });
   if (!result.success) return false;
   return result.output.includes(`branch refs/heads/${branchName}`);
 }
 
 function getGitCommonDir(cwd) {
-  const result = git('rev-parse --git-common-dir', { silent: true, cwd });
+  const result = git(['rev-parse', '--git-common-dir'], { silent: true, cwd });
   if (!result.success || !result.output) return null;
   return path.resolve(cwd, result.output);
 }
@@ -253,7 +257,7 @@ function getGitCommonDir(cwd) {
 function getMainWorktreePath(gitRoot, cwd) {
   const gitCommonDir = getGitCommonDir(cwd);
   if (!gitCommonDir) return gitRoot;
-  const configResult = git(`config --file "${gitCommonDir}/config" --get core.worktree`, { silent: true, cwd });
+  const configResult = git(['config', '--file', path.join(gitCommonDir, 'config'), '--get', 'core.worktree'], { silent: true, cwd });
   if (!configResult.success || !configResult.output) return gitRoot;
   return path.resolve(gitCommonDir, configResult.output);
 }
@@ -301,7 +305,7 @@ function parseWorktreeListPorcelain(output, options = {}) {
 }
 
 function getWorktreeRecords(gitRoot, cwd, outputError) {
-  const result = git('worktree list --porcelain', { silent: true, cwd });
+  const result = git(['worktree', 'list', '--porcelain'], { silent: true, cwd });
   if (!result.success) {
     outputError('WORKTREE_LIST_ERROR', 'Failed to list worktrees', {
       suggestion: 'Ensure you are in a git repository'
@@ -317,7 +321,7 @@ function getAheadBehind(branchName, baseBranch, cwd) {
   if (!branchName || !baseBranch || branchName === 'detached' || branchName === 'bare') {
     return { ahead: 0, behind: 0 };
   }
-  const result = git(`rev-list --left-right --count "${branchName}...${baseBranch}"`, { silent: true, cwd });
+  const result = git(['rev-list', '--left-right', '--count', `${branchName}...${baseBranch}`, '--'], { silent: true, cwd });
   if (!result.success || !result.output) return { ahead: 0, behind: 0 };
   const [ahead, behind] = result.output.trim().split(/\s+/).map(v => Number.parseInt(v, 10));
   return {

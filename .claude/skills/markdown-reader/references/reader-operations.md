@@ -7,7 +7,7 @@ sets the initial port, `--no-open` suppresses the browser, `--background` is leg
 `--foreground` runs in-process. `--stop` stops all instances.
 
 The HTTP routes are `/view?file=<path>`, `/browse?dir=<path>`, `/assets/*`, and `/file/*`.
-Allowed-directory validation protects every path. The service only binds localhost.
+Every path is resolved through symlinks and must sit inside an allowed directory; dotfiles and credential-like names are refused. The service only binds localhost and refuses any other Host header. Raw HTML in markdown renders as text, and a Content-Security-Policy limits pages to the reader's own nonced scripts and the Mermaid CDN module.
 
 ## State, architecture, and recovery
 

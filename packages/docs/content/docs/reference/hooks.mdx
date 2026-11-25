@@ -22,8 +22,8 @@ Only exit code 2 blocks a tool call. Any other exit is advisory, which is why th
 
 | Hook | Event and matcher | What it does | Blocks |
 | --- | --- | --- | --- |
-| `privacy-block.cjs` | PreToolUse: Edit\|Write, Read\|Grep\|Glob, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH), reads of archived plans under `tasks/plans/archive/` and `tasks/plans/ceo-plans/archive/`, and unsafe web-fetch targets | Yes (exit 2) |
-| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check. Before the check it prints the plan drift line and archive reminder, which change nothing | Yes: exit 2 when a check fails; the `ask` permission decision when a check could not run (crash, missing tool, deadline) |
+| `privacy-block.cjs` | PreToolUse: Edit\|Write, Read\|Grep\|Glob, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH, cloud and registry tokens), shell commands that print or copy one out, reads of archived plans under `tasks/plans/archive/` and `tasks/plans/ceo-plans/archive/`, and unsafe web-fetch targets | Yes (exit 2) |
+| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check, each from the project's own `node_modules/.bin` (nothing is fetched). Before the check it prints the plan drift line and archive reminder, which change nothing | Yes: exit 2 when a check fails; the `ask` permission decision when a check could not run (crash, missing tool, deadline) |
 
 `privacy-block.cjs` also blocks when the hook itself fails (`onFailure: block`). `mewkit doctor --hard-gates` runs both guards, and the injection scanner, in a scratch project and reports which block.
 
@@ -62,7 +62,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 
 ### build-verify
 
-`build-verify` picks the check from the file extension: `ts` and `tsx` run `tsc --noEmit` and `eslint`, the JavaScript extensions (`js`, `jsx`, `mjs`, `cjs`) run `eslint`, `py` runs `ruff check` and `mypy`, `go` runs `go build ./...`, `rs` runs `cargo check`, and `rb` runs `ruby -c` and `rubocop`. On failure it exits 2 and writes a `@@BUILD_VERIFY_ERROR@@ ... @@END_BUILD_VERIFY@@` block to stderr, which Claude Code shows to the model. It skips `node_modules/`, virtualenvs, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `out/`, `tasks/`, `docs/`, `plans/`, `.claude/`, test files, and minified, map and lock files. The default timeout is 30 s (60 s for Rust, 20 s for Ruby, 15 s for JavaScript), and `buildVerify.timeoutMs` overrides it. It does nothing when `autobuild.mode` is `MINIMAL`.
+`build-verify` picks the check from the file extension: `ts` and `tsx` run `tsc --noEmit` and `eslint`, the JavaScript extensions (`js`, `jsx`, `mjs`, `cjs`) run `eslint`, both from the project's own `node_modules/.bin` and never through `npx`, which would fetch a missing package; a tool not installed there is skipped. `py` runs `ruff check` and `mypy`, `go` runs `go build ./...`, `rs` runs `cargo check`, and `rb` runs `ruby -c` and `rubocop`. On failure it exits 2 and writes a `@@BUILD_VERIFY_ERROR@@ ... @@END_BUILD_VERIFY@@` block to stderr, which Claude Code shows to the model. It skips `node_modules/`, virtualenvs, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `out/`, `tasks/`, `docs/`, `plans/`, `.claude/`, test files, and minified, map and lock files. The default timeout is 30 s (60 s for Rust, 20 s for Ruby, 15 s for JavaScript), and `buildVerify.timeoutMs` overrides it. It does nothing when `autobuild.mode` is `MINIMAL`.
 
 ### pre-completion-check
 

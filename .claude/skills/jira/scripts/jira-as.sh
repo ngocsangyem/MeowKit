@@ -34,6 +34,11 @@ fi
 # parsed as KEY=VALUE lines, never sourced: sourcing would run any shell code in them.
 ENV_FILES=("$ROOT/.meowkit/.env" "$ROOT/.claude/.env" "${HOME:-}/.meowkit/.env")
 REFUSED_KEYS=" PATH LD_PRELOAD LD_LIBRARY_PATH DYLD_INSERT_LIBRARIES DYLD_FRAMEWORK_PATH IFS BASH_ENV ENV "
+# The site URL, email and token are one credential: a token is only ever sent to the
+# site saved beside it. Each file that supplies one of them is recorded, so a project
+# file naming only a site cannot borrow the user-wide token.
+CONNECTION_KEYS="MEOW_JIRA_SITE_URL MEOW_JIRA_EMAIL MEOW_JIRA_API_TOKEN"
+for key in $CONNECTION_KEYS; do unset "SRC_$key"; done
 
 load_env_file() {
   local line key value
@@ -57,11 +62,26 @@ load_env_file() {
       value="${value%%[[:space:]]#*}"
     fi
     export "$key=$value"
+    case " $CONNECTION_KEYS " in *" $key "*) printf -v "SRC_$key" '%s' "$1" ;; esac
   done < "$1"
 }
 
 for ENV_FILE in "${ENV_FILES[@]}"; do
   if [ -f "$ENV_FILE" ]; then load_env_file "$ENV_FILE"; fi
+done
+
+# Refuse a credential assembled from two files. A shell export is the user's own
+# choice and is not counted.
+FIRST_KEY="" FIRST_SRC=""
+for key in $CONNECTION_KEYS; do
+  src_var="SRC_$key"; src="${!src_var:-}"
+  [ -n "$src" ] || continue
+  if [ -z "$FIRST_SRC" ]; then FIRST_KEY="$key"; FIRST_SRC="$src"; continue; fi
+  if [ "$src" != "$FIRST_SRC" ]; then
+    echo "[jira] $FIRST_KEY comes from $FIRST_SRC but $key comes from $src" >&2
+    echo "[jira] Put MEOW_JIRA_SITE_URL, MEOW_JIRA_EMAIL and MEOW_JIRA_API_TOKEN together in one of these files, so a token is only sent to the site it was saved with." >&2
+    exit 78
+  fi
 done
 
 : "${MEOW_JIRA_API_TOKEN:?MEOW_JIRA_API_TOKEN missing — see .meowkit/.env.example}"

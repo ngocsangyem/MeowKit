@@ -212,3 +212,42 @@ fn a_ledger_changed_by_an_older_binary_keeps_the_skill_unmerged() {
     let after_keys: Vec<String> = after.as_object().unwrap().keys().cloned().collect();
     assert_eq!(after_keys, keys);
 }
+
+#[test]
+fn a_cache_entry_from_an_older_binary_is_a_merge_base_but_not_an_offline_install_source() {
+    let s = setup(true);
+    let p = s.env.project();
+    // An older mewkit wrote meta.json without a tree digest.
+    let cache = p.join(".meowkit/cache/kits");
+    for entry in std::fs::read_dir(&cache).unwrap().flatten() {
+        let meta = entry.path().join("meta.json");
+        if meta.is_file() {
+            let mut doc: Value = serde_json::from_str(&read(&entry.path(), "meta.json")).unwrap();
+            doc.as_object_mut().unwrap().remove("tree");
+            std::fs::write(&meta, doc.to_string()).unwrap();
+        }
+    }
+    let edited = read(&p, FILE);
+
+    let offline = s.env.mewkit(&["upgrade", "--offline"]);
+    assert_ne!(code(&offline), 0, "{}", text(&offline));
+    assert!(
+        text(&offline).contains("--allow-unverified-kit"),
+        "{}",
+        text(&offline)
+    );
+    assert_eq!(read(&p, FILE), edited);
+
+    let out = with_archive(&s.env, &s.next, &["upgrade"]);
+    assert_eq!(
+        code(&out),
+        0,
+        "merged against the old entry: {}",
+        text(&out)
+    );
+    let file = read(&p, FILE);
+    assert!(
+        file.contains(USER_LINE) && file.contains(KIT_LINE),
+        "{file}"
+    );
+}

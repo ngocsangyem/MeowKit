@@ -62,6 +62,18 @@ def _truncate(text: str, length: int) -> str:
     return text[: length].rstrip()
 
 
+def _inert_in_double_quotes(text: str) -> str:
+    """Escape what bash still expands inside "...": backslash, $, backtick, quote.
+
+    Summaries, descriptions and comment bodies are quoted from the source spec
+    or ticket, so they are data; unescaped, `cmd` or $(cmd) in them would run
+    when the planned command reaches a shell.
+    """
+    for char in ("\\", "$", "`", '"'):
+        text = text.replace(char, "\\" + char)
+    return text
+
+
 def _strip_forbidden_flags(text: str) -> str:
     for flag in FORBIDDEN_V1_FLAGS:
         if flag in text:
@@ -80,9 +92,9 @@ def _build_create_command(record: dict, project: str, epic: Optional[str],
         "/mk:jira-issue create",
         f'--project {project}',
         f'--type Story',
-        f'--summary "{summary}"',
+        f'--summary "{_inert_in_double_quotes(summary)}"',
         f'--story-points {sizing.get("points")}',
-        f'--description "{description}"',
+        f'--description "{_inert_in_double_quotes(description)}"',
     ]
     if epic:
         parts.append(f'--epic {epic}')
@@ -124,7 +136,7 @@ def _render_comment(template: str, record: dict, report_path: str) -> str:
 
 
 def _build_comment_command(new_key: str, body: str) -> str:
-    safe_body = body.replace('"', "'")
+    safe_body = _inert_in_double_quotes(body.replace('"', "'"))
     return (
         f'/mk:jira-collaborate comment add {new_key} '
         f'--body "{safe_body}" --visibility-role Administrators'

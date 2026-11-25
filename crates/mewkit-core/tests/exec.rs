@@ -692,3 +692,124 @@ fn a_mounted_directory_outside_the_root_installs_and_strips_back() {
         "model = \"x\"\n"
     );
 }
+
+#[cfg(unix)]
+#[test]
+fn a_merge_target_committed_as_a_symlink_is_refused_and_never_read_into_the_project() {
+    let dir = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let global = outside.path().join("settings.md");
+    std::fs::write(&global, "token: secret\n").unwrap();
+    std::os::unix::fs::symlink(&global, dir.path().join("AGENTS.md")).unwrap();
+    let err = execute(
+        &install_plan(),
+        &scope(dir.path()),
+        &mut fresh_index(),
+        &kit,
+        ExecOptions::default(),
+    )
+    .unwrap_err();
+    assert!(
+        matches!(&err, ExecError::Path(PathError::SymlinkedFile(p)) if p == "AGENTS.md"),
+        "{err}"
+    );
+    assert!(err.to_string().contains("is a symlink"), "{err}");
+    assert_eq!(std::fs::read_to_string(&global).unwrap(), "token: secret\n");
+    assert!(
+        std::fs::symlink_metadata(dir.path().join("AGENTS.md"))
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
+    assert!(!dir.path().join(".codex/hooks/gate.cjs").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_lock_file_committed_as_a_dangling_symlink_creates_nothing_at_its_target() {
+    let dir = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let victim = outside.path().join("created-by-the-lock");
+    std::fs::create_dir_all(dir.path().join(".meowkit/state")).unwrap();
+    std::os::unix::fs::symlink(&victim, dir.path().join(".meowkit/state/mewkit.lock")).unwrap();
+    let err = execute(
+        &install_plan(),
+        &scope(dir.path()),
+        &mut fresh_index(),
+        &kit,
+        ExecOptions::default(),
+    )
+    .unwrap_err();
+    assert!(
+        matches!(err, ExecError::Path(PathError::SymlinkedFile(_))),
+        "{err}"
+    );
+    assert!(!victim.exists());
+}
+
+/// A committed `mewkit-interrupted.json` beside the scope lock.
+fn plant_record(root: &Path, record: serde_json::Value) {
+    let file = root.join(".meowkit/state/mewkit-interrupted.json");
+    std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+    std::fs::write(file, record.to_string()).unwrap();
+}
+
+#[test]
+fn an_interrupted_record_naming_a_backup_outside_the_backups_dir_is_ignored() {
+    let home = tempfile::tempdir().unwrap();
+    let dir = home.path().join("project");
+    std::fs::create_dir_all(dir.join(".ssh")).unwrap();
+    std::fs::create_dir_all(home.path().join(".ssh")).unwrap();
+    std::fs::write(home.path().join(".ssh/id_fake"), "PRIVATE KEY").unwrap();
+    std::fs::create_dir_all(home.path().join(".codex")).unwrap();
+    std::fs::write(home.path().join(".codex/stolen"), "outside").unwrap();
+    std::fs::write(dir.join("AGENTS.md"), "# Mine\n").unwrap();
+    plant_record(
+        &dir,
+        json!({"backup": "..", "paths": [".ssh/id_fake", ".codex/stolen"]}),
+    );
+    let report = execute(
+        &install_plan(),
+        &scope(&dir),
+        &mut fresh_index(),
+        &kit,
+        ExecOptions::default(),
+    )
+    .unwrap();
+    assert!(
+        report.notices.iter().any(|n| n.contains("ignored")),
+        "{:?}",
+        report.notices
+    );
+    assert!(!dir.join(".ssh/id_fake").exists());
+    assert!(!dir.join(".codex/stolen").exists());
+    assert_eq!(
+        std::fs::read_to_string(home.path().join(".ssh/id_fake")).unwrap(),
+        "PRIVATE KEY"
+    );
+}
+
+#[test]
+fn an_interrupted_record_listing_paths_outside_the_roots_deletes_nothing() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("README.md"), "keep").unwrap();
+    std::fs::create_dir_all(dir.path().join(".meowkit/memory")).unwrap();
+    std::fs::write(dir.path().join(".meowkit/memory/gotchas.md"), "keep").unwrap();
+    for listed in ["README.md", ".meowkit/memory/gotchas.md"] {
+        plant_record(dir.path(), json!({"backup": null, "paths": [listed]}));
+        let report = execute(
+            &install_plan(),
+            &scope(dir.path()),
+            &mut fresh_index(),
+            &kit,
+            ExecOptions::default(),
+        )
+        .unwrap();
+        assert!(
+            report.notices.iter().any(|n| n.contains("ignored")),
+            "{listed}: {:?}",
+            report.notices
+        );
+        assert!(dir.path().join(listed).exists(), "{listed}");
+    }
+}

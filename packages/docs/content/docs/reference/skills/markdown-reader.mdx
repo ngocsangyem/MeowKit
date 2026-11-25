@@ -26,6 +26,8 @@ To render code, architecture or a diff as an explainer or diagram use `mk:previe
 
 Install the dependencies once (`marked`, `highlight.js`, `gray-matter`). Without them the reader returns "Error 500: Error rendering markdown".
 
+A rendered file is treated as text, not as a program. Front-matter is parsed as YAML or JSON only, raw HTML in the markdown is shown escaped, and the page runs no script from the file. The local server answers only requests addressed to `127.0.0.1` or `localhost`, serves files inside the project only, and refuses dotfiles and credential-named files.
+
 ```bash
 cd .claude/skills/markdown-reader && npm install
 node .claude/skills/markdown-reader/scripts/server.cjs --file ./tasks/plans/my-plan/plan.md

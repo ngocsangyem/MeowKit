@@ -42,6 +42,8 @@ MEOW_CONFLUENCE_API_TOKEN=your-api-token
 
 Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens (Atlassian Cloud login required).
 
+Keep all three in one file — project `.meowkit/.env` or user-wide `~/.meowkit/.env`. A shell export wins over every file; otherwise the first file that sets a key supplies it, and the wrapper exits 78 when the three come from different files, so a project file that sets only a site URL never receives the user-wide token.
+
 The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load credentials from a host `settings.local.json` even if present (security override of upstream default behavior).
 
 ## Install
@@ -59,7 +61,7 @@ The CLI binary is `confluence-as`; some upstream READMEs say `confluence`. If a 
 
 ## Cloud-only constraint
 
-The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.net`. Server / Data Center deployments are out of scope.
+The wrapper exits 3 unless the host of `MEOW_CONFLUENCE_SITE_URL` (the part between `scheme://` and the first `/`, `?`, `#` or `:`) ends in `.atlassian.net`. Server / Data Center deployments are out of scope.
 
 **Escape hatch for Server/DC users:** install the MCP Atlassian server (`@sooperset/mcp-atlassian`) and call its Confluence tools directly via your host-runtime MCP config. The `mk:confluence-*` skills do NOT auto-fallback.
 
@@ -72,6 +74,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | 2    | Plaintext credential fallback detected — move to `.meowkit/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
 | 127  | `confluence-as` binary not installed — run `mewkit skill env confluence` |
+| 78   | Site URL, email and token come from different env files — put all three in one file |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 

@@ -140,7 +140,9 @@ pub fn previous_archive() -> &'static (PathBuf, String) {
 pub fn current_archive() -> &'static (PathBuf, String) {
     static ZIP: OnceLock<(PathBuf, String)> = OnceLock::new();
     ZIP.get_or_init(|| {
-        let file = Path::new(env!("CARGO_TARGET_TMPDIR")).join("current-kit.zip");
+        // Per process: test binaries run at once and share this directory.
+        let file = Path::new(env!("CARGO_TARGET_TMPDIR"))
+            .join(format!("current-kit-{}.zip", std::process::id()));
         super::zip_tree(&kit::kit().dir, &file)
     })
 }

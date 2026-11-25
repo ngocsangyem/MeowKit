@@ -6,7 +6,7 @@
   <title>{{title}} - Novel Viewer</title>
   <link rel="icon" type="image/png" href="/assets/favicon.ico">
   <!-- Apply stored preferences BEFORE CSS loads to prevent FOUC -->
-  <script>
+  <script nonce="{{nonce}}">
     (function(){
       var h=document.documentElement;
       var t=localStorage.getItem('theme');
@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark" disabled>
   <!-- Mermaid.js for diagram rendering -->
-  <script type="module">
+  <script type="module" nonce="{{nonce}}">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     window.mermaidModule = mermaid;
   </script>
@@ -141,9 +141,9 @@
     </div>
   </div>
 
-  <script>
+  <script nonce="{{nonce}}">
     window.__frontmatter = {{frontmatter}};
   </script>
-  <script src="/assets/reader.js"></script>
+  <script src="/assets/reader.js" nonce="{{nonce}}"></script>
 </body>
 </html>

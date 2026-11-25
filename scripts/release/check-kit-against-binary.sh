@@ -27,7 +27,7 @@ for runtime in claude-code codex cursor; do
 	dir="$scratch/$runtime"
 	mkdir -p "$dir/project" "$dir/home"
 	out=$(cd "$dir/project" && env -u CLAUDE_CONFIG_DIR -u CODEX_HOME HOME="$dir/home" USERPROFILE="$dir/home" \
-		"$bin" init --target "$runtime" --dry-run --kit-dir "$kit" 2>&1)
+		"$bin" init --target "$runtime" --dry-run --kit-dir "$kit" --allow-unverified-kit 2>&1)
 	code=$?
 	# 0: nothing to do; 3: changes pending (what a dry run of a fresh install reports).
 	if [ "$code" -eq 0 ] || [ "$code" -eq 3 ]; then
