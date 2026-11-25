@@ -22,7 +22,7 @@ Option tables, JSON field docs and usage for the script verbs: `create`, `remove
 Returns repo metadata used as a pre-flight check before creating worktrees.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs info --json
+node scripts/worktree.cjs info --json
 ```
 
 ### JSON Output Fields
@@ -48,7 +48,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs info --json
 Lists all registered worktrees.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs list --json
+node scripts/worktree.cjs list --json
 ```
 
 ### JSON Output Fields
@@ -76,7 +76,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs list --json
 Health audit of all worktrees including divergence from base branch.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs status --json
+node scripts/worktree.cjs status --json
 ```
 
 ### JSON Output Fields
@@ -108,7 +108,7 @@ Creates a worktree. Two modes:
 ### Orchestrated mode (parallel agents)
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{agent-name}" --orchestrated [--dry-run] --json
+node scripts/worktree.cjs create "{agent-name}" --orchestrated [--dry-run] --json
 ```
 
 Places worktree at `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`.
@@ -117,9 +117,9 @@ Matches `.claude/skills/cook/references/parallel-execution-rules.md` Rule 3 exac
 ### Feature mode (standard)
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{feature}" --prefix feat [--dry-run] --json
+node scripts/worktree.cjs create "{feature}" --prefix feat [--dry-run] --json
 # Monorepo:
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
+node scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
 ```
 
 ### Options
@@ -157,7 +157,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{project}" "{feature}" --p
 Removes a worktree and deletes its branch. Supports fuzzy matching by name, path, or branch.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
+node scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
 ```
 
 **Match priority:** exact → prefix → contains (≥4 chars). Errors on 0 or >1 matches.
@@ -180,8 +180,8 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" [--dry-run] 
 Removes stale worktree metadata from `.git/worktrees/`. Always dry-run first.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --dry-run --json
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --json
+node scripts/worktree.cjs prune --dry-run --json
+node scripts/worktree.cjs prune --json
 ```
 
 ### JSON Output Fields
@@ -200,7 +200,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --json
 Creates a detached, SHA-bound worktree at `.worktrees/review-pr-*` from a PR head, for review. Fetches `pull/N/head` from the PR's base remote and writes a manifest to `tasks/reviews/<session>/manifest.json`.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr --pr <n> --remote <base-remote> --session <id> [--base <branch>] [--dry-run] --json
+node scripts/worktree.cjs review-pr --pr <n> --remote <base-remote> --session <id> [--base <branch>] [--dry-run] --json
 ```
 
 Required: `--pr` (positive integer), `--remote` (must be the base repo, not a fork), `--session` (letters, digits, `. _ -`). `--dry-run` validates and prints the manifest without fetching or creating anything. The output carries the manifest fields, including `worktreePath`, `ref` and the head SHA.
@@ -212,8 +212,8 @@ Required: `--pr` (positive integer), `--remote` (must be the base repo, not a fo
 Removes a review worktree. Accepts only a manifest path, or a sweep of stale sessions.
 
 ```bash
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
-node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json   # --apply to execute
+node scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
+node scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json   # --apply to execute
 ```
 
 Removal proceeds only when the manifest nonce matches the in-worktree `.mewkit-review.json` and the target is a detached `.worktrees/review-pr-*` worktree; otherwise `CLEANUP_REFUSED`.
