@@ -1,36 +1,36 @@
 {
   "stable": {
-    "version": "0.2.0",
+    "version": "0.2.1",
     "targets": {
       "x86_64-unknown-linux-musl": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-unknown-linux-musl.tar.gz",
-        "sha256": "be24242ac265e17d550ebe7e426d608c66c20ed11e0a916c3f3cffd2757413e4",
-        "size": 5458764
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-unknown-linux-musl.tar.gz",
+        "sha256": "f5d63c55006c8172171b654fed2dd3bd88cf4e99d2ed5cd6dd2b8f76a9386122",
+        "size": 5454147
       },
       "aarch64-unknown-linux-musl": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-unknown-linux-musl.tar.gz",
-        "sha256": "7c7aaf3306a64597b4840e84feeaf13f1235795353ad0b254079d2b9e4f40a5f",
-        "size": 4931425
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-unknown-linux-musl.tar.gz",
+        "sha256": "3d8066aa3b89c8f91c4548fda9c8e39ab680e4ce15e2220575140481f46c11ec",
+        "size": 4924501
       },
       "x86_64-apple-darwin": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-apple-darwin.tar.gz",
-        "sha256": "485902df541e3d0d458fa39197ac10b87455cab895fb61f7daf0daefa196395b",
-        "size": 5195884
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-apple-darwin.tar.gz",
+        "sha256": "523abd4c2da02f0687580f23e5edd5aa7583a860cb9770983f4f9ba89e203353",
+        "size": 5195306
       },
       "aarch64-apple-darwin": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-apple-darwin.tar.gz",
-        "sha256": "d5133dbb5cb535a466363415eb269c4c6526c1412bdf5b94d4d30479aa0d7810",
-        "size": 4734439
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-apple-darwin.tar.gz",
+        "sha256": "c43539d03397f2243107eb476be44ab04ed7761ace2516a1c66de65781e1dfca",
+        "size": 4741983
       },
       "x86_64-pc-windows-msvc": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-pc-windows-msvc.tar.gz",
-        "sha256": "6f93ca62502d250b43e392475b63e74335301e1f0dfef7903394efb199647f7e",
-        "size": 5719026
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-pc-windows-msvc.tar.gz",
+        "sha256": "5784b544a0b6007f7b31785a107d752ab849a837a676d521ad8aba725c993702",
+        "size": 5729828
       },
       "aarch64-pc-windows-msvc": {
-        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-pc-windows-msvc.tar.gz",
-        "sha256": "5c8a88ed6a97e7836306bece7d56e5f9b359dd12b32dce1abad0acd847b6aa82",
-        "size": 5196833
+        "url": "https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-pc-windows-msvc.tar.gz",
+        "sha256": "77b4615d09a885f8771c9e3e52133ec70abced2f165cecc0c49203bccb40eae8",
+        "size": 5201764
       }
     }
   },

@@ -24,10 +24,10 @@ die() { printf 'mewkit install: error: %s\n' "$1" >&2; exit 1; }
 # The pinned archive for a channel and target: "version url sha256 size".
 pin() {
 	case "$1:$2" in
-		stable:x86_64-unknown-linux-musl) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-unknown-linux-musl.tar.gz be24242ac265e17d550ebe7e426d608c66c20ed11e0a916c3f3cffd2757413e4 5458764" ;;
-		stable:aarch64-unknown-linux-musl) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-unknown-linux-musl.tar.gz 7c7aaf3306a64597b4840e84feeaf13f1235795353ad0b254079d2b9e4f40a5f 4931425" ;;
-		stable:x86_64-apple-darwin) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-apple-darwin.tar.gz 485902df541e3d0d458fa39197ac10b87455cab895fb61f7daf0daefa196395b 5195884" ;;
-		stable:aarch64-apple-darwin) echo "0.2.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-apple-darwin.tar.gz d5133dbb5cb535a466363415eb269c4c6526c1412bdf5b94d4d30479aa0d7810 4734439" ;;
+		stable:x86_64-unknown-linux-musl) echo "0.2.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-unknown-linux-musl.tar.gz f5d63c55006c8172171b654fed2dd3bd88cf4e99d2ed5cd6dd2b8f76a9386122 5454147" ;;
+		stable:aarch64-unknown-linux-musl) echo "0.2.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-unknown-linux-musl.tar.gz 3d8066aa3b89c8f91c4548fda9c8e39ab680e4ce15e2220575140481f46c11ec 4924501" ;;
+		stable:x86_64-apple-darwin) echo "0.2.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-apple-darwin.tar.gz 523abd4c2da02f0687580f23e5edd5aa7583a860cb9770983f4f9ba89e203353 5195306" ;;
+		stable:aarch64-apple-darwin) echo "0.2.1 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-apple-darwin.tar.gz c43539d03397f2243107eb476be44ab04ed7761ace2516a1c66de65781e1dfca 4741983" ;;
 		*) return 1 ;;
 	esac
 }

@@ -25,8 +25,8 @@ $ProgressPreference = 'SilentlyContinue'
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
 
 $Pins = @{
-	'stable:x86_64-pc-windows-msvc' = @{ Version = '0.2.0'; Url = 'https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-x86_64-pc-windows-msvc.tar.gz'; Sha256 = '6f93ca62502d250b43e392475b63e74335301e1f0dfef7903394efb199647f7e'; Size = 5719026 }
-	'stable:aarch64-pc-windows-msvc' = @{ Version = '0.2.0'; Url = 'https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.0/mewkit-0.2.0-aarch64-pc-windows-msvc.tar.gz'; Sha256 = '5c8a88ed6a97e7836306bece7d56e5f9b359dd12b32dce1abad0acd847b6aa82'; Size = 5196833 }
+	'stable:x86_64-pc-windows-msvc' = @{ Version = '0.2.1'; Url = 'https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-x86_64-pc-windows-msvc.tar.gz'; Sha256 = '5784b544a0b6007f7b31785a107d752ab849a837a676d521ad8aba725c993702'; Size = 5729828 }
+	'stable:aarch64-pc-windows-msvc' = @{ Version = '0.2.1'; Url = 'https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.2.1/mewkit-0.2.1-aarch64-pc-windows-msvc.tar.gz'; Sha256 = '77b4615d09a885f8771c9e3e52133ec70abced2f165cecc0c49203bccb40eae8'; Size = 5201764 }
 }
 
 # Throw, never exit: under `irm | iex` an exit would close the user's shell.
