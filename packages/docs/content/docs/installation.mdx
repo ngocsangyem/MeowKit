@@ -48,7 +48,7 @@ From the project directory:
 mewkit init
 ```
 
-Without flags, `init` asks which runtimes to set up. The choices are Claude Code, Codex, Cursor, Grok, Pi, OMP and Antigravity; tick one or more. Each runtime gets the files it reads. Those files are projected from the one authored tree in `.claude/`, plus a small overlay for that runtime's hooks and config. An install for a runtime other than Claude Code does not write `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker. [Portability](/cli/portability) lists where each runtime's files go.
+Without flags, `init` asks which runtimes to set up. The choices are Claude Code, Codex, Cursor, Grok, Pi, OMP and Antigravity; tick one or more. Each runtime gets the files it reads. Those files are projected from the one authored tree in `.claude/`, plus a small overlay for that runtime's hooks and config. An install for a runtime other than Claude Code does not write `.claude/`. In a project that already has an install, the picker opens with the installed runtimes ticked, so you can refresh them or add one. Leaving an installed runtime unticked does not remove it; `mewkit uninstall --target <name>` does. [Portability](/cli/portability) lists where each runtime's files go.
 
 ### Flags
 

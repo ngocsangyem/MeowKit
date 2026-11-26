@@ -7,7 +7,7 @@ use mewkit_core::kit::Kit;
 use mewkit_core::validate::{BASE_PACK, flatten_profile, has_pack_manifest, load_pack_manifest};
 
 use crate::failure::Failure;
-use crate::prompt::{Ask, Choice, Flag, default_prompt};
+use crate::prompt::{Ask, Choice, Flag, default_prompt, is_interactive};
 
 /// The on-disk shapes of a Claude Code install.
 pub const DELIVERIES: [&str; 2] = ["native", "plugin"];
@@ -46,11 +46,18 @@ pub fn delivery(targets: &[Runtime], raw: Option<&str>) -> Result<Delivery, Stri
     }
 }
 
-/// The runtimes to install for. With none named, `--yes` and an existing
-/// `.claude/` mean Claude Code (what omitting `--target` has always meant);
-/// otherwise ask, and without a terminal refuse by naming `--target`.
-pub fn pick_targets(yes: bool, installed_here: bool) -> Result<(Vec<Runtime>, bool), Failure> {
-    if yes || installed_here {
+/// The runtimes to install for when none is named. `--yes` means Claude Code
+/// (what omitting `--target` has always meant), and so does an existing
+/// `.claude/` without a terminal. With a terminal the picker always opens: in a
+/// fresh project with Claude Code ticked, on a rerun with the runtimes already
+/// installed here ticked, so a rerun can add one or show what is there. Without
+/// a terminal and with no `.claude/`, refuse by naming `--target`.
+pub fn pick_targets(
+    yes: bool,
+    installed: &[Runtime],
+    claude_dir: bool,
+) -> Result<(Vec<Runtime>, bool), Failure> {
+    if yes || (claude_dir && !is_interactive()) {
         return Ok((vec![Runtime::ClaudeCode], false));
     }
     let choices: Vec<Choice> = [
@@ -63,7 +70,15 @@ pub fn pick_targets(yes: bool, installed_here: bool) -> Result<(Vec<Runtime>, bo
         (Runtime::Antigravity, "installs .agents/"),
     ]
     .into_iter()
-    .map(|(r, hint)| Choice::plain(r.name()).with_hint(hint))
+    .map(|(r, hint)| {
+        Choice::plain(r.name())
+            .with_hint(hint)
+            .with_selected(if installed.is_empty() {
+                r == Runtime::ClaudeCode
+            } else {
+                installed.contains(&r)
+            })
+    })
     .collect();
     let ask = Ask::new(
         "Select the toolkits to set up",
