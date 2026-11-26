@@ -57,7 +57,8 @@ impl Emitter for Cursor {
     }
 
     fn roots(&self, scope: &Scope) -> Vec<RelPath> {
-        // `.meowkit` holds the bundle's README, which a project install keeps.
+        // `.meowkit` held the bundle's README in earlier installs; it stays a
+        // root so an upgrade can remove that file from the ownership index.
         let roots: &[&str] = match scope.kind {
             ScopeKind::Project => &[".cursor", ".meowkit", AGENTS_MD],
             ScopeKind::Global => &[".cursor"],
@@ -94,9 +95,6 @@ impl Emitter for Cursor {
                     plan.ops.extend(hooks::ops(&text()?, global)?);
                     continue;
                 }
-                // The project README is the only `.meowkit/` file the overlay
-                // ships; a global install has no `.meowkit` to put it in.
-                p if global && p.starts_with(".meowkit/") => continue,
                 p if p.starts_with(".cursor/agents/") && p.ends_with(".md") => {
                     let (text, dropped) = frontmatter::keep_keys(&text()?, AGENT_KEYS);
                     for key in dropped {

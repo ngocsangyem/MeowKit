@@ -9,6 +9,7 @@
     "---Configuration---",
     "hooks",
     "configuration",
+    "generated-files",
     "environment-variables"
   ]
 }

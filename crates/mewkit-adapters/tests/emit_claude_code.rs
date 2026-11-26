@@ -88,10 +88,13 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     // What the npm CLI wrote that this install does not, by decision
     // (DIVERGENCES.md): settings.json is merged, not written; install metadata
     // and the npm CLI's own kit copy and state are not part of a runtime
-    // install here.
+    // install here; kit-capabilities.json is read only by the kit's own
+    // portability check, so the release leaves it out.
     let kept_apart = |p: &str| {
-        matches!(p, ".claude/settings.json" | ".meowkit/metadata.json")
-            || p.starts_with(".meowkit/cache/")
+        matches!(
+            p,
+            ".claude/settings.json" | ".meowkit/metadata.json" | ".claude/kit-capabilities.json"
+        ) || p.starts_with(".meowkit/cache/")
             || p.starts_with(".meowkit/state/")
             || p.starts_with("~/")
     };
