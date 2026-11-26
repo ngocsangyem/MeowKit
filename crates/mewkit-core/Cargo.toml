@@ -31,7 +31,7 @@ flate2 = "1.1.11"
 #
 # Pinned EXACTLY because this crate decides a FILENAME a human reads and a script
 # globs: a date that moves should be a deliberate upgrade, not a `cargo update`.
-jiff = { version = "=0.2.43", default-features = false, features = [
+jiff = { version = "=1.0.1", default-features = false, features = [
     "std",
     "tz-system",
     "tzdb-zoneinfo",
