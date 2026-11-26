@@ -11,6 +11,7 @@
     "core-concepts/how-it-works",
     "core-concepts/workflow",
     "core-concepts/enforcement",
+    "core-concepts/security-hardening",
     "core-concepts/plan-creator-modes-and-flags",
     "guide/agent-skill-architecture",
     "guide/model-routing",
