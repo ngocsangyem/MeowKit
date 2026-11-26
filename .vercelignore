@@ -1,6 +1,9 @@
-# The Vercel project meowkit-landing builds packages/landing (its Root Directory)
-# and is deployed from the repository root, so the build can read the workspace
-# pnpm-lock.yaml. Upload only what that build needs.
+# The Vercel projects meowkit-landing and meowkit-docs build packages/landing and
+# packages/docs (their Root Directory) and are deployed from the repository root,
+# so the build can read the workspace pnpm-lock.yaml. Upload only what those
+# builds need. The root .vercel link points at meowkit-landing; deploy docs with
+#   VERCEL_ORG_ID=<team id> VERCEL_PROJECT_ID=<meowkit-docs id> npx vercel --prod
+# from the repository root (ids are in packages/docs/.vercel/project.json).
 /*
 !/.nvmrc
 !/package.json
@@ -13,3 +16,10 @@
 /packages/landing/.nuxt
 /packages/landing/.output
 /packages/landing/.vercel
+!/packages/docs
+/packages/docs/node_modules
+/packages/docs/.next
+/packages/docs/.source
+/packages/docs/.vercel
+/packages/docs/.env*
+/packages/docs/tsconfig.tsbuildinfo
