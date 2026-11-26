@@ -67,7 +67,7 @@ jobs:
       # Node and compares it to this crate, fixture by fixture. It FAILS when
       # Node is absent rather than skipping, so the runtime is requested
       # explicitly instead of relying on whatever the runner image preinstalls.
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
 
