@@ -241,6 +241,22 @@ jobs:
           if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
             echo "pin PR for $branch already open"; exit 0
           fi
-          gh pr create --base "$BASE" --head "$branch" \
-            --title "build(release): pin installers to mewkit $VERSION" \
-            --body "Pins install.sh and install.ps1 to the archives of mewkit-v$VERSION (URL, SHA-256 and size from its binary-manifest.json). Compare each digest with the release's checksums.txt before merging: merging is what makes the installers serve this version."
+          title="build(release): pin installers to mewkit $VERSION"
+          body="Pins install.sh and install.ps1 to the archives of mewkit-v$VERSION (URL, SHA-256 and size from its binary-manifest.json). Compare each digest with the release's checksums.txt before merging: merging is what makes the installers serve this version."
+          if out=$(gh pr create --base "$BASE" --head "$branch" --title "$title" --body "$body" 2>&1); then
+            echo "$out"; exit 0
+          fi
+          # Without RELEASE_PR_TOKEN, a repository that does not let GitHub Actions
+          # create pull requests refuses this one. The branch is pushed, so the PR is
+          # one click away; report that instead of failing a release that published.
+          if grep -q "not permitted to create or approve pull requests" <<<"$out"; then
+            url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/$BASE...$branch?expand=1"
+            echo "::notice title=Open the installer pin PR by hand::$url"
+            {
+              echo "### Installer pin PR not opened"
+              echo "GitHub Actions may not create pull requests in this repository. Branch \`$branch\` is pushed: [open the pull request]($url) with the title \`$title\`, after checking each digest against the release's checksums.txt."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "$out" >&2
+          exit 1

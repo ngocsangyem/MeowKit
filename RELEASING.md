@@ -558,10 +558,10 @@ git push origin mewkit-v<version>
 gh run watch "$(gh run list --workflow rust-release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
 ```
 
-The last job, "Open the installer pin pull request", fails while the repository setting "Allow
-GitHub Actions to create and approve pull requests" is off. The release is already published and the
-branch `release/installer-pins-mewkit-v<version>` is already pushed; open the PR by hand after the
-review below:
+While the repository setting "Allow GitHub Actions to create and approve pull requests" is off and
+no `RELEASE_PR_TOKEN` is set, the last job, "Open the installer pin pull request", cannot open the PR.
+It still pushes the branch `release/installer-pins-mewkit-v<version>` and ends with a notice and a
+job-summary link to open the PR; the run stays green. Open the PR by hand after the review below:
 
 ```bash
 git fetch origin release/installer-pins-mewkit-v<version>
@@ -867,13 +867,15 @@ The same steps apply to a `mewkit-v<version>` tag.
 gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobber
 ```
 
-### The binary workflow fails at "Open the installer pin pull request"
+### The binary workflow says "Open the installer pin PR by hand"
 
 **Cause:** "Allow GitHub Actions to create and approve pull requests" is off in the repository
-settings. The release itself is published and the pin branch is pushed.
+settings and no `RELEASE_PR_TOKEN` is set. The release itself is published and the pin branch is
+pushed; the job reports this as a notice, not a failure.
 
-**Fix:** Review the pin branch and open the PR by hand (step 10). To stop it recurring, turn the
-setting on or add the `RELEASE_PR_TOKEN` secret.
+**Fix:** Review the pin branch and open the PR from the link in the job summary (step 10). To have
+the workflow open it, turn the setting on or add the `RELEASE_PR_TOKEN` secret. Any other error from
+`gh pr create` still fails the job.
 
 ### `release.sh` stops at `git push origin main` ("fetch first")
 
