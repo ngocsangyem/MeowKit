@@ -13,6 +13,24 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
+## 3.1.1 (2026-11-26)
+
+Kit 3.1.1 ships with `mewkit` 0.2.0, the same binary as 3.1.0. Run `mewkit upgrade` to take the kit change.
+
+### Removals
+
+- `mewkit init` no longer writes `.claude/kit-capabilities.json` on Claude Code, or `.meowkit/README.md` in a Cursor install. Nothing in the kit or the CLI read either file. `mewkit upgrade` removes both from an existing install unless you edited them.
+
+### Improvements
+
+- New [Generated Files](/reference/generated-files) page: every file `mewkit init` writes on each runtime, who reads it, whether to commit it and what happens if you delete it.
+- New [Security Hardening](/core-concepts/security-hardening) page: where the defences against a hostile repository, web page, ticket or package live in the CLI, the hooks, the skill scripts and the release pipeline.
+- `SECURITY.md` asks for the kit version `mewkit versions` prints in the affected project.
+
+### Bug Fixes
+
+- The binary release workflow no longer fails its last job when GitHub Actions may not open pull requests in the repository. It pushes the installer pin branch and prints a link to open the pull request by hand.
+
 ## 3.1.0 (2026-11-26)
 
 Kit 3.1.0 ships with `mewkit` 0.2.0. Run `mewkit self-update`, then `mewkit upgrade`: the CLI changes below are in the binary.
