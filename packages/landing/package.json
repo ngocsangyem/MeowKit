@@ -16,7 +16,7 @@
     "@vercel/speed-insights": "latest",
     "@nuxt/fonts": "latest",
     "@nuxt/image": "latest",
-    "@nuxt/ui": "^4.7.1",
+    "@nuxt/ui": "^4.12.2",
     "@nuxtjs/seo": "latest",
     "@tailwindcss/vite": "latest",
     "@vueuse/nuxt": "latest",

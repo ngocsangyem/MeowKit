@@ -26,8 +26,8 @@
     "react-dom": "^19.2.5",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.58.0",
-    "vite": "^6.4.2",
-    "vitest": "^3.2.4"
+    "vite": "^6.4.6",
+    "vitest": "^4.1.12"
   },
   "engines": {
     "node": ">=24"

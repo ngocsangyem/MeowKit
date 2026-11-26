@@ -15,3 +15,10 @@ allowBuilds:
   "@parcel/watcher": false
   sharp: false
   vue-demi: false
+
+# Security floors for transitive deps whose parents still pin a vulnerable range
+# (Dependabot: minimatch globparts DoS, brace-expansion quadratic expansion).
+overrides:
+  "minimatch@>=7 <11.0.1": "^11.0.9"
+  "brace-expansion@<1.1.21": "^1.1.22"
+  "brace-expansion@>=4 <5.0.12": "^5.0.13"

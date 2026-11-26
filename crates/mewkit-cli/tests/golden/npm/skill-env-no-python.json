@@ -4,7 +4,7 @@
   "stderr": "\nNo Python interpreter found in PATH.\nalpha requires python>=3.9. Install it, then re-run this command.\n\n",
   "files": {
     ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
-    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.31.0\n\npillow>=10.0\n",
+    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.33.0\n\npillow>=10.0\n",
     "stub-bin/which": "#!/bin/sh\n# No interpreter on this machine.\nexit 1\n"
   }
 }

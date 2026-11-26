@@ -5,4 +5,4 @@
 google-genai==2.33.0
 
 # Image processing (required)
-Pillow==12.3.0
+Pillow==13.0.0

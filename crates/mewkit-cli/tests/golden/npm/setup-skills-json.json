@@ -4,7 +4,7 @@
   "stderr": "\nMeowKit Setup\n\n  Creating environment...\n\n  pinonly — pins from .claude/skills/pinonly/scripts/requirements.txt:\n  tool-binary==1.0  \n  > Installing tool-binary==1.0...\n    Collecting tool-binary==1.0\n  ✓ tool-binary==1.0\n  ✓ skill-envs: created pinonly; installed pinonly (1)\n      did create .meowkit/envs/pinonly (interpreter environment)\n      did install .meowkit/envs/pinonly (1 package(s) for pinonly)\n  ✓ mcp: Created .mcp.json — edit API keys inside.\n      did create .mcp.json\n  ✓ env: Created .meowkit/.env — add your API keys.\n      did create .meowkit/.env\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Appended MeowKit entries to .gitignore\n      did create .meowkit/.gitignore\n      did append .gitignore\n  ! project-context: Run `/mk:project-context init` in your first session to create docs/project-context.md\n\n  Summary: 4 configured, 0 skipped, 1 warnings\n",
   "files": {
     ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
-    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.31.0\n\npillow>=10.0\n",
+    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.33.0\n\npillow>=10.0\n",
     ".claude/skills/badpin/SKILL.md": "---\nname: badpin\nrequires_runtime: [python]\n---\n# badpin\n",
     ".claude/skills/badpin/requirements.txt": "-r evil.txt\nok==1\ngit+https://example.invalid/x.git\n",
     ".claude/skills/failpin/SKILL.md": "---\nname: failpin\nrequires_runtime: [python]\n---\n# failpin\n",

@@ -4,7 +4,7 @@
   "stderr": "\n1 of 1 package(s) failed to install.\n\n",
   "files": {
     ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
-    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.31.0\n\npillow>=10.0\n",
+    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.33.0\n\npillow>=10.0\n",
     ".claude/skills/badpin/SKILL.md": "---\nname: badpin\nrequires_runtime: [python]\n---\n# badpin\n",
     ".claude/skills/badpin/requirements.txt": "-r evil.txt\nok==1\ngit+https://example.invalid/x.git\n",
     ".claude/skills/failpin/SKILL.md": "---\nname: failpin\nrequires_runtime: [python]\n---\n# failpin\n",
