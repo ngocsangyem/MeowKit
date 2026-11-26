@@ -7,7 +7,7 @@ Report a vulnerability privately through GitHub: open the repository's **Securit
 Include what you can of:
 
 - the affected part (the `mewkit` binary, an installer, a hook, a skill script, the release pipeline)
-- the version (`mewkit --version`, and the kit version in `.claude/metadata.json`)
+- the version (`mewkit --version`, and the kit version `mewkit versions` prints in the affected project)
 - the steps to reproduce it, with a harmless payload
 - what an attacker needs beforehand (a hostile repository, a hostile web page or ticket the agent reads, network position, repository write access)
 
