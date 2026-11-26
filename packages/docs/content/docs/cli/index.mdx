@@ -49,7 +49,7 @@ mewkit task new --type feature "Add user authentication"
 
 `--target` takes a comma-separated list or `all`. Where a runtime's skills, agents and rules go depends on which runtimes are installed together, because some runtimes also read each other's folders. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/crates/mewkit-adapters/runtime-surface-table.md) lists the placement for each set. [Portability](/cli/portability) lists what each install writes.
 
-The CLI keeps its own state (ownership indexes, lock, kit cache) in `.meowkit/` for a project and in `~/.mewkit/state/` for a global install. Files you already had are merged, not replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key. The ownership index for each runtime sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` globally). `upgrade` and `uninstall` act only on what it records.
+The CLI keeps its own state (ownership indexes, lock, kit cache) in `.meowkit/` for a project and in `~/.mewkit/state/` for a global install. Files you already had are merged, not replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key. The ownership index for each runtime sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` globally). `upgrade` and `uninstall` act only on what it records. [Generated Files](/reference/generated-files) describes every file an install writes.
 
 ## How hooks reach `mewkit`
 

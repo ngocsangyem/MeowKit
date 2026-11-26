@@ -44,6 +44,7 @@
       ".claude/benchmarks/*",
       ".claude/skills/benchmark/*",
       ".claude/harness-substrate.md",
+      ".claude/kit-capabilities.json",
       ".claude/schemas/*",
       ".claude/eval/*",
       ".claude/skills/*/eval/*",

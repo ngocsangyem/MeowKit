@@ -114,7 +114,8 @@ For Claude Code the install is:
 ├── rules/           The 6 always-on rules
 ├── settings.json    Hook registrations
 ├── kit-contract.json      Kit version and CLI requirements
-├── kit-capabilities.json  How each runtime names Claude Code tools
+├── runtime.json           Where the hooks find the launcher
+├── shared-families.json   Skill text copied on purpose, for the rubric check
 └── statusline.cjs   Status line
 
 .meowkit/             Your project's own state
@@ -132,6 +133,8 @@ For Claude Code the install is:
 ├── cache/           Derived caches, rebuildable
 └── mcp.json.example Optional MCP server config
 ```
+
+[Generated Files](/reference/generated-files) covers each of these files, and what the other six runtimes write, one by one.
 
 The split follows ownership: `.claude/` holds what Claude Code itself reads, so `settings.json` and
 `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`. `config.yaml` and `memory/*.md`

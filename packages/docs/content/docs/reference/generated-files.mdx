@@ -1,0 +1,157 @@
+---
+title: "Generated Files"
+description: "Every file mewkit init writes into a project, per runtime: what reads it, when it changes, whether to commit or edit it, and what breaks without it."
+sourceOfTruth: "crates/mewkit-adapters/src"
+lastVerified: "2026-11-26"
+---
+
+`mewkit init --target <runtime>` writes two kinds of files into a project. The first is the runtime's own content (agents, skills, hooks, rules) in the folder that runtime reads. The second is bookkeeping: the files `mewkit` and the hooks read to know what was installed, which kit it came from and how the project is set up.
+
+This page lists both, for a project-scope install of kit 3.1.0. Paths are relative to the project root. A global install (`--global`) writes a smaller set into your home directory and is not covered here.
+
+Each file is described by five questions:
+
+- **Written by**: the command that creates it and rewrites it.
+- **Commit**: whether it belongs in git. For Claude Code installs, `.meowkit/.gitignore` already encodes the answer.
+- **Edit**: whether you may change it by hand. An edited kit file is kept on upgrade and reported as edited; `upgrade --force` replaces it.
+- **Read by**: what uses it.
+- **If deleted**: what stops working.
+
+## Files every runtime gets
+
+Every runtime writes its install record under `.meowkit/state/`, whatever else it installs.
+
+| Path | Written by | Commit | Edit | Read by | If deleted |
+| --- | --- | --- | --- | --- | --- |
+| `.meowkit/state/ownership/<runtime>.json` | `init`, `upgrade`, `uninstall`, `pack add/remove` | Yes | No | `upgrade`, `uninstall`, `doctor`, `pack` | The CLI can no longer tell the kit's files from yours. `upgrade` and `uninstall` act only on what this file lists. `init` can rebuild it ([An install whose record is gone](/cli/project-setup#an-install-whose-record-is-gone)) |
+| `.meowkit/state/ownership/skill-store.json` | `init`, `upgrade`, `mewkit skill` | Yes | No | `mewkit skill`, `upgrade`, `doctor` | The next `mewkit skill status` rebuilds the records from the ownership index. Each skill's history, overlays and rollback points are lost |
+| `.meowkit/state/skill-store/` | `init`, `upgrade`, `mewkit skill` | No | No | `mewkit skill rollback`, upgrade merges | Rebuilt for the current files on the next `mewkit skill` command. A rollback to an older digest has no files to restore |
+| `.meowkit/state/mewkit.lock` | every command that changes an install | No | No | `mewkit`, so two runs never change the same install at once | Nothing. The next run creates it again |
+| `.meowkit/cache/kits/` | `init`, `upgrade` | No | No | `upgrade` (compares against the old kit), `--offline` | `upgrade` downloads the old kit again. Offline, it keeps the files the new kit dropped instead of removing them |
+| `.meowkit/backups/` | `init`, `upgrade`, `uninstall`, before any change | No | No | `mewkit backups list/restore` | Those restore points are gone. Backups may hold credentials copied from your config files, so keep them out of git |
+
+`skill-store.json` and the ledger beside it are described in [Customising and Upgrading Skills](/guide/customising-skills).
+
+Every runtime except Claude Code also adds a block to `AGENTS.md`, between `<!-- mewkit:begin meowkit -->` and its end marker. That block holds the always-on working rules. Your text outside the markers is kept, and `uninstall` removes only the block, and only once no installed runtime still reads it. Commit `AGENTS.md`; do not edit inside the markers.
+
+### Ignoring state outside a Claude Code install
+
+Only a Claude Code install writes `.meowkit/.gitignore`. In a project with Codex, Cursor, Grok, Pi, OMP or Antigravity and no Claude Code, add these lines to your own `.gitignore`, so the local state stays out of git while the install record and team memory are shared:
+
+```
+.meowkit/*
+!.meowkit/memory/
+!.meowkit/state/
+.meowkit/state/*
+!.meowkit/state/ownership/
+```
+
+## Claude Code
+
+A Claude Code install copies the kit's `.claude/` tree and writes the shared project files under `.meowkit/`. Of the `.meowkit/` files on this page, a Codex, Cursor, Grok, Pi, OMP or Antigravity install writes only `state/`, `cache/` and `backups/`; the rest appear only when Claude Code is installed.
+
+### The runtime's content
+
+| Path | What it is |
+| --- | --- |
+| `.claude/agents/*.md` | The specialist agents |
+| `.claude/skills/<name>/` | The skills, each with its `SKILL.md`, references and scripts |
+| `.claude/hooks/` | The hook scripts (Node `.cjs`), their libraries and `handlers.json` |
+| `.claude/rules/*.md` | The six always-on rules ([Configuration](/reference/configuration#clauderules)) |
+| `.claude/settings.json` | Hook registrations, `env` entries and the status line. The kit's entries are merged into yours, and `uninstall` removes only what the kit added |
+| `.claude/statusline.cjs` | The status line script |
+
+Commit all of them. Edit a skill through [Customising and Upgrading Skills](/guide/customising-skills) so an upgrade can merge your change.
+
+### Bookkeeping files under .claude/
+
+| Path | Written by | Commit | Edit | Read by | If deleted |
+| --- | --- | --- | --- | --- | --- |
+| `.claude/kit-contract.json` | copied from the kit by `init` and `upgrade` | Yes | No | `init`, to name the release the files came from when the ownership index is missing | A clone without an ownership index needs `init --adopt-from <tag>` to sort the kit's files from yours |
+| `.claude/runtime.json` | `init`, `upgrade`, every time | Optional | No | the SessionStart orientation hook | Nothing breaks: the hook falls back to `.meowkit/bin/mewkit` |
+| `.claude/shared-families.json` | copied from the kit by `init` and `upgrade` | Yes | Only if your own skills share text | `mewkit validate --skill-rubric` | The rubric's duplicate check counts the kit's intentional copies as duplicates |
+
+`kit-contract.json` holds three facts: the kit version (`kitVersion`), the kit contract number and the oldest `mewkit` that can install it (`requires.mewkitMin`). When `init` downloads a kit it checks the release's own copy; the installed copy is what a later `init` reads in a clone that has the kit's files but no install record.
+
+`runtime.json` records the absolute path of the launcher. The orientation hook runs that file only after checking it is an existing file inside the project. In a teammate's clone the recorded path points outside their project, so the hook skips it and runs the committed launcher instead. Committing it does no harm, and the next `init` or `upgrade` on each machine rewrites it.
+
+`shared-families.json` names the files, or marked sections of files, that the kit copies into several skills and keeps identical on purpose. In the kit's own repository, `mewkit validate` fails when a copy drifts from its canonical file.
+
+### Project files under .meowkit/
+
+| Path | Written by | Commit | Edit | Read by | If deleted |
+| --- | --- | --- | --- | --- | --- |
+| `.meowkit/config.yaml` | `init`, when absent | Yes | Yes | the hooks and the CLI ([Configuration](/reference/configuration)) | Every setting falls back to `~/.meowkit/config.yaml` or the built-in default. The next `init` writes the stub again |
+| `.meowkit/.gitignore` | `init` | Yes | Yes, carefully | git | Everything under `.meowkit/` shows up as untracked, including the kit cache and backups, which may hold credentials |
+| `.meowkit/bin/mewkit` | `init`, `upgrade` | Yes | No | the hooks that run the CLI, and the bare `mewkit` in an agent's shell | Those hooks cannot reach the CLI, so session orientation falls back to the last checkpoint and the ship-time memory check cannot run. The next `init` or `upgrade` writes it again |
+| `.meowkit/pack-manifest.json` | copied from the kit | No | No | `init --profile`, `mewkit pack`, `mewkit budget context`, retired-skill removal | `mewkit pack` refuses to run and asks for an upgrade |
+| `.meowkit/harness-inventory.json` | copied from the kit | No | No | `mewkit pack`, `init --profile`, `mewkit validate` | Rules and hooks lose their pack owner, so `mewkit pack list` undercounts each pack and pack removal decides on less information |
+| `.meowkit/gitignore.meowkit` | copied from the kit | No | Yes | `mewkit setup --only gitignore`, which appends it to the project's `.gitignore` | `setup` appends its built-in default instead |
+| `.meowkit/mcp.json.example` | copied from the kit | Yes | Yes | `mewkit setup --only mcp`, which copies it to `.mcp.json` | `setup` writes `.mcp.json` from its built-in default |
+| `.meowkit/.env.example` | copied from the kit | Yes | Yes | you, and the Jira and Confluence helpers, which point to it when `.meowkit/.env` is missing | Nothing breaks; the list of supported keys is gone. `mewkit setup --only env` writes `.meowkit/.env` from a built-in template |
+
+`.meowkit/.gitignore` denies everything under `.meowkit/` and then re-includes what a team shares: `config.yaml`, the two example files, `bin/mewkit`, `memory/*.md` and `state/ownership/*.json`. A new kind of state stays ignored until someone decides to share it.
+
+`pack-manifest.json` defines the packs, the profiles `--profile` accepts, the files every install keeps, the skills a release retired and the patterns a release leaves out. `harness-inventory.json` is the registry behind it: for each rule, hook and other artifact it records the owning pack, how critical it is and its status.
+
+Files you create later, such as `.meowkit/.env`, `memory/`, `telemetry/` and `envs/`, are described in [Installation](/installation#what-gets-generated).
+
+## Codex
+
+| Path | What it is | Commit |
+| --- | --- | --- |
+| `.agents/skills/mk-<name>/` | The skills, in the folder Codex reads | Yes |
+| `.codex/agents/*.toml` | The agents in Codex's agent format | Yes |
+| `.codex/hooks.json` | Hook registrations; the kit's handlers are merged into yours | Yes |
+| `.codex/hooks/` | The privacy block, the ship check, the completion check, their libraries and `hook-runtime-config.json` | Yes |
+| `.codex/config.toml` | Sets `project_doc_max_bytes` so Codex reads all of `AGENTS.md`; merged by key into yours | Yes |
+| `.codex/rules/default.rules` | Starter exec-policy rules that ask before high-impact commands such as a force-push. Codex loads them only in a trusted project | Yes |
+| `.codex/rubrics/` | The grading rubrics skills name by path | Yes |
+| `.codex/scripts/` | Helper scripts skills name by path | Yes |
+| `AGENTS.md` | The always-on block | Yes |
+
+`hook-runtime-config.json` names the runtime the hook scripts run under (`{ "runtime": "codex" }`), so the shared scripts answer in that runtime's format. Every runtime with a `hooks/` folder has one.
+
+## Cursor
+
+| Path | What it is | Commit |
+| --- | --- | --- |
+| `.cursor/skills/mk-<name>/` | The skills | Yes |
+| `.cursor/agents/*.md` | The agents, with only the frontmatter fields Cursor accepts | Yes |
+| `.cursor/hooks.json` | Hook registrations; the kit's handlers are merged into yours, and a handler on a blocking event fails closed | Yes |
+| `.cursor/hooks/` | The gate scripts (shell, MCP, privacy read, tool), the ship check, session context, telemetry and their libraries | Yes |
+| `.cursor/rules/*.mdc` | Five rule files Cursor loads by topic: planning, security, testing, advice supervision and runtime invariants | Yes |
+| `.cursor/rubrics/`, `.cursor/scripts/` | Rubrics and helper scripts skills name by path | Yes |
+| `AGENTS.md` | The always-on block | Yes |
+
+With `--mcp-profiles`, `init` also merges the chosen MCP servers into `.cursor/mcp.json`. Without it, no MCP file is written.
+
+## Grok
+
+| Path | What it is | Commit |
+| --- | --- | --- |
+| `.grok/skills/mk-<name>/` | The skills | Yes |
+| `.grok/hooks/meowkit.json` | Hook registrations for the privacy block and the ship check | Yes |
+| `.grok/meowkit/hooks/` | The scripts that file runs | Yes |
+| `.grok/meowkit/agents/`, `rubrics/`, `scripts/` | Agent prompts, rubrics and helper scripts skills name by path | Yes |
+| `AGENTS.md` | The always-on block | Yes |
+
+## Pi, OMP and Antigravity
+
+These three, and Codex, read skills from `.agents/skills/`. They share that folder and `.agents/meowkit/`, write the same bytes there, and a shared file leaves with the last of them to be uninstalled.
+
+| Path | Written for | What it is |
+| --- | --- | --- |
+| `.agents/skills/mk-<name>/` | Codex, Pi, OMP, Antigravity | The skills |
+| `.agents/meowkit/agents/`, `rubrics/`, `scripts/` | Pi, OMP, Antigravity | Agent prompts, rubrics and helper scripts skills name by path |
+| `.agents/meowkit/hooks/` | Pi, OMP, Antigravity | `guard.cjs`, the one script the Pi extension and the OMP hook module run, with its libraries |
+| `.pi/extensions/meowkit.ts` | Pi | The extension that runs the guard before a tool call |
+| `.omp/hooks/pre/meowkit.ts` | OMP | The pre-tool hook module that runs the guard |
+| `.omp/agents/` | OMP | The agents in OMP's format |
+| `.agents/agents/*.md` | Antigravity | The agents, with the tools and model fields Antigravity takes |
+| `.agents/rules/*.md` | Antigravity | Two rule files that load on demand; the always-on rules stay in `AGENTS.md` |
+| `.agents/hooks.json` | Antigravity | Hook registrations for the privacy block and the ship check |
+| `.agents/meowkit-antigravity/hooks/` | Antigravity | The scripts that file runs |
+| `AGENTS.md` | all three | The always-on block |
+
+Commit all of them. Antigravity's guards were written from its documentation and have not yet been seen to deny in a live run; `init` says so when it installs them. [Enforcement](/core-concepts/enforcement) lists what each runtime enforces.

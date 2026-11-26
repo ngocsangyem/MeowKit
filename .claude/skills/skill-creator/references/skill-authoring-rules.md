@@ -213,8 +213,8 @@ never in other files and never as a shell variable. Other files (references, ste
 `scripts/<script>` relative to the skill root, and SKILL.md then names the variable
 once so the agent knows the directory they resolve against. Rules, agents, hooks and
 other skills keep the canonical `.claude/<surface>/…` form, which installers map per
-runtime. Every host-runtime tool name a skill mentions is listed in
-the kit's `kit-capabilities.json`. A line describing
+runtime. Every host-runtime tool name a skill mentions must be one the kit's
+tool-name table lists. A line describing
 another project's layout may carry `portable-ignore`. The kit's release check and CI
 enforce this.
 
