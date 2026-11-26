@@ -149,6 +149,27 @@ fn omp_switches_the_claude_import_off_only_while_claude_code_is_installed() {
 }
 
 #[test]
+fn a_rerun_that_changes_nothing_leaves_no_backup() {
+    let env = TempHome::new();
+    let p = env.project();
+    let backups = || {
+        p.join(".meowkit/backups")
+            .read_dir()
+            .map(|d| d.count())
+            .unwrap_or(0)
+    };
+    assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);
+    let first = backups();
+    let index = read(&p, ".meowkit/state/ownership/codex.json");
+    let again = env.with_kit(&["init", "--target", "codex"]);
+    assert_eq!(code(&again), 0, "{}", text(&again));
+    assert!(text(&again).contains("wrote 0"), "{}", text(&again));
+    assert!(!text(&again).contains("backup:"), "{}", text(&again));
+    assert_eq!(backups(), first, "no new backup");
+    assert_eq!(read(&p, ".meowkit/state/ownership/codex.json"), index);
+}
+
+#[test]
 fn a_second_uninstall_has_nothing_to_do() {
     let env = TempHome::new();
     assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);

@@ -104,8 +104,8 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
         return Ok(code);
     }
     let (targets, picked) = if named.is_empty() {
-        let installed = place.scope.root.join(".claude").exists();
-        choose::pick_targets(args.yes, installed)?
+        let claude_dir = place.scope.root.join(".claude").exists();
+        choose::pick_targets(args.yes, &place.installed()?, claude_dir)?
     } else {
         (named, false)
     };

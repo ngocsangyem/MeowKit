@@ -72,7 +72,13 @@ impl Prompt for Tty {
         if let Some(refusal) = require_choices(ask, choices) {
             return refusal;
         }
+        let ticked: Vec<usize> = choices
+            .iter()
+            .enumerate()
+            .filter_map(|(i, c)| c.selected.then_some(i))
+            .collect();
         MultiSelect::new(ask.message, labels(choices))
+            .with_default(&ticked)
             .raw_prompt()
             .map(|chosen| {
                 let mut indexes: Vec<usize> = chosen.iter().map(|c| c.index).collect();

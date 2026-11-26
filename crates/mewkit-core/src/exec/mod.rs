@@ -207,6 +207,22 @@ pub fn execute_merging(
         return Ok(report);
     }
 
+    // A run that changes no file and leaves the index byte-for-byte as it was
+    // has nothing to back up or journal: stop here rather than leave a backup
+    // of an unchanged index behind on every rerun.
+    let index_bytes = (!(work.paths.is_empty()
+        && work.sections.is_empty()
+        && work.hooks.is_empty()
+        && work.mcp_servers.is_empty()))
+    .then(|| work.to_json());
+    let changes_files = decisions
+        .iter()
+        .any(|d| matches!(d.action, Action::Write { .. } | Action::Remove));
+    if !changes_files && std::fs::read(scope.index_file.under(&scope.root)).ok() == index_bytes {
+        *index = work;
+        return Ok(report);
+    }
+
     // The index rides along so an interrupted run can be put back whole.
     let changing: Vec<&RelPath> = decisions
         .iter()
@@ -231,18 +247,13 @@ pub fn execute_merging(
             Action::Unchanged | Action::Preserve(_) => {}
         }
     }
-    if work.paths.is_empty()
-        && work.sections.is_empty()
-        && work.hooks.is_empty()
-        && work.mcp_servers.is_empty()
-    {
-        journal
+    match &index_bytes {
+        None => journal
             .remove(&scope.index_file)
-            .map_err(io("removing the ownership index"))?;
-    } else {
-        journal
-            .write(&scope.index_file, &work.to_json(), None)
-            .map_err(io("writing the ownership index"))?;
+            .map_err(io("removing the ownership index"))?,
+        Some(bytes) => journal
+            .write(&scope.index_file, bytes, None)
+            .map_err(io("writing the ownership index"))?,
     }
     journal.commit();
     interrupted::end(&record).map_err(io("finishing the run"))?;

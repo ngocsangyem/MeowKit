@@ -12,6 +12,8 @@ pub struct Choice {
     pub value: String,
     pub label: String,
     pub hint: Option<String>,
+    /// Ticked when a multi-select opens. Ignored by single-choice pickers.
+    pub selected: bool,
 }
 
 impl Choice {
@@ -23,6 +25,7 @@ impl Choice {
             label: value.clone(),
             value,
             hint: None,
+            selected: false,
         }
     }
 
@@ -33,11 +36,18 @@ impl Choice {
             value: value.into(),
             label: label.into(),
             hint: None,
+            selected: false,
         }
     }
 
     pub fn with_hint(mut self, hint: impl Into<String>) -> Self {
         self.hint = Some(hint.into());
+        self
+    }
+
+    /// Opens ticked in a multi-select, so a rerun shows what is already there.
+    pub fn with_selected(mut self, selected: bool) -> Self {
+        self.selected = selected;
         self
     }
 
