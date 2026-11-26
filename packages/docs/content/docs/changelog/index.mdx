@@ -15,11 +15,16 @@ A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-n
 
 ## 3.1.1 (2026-11-26)
 
-Kit 3.1.1 ships with `mewkit` 0.2.0, the same binary as 3.1.0. Run `mewkit upgrade` to take the kit change.
+Kit 3.1.1 ships with `mewkit` 0.2.1. Run `mewkit self-update`, then `mewkit upgrade`: the install changes below need the new binary.
+
+### CLI
+
+- A bare `mewkit init` in a project that is already installed opens the runtime picker, with the installed runtimes ticked, so a rerun can refresh them or add one. It used to refresh Claude Code alone and skip the picker, leaving a Codex install beside it untouched. In a fresh project Claude Code is ticked. Without a terminal, `--yes` or an existing `.claude/` still means Claude Code.
 
 ### Removals
 
-- `mewkit init` no longer writes `.claude/kit-capabilities.json` on Claude Code, or `.meowkit/README.md` in a Cursor install. Nothing in the kit or the CLI read either file. `mewkit upgrade` removes both from an existing install unless you edited them.
+- `mewkit init` no longer writes `.claude/kit-capabilities.json` or `.claude/runtime.json` on Claude Code, or `.meowkit/README.md` in a Cursor install. Nothing in the kit or the CLI read the first and the last, and the orientation hook now finds the `mewkit` launcher without `runtime.json`. `mewkit upgrade` removes all three from an existing install unless you edited them.
+- An Antigravity install on its own no longer writes the Pi and OMP guard under `.agents/meowkit/hooks/`, which Antigravity never ran. Installed beside Codex, Pi or OMP, which share `.agents/` with it, the guard stays. `mewkit upgrade` removes it from an Antigravity-only install.
 
 ### Improvements
 
@@ -29,6 +34,7 @@ Kit 3.1.1 ships with `mewkit` 0.2.0, the same binary as 3.1.0. Run `mewkit upgra
 
 ### Bug Fixes
 
+- A rerun of `mewkit init` or `mewkit upgrade` that changes nothing no longer leaves a backup of the unchanged install record under `.meowkit/backups/`.
 - The binary release workflow no longer fails its last job when GitHub Actions may not open pull requests in the repository. It pushes the installer pin branch and prints a link to open the pull request by hand.
 
 ## 3.1.0 (2026-11-26)
