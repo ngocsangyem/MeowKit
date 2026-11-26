@@ -47,9 +47,9 @@ fn the_session_start_handler_accepts_the_rust_orientation() {
     let project = scratch.path().join("project");
     npm::copy_fixture("active-task", &project);
 
-    // The handler re-validates the executable: absolute, a real file, and
-    // INSIDE the project. A binary outside it is refused however it is named,
-    // so the one under test is copied in, the way an install places it.
+    // The handler runs only a launcher that resolves to a file INSIDE the
+    // project, so the binary under test is copied in, the way an install
+    // places the launcher.
     let hooks = project.join(".claude").join("hooks");
     copy_tree(
         &repo.join(".claude").join("hooks").join("lib"),
@@ -62,20 +62,11 @@ fn the_session_start_handler_accepts_the_rust_orientation() {
     )
     .expect("copy the handler");
 
-    let binary = project.join(".claude").join(if cfg!(windows) {
-        "mewkit.exe"
-    } else {
-        "mewkit"
-    });
+    // The handler runs the committed launcher's path; the binary stands in
+    // for the launcher, placed where an install puts it.
+    let binary = project.join(".meowkit").join("bin").join("mewkit");
+    std::fs::create_dir_all(binary.parent().unwrap()).expect("create the launcher dir");
     std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &binary).expect("copy the binary");
-    std::fs::write(
-        project.join(".claude").join("runtime.json"),
-        format!(
-            "{{\n  \"schemaVersion\": \"1.0\",\n  \"executable\": {:?}\n}}\n",
-            binary.to_string_lossy()
-        ),
-    )
-    .expect("write the runtime descriptor");
 
     let driver = scratch.path().join("drive-handler.cjs");
     std::fs::write(&driver, DRIVER).expect("write the driver");

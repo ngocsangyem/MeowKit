@@ -36,7 +36,6 @@
 //! | `core/athena-supervision-receipt.ts` | [`supervision_receipt`] |
 //! | `core/athena-strategy-brief.ts` | [`strategy_brief`] |
 //! | `core/install-metadata.ts` | [`install_metadata`], [`install_metadata_read`] |
-//! | `core/hook-runtime.ts` | [`runtime_descriptor`] |
 //! | `review/schema.ts` | [`review_manifest`], [`review_session`] |
 //! | `review/verdict-schema.ts` | [`verdict`], [`review_findings`] |
 //! | `review/roster.ts` | [`roster`] |
@@ -67,7 +66,6 @@ pub mod review_findings;
 pub mod review_manifest;
 pub mod review_session;
 pub mod roster;
-pub mod runtime_descriptor;
 pub mod strategy_brief;
 pub mod supervision_output;
 pub mod supervision_packet;

@@ -22,7 +22,6 @@ const ROOT = path.resolve(__dirname, "..");
 const ALLOWED = [
 	{ path: ".github/workflows", why: "a user project's CI folder, named as an example of one" },
 	{ path: ".github/workflows/ci.yml", why: "a user project's CI file, named as an example of one" },
-	{ path: ".claude/runtime.json", why: "written by the installer at install time; the orientation hook reads it" },
 	{ path: ".claude/session-state", why: "state folder of an older install, still skipped by the completion check" },
 	{ path: ".claude/logs", why: "log folder of an older install, still skipped by the completion check" },
 	{ path: ".claude/cache", why: "cache folder of an older install, still skipped by the completion check" },

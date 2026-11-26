@@ -68,14 +68,13 @@ Commit all of them. Edit a skill through [Customising and Upgrading Skills](/gui
 | Path | Written by | Commit | Edit | Read by | If deleted |
 | --- | --- | --- | --- | --- | --- |
 | `.claude/kit-contract.json` | copied from the kit by `init` and `upgrade` | Yes | No | `init`, to name the release the files came from when the ownership index is missing | A clone without an ownership index needs `init --adopt-from <tag>` to sort the kit's files from yours |
-| `.claude/runtime.json` | `init`, `upgrade`, every time | Optional | No | the SessionStart orientation hook | Nothing breaks: the hook falls back to `.meowkit/bin/mewkit` |
 | `.claude/shared-families.json` | copied from the kit by `init` and `upgrade` | Yes | Only if your own skills share text | `mewkit validate --skill-rubric` | The rubric's duplicate check counts the kit's intentional copies as duplicates |
 
 `kit-contract.json` holds three facts: the kit version (`kitVersion`), the kit contract number and the oldest `mewkit` that can install it (`requires.mewkitMin`). When `init` downloads a kit it checks the release's own copy; the installed copy is what a later `init` reads in a clone that has the kit's files but no install record.
 
-`runtime.json` records the absolute path of the launcher. The orientation hook runs that file only after checking it is an existing file inside the project. In a teammate's clone the recorded path points outside their project, so the hook skips it and runs the committed launcher instead. Committing it does no harm, and the next `init` or `upgrade` on each machine rewrites it.
-
 `shared-families.json` names the files, or marked sections of files, that the kit copies into several skills and keeps identical on purpose. In the kit's own repository, `mewkit validate` fails when a copy drifts from its canonical file.
+
+An install made by `mewkit` 0.2.0 or earlier also has `.claude/runtime.json`, which recorded the launcher's absolute path for the orientation hook. The hook now runs `.meowkit/bin/mewkit` by its project path, and the next `upgrade` removes the old file unless you edited it.
 
 ### Project files under .meowkit/
 
@@ -138,13 +137,13 @@ With `--mcp-profiles`, `init` also merges the chosen MCP servers into `.cursor/m
 
 ## Pi, OMP and Antigravity
 
-These three, and Codex, read skills from `.agents/skills/`. They share that folder and `.agents/meowkit/`, write the same bytes there, and a shared file leaves with the last of them to be uninstalled.
+These three, and Codex, read skills from `.agents/skills/`. They share that folder and `.agents/meowkit/`, write the same bytes to the files they both install, and a shared file leaves with the last of them to be uninstalled.
 
 | Path | Written for | What it is |
 | --- | --- | --- |
 | `.agents/skills/mk-<name>/` | Codex, Pi, OMP, Antigravity | The skills |
 | `.agents/meowkit/agents/`, `rubrics/`, `scripts/` | Pi, OMP, Antigravity | Agent prompts, rubrics and helper scripts skills name by path |
-| `.agents/meowkit/hooks/` | Pi, OMP, Antigravity | `guard.cjs`, the one script the Pi extension and the OMP hook module run, with its libraries |
+| `.agents/meowkit/hooks/` | Pi, OMP; Antigravity in part | `guard.cjs`, the one script the Pi extension and the OMP hook module run, with its libraries. Antigravity installed alone writes only `lib/project-root.cjs`, which skill scripts load |
 | `.pi/extensions/meowkit.ts` | Pi | The extension that runs the guard before a tool call |
 | `.omp/hooks/pre/meowkit.ts` | OMP | The pre-tool hook module that runs the guard |
 | `.omp/agents/` | OMP | The agents in OMP's format |
@@ -153,5 +152,7 @@ These three, and Codex, read skills from `.agents/skills/`. They share that fold
 | `.agents/hooks.json` | Antigravity | Hook registrations for the privacy block and the ship check |
 | `.agents/meowkit-antigravity/hooks/` | Antigravity | The scripts that file runs |
 | `AGENTS.md` | all three | The always-on block |
+
+An Antigravity install from `mewkit` 0.2.0 or earlier wrote the whole `.agents/meowkit/hooks/` folder; the next `upgrade` removes the files it no longer writes unless you edited them.
 
 Commit all of them. Antigravity's guards were written from its documentation and have not yet been seen to deny in a live run; `init` says so when it installs them. [Enforcement](/core-concepts/enforcement) lists what each runtime enforces.

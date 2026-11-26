@@ -31,9 +31,9 @@ use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
 use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::registry::emitted;
-use mewkit_adapters::retired_eval_pack;
 use mewkit_adapters::surface_table::table;
 use mewkit_adapters::{EmitRequest, Emitter, ScopeKind, emitter};
+use mewkit_adapters::{retired_eval_pack, retired_files};
 use mewkit_core::exec::{ExecOptions, Merges, execute_merging};
 
 use crate::failure::Failure;
@@ -229,6 +229,11 @@ pub fn run_jobs(
         // No kit plans the retired eval pack's files, so their own record
         // corroborates removing them; a file edited since is still kept.
         for (path, hash) in retired_eval_pack::recorded_hashes(&job.index) {
+            hashes.entry(path).or_insert(hash);
+        }
+        // Files earlier installs wrote and no plan writes now, which the kit
+        // never shipped either: their record corroborates the same way.
+        for (path, hash) in retired_files::recorded_hashes(job.e.target(), &job.index) {
             hashes.entry(path).or_insert(hash);
         }
         let kept = skill_store::lifecycle::keep(store.as_mut(), &mut job.plan, &mut job.index);

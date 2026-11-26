@@ -1,4 +1,5 @@
-//! `orientation-ritual.cjs` against the runtime descriptor the Rust schema produces.
+//! `orientation-ritual.cjs` runs the committed launcher only when it stays
+//! inside the project.
 
 use super::*;
 
@@ -9,9 +10,9 @@ const handler = require(path.join(root, '.claude', 'hooks', 'handlers', 'orienta
 process.stdout.write(handler({ source: 'resume' }) || '');
 "#;
 
-/// descriptor with `descriptor_edit` applied, and returns what the handler
-/// injects.
-fn handler_output(descriptor_edit: impl FnOnce(&mut Value)) -> String {
+/// Install the handler in a scratch project, let `place_launcher` put (or not
+/// put) something at `.meowkit/bin/mewkit`, and return what the handler injects.
+fn handler_output(place_launcher: impl FnOnce(&Path, &Path)) -> String {
     let s = scratch("mewkit-mirror-handler-", "active-task");
     let hooks = s.project.join(".claude/hooks");
     copy_tree(
@@ -24,24 +25,9 @@ fn handler_output(descriptor_edit: impl FnOnce(&mut Value)) -> String {
         hooks.join("handlers/orientation-ritual.cjs"),
     )
     .expect("copy the handler");
-    let binary = s.project.join(".claude").join(if cfg!(windows) {
-        "mewkit.exe"
-    } else {
-        "mewkit"
-    });
-    std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &binary).expect("copy the binary");
-
-    // The descriptor comes from the Rust schema module, not from this file.
-    let described = mewkit_core::schema::runtime_descriptor::describe(
-        &binary.to_string_lossy(),
-        "0.0.0-test",
-        "2026-11-14T00:00:00Z",
-        &s.project,
-    )
-    .expect("describe a trusted executable");
-    let mut value = serde_json::to_value(&described).expect("encode the descriptor");
-    descriptor_edit(&mut value);
-    write_json(&s.project.join(".claude/runtime.json"), &value);
+    let launcher = s.project.join(".meowkit/bin/mewkit");
+    std::fs::create_dir_all(launcher.parent().unwrap()).expect("create the launcher dir");
+    place_launcher(Path::new(env!("CARGO_BIN_EXE_mewkit")), &launcher);
 
     let driver = s.project.join("drive-handler.cjs");
     std::fs::write(&driver, DRIVER).expect("write the driver");
@@ -51,29 +37,24 @@ fn handler_output(descriptor_edit: impl FnOnce(&mut Value)) -> String {
 }
 
 #[test]
-fn the_handler_trusts_the_runtime_descriptor_the_rust_schema_produces() {
-    let injected = handler_output(|_| {});
+fn the_handler_runs_the_committed_launcher() {
+    let injected = handler_output(|binary, launcher| {
+        std::fs::copy(binary, launcher).expect("copy the binary");
+    });
     assert!(
         injected.contains("orientation: active") && injected.contains("task: alpha"),
-        "the handler did not accept the Rust descriptor: {injected:?}"
+        "the handler did not run the launcher: {injected:?}"
     );
 }
 
+#[cfg(unix)]
 #[test]
-fn the_handler_refuses_a_descriptor_whose_shape_changed() {
-    let renamed_field = handler_output(|v| {
-        let object = v.as_object_mut().expect("an object");
-        let exe = object.remove("executable").expect("the executable field");
-        object.insert("exe".into(), exe);
+fn the_handler_refuses_a_launcher_that_leaves_the_project() {
+    let injected = handler_output(|binary, launcher| {
+        std::os::unix::fs::symlink(binary, launcher).expect("link outside the project");
     });
-    let bumped_version = handler_output(|v| v["schemaVersion"] = json!("2.0"));
-    for (what, injected) in [
-        ("renamed executable", renamed_field),
-        ("schemaVersion 2.0", bumped_version),
-    ] {
-        assert!(
-            !injected.contains("orientation: active"),
-            "the handler still ran the runtime after the descriptor changed ({what}): {injected:?}"
-        );
-    }
+    assert!(
+        !injected.contains("orientation: active"),
+        "the handler ran a launcher outside the project: {injected:?}"
+    );
 }

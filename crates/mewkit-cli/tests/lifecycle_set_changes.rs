@@ -20,14 +20,11 @@ const RUNTIMES: [&str; 7] = [
     "antigravity",
 ];
 
-/// Records the launcher's absolute path, so it differs between two projects.
-const DESCRIPTOR: &str = ".claude/runtime.json";
-
 /// The project tree without mewkit's own state.
 fn kit_files(env: &TempHome) -> BTreeMap<PathBuf, String> {
     sha_tree(&env.project())
         .into_iter()
-        .filter(|(path, _)| !path.starts_with(".meowkit") && !path.ends_with(DESCRIPTOR))
+        .filter(|(path, _)| !path.starts_with(".meowkit"))
         .collect()
 }
 

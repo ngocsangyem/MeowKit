@@ -298,3 +298,56 @@ fn a_rule_file_without_a_trigger_is_refused_before_anything_is_written() {
     let err = rules::check_plan(&plan).unwrap_err();
     assert!(err.to_string().contains("no `trigger`"), "{err}");
 }
+
+#[test]
+fn alone_it_leaves_out_the_pi_and_omp_guard_but_keeps_what_skills_load() {
+    let kit = kit();
+    let p = Project::new(Antigravity);
+    let plan = Antigravity
+        .prepare(&request(&kit, &p.scope, &[], &[]))
+        .unwrap();
+    let files = written(&plan);
+    assert!(!files.contains_key(agents_tree::GUARD));
+    assert!(!files.contains_key(".agents/meowkit/hooks/hook-runtime-config.json"));
+    // Skill scripts load the project-root helper from the shared folder.
+    assert!(files.contains_key(".agents/meowkit/hooks/lib/project-root.cjs"));
+    // Each kept hook file loads only files that are installed too.
+    for (path, bytes) in files
+        .iter()
+        .filter(|(p, _)| p.starts_with(".agents/meowkit/hooks/"))
+    {
+        let dir = std::path::Path::new(path).parent().unwrap();
+        let text = std::str::from_utf8(bytes).unwrap();
+        for quote in ["require(\"./", "require('./"] {
+            for rest in text.split(quote).skip(1) {
+                let name = rest.split(['"', '\'']).next().unwrap();
+                let target = dir.join(name);
+                let target = target.to_str().unwrap();
+                assert!(
+                    files.contains_key(target),
+                    "{path} loads {target}, which is not installed"
+                );
+            }
+        }
+    }
+    // The skill text that named the guard names Antigravity's own privacy hook.
+    let security =
+        std::str::from_utf8(files[".agents/skills/mk-web-to-markdown/references/security.md"])
+            .unwrap();
+    assert!(!security.contains("hooks/guard.cjs"));
+    assert!(security.contains(&format!("{HOOKS_DIR}/hooks/privacy-block.cjs")));
+}
+
+#[test]
+fn beside_pi_it_writes_the_guard_pi_runs() {
+    let kit = kit();
+    let p = Project::new(Antigravity);
+    let set = [Runtime::Pi, Runtime::Antigravity];
+    let placement = resolve(table(), &set);
+    let req = EmitRequest {
+        placement: Some(&placement),
+        ..request(&kit, &p.scope, &[], &[])
+    };
+    let plan = Antigravity.prepare(&req).unwrap();
+    assert!(written(&plan).contains_key(agents_tree::GUARD));
+}

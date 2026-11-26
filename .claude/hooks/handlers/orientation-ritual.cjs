@@ -1,13 +1,13 @@
 // orientation-ritual.cjs — SessionStart handler: safe resume orientation.
 //
 // On resume/clear/compact (NOT fresh startup — that stays disabled until the release gate), it
-// prefers the installed mewkit runtime: it reads the install-written runtime descriptor
-// (.claude/runtime.json), RE-VALIDATES the executable (absolute + exists + inside the project —
-// mirroring core/hook-runtime.ts, since .claude ships without the TS build), and runs
-// `orient --no-record` with a timeout to inject the bounded, control-stripped envelope the CLI
-// renders. It NEVER calls bare `npx`, scans arbitrary parent node_modules, or trusts a missing
-// binary. When the runtime is missing/untrusted/failed, it falls back to the checkpoint cache —
-// explicitly LABELED as fallback, never presented as recovered orientation.
+// prefers the installed mewkit runtime: it runs the committed launcher `.meowkit/bin/mewkit`
+// only after resolving it and checking it is a file inside the project (same realpath-both-sides
+// containment the PATH exposure uses), then runs `orient --no-record` with a timeout to inject
+// the bounded, control-stripped envelope the CLI renders. It NEVER calls bare `npx`, scans
+// arbitrary parent node_modules, or trusts a missing binary. When the runtime is
+// missing/untrusted/failed, it falls back to the checkpoint cache — explicitly LABELED as
+// fallback, never presented as recovered orientation.
 
 const fs = require('fs');
 const path = require('path');
@@ -21,38 +21,6 @@ const { LATEST_READ_FILE, gitHead } = require(
 const { exposeLauncherOnPath, containedLauncher } = require(
   path.join(CLAUDE_DIR, 'hooks', 'lib', 'launcher-path-env.cjs')
 );
-
-// Read-side trust gate for the runtime descriptor — MUST mirror core/hook-runtime.ts exactly
-// (same schemaVersion gate, same realpath-both-sides containment, same isFile check).
-function trustedExecutable() {
-  const file = path.join(CLAUDE_DIR, 'runtime.json');
-  if (!fs.existsSync(file)) return null;
-  let d;
-  try {
-    d = JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch {
-    return null;
-  }
-  if (!d || d.schemaVersion !== '1.0') return null; // mirror the TS schemaVersion gate
-  const exe = typeof d.executable === 'string' ? d.executable : '';
-  if (!exe || !path.isAbsolute(exe)) return null;
-  // Resolve symlinks on BOTH sides so a symlink escaping the project is rejected, not followed.
-  let realExe, realRoot;
-  try {
-    realExe = fs.realpathSync(exe);
-    realRoot = fs.realpathSync(ROOT);
-  } catch {
-    return null;
-  }
-  const rel = path.relative(realRoot, realExe);
-  if (rel === '..' || rel.startsWith('..' + path.sep) || path.isAbsolute(rel)) return null; // escapes project
-  try {
-    if (!fs.statSync(realExe).isFile()) return null;
-  } catch {
-    return null;
-  }
-  return realExe;
-}
 
 // Run the installed runtime's bounded orientation. Read-only (`--no-record`), timeout-bounded;
 // any failure returns null so the caller falls back.
@@ -112,7 +80,7 @@ module.exports = function orientationRitual(ctx) {
   // Make the bare `mewkit` form resolve for this session's shell commands. Deliberately
   // independent of orientation: it applies on every session source, including the fresh
   // startup that prints no orientation at all, and orientation itself reaches the CLI
-  // through the runtime descriptor rather than through PATH. A note comes back only when
+  // through the launcher's project path rather than through PATH. A note comes back only when
   // the bare form could not be exposed.
   const pathNote = exposeLauncherOnPath({ projectRoot: ROOT });
 
@@ -124,18 +92,13 @@ module.exports = function orientationRitual(ctx) {
 
   const prefix = pathNote ? pathNote + '\n' : '';
 
-  // Preferred path: bounded orientation from the installed runtime — the descriptor's
-  // executable when this is the project it was written in, else the committed launcher at
-  // its known project-relative path. The launcher is needed because the descriptor records
-  // an ABSOLUTE path: a teammate's clone carries the path the kit was installed under, which
-  // correctly fails containment against their own root, and an install step is exactly what
-  // a fresh clone has not run. `containedLauncher` applies the same containment rule, so it
-  // grants no reach the descriptor would not have granted.
-  let attempted = false;
-  for (const exe of [trustedExecutable(), containedLauncher(ROOT)]) {
-    if (!exe) continue;
-    attempted = true;
-    const oriented = orientViaRuntime(exe);
+  // Preferred path: bounded orientation from the committed launcher at its known
+  // project-relative path. `containedLauncher` resolves symlinks on both sides and refuses a
+  // target outside the project, so a clone runs its own launcher and nothing else.
+  const launcher = containedLauncher(ROOT);
+  const attempted = Boolean(launcher);
+  if (launcher) {
+    const oriented = orientViaRuntime(launcher);
     if (oriented) return prefix + oriented + '\n';
   }
 

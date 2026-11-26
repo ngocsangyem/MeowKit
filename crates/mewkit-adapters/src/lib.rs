@@ -22,6 +22,7 @@ pub mod projection;
 pub mod registry;
 mod report_gate;
 pub mod retired_eval_pack;
+pub mod retired_files;
 mod scope;
 mod strip;
 pub mod surface_doc;

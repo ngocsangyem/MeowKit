@@ -14,13 +14,15 @@
 //! - `.agents/hooks.json` and the scripts it runs in
 //!   `.agents/meowkit-antigravity/hooks`: the privacy guard and the ship check,
 //!   answering on stdout as the hooks page documents
-//!   (https://antigravity.google/docs/hooks, read 2026-11-22).
+//!   (https://antigravity.google/docs/hooks, read 2026-11-22). Installed alone,
+//!   it leaves out the Pi and OMP guard in the shared tree (see `unused_guard`).
 //!
 //! The guards were built from that page alone and no live run has shown them
 //! deny, so the kit's coverage file marks them `unverified` and the install
 //! names each one in a notice instead of presenting it as protection.
 mod agents;
 pub mod rules;
+pub mod unused_guard;
 
 use crate::agents_tree;
 use crate::contract::{
@@ -97,6 +99,9 @@ impl Emitter for Antigravity {
         let spec = agents_tree::spec(Runtime::Antigravity, req.placement);
         let mut plan = agents_tree::plan(req, spec)?;
         plan.ops.extend(agents_tree::overlay_files(req, OVERLAY)?);
+        if !agents_tree::is_shared(req.placement) {
+            unused_guard::drop_from(&mut plan);
+        }
         rules::check_plan(&plan)?;
         let (ops, dropped) = agents::definitions(&req.kit.dir, &plan)?;
         plan.ops.extend(ops);
