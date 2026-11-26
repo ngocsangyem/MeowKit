@@ -73,19 +73,19 @@ impl TaskType {
 /// failing: a missing time zone must not stop a task from being created, and
 /// UTC is what the file would have been named before this.
 pub fn today_yymmdd() -> String {
-    yymmdd(&jiff::Zoned::now())
+    yymmdd(&jiff::ZonedDateTime::now())
 }
 
 /// [`today_yymmdd`] for a given instant and zone, so a test can pin both.
 ///
 /// `zone` is an IANA name; an unknown one is UTC, matching the fallback
-/// `Zoned::now` takes when the system zone cannot be read.
+/// `ZonedDateTime::now` takes when the system zone cannot be read.
 pub fn stamp_yymmdd(unix_millis: i64, zone: &str) -> String {
     yymmdd(&zoned_at(unix_millis, zone))
 }
 
 /// The six digits, from a datetime that already carries its zone.
-fn yymmdd(zoned: &jiff::Zoned) -> String {
+fn yymmdd(zoned: &jiff::ZonedDateTime) -> String {
     format!(
         "{:02}{:02}{:02}",
         zoned.year().rem_euclid(100),
@@ -107,12 +107,12 @@ pub fn stamp_iso(unix_millis: i64) -> String {
 
 /// An instant in a named zone, falling back to UTC for an instant or a zone the
 /// library cannot resolve.
-fn zoned_at(unix_millis: i64, zone: &str) -> jiff::Zoned {
+fn zoned_at(unix_millis: i64, zone: &str) -> jiff::ZonedDateTime {
     let timestamp =
         jiff::Timestamp::from_millisecond(unix_millis).unwrap_or(jiff::Timestamp::UNIX_EPOCH);
     jiff::tz::TimeZone::get(zone)
-        .map(|tz| timestamp.to_zoned(tz))
-        .unwrap_or_else(|_| timestamp.to_zoned(jiff::tz::TimeZone::UTC))
+        .map(|tz| timestamp.to_zoned_datetime(tz))
+        .unwrap_or_else(|_| timestamp.to_zoned_datetime(jiff::tz::TimeZone::UTC))
 }
 
 /// Convert a description to a kebab-case slug: lower-cased, every character
