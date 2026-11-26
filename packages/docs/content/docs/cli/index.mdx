@@ -53,11 +53,11 @@ The CLI keeps its own state (ownership indexes, lock, kit cache) in `.meowkit/` 
 
 ## How hooks reach `mewkit`
 
-For Claude Code at project scope, `init` writes a small launcher at `.meowkit/bin/mewkit` and commits it, with a `.claude/runtime.json` that points the hooks at it.
+For Claude Code at project scope, `init` writes a small launcher at `.meowkit/bin/mewkit` for you to commit. The hooks find it by that project path.
 
 - The launcher resolves the CLI and runs it. It runs the `mewkit` binary (or `mk`) when one is on `PATH`, in `MEWKIT_INSTALL_DIR` or in `~/.local/bin` and reports a compatible version. A project whose kit the retired npm CLI installed keeps running the copy in its own `node_modules` until you move it ([Moving from the npm CLI](/migration/from-npx-mewkit)).
 - The launcher makes no network request. When no CLI is available it says so, names `mewkit doctor` and exits 127.
-- Hooks do not depend on your shell. They run the launcher through `.claude/runtime.json`, which is re-validated on every read and refuses any executable outside the project.
+- Hooks do not depend on your shell. They run `.meowkit/bin/mewkit` only after resolving it and checking that it stays inside the project, so a symlink out of the project is refused.
 - The SessionStart hook puts the launcher's directory first on `PATH`, so plain `mewkit` commands work in the agent's shell. That directory contains only `mewkit`, so nothing else on your `PATH` changes. On Windows PowerShell the bare form is unavailable and the hook prints the `mewkit doctor` hint instead.
 - A teammate who clones the repository gets the launcher with it. They still need the binary on their machine.
 

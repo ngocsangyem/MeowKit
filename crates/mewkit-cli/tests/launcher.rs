@@ -2,8 +2,8 @@
 //! launcher, with no `node_modules` and no npm CLI anywhere.
 //!
 //! Hooks stay Node scripts and run the CLI through `.meowkit/bin/mewkit`
-//! (orientation via `.claude/runtime.json`, the agent's shell via PATH, the
-//! ship-boundary memory lint directly). These cases run that launcher under
+//! (orientation and the ship-boundary memory lint by its project path, the
+//! agent's shell via PATH). These cases run that launcher under
 //! node, as the hooks do, with only the built binary and node on PATH. Node is
 //! required, as it is for the hooks themselves.
 mod support;
@@ -54,7 +54,7 @@ fn installed() -> TempHome {
 }
 
 #[test]
-fn init_writes_an_executable_launcher_and_a_descriptor_the_hook_trusts() {
+fn init_writes_an_executable_launcher_and_no_descriptor() {
     let env = installed();
     let p = env.project();
     let launcher = p.join(LAUNCHER);
@@ -65,11 +65,8 @@ fn init_writes_an_executable_launcher_and_a_descriptor_the_hook_trusts() {
         let mode = std::fs::metadata(&launcher).unwrap().permissions().mode();
         assert_ne!(mode & 0o111, 0, "the launcher is not executable");
     }
-    let descriptor: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(p.join(".claude/runtime.json")).unwrap()).unwrap();
-    let accepted = mewkit_core::schema::runtime_descriptor::accept(&descriptor, &p)
-        .unwrap_or_else(|e| panic!("the orientation hook would refuse it: {e}: {descriptor}"));
-    assert!(Path::new(&accepted.executable).ends_with(LAUNCHER));
+    // The hooks find the launcher by its project path; nothing points at it.
+    assert!(!p.join(".claude/runtime.json").exists());
 }
 
 #[test]
@@ -82,13 +79,13 @@ fn the_launcher_runs_the_binary_with_no_node_modules() {
         String::from_utf8_lossy(&out.stdout).trim(),
         format!("mewkit {}", mewkit_core::VERSION)
     );
-    // What the SessionStart orientation hook runs through the descriptor.
+    // What the SessionStart orientation hook runs through the launcher.
     let out = launch(&env, &["orient", "--no-record"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
 }
 
 #[test]
-fn a_reinstall_leaves_the_launcher_alone_and_uninstall_removes_both() {
+fn a_reinstall_leaves_the_launcher_alone_and_uninstall_removes_it() {
     let env = installed();
     let p = env.project();
     let dry = env.with_kit(&["upgrade", "--dry-run"]);
@@ -102,8 +99,4 @@ fn a_reinstall_leaves_the_launcher_alone_and_uninstall_removes_both() {
     let out = env.with_kit(&["uninstall", "--yes"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert!(!p.join(LAUNCHER).exists(), "the launcher was left behind");
-    assert!(
-        !p.join(".claude/runtime.json").exists(),
-        "the descriptor was left behind"
-    );
 }

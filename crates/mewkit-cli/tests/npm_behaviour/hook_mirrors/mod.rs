@@ -22,7 +22,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use serde_json::{Value, json};
+use serde_json::Value;
 
 use crate::npm;
 
@@ -79,11 +79,6 @@ pub(super) fn node(s: &Scratch, args: &[&OsStr]) -> (i32, String) {
         String::from_utf8_lossy(&out.stderr)
     );
     (out.status.code().unwrap_or(-1), text.trim().to_string())
-}
-
-pub(super) fn write_json(path: &Path, value: &Value) {
-    std::fs::write(path, serde_json::to_vec_pretty(value).expect("encode json"))
-        .expect("write a json file");
 }
 
 pub(super) fn copy_tree(source: &Path, dest: &Path) {

@@ -33,7 +33,7 @@ Grok, Pi, OMP and Antigravity install at project scope only, so `--global` cover
 | `--skill-packs <packs>` | Every runtime except Claude Code | Comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only |
 | `--mcp-profiles <names\|all>` | Cursor | Merge MCP servers into `.cursor/mcp.json`; your own servers win. A project with a git remote also needs `--allow-cloud-mcp` |
 
-For Claude Code at project scope, `init` also writes the committed launcher `.meowkit/bin/mewkit` and the `.claude/runtime.json` that points the hooks at it ([how hooks reach mewkit](/cli#how-hooks-reach-mewkit)). In the MeowKit source repository itself, `init` refuses unless you pass `--allow-kit-source`, because `.claude/` there is the kit's authored source. [Generated Files](/reference/generated-files) lists every file `init` writes for each runtime and says which to commit.
+For Claude Code at project scope, `init` also writes the committed launcher `.meowkit/bin/mewkit`, which the hooks run to reach the CLI ([how hooks reach mewkit](/cli#how-hooks-reach-mewkit)). In the MeowKit source repository itself, `init` refuses unless you pass `--allow-kit-source`, because `.claude/` there is the kit's authored source. [Generated Files](/reference/generated-files) lists every file `init` writes for each runtime and says which to commit.
 
 ### Opt-in and retired skills
 

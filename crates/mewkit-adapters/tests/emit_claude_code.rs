@@ -89,19 +89,22 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     // (DIVERGENCES.md): settings.json is merged, not written; install metadata
     // and the npm CLI's own kit copy and state are not part of a runtime
     // install here; kit-capabilities.json is read only by the kit's own
-    // portability check, so the release leaves it out.
+    // portability check, so the release leaves it out; runtime.json is not
+    // written, because the hooks find the launcher by its project path.
     let kept_apart = |p: &str| {
         matches!(
             p,
-            ".claude/settings.json" | ".meowkit/metadata.json" | ".claude/kit-capabilities.json"
+            ".claude/settings.json"
+                | ".meowkit/metadata.json"
+                | ".claude/kit-capabilities.json"
+                | ".claude/runtime.json"
         ) || p.starts_with(".meowkit/cache/")
             || p.starts_with(".meowkit/state/")
             || p.starts_with("~/")
     };
     // Written by both, with bytes that name the installing CLI: the launcher
-    // pins its version and kind, the descriptor its absolute path. The
-    // launcher's own parity test compares the template itself.
-    let names_the_installer = |p: &str| matches!(p, ".meowkit/bin/mewkit" | ".claude/runtime.json");
+    // pins its version and kind. Its own parity test compares the template.
+    let names_the_installer = |p: &str| p == ".meowkit/bin/mewkit";
     let ts: BTreeMap<&str, Option<&str>> = baseline["files"]
         .as_array()
         .unwrap()

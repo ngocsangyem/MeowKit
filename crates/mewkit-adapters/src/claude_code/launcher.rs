@@ -1,24 +1,25 @@
-//! The committed project launcher and the runtime descriptor that names it.
+//! The committed project launcher.
 //!
 //! Hooks stay Node scripts, and the ones that run the CLI (SessionStart
 //! orientation, the agent shell's bare `mewkit`, the ship-boundary memory lint)
 //! reach it through `.meowkit/bin/mewkit`, a small Node script that finds the
-//! CLI and runs it. `.claude/runtime.json` records that launcher for the
-//! orientation hook, which only runs an executable inside the project.
+//! CLI and runs it. Each hook resolves that project-relative path and runs it
+//! only when it stays inside the project.
 //!
 //! The npm CLI writes the same launcher with `INSTALLED_BY = "node"`; this one
 //! says `"native"`, so the binary is tried before a Node package. The template
 //! is the npm CLI's `launcherSource()` output, and a test compares the two.
 use mewkit_core::plan::{Op, Plan};
-use mewkit_core::schema::runtime_descriptor::{
-    RUNTIME_DESCRIPTOR_FILENAME, RUNTIME_DESCRIPTOR_SCHEMA_VERSION,
-};
 
-use crate::contract::{EmitError, EmitRequest};
+use crate::contract::EmitError;
 use crate::kit_files::rel;
 
 /// `.meowkit/bin/mewkit`, committed so a clone can run the CLI.
 pub const LAUNCHER: &str = ".meowkit/bin/mewkit";
+
+/// The descriptor earlier installs wrote beside the launcher. Nothing reads it
+/// any more: the hooks find the launcher by its project path.
+pub const LEGACY_DESCRIPTOR: &str = ".claude/runtime.json";
 
 const TEMPLATE: &str = include_str!("launcher.cjs.tmpl");
 
@@ -28,31 +29,12 @@ pub fn source(version: &str) -> String {
     TEMPLATE.replacen("\"@@VERSION@@\"", &quoted, 1)
 }
 
-/// Plan the launcher, then the descriptor that names it (project scope only).
-///
-/// The descriptor records the launcher's absolute path, which is what the
-/// orientation hook checks for containment. `writtenAt` is left empty: the
-/// descriptor is re-planned on every upgrade, and a timestamp would make each
-/// dry run report a change that is not one.
-pub fn push(req: &EmitRequest<'_>, plan: &mut Plan) -> Result<(), EmitError> {
+/// Plan the launcher (project scope only).
+pub fn push(plan: &mut Plan) -> Result<(), EmitError> {
     plan.ops.push(Op::WriteFile {
         path: rel(LAUNCHER)?,
         bytes: source(mewkit_core::VERSION).into_bytes(),
         mode: Some(0o755),
-    });
-    let executable = req.scope.root.join(LAUNCHER);
-    let descriptor = serde_json::json!({
-        "schemaVersion": RUNTIME_DESCRIPTOR_SCHEMA_VERSION,
-        "executable": executable.to_string_lossy(),
-        "packageVersion": req.kit.version,
-        "writtenAt": "",
-    });
-    let mut bytes = serde_json::to_vec_pretty(&descriptor).expect("JSON serialises");
-    bytes.push(b'\n');
-    plan.ops.push(Op::WriteFile {
-        path: rel(&format!(".claude/{RUNTIME_DESCRIPTOR_FILENAME}"))?,
-        bytes,
-        mode: None,
     });
     Ok(())
 }
