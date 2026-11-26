@@ -94,8 +94,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         matches!(
             p,
             ".claude/settings.json" | ".meowkit/metadata.json" | ".claude/kit-capabilities.json"
-        )
-            || p.starts_with(".meowkit/cache/")
+        ) || p.starts_with(".meowkit/cache/")
             || p.starts_with(".meowkit/state/")
             || p.starts_with("~/")
     };
