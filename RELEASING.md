@@ -1,26 +1,39 @@
 # Releasing MeowKit
 
-Complete guide to building, tagging and publishing MeowKit releases. There are two release
-streams: the **kit** (`.claude/` content, shipped as a zip) and the **binary** (the native `mewkit`
-CLI, with `mk` as a short alias).
+Complete guide to MeowKit releases. A release ships two things under **one version**: the **kit**
+(`.claude/` content, a zip) and the **binary** (the native `mewkit` CLI, with `mk` as a short alias).
+Releases run in GitHub Actions on two channels: **beta** from `develop` and **stable** from `main`.
+Nobody edits a version by hand in a feature PR.
 
 ## Architecture
 
 ```
-Source of truth (.claude/, kit/overlays/)
-    ↓
-prepare-release-assets.cjs → dist/meowkit-release.zip + dist/checksums.txt
-    ↓
-GitHub Release (tag vX.Y.Z + those two assets)                       kit stream
-    ↓
-mewkit init / mewkit upgrade download the zip
-
-Cargo workspace (crates/, version under [workspace.package])
-    ↓
-rust-release.yml on tag mewkit-vX.Y.Z → six archives, binary-manifest.json, checksums.txt
-    ↓
-GitHub Release (never "latest") + PR that re-pins install.sh / install.ps1   binary stream
+feature/* fix/* refactor/* chore/* docs/*  ──PR──▶  develop  (beta channel)
+                                                      │  every merge: release-beta.yml
+                                                      │  → mewkit-vX.Y.Z-beta.N + vX.Y.Z-beta.N
+                                                      ▼
+                                              release/vX.Y.Z  (cut from develop)
+                                                      │  release-prepare.yml: validate, stamp version,
+                                                      │  build changelog, full dry-run release, open PR
+                                                      ▼
+hotfix/vX.Y.Z (cut from main) ──PR──▶  main  (stable channel)
+                                                      │  merge: release-stable.yml
+                                                      │  → mewkit-vX.Y.Z + vX.Y.Z (latest),
+                                                      │    installer pin PR, back-merge PR → develop
 ```
+
+Every release goes through `.github/workflows/release.yml`:
+
+1. `binary-build.yml` stamps the version into `Cargo.toml` and builds six targets.
+2. The kit gate (`scripts/release/build-kit.sh`) stamps the same version into `package.json` and
+   `.claude/kit-contract.json`, runs `scripts/release-check.sh` with the linux binary from step 1 as
+   `MEWKIT_NEXT_BIN`, builds `dist/meowkit-release.zip` + `dist/checksums.txt`, and builds the docs.
+3. It publishes `mewkit-v<version>` (archives, `binary-manifest.json`, `checksums.txt`, build
+   provenance; never `latest`) and then `v<version>` (`meowkit-release.zip`, `checksums.txt`;
+   `latest` only for a stable).
+4. For a stable only, it opens the installer pin PR into `main`.
+
+A failed step publishes nothing after it. Published assets are immutable: a rerun never replaces one.
 
 **One distribution, one source.** `.claude/` is the source for skills, agents, rules and hooks. The
 per-runtime overlays in `kit/overlays/<runtime>/` hold what one runtime needs that `.claude/` cannot
@@ -31,96 +44,118 @@ layout and adds its overlay. Nothing is hand-ported per release.
 **Key insight:** the `mewkit` binary downloads `meowkit-release.zip` from GitHub Releases at runtime.
 A release without that zip asset is invisible to it, so the binary skips it.
 
-## Version Independence: kit vs binary
+## One version for kit and binary
 
-There are **two independently versioned things** in this repo, and they are deliberately not
-synchronized:
+Root `package.json` `version` is the source of truth. `scripts/sync-versions.cjs` stamps it into
+`[workspace.package] version` in `Cargo.toml`, the workspace crates in `Cargo.lock`,
+`.claude/kit-contract.json` (`kitVersion`) and `release-manifest.json`, and fails CI on any drift:
 
-| Version field | What it versions |
-| --- | --- |
-| root `package.json` → `version` | The **kit**: `.claude/` and `kit/overlays/` content |
-| root `Cargo.toml` → `[workspace.package]` `version` | The **binary** (`mewkit`, alias `mk`): the installer, validator and lifecycle CLI |
+```bash
+node scripts/sync-versions.cjs                 # check
+node scripts/sync-versions.cjs --set 3.2.0     # set package.json, then stamp the rest
+```
 
-Read the current numbers from those files, never from this page. A version pasted into prose is
-stale the next time either one is bumped.
+Since 3.1.2 the binary carries the kit's number (it jumped from 0.2.1). Every release publishes both,
+even when only one of them changed: the cost is a binary build per release, the gain is that
+`mewkit --version` and `mewkit versions` always name the same release.
 
-**Do not synchronize the two version fields.** They answer different questions: "which harness
-content am I running" and "which binary installed it". A user can hold a new binary against an old
-kit, or the reverse. Aligning the numbers would force a binary release for every prose edit, and a
-kit release for every binary bugfix.
+`requires.mewkitMin` in the kit contract is still the oldest binary that can read the kit. Raise it
+only when the kit needs new binary behavior, not on every release.
 
-Bump each **only** for its own change:
+## Branches
 
-- Kit content changed (`.claude/`, `kit/overlays/`, rules, skills, agents) → bump the **root** version.
-- Binary code changed (`crates/`) → bump the **workspace** version.
-- Both changed → bump both, independently, in the same release. Not to the same number.
+| Branch | Role | Takes PRs from | Releases |
+| --- | --- | --- | --- |
+| `main` | Stable channel, production docs | `release/vX.Y.Z`, `hotfix/vX.Y.Z`, `release/installer-pins-mewkit-v*` | stable on merge |
+| `develop` | Beta channel, beta docs | `feature/*`, `fix/*`, `refactor/*`, `chore/*`, `docs/*`, `dependabot/*`, `chore/back-merge-v*` | beta on merge |
 
-A version-field change is a release decision. Never edit one to make the other match, and never let
-tooling do it automatically.
+The CI job `branch-policy` refuses any other head → base pair. Both branches are protected by
+rulesets (`.github/rulesets/`): no direct or force push, no deletion, PR with passing checks; `main`
+also needs one approval.
+
+## Versions are computed, never typed
+
+`scripts/release/next-version.cjs` decides every number from tags:
+
+- **Beta:** the latest stable bumped by the highest conventional-commit level since it
+  (`feat!:` or `BREAKING CHANGE:` → major, `feat:` → minor, anything else → patch), never below a base
+  an existing beta already used; `N` is the highest existing `-beta.N` of that base plus one. The beta
+  job stamps it in its workspace and commits nothing back to `develop`, so the tagged commit's
+  `package.json` keeps the last stable number; the zip, the binary and the tags carry the beta.
+- **Stable:** the number in the `release/vX.Y.Z` or `hotfix/vX.Y.Z` branch name. It must be strictly
+  greater than the latest stable, and neither `vX.Y.Z` nor `mewkit-vX.Y.Z` may exist.
+
+Concurrent PRs therefore never conflict on a version. Changelog entries are one file per PR in
+`changes/` (see [changes/README.md](changes/README.md)), so they never conflict either.
 
 ## Release Tags and Channels
 
 | Stream | Tag | GitHub Release | Marked `latest` |
 | ------ | --- | -------------- | --------------- |
 | Kit | `v<version>` | Stable release, with `meowkit-release.zip` and `checksums.txt` | Yes |
-| Kit prerelease | `v<version>-beta.N` | Pre-release with the same two assets; `release.sh` passes `--prerelease --latest=false` for any version with a `-`. Installed only with `mewkit init --beta` / `mewkit upgrade --beta` | Never |
+| Kit beta | `v<version>-beta.N` | Pre-release with the same two assets. Installed only with `mewkit init --beta` / `mewkit upgrade --beta` | Never |
 | Binary | `mewkit-v<version>` | Stable release, no `.zip` asset | Never |
-| Binary prerelease | `mewkit-v<version>-beta.N` | Pre-release on the beta channel (the `-` in the version makes it one) | Never |
+| Binary beta | `mewkit-v<version>-beta.N` | Pre-release on the beta channel | Never |
 
-`https://github.com/ngocsangyem/MeowKit/releases/latest` must keep resolving to the newest kit.
+`https://github.com/ngocsangyem/MeowKit/releases/latest` must keep resolving to the newest kit. The
+two tag prefixes stay so that kit selection (newest release with the zip) and `self-update` (tags
+`mewkit-v*`) work unchanged in every binary already installed.
 
-## Quick Release (Script)
-
-For a kit release, use the release script:
-
-```bash
-./scripts/release.sh <version> "<release title>"
-```
-
-Example:
+## Cutting a stable release
 
 ```bash
-./scripts/release.sh 2.3.2 "The Agent-Skills Integration Release"
+git switch develop && git pull --ff-only
+git switch -c release/v3.2.0
+git push -u origin release/v3.2.0
 ```
 
-The script checks that `<version>` equals root `package.json` `version`, stamps
-`.claude/kit-contract.json`, runs `scripts/release-check.sh`, builds and verifies the kit assets,
-checks the docs build, commits and tags, pushes, and creates the GitHub Release with the zip. It does
-not build or tag the binary. That is the separate `mewkit-v` tag (see
-[Binary release stream](#binary-release-stream)).
+`release-prepare.yml` then validates `3.2.0`, commits `chore(release): v3.2.0` to the branch (version
+in every surface, `## 3.2.0 (<date>)` built from `changes/*.md`, fragments deleted), runs the whole
+release without publishing, and opens `release: v3.2.0` into `main`. Fix anything it reports with
+commits on the release branch (it reruns). Review, approve, merge (merge commit). Then:
 
-**Before running the script:** complete step 2 (CHANGELOG) by hand, plus steps 1a, 1b and 1e when they apply.
+1. `release-stable.yml` publishes `mewkit-v3.2.0` and `v3.2.0` from `main`.
+2. Review and merge the installer pin PR (see [Binary release stream](#binary-release-stream)).
+3. Merge the back-merge PR `chore/back-merge-v3.2.0` into `develop`.
+4. `docs-deploy.yml` deploys the production docs from `main`.
 
-**After the script:** run step 11 (end-to-end test).
+A **hotfix** is the same with `hotfix/v3.2.1` cut from `main`; its fixes reach `develop` through the
+back-merge PR.
 
-### Order when both streams change
+## Beta releases
 
-Release the binary first, then the kit. The kit gate installs the candidate kit with the newest
-published binary, and a kit that needs new binary behavior must find it published.
+Merging any PR into `develop` runs `release-beta.yml` (unless it only touched docs, landing, `tasks/`
+or root prose). One beta runs at a time; when merges land faster than a release, the newest queued
+run replaces older queued ones and its beta carries all of them. Notes list the fragments added since
+the previous beta. Run it by hand from Actions → "Release beta" when needed.
 
-1. One PR bumps both versions (step 3) and turns the changelog's `## Unreleased` into the
-   `## <kit version> (<date>)` section. Merge it.
-2. Tag the merge commit `mewkit-v<binary version>` and push the tag (step 10). Wait for
-   `rust-release.yml` to publish.
-3. Merge the installer pin PR (step 10).
-4. Run the script against the published binary:
+## Docs channels
 
-   ```bash
-   B=$(mktemp -d) && cd "$B"
-   gh release download mewkit-v<binary version> -R ngocsangyem/MeowKit -p checksums.txt -p 'mewkit-<binary version>-<your target>.tar.gz'
-   grep '<your target>' checksums.txt | shasum -a 256 -c     # must print OK
-   tar -xzf mewkit-*.tar.gz && cd -
-   MEWKIT_NEXT_BIN="$B/mewkit-<binary version>-<your target>/mewkit" ./scripts/release.sh <kit version> "<title>"
-   ```
+`docs-deploy.yml` deploys the one docs site from both branches through Vercel, from the repo root
+(the project's Root Directory is `packages/docs`): `main` → production `docs.meowkit.dev`, `develop` →
+the `DOCS_BETA_DOMAIN` variable (for example `beta.docs.meowkit.dev`), built with
+`NEXT_PUBLIC_DOCS_CHANNEL=beta` so `robots.txt` disallows indexing. Production deploys queue and are
+never cancelled. Secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_DOCS_PROJECT_ID`.
 
-   Without `MEWKIT_NEXT_BIN` the gate uses `mk` from your `PATH`, which may be an older binary.
+## Repository settings (owner)
 
-**The script pushes to `main` directly.** It is the one sanctioned direct push. Run it on a clean,
-up-to-date `main`: if someone merges while it runs, `git push origin main` is rejected. Then
-`git pull --ff-only` and run the script again; it reuses the local tag. A change merged in between
-re-runs the whole gate, so fix whatever it reports first.
+- Rulesets from `.github/rulesets/main.json` and `.github/rulesets/develop.json`:
+  `gh api -X POST repos/ngocsangyem/MeowKit/rulesets --input .github/rulesets/main.json` (same for develop).
+- Default branch: `develop`, so new PRs target it. `releases/latest` is unaffected.
+- Secret `RELEASE_PR_TOKEN` (fine-grained: contents and pull requests write, this repository),
+  **required**: commits and PRs made with the default token start no workflow, so the checks `main`
+  requires would never run on the release PR. `release-prepare.yml` fails without it. The pin and
+  back-merge PRs fall back to the default token and then need a push (or close/reopen) to get CI.
+- Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+- Variable `DOCS_BETA_DOMAIN` and the Vercel secrets above; the domain must be added to the Vercel project.
 
-## Manual Release (Step-by-Step)
+## Manual recovery
+
+`scripts/release.sh <version> "<title>"` finishes a kit release a workflow could not, from a clean
+checkout of the exact commit: it runs `build-kit.sh` and `publish-kit.sh`, and refuses when the commit
+is on no remote branch or `mewkit-v<version>` is not published. It never commits or pushes a branch.
+
+## What each change and release needs
 
 ### 1. Update CHANGELOG and affected docs
 
@@ -328,7 +363,7 @@ A broader `grep -ri meowkit .claude` also surfaces functional hits (config ident
 log prefixes, generated views). Those are expected. Only new prose that names the product as a
 subject needs neutralizing.
 
-### 2. Update CHANGELOG (`packages/docs/content/docs/changelog/index.mdx`)
+### 2. Changelog fragments (`changes/*.md` → `packages/docs/content/docs/changelog/index.mdx`)
 
 > **Note:** The ONLY changelog file you edit is `packages/docs/content/docs/changelog/index.mdx`, the
 > Fumadocs source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a
@@ -336,8 +371,11 @@ subject needs neutralizing.
 > Older releases live in the sibling `changelog/archive.mdx`; a release moves there only when the
 > index page needs trimming, never as part of adding a new section.
 
-Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below.
-Only include sections that have content. Empty sections are dropped, not stubbed.
+Do not edit this page in a feature PR. Add a fragment under `changes/` instead
+([changes/README.md](changes/README.md)); its `section` is one of the sections below.
+`release-prepare.yml` writes the version section at the **top** (just below the `## Upgrade` block)
+from all fragments, in this order, and drops empty sections. Edit the generated section on the
+release branch if it needs polish.
 
 #### Section schema (in this order)
 
@@ -419,162 +457,51 @@ would want it.
 - `mewkit upgrade` to pick up the new defaults.
 ```
 
-### 3. Bump versions
+### 3. Choose the version
 
-#### Kit version
+Feature PRs set no version. For a stable, pick `X.Y.Z` from the conventional commits since the last
+stable ([table below](#conventional-commits--version-bumps)), one number for kit and binary, and cut
+`release/vX.Y.Z` ([Cutting a stable release](#cutting-a-stable-release)). `requires.mewkitMin` in
+`.claude/kit-contract.json` changes only when the kit needs newer binary behavior.
 
-Set root `package.json` `version` to the kit version in the release PR. `scripts/release.sh <version>`
-refuses any other value, so the kit version is always set first.
-
-#### Binary (CLI) version
-
-Bump only when the release changes the binary. Check first:
-
-```bash
-LAST=$(git tag --list 'mewkit-v*' --sort=-v:refname | head -1)
-git diff --name-only "${LAST:-HEAD~1}"..HEAD -- crates Cargo.toml Cargo.lock
-```
-
-If the command prints nothing, the binary is unchanged: skip this sub-step and step 10. The binary
-keeps its current version.
-
-Map the size of the change to a SemVer field:
-
-| Change shape                                                                                                                       | Bump                  | Example            |
-| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------------------ |
-| Minor edits: bug fix, log tweak, refactor that preserves the CLI surface                                                           | patch (last number)   | `X.Y.Z → X.Y.(Z+1)` |
-| Big changes: new flag, new subcommand, new env var, behavior addition that does NOT remove or rename existing behavior            | minor (middle number) | `X.Y.Z → X.(Y+1).0` |
-| Breaking changes: removed flag, renamed subcommand, removed or renamed env var, contract change that an existing script would notice | major (first number)  | `X.Y.Z → (X+1).0.0` |
-
-Run the bump: edit `version` under `[workspace.package]` in the root `Cargo.toml`, run
-`cargo build -p mewkit-cli` so `Cargo.lock` follows, and commit both. Every crate inherits that one
-value. The release scripts read it through `scripts/lib/cli-version.cjs`, so do not set a version in a
-crate's own `Cargo.toml`.
-
-### 4. Build and verify
+### 4. Check locally before cutting (optional)
 
 ```bash
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
-npm test
-npm run lint
+npm test && npm run lint && npm run format:check
 node --test .claude/hooks/__tests__/*.test.cjs
-npm run release:check      # the readiness gate release.sh also runs
+node scripts/release/next-version.cjs stable --branch release/vX.Y.Z
+npm run release:check      # the readiness gate the release workflow runs
 ```
 
-### 5. Build release assets
+### 5. What the workflows do
 
-```bash
-node scripts/prepare-release-assets.cjs "<version>"
-```
+Steps 5–10 of the old manual flow (assets, commit, tag, push, GitHub Release, binary tag) are done by
+`release.yml`. `scripts/release/build-kit.sh <version>` and `scripts/release/publish-kit.sh` are the
+same steps it runs, usable by hand for [Manual recovery](#manual-recovery). The zip carries
+`.claude/`, the `kit/overlays/` files and catalogs, and manifests (no root `CLAUDE.md`, no `tasks/`,
+no `changes/`), and `.claude/kit-contract.json`. The script does NOT write `.claude/metadata.json`;
+the binary writes it on install and upgrade.
 
-This creates:
+### 6. Review the installer pin PR (stable only)
 
-- `release-manifest.json`: SHA-256 checksums for all files
-- `dist/meowkit-release.zip`: the release package (`.claude/`, the `kit/overlays/` files and catalogs, and manifests; no root `CLAUDE.md`, no `tasks/`); it carries `.claude/kit-contract.json`
-- `dist/checksums.txt`: `<sha256>  meowkit-release.zip`, in `sha256sum -c` format
-
-> **Note:** This script does NOT write `.claude/metadata.json`. The `mewkit` binary writes it on
-> install and upgrade, and the script excludes it from the zip.
-
-Verify the assets (contract inside the zip, checksum matches, no signed-artifact asset in `dist/`):
-
-```bash
-node scripts/verify-release-assets.cjs "<version>" dist
-python3 -c "import os,zipfile; z=zipfile.ZipFile('dist/meowkit-release.zip'); print(f'Size: {os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f} KB, Files: {len(z.namelist())}')"
-```
-
-### 6. Commit and tag
-
-```bash
-git add -A
-git commit -m "chore: release v<version>"
-git tag -a v<version> -m "v<version> — <release title>
-
-<Brief description of what changed>"
-```
-
-### 7. Push to GitHub
-
-```bash
-git push origin main
-git push origin v<version>
-```
-
-### 8. Create GitHub Release with zip and checksums
-
-**This is the critical step.** The zip and `checksums.txt` MUST be attached as release assets, and
-nothing else.
-
-````bash
-gh release create v<version> dist/meowkit-release.zip dist/checksums.txt \
-  --title "v<version> — <release title>" \
-  --notes-file - <<'NOTES'
-## <Release Title>
-
-<Release notes in markdown>
-
-### Install
-
-```bash
-mewkit init
-# or upgrade:
-mewkit upgrade
-```
-NOTES
-````
-
-To upload the assets separately:
-
-```bash
-gh release create v<version> --title "..." --notes "..."
-gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobber
-```
-
-### 9. Verify the release
-
-```bash
-# Check tag exists
-git tag | grep v<version>
-
-# Check the assets
-gh release view v<version> --json assets -q '.assets[].name'
-# Must show exactly: meowkit-release.zip, checksums.txt
-
-# Check release URL
-gh release view v<version> --json url -q '.url'
-```
-
-### 10. Release the binary (only when step 3 bumped the binary version)
-
-Skip this step if `git diff` in step 3 printed nothing. The binary keeps its version and nothing is
-tagged. Otherwise follow [Binary release stream](#binary-release-stream). Do it before the kit
-release when both changed ([order](#order-when-both-streams-change)).
-
-```bash
-git switch main && git pull --ff-only
-git tag -a mewkit-v<version> -m "mewkit <version>"
-git push origin mewkit-v<version>
-gh run watch "$(gh run list --workflow rust-release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
-```
-
-While the repository setting "Allow GitHub Actions to create and approve pull requests" is off and
-no `RELEASE_PR_TOKEN` is set, the last job, "Open the installer pin pull request", cannot open the PR.
-It still pushes the branch `release/installer-pins-mewkit-v<version>` and ends with a notice and a
-job-summary link to open the PR; the run stays green. Open the PR by hand after the review below:
+While "Allow GitHub Actions to create and approve pull requests" is off and no `RELEASE_PR_TOKEN` is
+set, the "Open the installer pin pull request" job cannot open the PR. It still pushes the branch
+`release/installer-pins-mewkit-v<version>` and ends with a notice and a job-summary link; the run stays
+green. Review before merging:
 
 ```bash
 git fetch origin release/installer-pins-mewkit-v<version>
 gh release download mewkit-v<version> -p checksums.txt -D "$(mktemp -d)"   # compare each digest with the diff
 git diff main FETCH_HEAD                                                     # every URL under releases/download/mewkit-v<version>/
 git switch --detach FETCH_HEAD && node scripts/release/render-installers.mjs --check; git switch main
-gh pr create --base main --head release/installer-pins-mewkit-v<version> --title "build(release): pin installers to mewkit <version>"
 ```
 
 Until the pin PR merges, `install.sh` and `install.ps1` still install the previous binary.
 
-### 11. Test end-to-end
+### 7. Test end-to-end
 
 After the pin PR and the kit release, in a scratch `HOME` so your own install is untouched:
 
@@ -600,12 +527,12 @@ Copy this checklist for each release:
 
 - [ ] Affected guide/reference pages (step 1a) and routing surfaces (step 1b) updated
 - [ ] No product-brand leakage in shipped `.claude/` (step 1f); docs build passes
-- [ ] `v<version>` section added to `packages/docs/content/docs/changelog/index.mdx` (not root `CHANGELOG.md`, a stub)
+- [ ] Every user-visible PR since the last stable added a `changes/*.md` fragment; the generated `## <version>` section reads well
 
 ### Versions
 
-- [ ] Root `package.json` `version` is the kit version being released
-- [ ] Binary changed? (step 3 `git diff`). If yes: `[workspace.package] version` bumped, `Cargo.lock` committed, step 10 planned. If no: step 10 skipped
+- [ ] `release/v<version>` validated by `release-prepare.yml`; `node scripts/sync-versions.cjs` passes (one version everywhere)
+- [ ] `requires.mewkitMin` raised only if the kit needs newer binary behavior
 - [ ] Memory contract changed? (step 1e): docs, rule and `Migration Notes` updated, `mewkit validate --memory` green
 
 ### Build and overlays
@@ -616,19 +543,18 @@ Copy this checklist for each release:
 
 ### Release
 
-- [ ] `prepare-release-assets.cjs` and `verify-release-assets.cjs` ran; `dist/meowkit-release.zip` has the expected size
-- [ ] Committed, tagged `v<version>`, pushed; GitHub Release has `meowkit-release.zip` and `checksums.txt` only, with `mewkit init` install notes
-- [ ] Binary changed: `mewkit-v<version>` tag pushed and release published BEFORE the kit release; pin PR reviewed and merged (step 10)
-- [ ] Kit gate ran against the published binary (`MEWKIT_NEXT_BIN`)
-- [ ] Fresh `install.sh` + `mewkit init` in a scratch `HOME` gives the new binary and kit (step 11)
+- [ ] Release PR into `main` green and approved; merged with a merge commit
+- [ ] `release-stable.yml` published `mewkit-v<version>` then `v<version>`; the kit release has `meowkit-release.zip` and `checksums.txt` only
+- [ ] Installer pin PR reviewed and merged (step 6); back-merge PR into `develop` merged
+- [ ] Fresh `install.sh` + `mewkit init` in a scratch `HOME` gives the new binary and kit (step 7)
 ```
 
 ## Release Streams and Trust Model
 
 Three things ship. Only two are released.
 
-- **Kit**: `scripts/release.sh <version> "<title>"` tags `v<version>` and publishes `meowkit-release.zip` + `checksums.txt` to the GitHub Release. The zip carries `.claude/kit-contract.json`: `kitContract` (format version), `requires.mewkitMin` (oldest binary that can read this kit) and `kitVersion` (stamped from root `package.json` by `sync-versions.cjs`).
-- **Binary**: the native `mewkit` CLI (alias `mk`) is released from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so kit consumers never mistake it for a kit. It fetches the kit zip and checks it against `checksums.txt`. See [Binary release stream](#binary-release-stream).
+- **Kit**: `release.yml` (through `scripts/release/publish-kit.sh`) tags `v<version>` and publishes `meowkit-release.zip` + `checksums.txt` to the GitHub Release. The zip carries `.claude/kit-contract.json`: `kitContract` (format version), `requires.mewkitMin` (oldest binary that can read this kit) and `kitVersion` (stamped from root `package.json` by `sync-versions.cjs`).
+- **Binary**: the native `mewkit` CLI (alias `mk`) is released from this repo under `mewkit-v<version>` tags, same number as the kit, with no `.zip` asset, so kit consumers never mistake it for a kit. It fetches the kit zip and checks it against `checksums.txt`. See [Binary release stream](#binary-release-stream).
 - **npm package (`mewkit`)**: retired. It is no longer released. See [Retiring the npm package](#retiring-the-npm-package).
 
 **Trust model: checksums only.** MeowKit is open source and releases carry no signatures. `checksums.txt` is fetched from the same release as the zip, so it detects corruption and partial downloads, not a tampered release. Trust rests on GitHub, TLS and who can push tags.
@@ -637,17 +563,16 @@ Three things ship. Only two are released.
 
 ### Binary release stream
 
-**What a release is.** Pushing the tag `mewkit-v<version>` runs `.github/workflows/rust-release.yml`. The tag must equal `version` under `[workspace.package]` in `Cargo.toml`; the workflow fails otherwise. Bump that in a reviewed PR first. The workflow:
+**What a release is.** Every beta and stable run of `.github/workflows/release.yml` builds the binary with `binary-build.yml` (the version stamped into `Cargo.toml` first, so `mewkit --version` prints it) and publishes it as `mewkit-v<version>` before the kit. Nobody pushes a `mewkit-v*` tag by hand. The workflow:
 
 1. builds six targets: `{x86_64,aarch64}-unknown-linux-musl` (static), `{x86_64,aarch64}-apple-darwin`, `{x86_64,aarch64}-pc-windows-msvc` (static C runtime);
 2. packs each as `mewkit-<version>-<target>.tar.gz` (Windows too: never `.zip`);
 3. writes `checksums.txt` and `binary-manifest.json` (`version`, `channel`, `published_at`, `min_supported`, per-target `url`, `sha256`, `size`) from the archives;
-4. creates the release as a draft, uploads everything, then publishes it with `--latest=false`. A version with `-` (e.g. `0.2.0-beta.1`) is a prerelease on the beta channel;
-5. opens a PR `release/installer-pins-mewkit-v<version>` that re-renders `install.sh` and `install.ps1` with the new pins.
+4. creates the release as a draft, uploads everything, then publishes it with `--latest=false`. A version with `-` (e.g. `3.2.0-beta.1`) is a prerelease on the beta channel;
+5. for a stable only, opens a PR `release/installer-pins-mewkit-v<version>` into `main` that re-renders `install.sh` and `install.ps1` with the new pins (the installers serve stable binaries only).
 
-`workflow_dispatch` (Actions → "Rust release" → Run workflow) builds all six targets and publishes
-nothing. **Run it once before the first tag**: it is the only proof that the arm64 runners build every
-target.
+`workflow_dispatch` (Actions → "Binary build" → Run workflow) builds all six targets from any branch
+and publishes nothing.
 
 **Installers.** `install.sh` and `install.ps1` place `mewkit` and `mk` (the same binary). An existing
 `mk` that is not MeowKit is left alone and reported. The 0.1.0 and 0.1.1 installers also placed
@@ -704,8 +629,9 @@ Projects that still run `npx mewkit` keep working.
 
 ### Conventional commits → version bumps
 
-Use the commit history to choose the kit bump. The mapping below applies to `.claude/` content. The
-binary follows the same SemVer fields, but it only bumps when `crates/` changes; see step 3.
+Kit and binary share one version, so the mapping below applies to any change, in `.claude/`,
+`kit/` or `crates/`. Betas apply it automatically (`next-version.cjs`); for a stable, pick the branch
+name with it.
 
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)
@@ -715,22 +641,27 @@ chore: cleanup             → no release
 docs: update readme        → no release
 ```
 
-For binary changes, use the SemVer table in step 3.
+For the binary, a removed flag, renamed subcommand or removed env var is breaking (`!`); a new flag,
+subcommand or env var is `feat:`.
 
 ## Release Scripts
 
 | Script                                  | Purpose                                                                         |
 | --------------------------------------- | ------------------------------------------------------------------------------- |
-| `scripts/release.sh`                    | Kit release: version check → stamp → readiness gate → assets → commit → tag → push → GitHub Release |
+| `scripts/release/next-version.cjs`      | Next beta (from tags + conventional commits) or the validated stable target of a `release/`/`hotfix/` branch |
+| `scripts/release/assemble-changelog.cjs` | Changelog fragments: `check`, beta `notes`, stable `section` insertion, PR `require` check |
+| `scripts/release/build-kit.sh`          | Stamp one version → readiness gate → JSON checks → assets → docs build (no git, no publish) |
+| `scripts/release/publish-kit.sh`        | Publish `v<version>` with the zip and checksums (tag at a given commit; never replaces an asset) |
+| `scripts/release.sh`                    | Manual recovery: `build-kit.sh` + `publish-kit.sh` on a clean, pushed commit |
 | `scripts/release-check.sh`              | Readiness gate (`npm run release:check`): cargo build, bless tests, version sync, portable skills, kit contract, install check, `validate --portable` on the binary, npm test, lint, format check |
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + `dist/meowkit-release.zip` + `dist/checksums.txt`   |
 | `scripts/verify-release-assets.cjs`     | Check `dist/` before upload: contract in the zip, checksum, no signed-artifact asset |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
 | `scripts/kit-ship-set.cjs`              | The files a kit ships: `.claude/`, `kit/overlays/{codex,cursor,grok,agents}/` (`overlay.toml`, `files/`, catalogs), `kit/overlays/{pi,omp}/files`, `kit/overlays/shared/AGENTS.md` |
 | `scripts/sync-hook-core.cjs`            | Copies the shared hook libraries from `.claude/hooks/lib/` into the overlays; `--check` exits 1 on drift |
-| `scripts/sync-versions.cjs`             | Check or stamp the kit version into the derived surfaces, incl. `.claude/kit-contract.json`; records the binary version read from `Cargo.toml` |
+| `scripts/sync-versions.cjs`             | Check, stamp (`--write`) or set (`--set <v>`) the one version: `package.json` → `Cargo.toml`, `Cargo.lock`, `.claude/kit-contract.json`, `release-manifest.json` |
 | `scripts/lib/cli-version.cjs`           | Reads the binary version from `[workspace.package]` in the root `Cargo.toml`    |
-| `scripts/release/build-binary-manifest.mjs` | Binary stream: `binary-manifest.json` + `checksums.txt` from the six archives (run by `rust-release.yml`) |
+| `scripts/release/build-binary-manifest.mjs` | Binary stream: `binary-manifest.json` + `checksums.txt` from the six archives (run by `release.yml`) |
 | `scripts/release/render-installers.mjs` | Binary stream: render `install.sh` / `install.ps1` from their templates and `installer-pins.json`; `--check` fails on drift |
 | `scripts/release/check-kit-against-binary.sh` | Kit gate: `init --dry-run` of a staged kit for claude-code, codex and cursor with a given binary |
 
@@ -856,11 +787,12 @@ git push origin v<version>               # push
 
 The same steps apply to a `mewkit-v<version>` tag.
 
-### Binary release workflow fails at "Tag and crate version must agree"
+### CI fails at "One version for kit and binary"
 
-**Cause:** The tag `mewkit-v<version>` does not equal `version` under `[workspace.package]` in the root `Cargo.toml`. The workflow refuses to build.
+**Cause:** `package.json`, `Cargo.toml`, `Cargo.lock` or `.claude/kit-contract.json` disagree.
 
-**Fix:** Delete the wrong tag as above, bump `Cargo.toml` in a PR, merge it, and tag the merged commit.
+**Fix:** `node scripts/sync-versions.cjs --write` and commit the result. Feature PRs should not
+change a version at all.
 
 ### GitHub Release exists but no zip
 
@@ -874,16 +806,23 @@ gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobb
 settings and no `RELEASE_PR_TOKEN` is set. The release itself is published and the pin branch is
 pushed; the job reports this as a notice, not a failure.
 
-**Fix:** Review the pin branch and open the PR from the link in the job summary (step 10). To have
+**Fix:** Review the pin branch and open the PR from the link in the job summary (step 6). To have
 the workflow open it, turn the setting on or add the `RELEASE_PR_TOKEN` secret. Any other error from
 `gh pr create` still fails the job.
 
-### `release.sh` stops at `git push origin main` ("fetch first")
+### `release-prepare.yml` fails at "Validate the target version"
 
-**Cause:** `main` moved while the script ran. Nothing was published: the tag is local only.
+**Cause:** The branch is not `release/vX.Y.Z` / `hotfix/vX.Y.Z`, or `X.Y.Z` is not above the latest
+stable, or `vX.Y.Z` / `mewkit-vX.Y.Z` already exists (published releases are immutable).
 
-**Fix:** `git pull --ff-only`, then run the script again. It reuses the local tag when that tag's
-commit is still an ancestor of `main`.
+**Fix:** Delete the branch and cut one with the next free version.
+
+### A beta was not released after a merge
+
+**Cause:** The merge touched only paths `release-beta.yml` ignores (docs, landing, `tasks/`, root
+prose), or a newer queued run replaced it (its beta carries the change), or the gate failed.
+
+**Fix:** Check the "Release beta" runs; rerun or run it by hand after fixing the gate.
 
 ### The readiness gate reports "generated artifacts drifted" for `README.md`
 
@@ -897,8 +836,9 @@ diff and commit it. The same failure makes `validate --portable` report hard fai
 
 **Cause:** No `mk` on `PATH` and no `MEWKIT_NEXT_BIN`.
 
-**Fix:** Set `MEWKIT_NEXT_BIN` to a checksum-verified binary from the newest `mewkit-v*` release
-([order](#order-when-both-streams-change)).
+**Fix:** Set `MEWKIT_NEXT_BIN` to a checksum-verified binary from the newest `mewkit-v*` release, or
+to `target/debug/mewkit` built from the same commit. In CI the release workflow sets it to the binary it
+just built.
 
 ### An install is missing a skill or rule after editing `.claude/`
 

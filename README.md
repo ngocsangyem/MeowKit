@@ -202,7 +202,7 @@ meowkit/
 ├── scripts/                  Release and validation scripts
 ├── install.sh, install.ps1   Binary installers, pinned to one binary release
 ├── CLAUDE.md                 Maintainer guide for this repo (not shipped to projects)
-└── .github/workflows/        ci.yml (kit and docs), rust-ci.yml, rust-release.yml (binary release)
+└── .github/workflows/        ci.yml (kit and docs), rust-ci.yml, release*.yml (beta and stable releases)
 ```
 
 ## Releasing
