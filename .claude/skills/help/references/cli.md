@@ -710,6 +710,7 @@ Commands:
   status  (beta) Sample CPU, memory, disk, thermal and free space; print a verdict
   run     (beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
   jobs    (beta) List, wait for, read or cancel queued and running jobs
+  watch   (beta) Run the machine-wide watcher: samples every 5 s and writes each loaded worktree's inbox; exits after 30 min with no agent running
   help    Print this message or the help of the given subcommand(s)
 
 Options:
@@ -816,4 +817,17 @@ Arguments:
 
 Options:
   -h, --help  Print help
+```
+
+### mewkit host watch
+
+```text
+(beta) Run the machine-wide watcher: samples every 5 s and writes each loaded worktree's inbox; exits after 30 min with no agent running
+
+Usage: mewkit host watch [OPTIONS]
+
+Options:
+      --detach  Start the watcher in the background and print its pid
+      --stop    Stop the running watcher
+  -h, --help    Print help
 ```

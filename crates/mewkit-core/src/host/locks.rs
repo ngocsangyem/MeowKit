@@ -52,6 +52,21 @@ pub fn is_held(path: &Path) -> bool {
     matches!(file.try_lock(), Err(TryLockError::WouldBlock))
 }
 
+/// Test helper: true once `cond` holds, polling for up to a second. A child
+/// forked by another test thread holds a copy of every open lock until it
+/// execs, so "released" can lag a drop by a moment.
+#[cfg(test)]
+pub(crate) fn eventually(cond: impl Fn() -> bool) -> bool {
+    let started = Instant::now();
+    while started.elapsed() < Duration::from_secs(1) {
+        if cond() {
+            return true;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    cond()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -65,7 +80,7 @@ mod tests {
         assert!(is_held(&path));
         assert!(try_hold(&path).unwrap().is_none());
         drop(guard);
-        assert!(!is_held(&path));
+        assert!(eventually(|| !is_held(&path)));
         assert!(
             hold_within(&path, Duration::from_millis(50))
                 .unwrap()

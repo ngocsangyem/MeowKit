@@ -9,6 +9,7 @@ pub mod cmd_class;
 pub mod collect;
 pub mod config;
 pub mod detach;
+pub mod inbox;
 pub mod joblog;
 pub mod jobs;
 pub mod locks;
@@ -26,6 +27,7 @@ pub mod supervisor;
 pub mod tree_digest;
 pub mod verdict;
 pub mod wait_default;
+pub mod watch;
 pub mod worktree;
 
 #[cfg(test)]
@@ -36,6 +38,8 @@ mod supervisor_tests;
 mod tree_digest_tests;
 #[cfg(test)]
 mod verdict_tests;
+#[cfg(test)]
+mod watch_inbox_tests;
 
 use std::path::PathBuf;
 

@@ -529,7 +529,7 @@ Subcommands: `list`, `restore`.
 
 (beta) Machine load, who causes it, and admission for heavy commands
 
-Subcommands: `status`, `run`, `jobs`.
+Subcommands: `status`, `run`, `jobs`, `watch`.
 
 ### `mewkit host status`
 
@@ -575,5 +575,14 @@ Print a job's log (secrets masked, last 2 MB at most)
 ### `mewkit host jobs cancel`
 
 Ask a job's supervisor to stop it
+
+### `mewkit host watch`
+
+(beta) Run the machine-wide watcher: samples every 5 s and writes each loaded worktree's inbox; exits after 30 min with no agent running
+
+| Flag | What it does |
+|---|---|
+| `--detach` | Start the watcher in the background and print its pid |
+| `--stop` | Stop the running watcher |
 
 {/* GENERATED:cli-flags END */}

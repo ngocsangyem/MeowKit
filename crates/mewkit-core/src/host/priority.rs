@@ -70,6 +70,7 @@ pub fn stop_tree(child: &mut Child, grace: std::time::Duration) {
         let group = format!("-{pid}");
         let _ = Command::new("/bin/kill")
             .args(["-TERM", "--", &group])
+            .stderr(Stdio::null())
             .status();
         let started = std::time::Instant::now();
         while started.elapsed() < grace {
@@ -80,6 +81,7 @@ pub fn stop_tree(child: &mut Child, grace: std::time::Duration) {
         }
         let _ = Command::new("/bin/kill")
             .args(["-KILL", "--", &group])
+            .stderr(Stdio::null())
             .status();
     }
     #[cfg(windows)]
@@ -87,6 +89,8 @@ pub fn stop_tree(child: &mut Child, grace: std::time::Duration) {
         let _ = grace;
         let _ = Command::new("taskkill")
             .args(["/T", "/F", "/PID", &pid])
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
             .status();
     }
     let _ = child.kill();

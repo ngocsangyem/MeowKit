@@ -53,11 +53,10 @@ fn a_dead_ticket_is_swept_and_its_number_is_never_reused_while_live() {
     let c = q.enqueue(ticket(Priority::Normal, 0)).unwrap();
     assert!(c.ticket.seq > b.ticket.seq);
     drop(a); // supervisor died: lock released, json left behind
-    let live: Vec<u64> = q.live().iter().map(|t| t.seq).collect();
-    assert_eq!(live.len(), 2);
+    assert!(super::locks::eventually(|| q.live().len() == 2));
     assert!(!dir.path().join(format!("{:012}.json", 1)).exists());
     b.leave();
-    assert_eq!(q.live().len(), 1);
+    assert!(super::locks::eventually(|| q.live().len() == 1));
 }
 
 #[test]
@@ -128,8 +127,11 @@ fn shrinking_k_keeps_running_slots_and_blocks_new_ones_after_hysteresis() {
     assert!(slots.try_admit(1, 1_000).unwrap().is_none());
     held.pop();
     // Within hysteresis K stays 4, so the freed slot can be reused.
-    let again = slots.try_admit(1, 2_000).unwrap();
-    assert!(again.is_some());
+    let again = std::cell::RefCell::new(None);
+    assert!(super::locks::eventually(|| {
+        *again.borrow_mut() = slots.try_admit(1, 2_000).unwrap();
+        again.borrow().is_some()
+    }));
     drop(again);
     // After hysteresis K = 1 while 3 run: nobody new.
     assert!(slots.try_admit(1, K_HYSTERESIS_MS + 1).unwrap().is_none());

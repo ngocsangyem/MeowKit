@@ -197,6 +197,6 @@ fn a_job_without_its_supervisor_is_lost_and_frees_its_slot() {
         assert_eq!(job.state(), JobState::Running);
         assert_eq!(slots.held(), 1);
     } // the supervisor dies: the OS drops both locks
-    assert_eq!(job.state(), JobState::Lost);
-    assert_eq!(slots.held(), 0);
+    assert!(super::locks::eventually(|| job.state() == JobState::Lost));
+    assert!(super::locks::eventually(|| slots.held() == 0));
 }
