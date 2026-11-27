@@ -32,7 +32,22 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       channels: ${{ steps.pick.outputs.channels }}
+      stable: ${{ steps.versions.outputs.stable }}
+      beta: ${{ steps.versions.outputs.beta }}
     steps:
+      # This workflow's own commit, not the branch being built: main may predate the script.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: scripts/release
+      - name: Read the channel versions from the release tags
+        id: versions
+        run: |
+          # Tag names are all it needs; no history is fetched for them.
+          git ls-remote --tags --refs origin 'v*' 'mewkit-v*' | sed 's#.*refs/tags/##' |
+            node -e 'const { channels } = require("./scripts/release/next-version.cjs");
+              const tags = require("fs").readFileSync(0, "utf8").split("\n").filter(Boolean);
+              const c = channels(tags);
+              process.stdout.write(`stable=${c.stable}\nbeta=${c.beta || ""}\n`);' >> "$GITHUB_OUTPUT"
       - id: pick
         env:
           EVENT: ${{ github.event_name }}
@@ -90,15 +105,10 @@ jobs:
 
       - name: Deploy
         if: steps.creds.outputs.ok == 'true'
+        env:
+          stable_version: ${{ needs.plan.outputs.stable }}
+          beta_version: ${{ needs.plan.outputs.beta }}
         run: |
-          # Tag names are all the channel versions need; no history is fetched for them.
-          versions=$(git ls-remote --tags --refs origin 'v*' 'mewkit-v*' | sed 's#.*refs/tags/##' |
-            node -e 'const { channels } = require("./scripts/release/next-version.cjs");
-              const tags = require("fs").readFileSync(0, "utf8").split("\n").filter(Boolean);
-              const c = channels(tags);
-              process.stdout.write(`${c.stable}\n${c.beta || ""}\n`);')
-          stable_version=$(echo "$versions" | sed -n 1p)
-          beta_version=$(echo "$versions" | sed -n 2p)
           echo "Channels: stable $stable_version, beta ${beta_version:-(none ahead)}"
 
           args=(--build-env "NEXT_PUBLIC_DOCS_CHANNEL=$CHANNEL" --build-env "NEXT_PUBLIC_STABLE_VERSION=$stable_version")
@@ -111,4 +121,4 @@ jobs:
               args+=(--build-env "NEXT_PUBLIC_SITE_URL=https://$BETA_DOMAIN")
             fi
           fi
-          $VERCEL deploy --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" "${args[@]}"
+          $VERCEL deploy --prod --yes --token "$VERCEL_TOKEN" "${args[@]}"
