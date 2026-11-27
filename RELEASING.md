@@ -71,7 +71,9 @@ only when the kit needs new binary behavior, not on every release.
 
 The CI job `branch-policy` refuses any other head → base pair. Both branches are protected by
 rulesets (`.github/rulesets/`): no direct or force push, no deletion, PR with passing checks; `main`
-also needs one approval.
+also needs every review thread resolved and the full release gate. It needs no approval: the repository
+has one maintainer, and GitHub does not let an author approve their own PR (release PRs are opened with
+that maintainer's `RELEASE_PR_TOKEN`). Raise `required_approving_review_count` once a second reviewer joins.
 
 ## Versions are computed, never typed
 
