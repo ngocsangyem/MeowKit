@@ -10,7 +10,7 @@ Read the repo's `VERSION` file (or the version field the project uses) and keep 
 - next digit: bug fixes and small to medium features;
 - minor or major: only the user chooses this, for significant features, milestones or breaking changes.
 
-Bumping a digit resets every digit to its right to 0. For `beta`, append `-beta.N`, where N follows the last tag matching `*-beta.*` (`git tag -l "*-beta.*"`). Write the version only after the user names or accepts one.
+If the version already differs from the base on this branch (`git diff origin/<base>...HEAD -- <version file>` shows a change), it was bumped by an earlier run: say so and propose no second bump. Bumping a digit resets every digit to its right to 0. For `beta`, append `-beta.N`, where N follows the last tag matching `*-beta.*` (`git tag -l "*-beta.*"`). Write the version only after the user names or accepts one.
 
 ## CHANGELOG
 

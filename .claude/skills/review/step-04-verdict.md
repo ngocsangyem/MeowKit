@@ -56,6 +56,7 @@ coverage; attested sessions cap at `PASS_WITH_RISK`, and the verdict says so.
 ## Review Verdict
 
 **Overall:** [PASS|WARN|FAIL]
+**Reviewed commit:** [full `git rev-parse HEAD` at review time][, with uncommitted changes — when `git status --porcelain` listed any change, tracked or untracked]
 
 | Dimension | Result | Summary |
 |-----------|--------|---------|
@@ -158,12 +159,20 @@ verdict at `tasks/reviews/<slug>-verdict.json` (atomic write):
     { "name": "Correctness", "verdict": "PASS|WARN|FAIL", "note": "<one-line>" }
   ],
   "evidence_refs": ["tasks/reviews/<slug>-verdict.md"],
+  "reviewed_commit": "<full sha of HEAD at review time>",
+  "reviewed_dirty": false,
+  "reviewed_files": { "<path>": "<git hash-object of the file, or null if deleted>" },
   "created_at": "<ISO-8601 UTC>"
 }
 ```
 
 Map the overall verdict to `decision`: Overall **PASS** → `PASS`; Overall **WARN** →
 `PASS_WITH_RISK`; Overall **FAIL** → `BLOCKED`. List all five dimensions.
+`reviewed_commit` and `reviewed_dirty` match the markdown's **Reviewed commit** line. When
+`reviewed_dirty` is true, `reviewed_files` lists every uncommitted path the review saw (changed,
+new or deleted) with `git hash-object <path>` at review time; omit it for a clean tree. `mk:ship`
+uses these to tell whether the verdict still describes what it ships, including after the
+reviewed edits are committed.
 
 The markdown verdict remains the authoritative human narrative; the JSON is the same
 verdict in a form a tool can read. The bundle stays under `tasks/` and is never

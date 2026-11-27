@@ -20,12 +20,13 @@ Use `git diff origin/<base>...HEAD` and `git log origin/<base>..HEAD --oneline`.
 - **PARTIAL**: some of the work is present and some is missing.
 - **NOT DONE**: no evidence.
 - **CHANGED**: a different approach reaches the same goal; note the difference.
+- **UNVERIFIABLE**: the diff cannot show it either way (a manual check, a deploy step, an outside system). Ask the user about each such item on its own; never fold them into one blanket confirmation.
 
-Report a checklist per category with the totals, for example `COMPLETION: 4/7 DONE, 1 PARTIAL, 1 NOT DONE, 1 CHANGED`.
+Report a checklist per category with the totals, for example `COMPLETION: 4/8 DONE, 1 PARTIAL, 1 NOT DONE, 1 CHANGED, 1 UNVERIFIABLE`.
 
 ## Outcomes
 
-- All DONE or CHANGED: pass.
+- All DONE or CHANGED, and each UNVERIFIABLE item confirmed by the user: pass.
 - Only PARTIAL left: continue, and note it in the PR body.
 - Any NOT DONE: show the checklist and ask: A) stop and implement the missing items, B) ship anyway and record each as a follow-up (a P1 entry in `TODOS.md` "Deferred from plan: <path>" if the repo keeps one), C) the items were intentionally dropped (note that in the PR body). Recommend A when core behaviour is missing and B when only docs or config items are.
 

@@ -18,6 +18,7 @@ The ship check is the one control a hook enforces at ship time. On `git commit`,
 
 - Lint, tests and the type-check run from the project's own `node_modules/.bin`. Nothing is fetched: a project with a `tsconfig.json` but no local TypeScript gets `SKIP: typescript not installed locally`.
 - When the test runner cannot name the related tests, the check runs lint and type-check only and says that tests did not run.
+- When vitest or jest finds no test related to the changed files, the check says that no test relates to the change instead of printing a pass; when tests ran, the pass line shows how many.
 - `MEOWKIT_HOOK_PROFILE=fast` does not turn it off.
 - A ship command run inside `bash -c`, `eval`, `env -S`, backticks, a script or a Makefile target is not seen. Shell keywords (`if … then`, `{ }`, `!`), subshells and the `env`, `sudo`, `nice`, `time`, `nohup`, `exec` and `xargs` wrappers are seen through.
 - The check stops itself after 270 seconds and reports what did not finish.

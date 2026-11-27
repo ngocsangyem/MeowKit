@@ -73,6 +73,8 @@ Any FAIL makes the verdict FAIL, all PASS makes it PASS, and a PASS/WARN mix is 
 
 When the diff breaks existing behaviour, the verdict adds `Side Effects Detected: Yes` with one bullet per effect. The user's chosen recovery option is appended as a `## User Decision Addendum`. A verdict without that line means nothing was detected.
 
+Each verdict names the commit it reviewed (`Reviewed commit:` in the markdown, `reviewed_commit` and `reviewed_dirty` in the JSON beside it). [mk:ship](/reference/skills/ship) compares it with the HEAD it ships and calls the verdict stale when code, test or build files changed after the review.
+
 ## Outputs
 
 The verdict goes to `tasks/reviews/`. PR mode also writes `tasks/reviews/<session>/impact-map.json`. The skill appends a lesson to `.meowkit/memory/gotchas.md` with `mewkit note gotchas` only when the lesson cannot be derived from the code or git history.

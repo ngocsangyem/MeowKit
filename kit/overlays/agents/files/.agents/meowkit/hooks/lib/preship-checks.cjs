@@ -6,7 +6,9 @@
 //               otherwise the project's own lint script, project-wide
 //   tests       only those the runner can relate to the changed files (vitest `related`,
 //               jest `--findRelatedTests`). A runner with no such mode runs no tests, and the
-//               output says so — lint and type-check still run
+//               output says so — lint and type-check still run. When the runner relates no test
+//               to the change it still exits 0; its JSON report's test count tells that apart
+//               from a pass, so zero tests is named instead of printed as PASS
 //   type-check  project-wide, because a change can break a caller in a file it never touched
 //
 // Each check is detected before it runs, and an absent optional tool is a named SKIP rather than
@@ -25,6 +27,7 @@
 // would bury the summary the model has to act on.
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
@@ -35,6 +38,7 @@ const PY_FILE = /\.py$/;
 const SWIFT_FILE = /\.swift$/;
 const ESLINT_CONFIG = ['eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs', 'eslint.config.ts', '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', '.eslintrc.yml', '.eslintrc.yaml'];
 const NO_RELATED_TESTS = 'Tests did not run: the test runner cannot name the tests related to the changed files (lint and type-check only).';
+const ZERO_RELATED_TESTS = 'Tests did not run: no test relates to the changed files (lint and type-check only).';
 
 function exists(root, rel) {
   try { return fs.statSync(path.join(root, rel)).isFile(); } catch { return false; }
@@ -112,11 +116,11 @@ function createRunner(root, out, deadline, deadlineMs) {
     return spawnSync(plan.command, plan.args, { cwd: root, stdio: 'ignore', shell: false, timeout: remaining, ...plan.options });
   };
 
-  const record = (name, command, result) => {
+  const record = (name, command, result, passLabel = name) => {
     out.push(`Running: ${name}`);
     state.run += ` ${name}`;
     if (!result.error && result.status === 0) {
-      out.push(`  PASS: ${name}`);
+      out.push(`  PASS: ${passLabel}`);
       return;
     }
     // A spawn error means the check gave no verdict; a non-zero exit is the verdict.
@@ -151,13 +155,43 @@ function createRunner(root, out, deadline, deadlineMs) {
     return true;
   };
 
-  return { state, runCheck, runIfInstalled };
+  /**
+   * Run a test runner that writes a JSON report and read its test count. `buildArgs(file)`
+   * returns the arguments with the report flags for `file`, or without them when given null.
+   * A clean exit with zero tests is named as tests not run; a count that cannot be read leaves
+   * the plain PASS, so a parsing problem here never turns into a block.
+   */
+  const runTests = (name, command, buildArgs) => {
+    let dir;
+    try {
+      dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-preship-'));
+    } catch {
+      return runCheck(name, command, buildArgs(null));
+    }
+    const report = path.join(dir, 'report.json');
+    const result = launch(command, buildArgs(report));
+    let total = null;
+    try { total = Number(JSON.parse(fs.readFileSync(report, 'utf8')).numTotalTests); } catch { total = null; }
+    // A temp dir another process holds open (an antivirus scan on Windows) is left behind
+    // rather than turned into a verdict: cleanup is not a check.
+    try { fs.rmSync(dir, { recursive: true, force: true, maxRetries: 3 }); } catch { /* left for the OS */ }
+    const clean = !result.error && result.status === 0;
+    if (clean && total === 0) {
+      out.push(`Running: ${name}`, `  ${ZERO_RELATED_TESTS}`);
+      state.run += ` ${name}`;
+      return;
+    }
+    const counted = Number.isInteger(total) && total > 0;
+    record(name, command, result, counted ? `${name} (${total} test${total === 1 ? '' : 's'})` : name);
+  };
+
+  return { state, runCheck, runIfInstalled, runTests };
 }
 
 /** A project's own copy of a Node tool; nothing here runs one through npx, which can fetch it. */
 const localBin = (root, name) => path.join(root, 'node_modules', '.bin', name);
 
-function nodeChecks(root, scope, out, { runCheck }) {
+function nodeChecks(root, scope, out, { runCheck, runTests }) {
   out.push('Detected: Node.js project', '');
   const pkg = readPackage(root) || {};
   const scripts = pkg.scripts || {};
@@ -174,9 +208,13 @@ function nodeChecks(root, scope, out, { runCheck }) {
 
   const testScript = String(scripts.test || '');
   if (!scope.rangeKnown) out.push('Tests did not run: the commits this action ships could not be determined (no upstream or origin/HEAD).');
-  else if (/\bvitest\b/.test(testScript) && fs.existsSync(localBin(root, 'vitest'))) runCheck('vitest related', localBin(root, 'vitest'), ['related', '--run', '--passWithNoTests', ...scope.files]);
-  else if (/\bjest\b/.test(testScript) && fs.existsSync(localBin(root, 'jest'))) runCheck('jest --findRelatedTests', localBin(root, 'jest'), ['--findRelatedTests', '--passWithNoTests', ...scope.files]);
-  else out.push(testScript ? NO_RELATED_TESTS : 'SKIP: No test script in package.json');
+  else if (/\bvitest\b/.test(testScript) && fs.existsSync(localBin(root, 'vitest'))) {
+    const reportArgs = (report) => (report ? ['--reporter=json', `--outputFile=${report}`] : []);
+    runTests('vitest related', localBin(root, 'vitest'), (report) => ['related', '--run', '--passWithNoTests', ...reportArgs(report), ...scope.files]);
+  } else if (/\bjest\b/.test(testScript) && fs.existsSync(localBin(root, 'jest'))) {
+    const reportArgs = (report) => (report ? ['--json', `--outputFile=${report}`] : []);
+    runTests('jest --findRelatedTests', localBin(root, 'jest'), (report) => [...reportArgs(report), '--passWithNoTests', '--findRelatedTests', ...scope.files]);
+  } else out.push(testScript ? NO_RELATED_TESTS : 'SKIP: No test script in package.json');
 
   // The project's own compiler only: `npx tsc` with no terminal installs whatever registry
   // package is named `tsc` without asking. Absent, it is an optional tool like eslint: a SKIP.
@@ -245,4 +283,4 @@ function runPreShipChecks(root, scope, { deadlineMs = DEFAULT_DEADLINE_MS } = {}
   return { exit: 0, stdout: out, stderr: [], outcome: 'passed', cause: '' };
 }
 
-module.exports = { isMissingExecutable, localBin, runPreShipChecks, spawnPlan, NO_RELATED_TESTS };
+module.exports = { isMissingExecutable, localBin, runPreShipChecks, spawnPlan, NO_RELATED_TESTS, ZERO_RELATED_TESTS };
