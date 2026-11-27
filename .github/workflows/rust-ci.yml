@@ -13,10 +13,16 @@ on:
       - "install.sh"
       - "install.ps1"
       - ".github/workflows/rust-ci.yml"
-      # The CLI's tests run the shipped hooks, so a hook change must re-run them.
-      - ".claude/hooks/**"
-      # `review prepare` and `review cleanup` exec the kit's worktree action.
-      - ".claude/skills/worktree/scripts/**"
+      # The CLI's tests package these paths as the kit (`ARCHIVE_ROOTS` in
+      # crates/mewkit-adapters/tests/support/mod.rs), so a kit-only change
+      # must re-run them. Keep this list in step with that one.
+      - ".claude/**"
+      - ".meowkit/.env.example"
+      - ".meowkit/gitignore.meowkit"
+      - ".meowkit/harness-inventory.json"
+      - ".meowkit/mcp.json.example"
+      - ".meowkit/pack-manifest.json"
+      - "kit/overlays/**"
       - ".github/workflows/rust-release.yml"
   push:
     branches: [main]
@@ -30,10 +36,16 @@ on:
       - "install.sh"
       - "install.ps1"
       - ".github/workflows/rust-ci.yml"
-      # The CLI's tests run the shipped hooks, so a hook change must re-run them.
-      - ".claude/hooks/**"
-      # `review prepare` and `review cleanup` exec the kit's worktree action.
-      - ".claude/skills/worktree/scripts/**"
+      # The CLI's tests package these paths as the kit (`ARCHIVE_ROOTS` in
+      # crates/mewkit-adapters/tests/support/mod.rs), so a kit-only change
+      # must re-run them. Keep this list in step with that one.
+      - ".claude/**"
+      - ".meowkit/.env.example"
+      - ".meowkit/gitignore.meowkit"
+      - ".meowkit/harness-inventory.json"
+      - ".meowkit/mcp.json.example"
+      - ".meowkit/pack-manifest.json"
+      - "kit/overlays/**"
       - ".github/workflows/rust-release.yml"
 
 env:
