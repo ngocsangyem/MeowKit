@@ -21,6 +21,7 @@
  *   --json                 Output in JSON format for LLM consumption
  *   --env <files>          Comma-separated list of .env files to copy (legacy)
  *   --dry-run              Show what would be done without executing
+ *   --discard-changes      Let remove delete a worktree that has uncommitted work
  *   --no-prefix            Skip branch prefix and preserve original case
  */
 
@@ -30,12 +31,13 @@ const fs = require('fs');
 const path = require('path');
 const helpers = require('./lib/worktree-git-helpers.cjs');
 const reviewPr = require('./lib/worktree-review-pr.cjs');
+const ownership = require('./lib/worktree-ownership.cjs');
 
 const {
   sanitizeBranchPrefix, isSafeEnvFileName, sanitizeBaseBranch,
   sanitizeFeatureName, flattenForDirectoryName,
   git, checkGitRepo, checkGitVersion, detectBaseBranch,
-  getWorktreeRoot, checkDirtyState, getDirtyStateDetails,
+  getWorktreeRoot, ensureWorktreeRootIgnored, getMainWorktreePath, checkDirtyState, getDirtyStateDetails,
   branchExists, isBranchCheckedOut, getWorktreeRecords,
   getAheadBehind, parseGitModules, findEnvFiles,
   copyEnvTemplates, findMatchingProjects
@@ -112,6 +114,10 @@ if (baseIndex > -1) {
   args.splice(baseIndex, 2);
 }
 
+const discardChangesIndex = args.indexOf('--discard-changes');
+const discardChanges = discardChangesIndex > -1;
+if (discardChangesIndex > -1) args.splice(discardChangesIndex, 1);
+
 const checkoutSubmodulesIndex = args.indexOf('--checkout-submodules');
 const checkoutSubmodules = checkoutSubmodulesIndex > -1;
 if (checkoutSubmodulesIndex > -1) args.splice(checkoutSubmodulesIndex, 1);
@@ -133,8 +139,7 @@ function output(data) {
         console.log(`   1. cd ${data.worktreePath}`);
         console.log(`   2. Start working on your feature`);
         console.log(`\n🧹 Cleanup when done:`);
-        console.log(`   git worktree remove ${data.worktreePath}`);
-        console.log(`   git branch -d ${data.branch}`);
+        console.log(`   node worktree.cjs remove ${path.basename(data.worktreePath)}`);
       }
       if (data.envTemplatesCopied && data.envTemplatesCopied.length > 0) {
         console.log(`\n📄 Environment templates copied:`);
@@ -196,7 +201,7 @@ function cmdInfo() {
   const dirtyState = checkDirtyState();
   const dirtyDetails = dirtyState ? getDirtyStateDetails() : null;
   const envFiles = findEnvFiles(gitRoot);
-  const worktreeRoot = getWorktreeRoot(gitRoot, isMonorepo, null, null, outputError);
+  const worktreeRoot = getWorktreeRoot(gitRoot, null, outputError);
 
   const projectEnvFiles = {};
   if (isMonorepo) {
@@ -224,7 +229,8 @@ function cmdInfo() {
 
 function cmdList() {
   const gitRoot = checkGitRepo(outputError);
-  const worktrees = getWorktreeRecords(gitRoot, gitRoot, outputError);
+  const mainRoot = getMainWorktreePath(gitRoot, gitRoot);
+  const worktrees = ownership.withOwner(getWorktreeRecords(gitRoot, gitRoot, outputError), mainRoot);
 
   if (jsonOutput) {
     console.log(JSON.stringify({ success: true, worktrees }, null, 2));
@@ -232,7 +238,7 @@ function cmdList() {
     console.log('\n📂 Existing worktrees:');
     worktrees.forEach(w => {
       console.log(`   ${w.path}`);
-      console.log(`      Branch: ${w.branch} (${(w.commit || '').slice(0, 7)})`);
+      console.log(`      Branch: ${w.branch} (${(w.commit || '').slice(0, 7)}) | Owner: ${w.owner}`);
     });
   }
 }
@@ -241,7 +247,9 @@ function cmdStatus() {
   const gitRoot = checkGitRepo(outputError);
   checkGitVersion(outputError);
 
-  const worktrees = getWorktreeRecords(gitRoot, gitRoot, outputError).map(worktree => {
+  const mainRoot = getMainWorktreePath(gitRoot, gitRoot);
+  const records = ownership.withOwner(getWorktreeRecords(gitRoot, gitRoot, outputError), mainRoot);
+  const worktrees = records.map(worktree => {
     const existsOnDisk = fs.existsSync(worktree.path);
     const isCurrentWorktree = path.resolve(worktree.path) === path.resolve(gitRoot);
     const branchIsTracked = worktree.branch !== 'detached' && worktree.branch !== 'bare';
@@ -289,9 +297,30 @@ function cmdStatus() {
     if (worktree.prunable) flags.push('prunable');
     const suffix = flags.length > 0 ? ` [${flags.join(', ')}]` : '';
     console.log(`   ${worktree.path}${suffix}`);
-    console.log(`      Branch: ${worktree.branch}`);
+    console.log(`      Branch: ${worktree.branch} | Owner: ${worktree.owner}`);
     console.log(`      Base: ${worktree.baseBranch || 'n/a'} | Ahead/Behind: ${worktree.ahead}/${worktree.behind}`);
   });
+}
+
+// Creates the default root's ignore file; a flag or env root is the caller's to manage.
+function prepareWorktreeRoot(worktreeRoot) {
+  try {
+    if (worktreeRoot.isDefault) ensureWorktreeRootIgnored(worktreeRoot.dir);
+    else fs.mkdirSync(worktreeRoot.dir, { recursive: true });
+  } catch (err) {
+    outputError('MKDIR_FAILED', `Failed to create worktrees directory: ${worktreeRoot.dir}`, {
+      suggestion: `Check write permissions (${err.message})`
+    });
+  }
+}
+
+// A worktree left unmarked is still removable as `legacy`, with a warning.
+function markOwned(worktreePath, mode, warnings) {
+  try {
+    ownership.writeOwnerMarker(worktreePath, mode);
+  } catch (err) {
+    warnings.push(`Ownership marker not written (${err.message}); remove will treat this worktree as legacy`);
+  }
 }
 
 function cmdCreate() {
@@ -319,7 +348,9 @@ function cmdCreate() {
 
     const timestamp = Date.now();
     const branchName = `parallel/${sanitizedAgent}-${timestamp}`;
-    const worktreePath = path.join(gitRoot, '.worktrees', sanitizedAgent);
+    const worktreeRoot = getWorktreeRoot(gitRoot, explicitWorktreeRoot, outputError);
+    if (worktreeRoot.warning) warnings.push(worktreeRoot.warning);
+    const worktreePath = path.join(worktreeRoot.dir, sanitizedAgent);
     const baseBranch = explicitBase || detectBaseBranch(gitRoot);
 
     if (isBranchCheckedOut(branchName, gitRoot)) {
@@ -333,7 +364,8 @@ function cmdCreate() {
         success: true, dryRun: true,
         message: 'Dry run - no changes made',
         wouldCreate: {
-          worktreePath, branch: branchName, agentName: sanitizedAgent,
+          worktreePath, worktreeRootSource: worktreeRoot.source,
+          branch: branchName, agentName: sanitizedAgent,
           baseBranch, orchestrated: true
         },
         warnings: warnings.length > 0 ? warnings : undefined
@@ -341,13 +373,7 @@ function cmdCreate() {
       return;
     }
 
-    // Ensure .worktrees/ exists (per parallel-execution-rules Rule 3)
-    const worktreesDir = path.join(gitRoot, '.worktrees');
-    try {
-      fs.mkdirSync(worktreesDir, { recursive: true });
-    } catch (err) {
-      outputError('MKDIR_FAILED', `Failed to create .worktrees/ directory`, { suggestion: 'Check write permissions' });
-    }
+    prepareWorktreeRoot(worktreeRoot);
 
     const createResult = git(['worktree', 'add', '-b', branchName, worktreePath, baseBranch], { cwd: gitRoot });
     if (!createResult.success) {
@@ -356,6 +382,7 @@ function cmdCreate() {
         gitError: createResult.stderr
       });
     }
+    markOwned(worktreePath, 'orchestrated', warnings);
 
     const envResult = copyEnvTemplates(gitRoot, worktreePath);
     envResult.warnings.forEach(w => warnings.push(w));
@@ -363,8 +390,8 @@ function cmdCreate() {
     output({
       success: true,
       message: 'Parallel agent worktree created',
-      worktreePath, branch: branchName,
-      agentName: sanitizedAgent, baseBranch,
+      worktreePath, worktreeRootSource: worktreeRoot.source,
+      branch: branchName, agentName: sanitizedAgent, baseBranch,
       orchestrated: true,
       envTemplatesCopied: envResult.copied.length > 0 ? envResult.copied : undefined,
       warnings: warnings.length > 0 ? warnings : undefined
@@ -478,9 +505,10 @@ function cmdCreate() {
     });
   }
 
-  const worktreeRoot = getWorktreeRoot(gitRoot, isMonorepo, explicitWorktreeRoot, null, outputError);
+  const worktreeRoot = getWorktreeRoot(gitRoot, explicitWorktreeRoot, outputError);
+  if (worktreeRoot.warning) warnings.push(worktreeRoot.warning);
   const worktreesDir = worktreeRoot.dir;
-  const repoName = path.basename(gitRoot);
+  const repoName = path.basename(worktreeRoot.mainRoot);
   const flatFeature = flattenForDirectoryName(sanitizedFeature);
   const worktreeName = isMonorepo ? `${projectName}-${flatFeature}` : `${repoName}-${flatFeature}`;
   const worktreePath = path.join(worktreesDir, worktreeName);
@@ -509,13 +537,7 @@ function cmdCreate() {
     return;
   }
 
-  try {
-    fs.mkdirSync(worktreesDir, { recursive: true });
-  } catch (err) {
-    outputError('MKDIR_FAILED', `Failed to create worktrees directory: ${worktreesDir}`, {
-      suggestion: 'Check write permissions'
-    });
-  }
+  prepareWorktreeRoot(worktreeRoot);
 
   if (branchStatus === 'remote') {
     const fetchResult = git(['fetch', 'origin', branchName], { silent: true, cwd: workDir });
@@ -536,6 +558,7 @@ function cmdCreate() {
       gitError: createResult.stderr
     });
   }
+  markOwned(worktreePath, 'feature', warnings);
 
   const sourceDir = isMonorepo ? workDir : gitRoot;
   const envResult = copyEnvTemplates(sourceDir, worktreePath);
@@ -590,88 +613,14 @@ function cmdRemove() {
 
   const gitRoot = checkGitRepo(outputError);
   checkGitVersion(outputError);
-  const worktrees = getWorktreeRecords(gitRoot, gitRoot, outputError);
-
-  const searchTerm = arg1.toLowerCase();
-  const removable = worktrees.filter(w => !w.isMainWorktree);
-
-  const exactMatches = removable.filter(w => {
-    const name = path.basename(w.path).toLowerCase();
-    return name === searchTerm || w.path.toLowerCase() === searchTerm ||
-      (w.adminPath || '').toLowerCase() === searchTerm ||
-      (w.branch || '').toLowerCase() === searchTerm;
+  const result = ownership.removeOwnedWorktree({
+    records: getWorktreeRecords(gitRoot, gitRoot, outputError),
+    term: arg1,
+    mainRoot: getMainWorktreePath(gitRoot, gitRoot),
+    discardChanges, dryRun
   });
-  const prefixMatches = removable.filter(w => {
-    const name = path.basename(w.path).toLowerCase();
-    return name.startsWith(searchTerm) || w.path.toLowerCase().startsWith(searchTerm) ||
-      (w.adminPath || '').toLowerCase().startsWith(searchTerm) ||
-      (w.branch || '').toLowerCase().startsWith(searchTerm);
-  });
-  const containsMatches = removable.filter(w => {
-    const name = path.basename(w.path).toLowerCase();
-    return name.includes(searchTerm) || w.path.toLowerCase().includes(searchTerm) ||
-      (w.adminPath || '').toLowerCase().includes(searchTerm) ||
-      (w.branch || '').toLowerCase().includes(searchTerm);
-  });
-
-  let removableMatches = exactMatches;
-  if (removableMatches.length === 0) removableMatches = prefixMatches;
-  if (removableMatches.length === 0 && searchTerm.length >= 4) removableMatches = containsMatches;
-
-  if (removableMatches.length === 0) {
-    outputError('WORKTREE_NOT_FOUND', `No worktree matching "${arg1}" found`, {
-      suggestion: 'Use "node worktree.cjs list" to see available worktrees',
-      availableWorktrees: removable.map(w => path.basename(w.path))
-    });
-  }
-
-  if (removableMatches.length > 1) {
-    outputError('MULTIPLE_WORKTREES_MATCH', `Multiple worktrees match "${arg1}"`, {
-      suggestion: 'Be more specific or use full path',
-      matchingWorktrees: removableMatches.map(w => ({ name: path.basename(w.path), path: w.path, branch: w.branch }))
-    });
-  }
-
-  const worktree = removableMatches[0];
-  const worktreePath = worktree.path;
-  const branchName = worktree.branch;
-
-  if (dryRun) {
-    output({
-      success: true, dryRun: true,
-      message: 'Dry run - no changes made',
-      wouldRemove: { worktreePath, branch: branchName, deleteBranch: !!branchName }
-    });
-    return;
-  }
-
-  const removeResult = git(['worktree', 'remove', worktreePath, '--force'], { silent: true });
-  if (!removeResult.success) {
-    outputError('WORKTREE_REMOVE_FAILED', `Failed to remove worktree: ${worktreePath}`, {
-      suggestion: removeResult.stderr || 'Check if the worktree has uncommitted changes',
-      gitError: removeResult.stderr
-    });
-  }
-
-  let branchDeleted = false;
-  let branchDeleteWarning = null;
-  if (branchName) {
-    const deleteResult = git(['branch', '-d', branchName], { silent: true });
-    if (deleteResult.success) {
-      branchDeleted = true;
-    } else {
-      branchDeleteWarning = `Branch kept: ${branchName} (${deleteResult.stderr || 'not fully merged'})`;
-    }
-  }
-
-  output({
-    success: true,
-    message: 'Worktree removed successfully!',
-    removedPath: worktreePath,
-    branchDeleted: branchDeleted ? branchName : null,
-    branchKept: !branchDeleted && branchName ? branchName : null,
-    warnings: branchDeleteWarning ? [branchDeleteWarning] : undefined
-  });
+  if (!result.ok) outputError(result.code, result.message, result.details);
+  output(result.data);
 }
 
 function cmdPrune() {
@@ -715,7 +664,7 @@ Usage: node worktree.cjs <command> [options]
 Commands:
   create <feature>           Create a new feature worktree
   create <agent> --orchestrated  Create a parallel agent worktree in .worktrees/{agent}
-  remove <name-or-path>      Remove a worktree and its branch
+  remove <name-or-path>      Remove a worktree this script created, and its branch
   info                       Get repo info (type, projects, env files)
   list                       List existing worktrees
   status                     Inspect worktree health and branch status
@@ -724,12 +673,13 @@ Commands:
 Options:
   --prefix <type>        Branch prefix (feat|fix|refactor|docs|test|chore|perf)
   --base <branch>        Override auto-detected base branch
-  --orchestrated         Create a parallel agent worktree in .worktrees/{name} on parallel/{name}-{ts} branch
+  --orchestrated         Create a parallel agent worktree in <root>/{name} on parallel/{name}-{ts} branch
   --checkout-submodules  Initialize submodules in the new worktree
-  --worktree-root <path> Explicit worktree directory
+  --worktree-root <path> Explicit worktree directory (default: <main checkout>/.worktrees)
   --json                 Output in JSON format for LLM consumption
   --env <files>          Comma-separated list of .env files to copy (legacy)
   --dry-run              Show what would be done without executing
+  --discard-changes      Let remove delete a worktree that has uncommitted work
   --no-prefix            Skip branch prefix and preserve original case
   --help, -h             Show this help message`);
 }
