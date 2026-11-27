@@ -51,7 +51,7 @@ serde = { version = "1.0.229", features = ["derive"] }
 # established of these dependencies and it replaces js-yaml kit-wide; its
 # `granit-parser` dependency comes with it. Full rationale and the YAML
 # 1.1-vs-1.2 caveats: `src/yaml_doc.rs`.
-serde-saphyr = { version = "=2.1.1", default-features = false, features = ["deserialize"] }
+serde-saphyr = { version = "=2.2.0", default-features = false, features = ["deserialize"] }
 serde_json = { version = "1.0.154", features = ["preserve_order"] }
 sha2 = "0.11.1"
 tar = { version = "0.4", default-features = false }

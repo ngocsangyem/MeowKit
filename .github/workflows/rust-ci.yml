@@ -2,7 +2,7 @@ name: Rust CI
 
 on:
   pull_request:
-    branches: [main, dev]
+    branches: [main, develop]
     paths:
       - "crates/**"
       - "Cargo.toml"
@@ -23,9 +23,9 @@ on:
       - ".meowkit/mcp.json.example"
       - ".meowkit/pack-manifest.json"
       - "kit/overlays/**"
-      - ".github/workflows/rust-release.yml"
+      - ".github/workflows/binary-build.yml"
   push:
-    branches: [main]
+    branches: [main, develop]
     paths:
       - "crates/**"
       - "Cargo.toml"
@@ -46,7 +46,7 @@ on:
       - ".meowkit/mcp.json.example"
       - ".meowkit/pack-manifest.json"
       - "kit/overlays/**"
-      - ".github/workflows/rust-release.yml"
+      - ".github/workflows/binary-build.yml"
 
 env:
   CARGO_TERM_COLOR: always

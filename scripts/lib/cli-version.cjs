@@ -1,7 +1,7 @@
 "use strict";
-// The `mewkit` binary's version, which rides its own semver track apart from the kit's.
-// Every crate inherits it from `[workspace.package]` in the root Cargo.toml, so that table
-// is the one place to read it.
+// The `mewkit` binary's version: `[workspace.package]` in the root Cargo.toml, which every
+// crate inherits. It always equals the kit version in root package.json (one version for
+// both); scripts/sync-versions.cjs stamps it and fails on drift.
 
 const fs = require("node:fs");
 const path = require("node:path");

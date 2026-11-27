@@ -1,0 +1,75 @@
+name: Release validation
+
+# The read-only half of a release; one version for the kit and the binary:
+#   1. build the binary for six targets (binary-build.yml), version stamped in;
+#   2. gate the kit with the linux binary from step 1 and build its assets.
+# It uploads the archives and the kit assets as artifacts and publishes nothing. Called by
+# ci.yml on every PR into main (the release gate the merge waits for) and, before
+# release-publish.yml, by release-beta.yml and release-stable.yml.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      ref:
+        description: Commit SHA to release
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  binaries:
+    uses: ./.github/workflows/binary-build.yml
+    with:
+      version: ${{ inputs.version }}
+      ref: ${{ inputs.ref }}
+
+  kit:
+    name: Gate and build the kit
+    needs: binaries
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: mewkit-x86_64-unknown-linux-musl
+          path: ${{ runner.temp }}/bin
+
+      # The kit must install with the binary that ships beside it.
+      - name: Point the gate at the binary built in this run
+        run: |
+          tar -xzf "$RUNNER_TEMP/bin/mewkit-$VERSION-x86_64-unknown-linux-musl.tar.gz" -C "$RUNNER_TEMP/bin"
+          bin="$RUNNER_TEMP/bin/mewkit-$VERSION-x86_64-unknown-linux-musl/mewkit"
+          "$bin" --version | grep -qx "mewkit $VERSION" || { echo "::error::built binary is not mewkit $VERSION"; exit 1; }
+          echo "MEWKIT_NEXT_BIN=$bin" >> "$GITHUB_ENV"
+
+      - name: Gate and build the kit assets
+        run: bash scripts/release/build-kit.sh "$VERSION"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: kit-dist
+          path: |
+            dist/meowkit-release.zip
+            dist/checksums.txt
+          if-no-files-found: error

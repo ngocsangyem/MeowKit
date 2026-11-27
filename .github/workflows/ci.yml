@@ -2,13 +2,75 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, dev]
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 # Pull-request checks only read the repository; nothing here publishes or comments.
 permissions:
   contents: read
 
+# A new push or label change supersedes the previous run of the same PR.
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
+  # main is the stable channel and takes only release/hotfix PRs (plus the release bots);
+  # develop is the beta channel and takes every regular change. See RELEASING.md.
+  branch-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Head branch may target this base
+        env:
+          HEAD: ${{ github.head_ref }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          case "$BASE" in
+            # develop itself may also go to main as is, for a change with no release (CI or
+            # process only); main then keeps a prerelease version and release-stable skips it.
+            main) allowed='^(release/v[0-9]+\.[0-9]+\.[0-9]+|hotfix/v[0-9]+\.[0-9]+\.[0-9]+|release/installer-pins-mewkit-v.+|develop)$' ;;
+            develop) allowed='^((feature|fix|refactor|chore|docs)/.+|dependabot/.+)$' ;;
+            *) echo "no branch policy for base $BASE"; exit 0 ;;
+          esac
+          if ! printf '%s' "$HEAD" | grep -qE "$allowed"; then
+            echo "::error::$HEAD may not target $BASE. main takes release/vX.Y.Z, hotfix/vX.Y.Z and develop; develop takes feature/*, fix/*, refactor/*, chore/*, docs/*."
+            exit 1
+          fi
+          echo "$HEAD → $BASE allowed"
+
+  # Each user-visible change carries its own changelog fragment (changes/README.md), so
+  # concurrent PRs never edit one shared section. Release and back-merge PRs consume them.
+  changelog-fragment:
+    if: github.base_ref == 'develop' && !contains(github.event.pull_request.labels.*.name, 'no-changelog') && !startsWith(github.head_ref, 'dependabot/') && !startsWith(github.head_ref, 'chore/back-merge-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: node scripts/release/assemble-changelog.cjs require --base "origin/$GITHUB_BASE_REF"
+
+  # A PR into main is a release: it must pass the whole release validation (six-target
+  # binary build, kit gate with that binary, assets, docs build) before it can merge.
+  release-version:
+    # Runs on the installer pin PR too: a skipped reusable job does not report the check
+    # name main requires, so skipping it would block the pin PR.
+    if: github.base_ref == 'main'
+    needs: branch-policy
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: v
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+  release-gate:
+    needs: release-version
+    uses: ./.github/workflows/release.yml
+    with:
+      version: ${{ needs.release-version.outputs.version }}
+      ref: ${{ github.event.pull_request.head.sha }}
+
   validate:
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +105,12 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: One version for kit and binary
+        run: node scripts/sync-versions.cjs
 
       - name: Test
         run: npm test

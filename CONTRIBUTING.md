@@ -26,14 +26,20 @@ The CI steps below call the binary as `"$MEWKIT"`. Locally, use the same path or
 
 ## Make a change
 
-1. Branch from `main`. Open the pull request against `main`; do not stack pull requests.
+1. Branch from `develop` as `feature/*`, `fix/*`, `refactor/*`, `chore/*` or `docs/*`, and open the
+   pull request against `develop`; do not stack pull requests. `main` takes only release and hotfix
+   branches (CI job `branch-policy`). Each merge into `develop` publishes a beta; see
+   [RELEASING.md](RELEASING.md).
 2. Edit the source, never a generated file. Skills and agents live in `.claude/`; a Codex, Cursor,
    Grok, Pi or OMP install is projected from them. Hand-edit an overlay only for the cases in
    [RELEASING.md step 1d](RELEASING.md#1d-update-the-runtime-overlays-when-claude-content-changes).
 3. Keep shipped text runtime-neutral and free of the product name (RELEASING.md step 1f). Shipped
    files may name only files that exist in an install.
-4. Add an entry under `## Unreleased` in `packages/docs/content/docs/changelog/index.mdx` for a
-   user-visible change, and update the docs page that describes the behavior.
+4. For a user-visible change, add a changelog fragment `changes/<your-branch>.md`
+   ([changes/README.md](changes/README.md)) and update the docs page that describes the behavior.
+   Never edit the changelog page or any version: releases compute both. CI requires a fragment when
+   the PR touches `.claude/`, `kit/`, `crates/`, `.meowkit/` or `install.*`, unless it carries the
+   `no-changelog` label.
 5. Use conventional commits (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `build:`, `ci:`).
    A change to shipped kit content under `.claude/` is `feat:`, `fix:` or `refactor:`, because it
    reaches every installed project.
@@ -47,13 +53,17 @@ hook.
 
 ## What CI runs
 
-Three workflows run on a pull request to `main`.
+These workflows run on a pull request to `develop` or `main`, and the release workflows after a merge.
 
 | Workflow | File | Runs when |
 | --- | --- | --- |
 | CI | `.github/workflows/ci.yml` | every pull request |
-| Rust CI | `.github/workflows/rust-ci.yml` | a pull request or push to `main` that touches `crates/`, `Cargo.*`, `deny.toml`, `rust-toolchain.toml`, `install.*`, `scripts/release/`, the kit the tests package (`.claude/`, `kit/overlays/` and the shipped `.meowkit/` files) or either Rust workflow |
-| Rust release | `.github/workflows/rust-release.yml` | a pushed `mewkit-v*` tag, or a manual run (builds, publishes nothing) |
+| Rust CI | `.github/workflows/rust-ci.yml` | a pull request or push to `main` or `develop` that touches `crates/`, `Cargo.*`, `deny.toml`, `rust-toolchain.toml`, `install.*`, `scripts/release/`, the kit the tests package (`.claude/`, `kit/overlays/` and the shipped `.meowkit/` files) or either Rust workflow |
+| Release beta | `.github/workflows/release-beta.yml` | a merge into `develop` (publishes `vX.Y.Z-beta.N` and `mewkit-vX.Y.Z-beta.N`) |
+| Release prepare | `.github/workflows/release-prepare.yml` | a push to `release/vX.Y.Z` or `hotfix/vX.Y.Z` (validates, commits the version and changelog, dry-runs the release, opens the PR into `main`) |
+| Release stable | `.github/workflows/release-stable.yml` | a merge into `main` whose version is untagged |
+| Binary build | `.github/workflows/binary-build.yml` | called by `release.yml`, or a manual run (builds six targets, publishes nothing) |
+| Docs deploy | `.github/workflows/docs-deploy.yml` | a push to `main` (stable docs) or `develop` (beta docs) that touches the docs or `.claude/`, and after each release (both) |
 
 Run the full local set before you push:
 

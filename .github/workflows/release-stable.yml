@@ -1,0 +1,125 @@
+name: Release stable
+
+# Publishes the stable release when a release (or hotfix) pull request is merged into
+# main. The version is root package.json, which release-prepare.yml committed on the
+# release branch; a push to main whose version is already tagged (an installer pin PR,
+# a rerun) publishes nothing. After publishing it opens the back-merge pull request
+# main → develop, so develop carries the released version and changelog.
+# Docs deploy on their own (docs-deploy.yml on push to main).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-stable
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Read the stable version
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      skip: ${{ steps.v.outputs.skip }}
+      notes: ${{ steps.v.outputs.notes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - id: v
+        run: |
+          version=$(node -p "require('./package.json').version")
+          node scripts/sync-versions.cjs
+          case "$version" in *-*)
+            echo "main carries a prerelease version ($version); nothing to publish"
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "v$version is already released"
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          {
+            echo "skip=false"
+            echo "version=$version"
+            eof="NOTES_$(openssl rand -hex 8)"
+            echo "notes<<$eof"
+            node scripts/release/assemble-changelog.cjs section "$version"
+            echo
+            echo "### Install"
+            echo
+            echo '```bash'
+            echo 'mewkit self-update && mewkit upgrade'
+            echo '# fresh install: install.sh / install.ps1, then mewkit init'
+            echo '```'
+            echo "$eof"
+          } >> "$GITHUB_OUTPUT"
+
+  validate:
+    needs: plan
+    if: needs.plan.outputs.skip != 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      version: ${{ needs.plan.outputs.version }}
+      ref: ${{ github.sha }}
+
+  release:
+    needs: [plan, validate]
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/release-publish.yml
+    with:
+      version: ${{ needs.plan.outputs.version }}
+      ref: ${{ github.sha }}
+      title: ${{ needs.plan.outputs.version }}
+      notes: ${{ needs.plan.outputs.notes }}
+    secrets: inherit
+
+  back-merge:
+    name: Open the back-merge pull request into develop
+    needs: [plan, release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+      - name: Push the back-merge branch and open the pull request
+        run: |
+          branch="chore/back-merge-v$VERSION"
+          # The branch belongs to this job; a rerun after main moved replaces it.
+          git push --force origin "HEAD:refs/heads/$branch"
+          if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "back-merge PR already open"; exit 0
+          fi
+          title="chore: back-merge v$VERSION into develop"
+          body="Brings the v$VERSION release commit (version, changelog, consumed changes/ fragments) from main into develop. Merge with a merge commit; on a conflict, keep develop's code and main's version and changelog."
+          if out=$(gh pr create --base develop --head "$branch" --title "$title" --body "$body" 2>&1); then
+            echo "$out"; exit 0
+          fi
+          # The release is already published: report the missing PR instead of failing the run.
+          if grep -q "not permitted to create or approve pull requests" <<<"$out"; then
+            url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/develop...$branch?expand=1"
+            echo "::notice title=Open the back-merge PR by hand::$url"
+            echo "### Back-merge PR not opened: [open it]($url)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "$out" >&2
+          exit 1

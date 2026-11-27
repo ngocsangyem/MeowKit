@@ -1,4 +1,4 @@
-// The check scripts/release.sh runs on dist/ before uploading a kit release.
+// The check scripts/release/build-kit.sh runs on dist/ before uploading a kit release.
 //
 // A good build passes; each way a release could go out wrong — no contract in
 // the zip, a contract for another version, a checksum that does not match, a
