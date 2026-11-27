@@ -26,12 +26,14 @@ jobs:
           BASE: ${{ github.base_ref }}
         run: |
           case "$BASE" in
-            main) allowed='^(release/v[0-9]+\.[0-9]+\.[0-9]+|hotfix/v[0-9]+\.[0-9]+\.[0-9]+|release/installer-pins-mewkit-v.+)$' ;;
+            # develop itself may also go to main as is, for a change with no release (CI or
+            # process only); main then keeps a prerelease version and release-stable skips it.
+            main) allowed='^(release/v[0-9]+\.[0-9]+\.[0-9]+|hotfix/v[0-9]+\.[0-9]+\.[0-9]+|release/installer-pins-mewkit-v.+|develop)$' ;;
             develop) allowed='^((feature|fix|refactor|chore|docs)/.+|dependabot/.+)$' ;;
             *) echo "no branch policy for base $BASE"; exit 0 ;;
           esac
           if ! printf '%s' "$HEAD" | grep -qE "$allowed"; then
-            echo "::error::$HEAD may not target $BASE. main takes release/vX.Y.Z and hotfix/vX.Y.Z; develop takes feature/*, fix/*, refactor/*, chore/*, docs/*."
+            echo "::error::$HEAD may not target $BASE. main takes release/vX.Y.Z, hotfix/vX.Y.Z and develop; develop takes feature/*, fix/*, refactor/*, chore/*, docs/*."
             exit 1
           fi
           echo "$HEAD → $BASE allowed"

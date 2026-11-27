@@ -67,6 +67,7 @@ only when the kit needs new binary behavior, not on every release.
 | Branch | Role | Takes PRs from | Releases |
 | --- | --- | --- | --- |
 | `main` | Stable channel, production docs | `release/vX.Y.Z`, `hotfix/vX.Y.Z`, `release/installer-pins-mewkit-v*` | stable on merge |
+| `main` | (no release) | `develop` itself, for a CI or process change only | none: `main` keeps `develop`'s prerelease version, so `release-stable.yml` skips |
 | `develop` | Beta channel, beta docs | `feature/*`, `fix/*`, `refactor/*`, `chore/*`, `docs/*`, `dependabot/*`, `chore/back-merge-v*` | beta on merge |
 
 The CI job `branch-policy` refuses any other head → base pair. Both branches are protected by
