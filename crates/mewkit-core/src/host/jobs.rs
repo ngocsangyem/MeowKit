@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use super::locks;
-use super::paths::HostPaths;
+use super::paths::{HostPaths, read_json, read_parsed};
 
 /// Finished and lost job directories older than this are swept.
 pub const RETENTION_MS: i64 = 7 * 24 * 3600 * 1000;
@@ -89,7 +89,7 @@ impl JobDir {
     }
 
     pub fn read_meta(&self) -> Option<Meta> {
-        serde_json::from_slice(&std::fs::read(self.meta()).ok()?).ok()
+        read_json(&self.meta())
     }
     pub fn write_meta(&self, meta: &Meta) -> std::io::Result<()> {
         let bytes = serde_json::to_vec_pretty(meta).map_err(std::io::Error::other)?;
@@ -97,11 +97,7 @@ impl JobDir {
     }
 
     fn finished(&self) -> Option<JobState> {
-        let code = std::fs::read_to_string(self.exit())
-            .ok()?
-            .trim()
-            .parse::<i32>()
-            .ok()?;
+        let code: i32 = read_parsed(&self.exit())?;
         Some(if self.cancelled().exists() {
             JobState::Cancelled
         } else {
@@ -128,11 +124,7 @@ impl JobDir {
 
     /// When the command started, for elapsed-time display.
     pub fn admitted_at_ms(&self) -> Option<i64> {
-        std::fs::read_to_string(self.admitted())
-            .ok()?
-            .trim()
-            .parse()
-            .ok()
+        read_parsed(&self.admitted())
     }
 }
 

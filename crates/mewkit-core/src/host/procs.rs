@@ -11,6 +11,7 @@ use std::path::Path;
 use sysinfo::{Pid, Process, ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};
 
 use super::model::ProcIo;
+use super::sample::round1;
 use super::worktree::ToplevelCache;
 
 /// Executable basenames of the agent runtimes the kit installs into.
@@ -80,6 +81,16 @@ pub fn runtime_of(exe: &str, args: &[String]) -> Option<String> {
     })
 }
 
+/// The runtime process `p` is, from its executable and command line.
+pub fn runtime_of_process(p: &Process) -> Option<String> {
+    let args: Vec<String> = p
+        .cmd()
+        .iter()
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
+    runtime_of(&exe_base(p), &args)
+}
+
 fn runtime_above(sys: &System, pid: Pid) -> Option<String> {
     let mut seen = HashSet::new();
     let mut cursor = Some(pid);
@@ -88,12 +99,7 @@ fn runtime_above(sys: &System, pid: Pid) -> Option<String> {
         if !seen.insert(p.pid()) {
             return None;
         }
-        let args: Vec<String> = p
-            .cmd()
-            .iter()
-            .map(|a| a.to_string_lossy().into_owned())
-            .collect();
-        if let Some(rt) = runtime_of(&exe_base(p), &args) {
+        if let Some(rt) = runtime_of_process(p) {
             return Some(rt);
         }
         cursor = p.parent();
@@ -103,14 +109,9 @@ fn runtime_above(sys: &System, pid: Pid) -> Option<String> {
 
 /// True while any agent runtime process is alive (the watcher's idle test).
 pub fn any_runtime_alive(sys: &System) -> bool {
-    sys.processes().values().any(|p| {
-        let args: Vec<String> = p
-            .cmd()
-            .iter()
-            .map(|a| a.to_string_lossy().into_owned())
-            .collect();
-        runtime_of(&exe_base(p), &args).is_some()
-    })
+    sys.processes()
+        .values()
+        .any(|p| runtime_of_process(p).is_some())
 }
 
 /// The busiest processes since the previous refresh, `dt_s` seconds ago.
@@ -131,7 +132,7 @@ pub fn top_io(sys: &System, dt_s: f64) -> Vec<ProcIo> {
         .map(|(bytes, p)| ProcIo {
             pid: p.pid().as_u32(),
             exe: exe_base(p),
-            io_mb_s: ((bytes as f64 / 1e6 / dt_s.max(0.001)) * 10.0).round() / 10.0,
+            io_mb_s: round1(bytes as f64 / 1e6 / dt_s.max(0.001)),
             worktree: p
                 .cwd()
                 .and_then(|cwd| cache.get(cwd))

@@ -10,9 +10,10 @@ use serde::{Deserialize, Serialize};
 
 use super::collect::Collector;
 use super::joblog::CappedLog;
-use super::paths::HostPaths;
+use super::model::Verdict;
+use super::paths::{HostPaths, read_json, read_parsed};
 use super::snapshot::{self, Envelope};
-use super::{clean, inbox, locks, procs, time_now_ms};
+use super::{clean, inbox, jobs, locks, procs, time_now_ms};
 
 /// Sampling interval (fixed for the beta).
 pub const INTERVAL: Duration = Duration::from_secs(5);
@@ -50,7 +51,7 @@ pub fn files(paths: &HostPaths) -> Files {
 }
 
 pub fn read_pid(paths: &HostPaths) -> Option<PidFile> {
-    serde_json::from_slice(&std::fs::read(files(paths).pid).ok()?).ok()
+    read_json(&files(paths).pid)
 }
 
 pub fn is_running(paths: &HostPaths) -> bool {
@@ -64,10 +65,7 @@ pub fn mark(path: &std::path::Path) -> io::Result<()> {
 
 /// True while a marker exists and is younger than its TTL.
 pub fn marker_fresh(path: &std::path::Path, now_ms: i64) -> bool {
-    std::fs::read_to_string(path)
-        .ok()
-        .and_then(|t| t.trim().parse::<i64>().ok())
-        .is_some_and(|at| (0..MARKER_TTL_MS).contains(&(now_ms - at)))
+    read_parsed::<i64>(path).is_some_and(|at| (0..MARKER_TTL_MS).contains(&(now_ms - at)))
 }
 
 pub struct Options {
@@ -161,6 +159,11 @@ fn tick_loop(paths: &HostPaths, opts: &Options, f: &Files, log: &mut Option<Capp
             log_line(log, &format!("snapshot write failed: {e}"));
         }
         inbox::publish(paths, &inbox::entries(paths, &report, now), now);
+        // Ended jobs past retention go every tick, except while the disk is
+        // saturated: deleting adds I/O exactly when the host can least spare it.
+        if report.verdict != Verdict::Hold {
+            jobs::sweep(paths, now);
+        }
         if let Some(n) = clean::run_auto(paths, report.verdict, opts.auto_clean, now) {
             log_line(log, &format!("low free space: removed {n} kit state items"));
         }

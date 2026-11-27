@@ -2,6 +2,7 @@
 //! the fixture tests.
 use std::collections::BTreeMap;
 
+use super::{round1, round3};
 use crate::host::model::{Disk, MemPressure};
 
 /// Cumulative IOBlockStorageDriver statistics summed over every driver.
@@ -82,14 +83,6 @@ pub fn parse_thermal(text: &str) -> Option<u8> {
         .parse::<u8>()
         .ok()
         .filter(|level| *level <= 4)
-}
-
-pub fn round1(v: f64) -> f64 {
-    (v * 10.0).round() / 10.0
-}
-
-pub fn round3(v: f64) -> f64 {
-    (v * 1000.0).round() / 1000.0
 }
 
 #[cfg(test)]

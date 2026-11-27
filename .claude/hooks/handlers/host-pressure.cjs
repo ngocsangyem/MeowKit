@@ -77,8 +77,10 @@ module.exports = function hostPressure(ctx, _state, { home = os.homedir(), now =
     if (configValue('host.enabled', true, { root: ctx.root }).value === false) return null;
     const hostDir = path.join(home, '.meowkit', 'host');
     const status = core.readStatus(hostDir, now);
-    if (!status || status.ageMs > core.STALE_MS) startWatcher(hostDir, now);
-    if (!status || status.ageMs > core.STALE_MS) return null;
+    if (!status || status.ageMs > core.STALE_MS) {
+      startWatcher(hostDir, now);
+      return null;
+    }
     const toplevel = core.worktreeOf(ctx.cwd || ctx.root);
     const inbox = toplevel ? core.readInbox(hostDir, toplevel) : null;
     const line = core.buildLine(status, inbox);

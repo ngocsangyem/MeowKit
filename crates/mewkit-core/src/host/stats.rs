@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use std::time::Duration;
 
 use super::locks;
-use super::paths::HostPaths;
+use super::paths::{HostPaths, read_json};
 
 pub const COUNTERS: &[&str] = &[
     "runs",
@@ -18,10 +18,7 @@ pub const COUNTERS: &[&str] = &[
 ];
 
 pub fn read(paths: &HostPaths) -> BTreeMap<String, u64> {
-    std::fs::read(paths.stats())
-        .ok()
-        .and_then(|b| serde_json::from_slice(&b).ok())
-        .unwrap_or_default()
+    read_json(&paths.stats()).unwrap_or_default()
 }
 
 pub fn bump(paths: &HostPaths, counter: &str) {

@@ -1,6 +1,6 @@
 //! `host status [--json] [--fresh] [--caches]`. The verdict is data, so the exit code is
 //! 0 whatever it says; a script reads `data.verdict` from `--json`.
-use std::path::PathBuf;
+use std::path::Path;
 
 use clap::Args;
 use mewkit_core::host::model::Report;
@@ -131,8 +131,8 @@ fn render(r: &Report) {
 }
 
 fn short(path: &str) -> String {
-    let p = PathBuf::from(path);
-    p.file_name()
+    Path::new(path)
+        .file_name()
         .map_or(path.to_string(), |n| n.to_string_lossy().into_owned())
 }
 

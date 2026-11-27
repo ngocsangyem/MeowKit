@@ -9,7 +9,7 @@ use std::time::Duration;
 use sysinfo::{Disks, System};
 
 use super::model::{Cpu, MachineSample, Memory, Os, Report, Space};
-use super::sample::{self, OsRead};
+use super::sample::{self, OsRead, round1};
 use super::snapshot::Counters;
 use super::verdict::{self, MIN_FREE_GB};
 use super::{procs, time_now_ms};
@@ -49,13 +49,10 @@ impl Collector {
         self.sys.refresh_cpu_usage();
         procs::refresh(&mut self.sys);
         self.last_refresh_ms = time_now_ms();
-        self.baseline = match stored {
-            Some(c) => Some(c.clone()),
-            None => Some(Counters {
-                taken_ms: self.last_refresh_ms,
-                disk: sample::read_os().counters,
-            }),
-        };
+        self.baseline = Some(stored.cloned().unwrap_or_else(|| Counters {
+            taken_ms: self.last_refresh_ms,
+            disk: sample::read_os().counters,
+        }));
     }
 
     /// The next sample; becomes the baseline for the one after.
@@ -105,7 +102,7 @@ impl Collector {
     fn cpu(&self, read: &OsRead) -> Cpu {
         let busy = self.sys.global_cpu_usage() as f64;
         Cpu {
-            busy_pct: busy.is_finite().then(|| (busy * 10.0).round() / 10.0),
+            busy_pct: busy.is_finite().then(|| round1(busy)),
             cores: self.sys.cpus().len(),
             psi: read.psi_cpu,
         }
@@ -113,10 +110,8 @@ impl Collector {
 
     fn memory(&self, read: &OsRead) -> Option<Memory> {
         let total = self.sys.total_memory();
-        let used_pct = (total > 0).then(|| {
-            let pct = self.sys.used_memory() as f64 / total as f64 * 100.0;
-            (pct * 10.0).round() / 10.0
-        });
+        let used_pct =
+            (total > 0).then(|| round1(self.sys.used_memory() as f64 / total as f64 * 100.0));
         if used_pct.is_none() && read.mem_pressure.is_none() && read.psi_mem.is_none() {
             return None;
         }
@@ -146,7 +141,7 @@ fn space_report(paths: &[PathBuf]) -> Vec<Space> {
         if rows.iter().any(|r| r.path == mount) {
             continue;
         }
-        let gb = |bytes: u64| (bytes as f64 / 1e9 * 10.0).round() / 10.0;
+        let gb = |bytes: u64| round1(bytes as f64 / 1e9);
         let free_gb = gb(disk.available_space());
         rows.push(Space {
             path: mount,

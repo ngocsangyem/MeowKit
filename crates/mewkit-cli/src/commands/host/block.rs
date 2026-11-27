@@ -6,7 +6,9 @@ use std::time::Duration;
 use mewkit_core::host::client::queue_position;
 use mewkit_core::host::jobs::{JobDir, JobState};
 use mewkit_core::host::paths::HostPaths;
-use mewkit_core::host::snapshot;
+use mewkit_core::host::{snapshot, stats, wait_default};
+
+use crate::failure::Failure;
 
 /// Exit code: queued or still running, not verified (EX_TEMPFAIL).
 pub const NOT_DONE: u8 = 75;
@@ -58,6 +60,34 @@ pub fn print(paths: &HostPaths, job: &JobDir, state: JobState, elapsed: Duration
     );
     println!("            meanwhile: a narrower related check, or other work");
     println!("            do not re-run the same command: it attaches to this job");
+}
+
+/// The wait given to `flag` (`--wait`, `--timeout`), else the default for
+/// the calling agent runtime.
+pub fn wait_for(flag: &str, text: Option<&str>) -> Result<Duration, Failure> {
+    match text {
+        Some(text) => wait_default::parse(text)
+            .ok_or_else(|| Failure::usage(format!("{flag}: not a duration: {text}"))),
+        None => Ok(wait_default::for_runtime(
+            wait_default::calling_runtime().as_deref(),
+        )),
+    }
+}
+
+/// Say on stderr that a lost or cancelled job is NOT VERIFIED, counting a
+/// lost one; any other state prints nothing.
+pub fn report_lost_or_cancelled(paths: &HostPaths, job: &JobDir, state: JobState) {
+    match state {
+        JobState::Lost => {
+            stats::bump(paths, "lost");
+            eprintln!(
+                "mewkit host: job {} was lost (its supervisor died); NOT VERIFIED",
+                job.id
+            );
+        }
+        JobState::Cancelled => eprintln!("mewkit host: job {} was cancelled; NOT VERIFIED", job.id),
+        _ => {}
+    }
 }
 
 /// Exit code for a job state reached at the end of a wait.

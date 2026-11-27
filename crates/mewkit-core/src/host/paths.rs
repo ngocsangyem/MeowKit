@@ -2,6 +2,9 @@
 //! Created owner-only (0700 on Unix): it lists pids, worktrees and job logs.
 use std::io;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
+
+use serde::de::DeserializeOwned;
 
 /// The on-disk state layout version. A binary that finds a NEWER version
 /// reads nothing and reports `unknown` rather than misreading the files.
@@ -61,6 +64,17 @@ impl HostPaths {
             Err(_) => true,
         }
     }
+}
+
+/// The JSON value in `path`; `None` when absent or unparsable.
+pub(crate) fn read_json<T: DeserializeOwned>(path: &Path) -> Option<T> {
+    serde_json::from_slice(&std::fs::read(path).ok()?).ok()
+}
+
+/// The trimmed text of `path` parsed as `T` (a timestamp, exit code or
+/// counter); `None` when absent or unparsable.
+pub(crate) fn read_parsed<T: FromStr>(path: &Path) -> Option<T> {
+    std::fs::read_to_string(path).ok()?.trim().parse().ok()
 }
 
 /// `create_dir_all`, then 0700 on Unix.

@@ -16,19 +16,36 @@ pub struct Prepared {
     pub attached: bool,
 }
 
-/// Hash of the full argv: identifies "the same command" without storing it.
-pub fn cmd_hash(argv: &[String]) -> String {
-    crate::fsx::sha256_hex(argv.join("\0").as_bytes())[..16].to_string()
+/// Hash of the full argv and of the directory it runs in, relative to the
+/// worktree root: identifies "the same command" without storing it. The
+/// directory matters because `cargo test` in two member crates of one tree
+/// runs different tests, so one must never attach to the other.
+pub fn cmd_hash(argv: &[String], rel_cwd: &str) -> String {
+    let mut input = rel_cwd.as_bytes().to_vec();
+    input.extend_from_slice(b"\0\0");
+    input.extend_from_slice(argv.join("\0").as_bytes());
+    crate::fsx::sha256_hex(&input)[..16].to_string()
+}
+
+/// `cwd` relative to its worktree root ("" at the root, or when outside one).
+fn rel_cwd(cwd: &Path, toplevel: Option<&Path>) -> String {
+    toplevel
+        .and_then(|t| cwd.strip_prefix(t).ok())
+        .map(|r| r.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default()
 }
 
 /// What the job records about itself: basenames, class and hashes only.
 pub fn describe(argv: &[String], cwd: &Path, priority: Priority, id: &str) -> Meta {
+    let toplevel = worktree::git_toplevel(cwd);
     Meta {
         id: id.to_string(),
-        worktree: worktree::git_toplevel(cwd).map(|t| worktree::normalize(&t.to_string_lossy())),
+        worktree: toplevel
+            .as_deref()
+            .map(|t| worktree::normalize(&t.to_string_lossy())),
         tree_digest: tree_digest::tree_digest(cwd),
         cmd_class: cmd_class::classify(&argv.join(" ")).map(str::to_string),
-        cmd_hash: cmd_hash(argv),
+        cmd_hash: cmd_hash(argv, &rel_cwd(cwd, toplevel.as_deref())),
         exe_base: argv
             .first()
             .map_or_else(|| "?".into(), |a| procs::basename(Path::new(a))),

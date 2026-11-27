@@ -107,7 +107,7 @@ test('a stale snapshot starts the installed watcher once and stays quiet', { ski
   }
 });
 
-test('a mewkit inside a git checkout is never started', { skip: process.platform === 'win32' }, () => {
+test('a binary built inside a git checkout is never started as the watcher', { skip: process.platform === 'win32' }, () => {
   const s = sandbox();
   const bin = path.join(s.project, 'target', 'debug');
   fs.mkdirSync(bin, { recursive: true });

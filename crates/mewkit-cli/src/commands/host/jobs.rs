@@ -5,7 +5,7 @@ use clap::{Args, Subcommand};
 use mewkit_core::host::client::wait_quietly;
 use mewkit_core::host::jobs::{self, JobDir, JobState};
 use mewkit_core::host::paths::HostPaths;
-use mewkit_core::host::{joblog, stats, time_now, wait_default};
+use mewkit_core::host::{joblog, time_now_ms};
 
 use super::block;
 use crate::failure::{Failure, OK};
@@ -50,7 +50,7 @@ fn find(paths: &HostPaths, id: &str) -> Result<JobDir, Failure> {
 }
 
 pub fn run(args: &JobsArgs) -> Result<u8, Failure> {
-    let paths = HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))?;
+    let paths = super::host_paths()?;
     match &args.command {
         JobsCommand::List => {
             for job in jobs::all(&paths) {
@@ -73,11 +73,7 @@ pub fn run(args: &JobsArgs) -> Result<u8, Failure> {
         }
         JobsCommand::Wait { id, timeout } => {
             let job = find(&paths, id)?;
-            let wait = match timeout {
-                Some(t) => wait_default::parse(t)
-                    .ok_or_else(|| Failure::usage(format!("--timeout: not a duration: {t}")))?,
-                None => wait_default::for_runtime(wait_default::calling_runtime().as_deref()),
-            };
+            let wait = block::wait_for("--timeout", timeout.as_deref())?;
             let state = wait_quietly(&job, Instant::now() + wait);
             match state {
                 JobState::Done(_) => print!("{}", joblog::tail(&job.log(), WAIT_TAIL)),
@@ -85,17 +81,13 @@ pub fn run(args: &JobsArgs) -> Result<u8, Failure> {
                     let since = job
                         .admitted_at_ms()
                         .or(job.read_meta().map(|m| m.enqueued_at_ms))
-                        .unwrap_or(time_now());
+                        .unwrap_or(time_now_ms());
                     let elapsed =
-                        Duration::from_millis(u64::try_from(time_now() - since).unwrap_or(0));
+                        Duration::from_millis(u64::try_from(time_now_ms() - since).unwrap_or(0));
                     block::print(&paths, &job, state, elapsed);
                 }
-                JobState::Lost => {
-                    stats::bump(&paths, "lost");
-                    eprintln!("mewkit host: job {id} was lost (its supervisor died); NOT VERIFIED");
-                }
-                JobState::Cancelled => {
-                    eprintln!("mewkit host: job {id} was cancelled; NOT VERIFIED")
+                JobState::Lost | JobState::Cancelled => {
+                    block::report_lost_or_cancelled(&paths, &job, state);
                 }
             }
             Ok(block::code_for(state))

@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use super::locks;
 use super::model::Verdict;
+use super::paths::read_json;
 
 /// The most slot files ever probed; `host.max_heavy` is clamped to 8.
 pub const MAX_SLOTS: usize = 8;
@@ -64,10 +65,7 @@ impl Slots {
     /// change is at least 30 s old. Call with the admit lock held.
     fn effective_k(&self, target: usize, now_ms: i64) -> usize {
         let file = self.dir.join("k.json");
-        let stored = std::fs::read(&file)
-            .ok()
-            .and_then(|b| serde_json::from_slice::<KState>(&b).ok());
-        let next = match stored {
+        let next = match read_json::<KState>(&file) {
             Some(s) if s.k == target => return s.k,
             Some(s) if now_ms - s.changed_at_ms < K_HYSTERESIS_MS && now_ms >= s.changed_at_ms => {
                 return s.k;

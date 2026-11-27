@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::jobs::{self, JobState};
 use super::model::{Report, Verdict};
-use super::paths::HostPaths;
+use super::paths::{HostPaths, read_json};
 use super::queue::Queue;
 use super::worktree::{inbox_key, normalize};
 
@@ -151,9 +151,8 @@ pub fn prune(paths: &HostPaths, now_ms: i64) {
             .metadata()
             .ok()
             .filter(|m| m.is_file())
-            .and_then(|m| m.modified().ok())
-            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-            .is_some_and(|d| now_ms - d.as_millis() as i64 > PRUNE_MS);
+            .and_then(|m| super::clean::mtime_ms(&m))
+            .is_some_and(|ms| now_ms - ms > PRUNE_MS);
         if stale {
             let _ = std::fs::remove_file(entry.path());
         }
@@ -162,5 +161,5 @@ pub fn prune(paths: &HostPaths, now_ms: i64) {
 
 /// The entry for `worktree`, left in place for the next reader.
 pub fn read(paths: &HostPaths, worktree: &str) -> Option<Entry> {
-    serde_json::from_slice(&std::fs::read(file_for(paths, &normalize(worktree))).ok()?).ok()
+    read_json(&file_for(paths, &normalize(worktree)))
 }

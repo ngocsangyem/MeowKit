@@ -55,7 +55,7 @@ When admission is switched off, `HOME` is unset, or anything in the queue fails,
 
 ## The watcher
 
-`mewkit host watch --detach` starts one watcher per machine. It samples every 5 seconds and writes, for each worktree that loads the host, a short note naming the heavy processes (by pid and executable name), queue positions and the slots held. It exits after 30 minutes with no agent runtime running. `mewkit host watch --stop` stops it.
+`mewkit host watch --detach` starts one watcher per machine. It samples every 5 seconds and writes, for each worktree that loads the host, a short note naming the heavy processes (by pid and executable name), queue positions and the slots held. It exits after 30 minutes with no agent runtime running. `mewkit host watch --stop` stops it; on Claude Code the hook starts it again on a prompt more than a minute later. To keep it off, set `host.enabled: false`.
 
 On Claude Code the `host-pressure` hook reads that note and adds one line to the agent's context when the verdict is `throttle` or worse, or when this worktree has jobs. It repeats a line at most every 5 minutes unless the verdict gets worse. The hook starts the watcher only from a `mewkit` installed on `PATH`, never from a build inside a git checkout. `hooks.host-pressure: false` in `.meowkit/config.yaml` switches it off. Other runtimes do not run the hook; their skills tell the agent to run `mewkit host status`.
 

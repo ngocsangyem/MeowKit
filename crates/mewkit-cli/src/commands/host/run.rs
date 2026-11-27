@@ -9,7 +9,7 @@ use mewkit_core::host::config::HostConfig;
 use mewkit_core::host::jobs::{self, JobState};
 use mewkit_core::host::paths::HostPaths;
 use mewkit_core::host::queue::Priority;
-use mewkit_core::host::{detach, stats, time_now, wait_default};
+use mewkit_core::host::{detach, stats, time_now_ms};
 
 use super::block;
 use crate::failure::{FAILED, Failure};
@@ -45,18 +45,14 @@ fn run_directly(argv: &[String]) -> Result<u8, Failure> {
 }
 
 pub fn run(args: &RunArgs) -> Result<u8, Failure> {
-    let wait = match &args.wait {
-        Some(text) => wait_default::parse(text)
-            .ok_or_else(|| Failure::usage(format!("--wait: not a duration: {text}")))?,
-        None => wait_default::for_runtime(wait_default::calling_runtime().as_deref()),
-    };
+    let wait = block::wait_for("--wait", args.wait.as_deref())?;
     let Some(paths) = HostPaths::resolve() else {
         return run_directly(&args.command);
     };
     if !HostConfig::for_paths(&paths).enabled {
         return run_directly(&args.command);
     }
-    jobs::sweep(&paths, time_now());
+    jobs::sweep(&paths, time_now_ms());
     let priority = Priority::parse(&args.priority).unwrap_or_default();
     let cwd = std::env::current_dir()?;
     let started = Instant::now();
@@ -101,14 +97,9 @@ pub fn run(args: &RunArgs) -> Result<u8, Failure> {
             );
             block::print(&paths, &job, state, started.elapsed());
         }
-        JobState::Lost => {
-            stats::bump(&paths, "lost");
-            eprintln!(
-                "mewkit host: job {} was lost (its supervisor died); NOT VERIFIED",
-                job.id
-            );
+        JobState::Lost | JobState::Cancelled => {
+            block::report_lost_or_cancelled(&paths, &job, state)
         }
-        JobState::Cancelled => eprintln!("mewkit host: job {} was cancelled; NOT VERIFIED", job.id),
         JobState::Done(_) => {}
     }
     Ok(block::code_for(state))

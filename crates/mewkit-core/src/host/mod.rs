@@ -6,6 +6,7 @@
 //! nothing here ever blocks a command on its own error.
 pub mod cache_report;
 pub mod clean;
+mod clean_remove;
 pub mod client;
 pub mod cmd_class;
 pub mod collect;
@@ -35,6 +36,8 @@ pub mod worktree;
 #[cfg(test)]
 mod clean_tests;
 #[cfg(test)]
+mod client_tests;
+#[cfg(test)]
 mod queue_slots_tests;
 #[cfg(test)]
 mod supervisor_tests;
@@ -55,11 +58,7 @@ use snapshot::Envelope;
 /// A snapshot younger than this is served as is by `host status`.
 pub const FRESH_MS: i64 = 10_000;
 
-pub fn time_now() -> i64 {
-    time_now_ms()
-}
-
-pub(crate) fn time_now_ms() -> i64 {
+pub fn time_now_ms() -> i64 {
     crate::time_utc::now_millis()
 }
 

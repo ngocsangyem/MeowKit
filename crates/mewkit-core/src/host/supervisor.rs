@@ -69,8 +69,8 @@ fn finish(job: &JobDir, code: i32, cancelled: bool) {
 
 /// Run job `job` to completion and return its exit code. `admission` says
 /// how many heavy jobs may run right now and under which verdict; it is
-/// asked only while this job is at the head of the queue. Errors fail open: a queue or slot error runs
-/// the command rather than blocking it.
+/// asked only while this job is at the head of the queue. Errors fail open:
+/// a queue or slot error runs the command rather than blocking it.
 pub fn run(
     paths: &HostPaths,
     job: &JobDir,

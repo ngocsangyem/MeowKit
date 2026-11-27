@@ -2238,6 +2238,11 @@
       "size": 8075
     },
     {
+      "path": ".agents/skills/mk-orchestrate/references/host-admission.md",
+      "sha256": "f61212b3985eb2040798e55222df40a52f58d0c7f070bd1ad5a0230d96d40612",
+      "size": 1509
+    },
+    {
       "path": ".agents/skills/mk-orchestrate/references/internal-routing.md",
       "sha256": "2ce0296f9b5aebc9706bdf077dee846a2ae642c6df0683d60b1f05f5ded575e4",
       "size": 7565
@@ -3898,6 +3903,11 @@
       "size": 8097
     },
     {
+      "path": ".agents/skills/mk-verify/references/heavy-commands.md",
+      "sha256": "ba840fbba23489f5e63cadd1d28931695faab408dc24028d257cf9364409f557",
+      "size": 2683
+    },
+    {
       "path": ".agents/skills/mk-verify/references/project-detection.md",
       "sha256": "f5ab3e695c509522365ac329bed32f680765a3856aeb8318e936187ae79db05c",
       "size": 6624
@@ -4291,6 +4301,11 @@
       "path": ".codex/hooks/lib/core/completion-check.cjs",
       "sha256": "9a4f22cc03e38ffdf6607f1326b57daf33e2dd22cb7e767bf98d069d24035fc9",
       "size": 9546
+    },
+    {
+      "path": ".codex/hooks/lib/core/host-evidence.cjs",
+      "sha256": "d49e5cf7e0dd9c3ca4e4cbd2b61569d01992a1e56d626f84daa35f0493e13c98",
+      "size": 2535
     },
     {
       "path": ".codex/hooks/lib/core/plan-state-sync.cjs",

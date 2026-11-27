@@ -34,7 +34,7 @@ pub fn disk_from_raw(prev: &BTreeMap<String, f64>, next: &BTreeMap<String, f64>)
     };
     Some(Disk {
         device: "_Total".into(),
-        busy_pct: Some((busy * 10.0).round() / 10.0),
+        busy_pct: Some(super::round1(busy)),
         latency_ms: latency,
         psi: None,
         scope: "host".into(),

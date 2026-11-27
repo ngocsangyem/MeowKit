@@ -3,8 +3,7 @@
 //! `target/` or `~/.cargo`; `host status --caches` reports those instead.
 use clap::Args;
 use mewkit_core::host::clean;
-use mewkit_core::host::paths::HostPaths;
-use mewkit_core::host::time_now;
+use mewkit_core::host::time_now_ms;
 
 use crate::failure::{Failure, OK};
 
@@ -16,8 +15,8 @@ pub struct CleanArgs {
 }
 
 pub fn run(args: &CleanArgs) -> Result<u8, Failure> {
-    let paths = HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))?;
-    let items = clean::plan(&paths, time_now());
+    let paths = super::host_paths()?;
+    let items = clean::plan(&paths, time_now_ms());
     if items.is_empty() {
         println!("nothing to clean under {}", paths.root.display());
         return Ok(OK);

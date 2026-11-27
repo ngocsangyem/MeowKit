@@ -182,9 +182,10 @@ fn walk(dir: &Path, skip: &[PathBuf], out: &mut Vec<PathBuf>) {
 }
 
 /// The text after a call up to where the command plainly ends, so a flag of the next
-/// command or of a shell pipe on the same line is not charged to this one.
+/// command or of a shell pipe on the same line is not charged to this one. A bare `--`
+/// ends the options too: what follows is a wrapped command's argv (`host run -- …`).
 fn tail(rest: &str) -> &str {
-    let end = ["`", "|", ";", "&&", "#", ")", "]", "\"", "'"]
+    let end = ["`", "|", ";", "&&", "#", ")", "]", "\"", "'", " -- "]
         .iter()
         .filter_map(|stop| rest.find(stop))
         .min()

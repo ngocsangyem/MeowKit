@@ -47,8 +47,7 @@ impl Envelope {
 /// The snapshot at `path`, or `None` when absent, unparsable, of another kind
 /// or of a newer schema (read nothing rather than misread it).
 pub fn read(path: &Path) -> Option<Envelope> {
-    let text = std::fs::read_to_string(path).ok()?;
-    let env: Envelope = serde_json::from_str(&text).ok()?;
+    let env: Envelope = super::paths::read_json(path)?;
     (env.kind == KIND && env.schema_version <= SCHEMA_VERSION).then_some(env)
 }
 

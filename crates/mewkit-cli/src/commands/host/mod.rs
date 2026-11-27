@@ -11,8 +11,14 @@ mod status;
 mod watch;
 
 use clap::{Args, Subcommand};
+use mewkit_core::host::paths::HostPaths;
 
 use crate::failure::Failure;
+
+/// The host state directory, or a failure when there is no home to hold it.
+fn host_paths() -> Result<HostPaths, Failure> {
+    HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))
+}
 
 #[derive(Args, Debug)]
 pub struct HostArgs {

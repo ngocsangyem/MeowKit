@@ -11,6 +11,7 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 
 use super::locks;
+use super::paths::{read_json, read_parsed};
 
 /// Waiting this long raises a ticket one priority level (anti-starvation).
 pub const AGING_MS: i64 = 10 * 60 * 1000;
@@ -77,9 +78,14 @@ pub struct TicketGuard {
 impl TicketGuard {
     /// Leave the queue: data first, so no reader sees a live lock without data.
     pub fn leave(self) {
-        let _ = std::fs::remove_file(&self.json);
-        let lock_path = self.lock_path.clone();
-        drop(self);
+        let Self {
+            json,
+            lock_path,
+            _lock: lock,
+            ..
+        } = self;
+        let _ = std::fs::remove_file(json);
+        drop(lock);
         let _ = std::fs::remove_file(lock_path);
     }
 }
@@ -107,10 +113,7 @@ impl Queue {
             locks::hold_within(&self.dir.join("seq.lock"), Duration::from_secs(10))?
                 .ok_or_else(|| io::Error::other("queue counter lock busy"))?;
         let counter_file = self.dir.join("seq");
-        let counter = std::fs::read_to_string(&counter_file)
-            .ok()
-            .and_then(|t| t.trim().parse::<u64>().ok())
-            .unwrap_or(0);
+        let counter: u64 = read_parsed(&counter_file).unwrap_or(0);
         let highest = self.live().iter().map(|t| t.seq).max().unwrap_or(0);
         ticket.seq = counter.max(highest) + 1;
         // Lock before data: a data file without a held lock reads as dead.
@@ -142,10 +145,7 @@ impl Queue {
             if path.extension().is_none_or(|e| e != "json") {
                 continue;
             }
-            let Some(ticket) = std::fs::read(&path)
-                .ok()
-                .and_then(|b| serde_json::from_slice::<Ticket>(&b).ok())
-            else {
+            let Some(ticket) = read_json::<Ticket>(&path) else {
                 continue;
             };
             if locks::is_held(&self.lock(ticket.seq)) {

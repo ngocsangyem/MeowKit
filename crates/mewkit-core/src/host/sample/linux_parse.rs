@@ -70,7 +70,7 @@ pub fn busiest_util(
             let before = prev.get(key)?;
             let device = key.strip_prefix("io_ticks:")?;
             let util = ((now - before) / (dt_s * 1000.0) * 100.0).clamp(0.0, 100.0);
-            Some((device.to_string(), (util * 10.0).round() / 10.0))
+            Some((device.to_string(), super::round1(util)))
         })
         .max_by(|a, b| a.1.total_cmp(&b.1))
 }

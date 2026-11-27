@@ -4,7 +4,6 @@
 use clap::Args;
 use mewkit_core::host::config::HostConfig;
 use mewkit_core::host::jobs::JobDir;
-use mewkit_core::host::paths::HostPaths;
 use mewkit_core::host::slots::k_for;
 use mewkit_core::host::supervisor::{self, Options};
 use mewkit_core::host::{detach, status};
@@ -36,7 +35,7 @@ pub fn spawn(args: &SpawnArgs) -> Result<u8, Failure> {
 }
 
 pub fn supervise(args: &SuperviseArgs) -> Result<u8, Failure> {
-    let paths = HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))?;
+    let paths = super::host_paths()?;
     let job = JobDir::new(&paths, &args.id);
     let max_heavy = usize::from(HostConfig::for_paths(&paths).max_heavy);
     let space: Vec<std::path::PathBuf> = std::env::current_dir().into_iter().collect();

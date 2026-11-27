@@ -280,6 +280,11 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/handlers/host-pressure.cjs",
+      "sha256": "0e1fa433cb73e6b52d693423f6bcd3f52b5681da79064e7ad2d00212b55e92b0",
+      "size": 4006
+    },
+    {
       "path": ".claude/hooks/handlers/jira-env-loader.cjs",
       "sha256": "b9cf74d1ca6dd32b9813d06860f66417534849d0890a73d9c1bb2b637eb4b352",
       "size": 1319,
@@ -429,6 +434,16 @@
       "path": ".claude/hooks/lib/core/hook-payload.cjs",
       "sha256": "6fe4af50785b60745aa0b0a9eb3ae27453000fa9287fd400f7374fc8ff95d81a",
       "size": 2249
+    },
+    {
+      "path": ".claude/hooks/lib/core/host-evidence.cjs",
+      "sha256": "d49e5cf7e0dd9c3ca4e4cbd2b61569d01992a1e56d626f84daa35f0493e13c98",
+      "size": 2535
+    },
+    {
+      "path": ".claude/hooks/lib/core/host-pressure.cjs",
+      "sha256": "3bc2051018470d8d53a393cdc4b9025000953871b6e00d12638c8c8e6ebf3fba",
+      "size": 5247
     },
     {
       "path": ".claude/hooks/lib/core/plan-state-sync.cjs",
@@ -2927,6 +2942,11 @@
       "size": 8087
     },
     {
+      "path": ".claude/skills/orchestrate/references/host-admission.md",
+      "sha256": "55061d981905dcd809267e651c5491470db4c8906e70298e652177c8b77ce309",
+      "size": 1503
+    },
+    {
       "path": ".claude/skills/orchestrate/references/internal-routing.md",
       "sha256": "bd201fb2a6360bd6ed46c9a39dc8ec157ca37cef5a30313789b60e1db4b1b365",
       "size": 7609
@@ -4575,6 +4595,11 @@
       "path": ".claude/skills/verify/SKILL.md",
       "sha256": "cc101a2f77fb433d7f197e867a6742964f2656712fddd2137fbc709e4647a16c",
       "size": 8435
+    },
+    {
+      "path": ".claude/skills/verify/references/heavy-commands.md",
+      "sha256": "4d5d51cafe80b8f7254a2678e1030fd6724e8ea0b5308ac2404aca51ae1d2694",
+      "size": 2683
     },
     {
       "path": ".claude/skills/verify/references/project-detection.md",

@@ -4,19 +4,20 @@
 //! `stats.json` or `VERSION`. Each item is renamed to a trash name in its own
 //! directory, then deleted; a symlink anywhere on the way aborts that item.
 //! The allowlist is code: no config widens it.
-use std::io::{self, Write};
-use std::path::{Component, Path, PathBuf};
+use std::io::Write;
+use std::path::{Path, PathBuf};
 
 use super::jobs;
 use super::locks;
 use super::model::Verdict;
-use super::paths::HostPaths;
+use super::paths::{HostPaths, read_parsed};
+
+pub use super::clean_remove::remove;
 
 /// Ended jobs older than this go under a `clean` verdict.
 pub const JOB_AGE_MS: i64 = 24 * 3600 * 1000;
 /// Automatic runs are at least this far apart.
 pub const COOLDOWN_MS: i64 = 30 * 60 * 1000;
-const NEVER: &[&str] = &["stats.json", "VERSION"];
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Item {
@@ -25,7 +26,7 @@ pub struct Item {
     pub kind: &'static str,
 }
 
-fn mtime_ms(meta: &std::fs::Metadata) -> Option<i64> {
+pub(super) fn mtime_ms(meta: &std::fs::Metadata) -> Option<i64> {
     let d = meta
         .modified()
         .ok()?
@@ -47,17 +48,7 @@ pub fn size_of(path: &Path) -> u64 {
         .unwrap_or(0)
 }
 
-#[cfg(unix)]
-fn same_owner(a: &std::fs::Metadata, b: &std::fs::Metadata) -> bool {
-    use std::os::unix::fs::MetadataExt;
-    a.uid() == b.uid()
-}
-#[cfg(not(unix))]
-fn same_owner(_: &std::fs::Metadata, _: &std::fs::Metadata) -> bool {
-    true
-}
-
-fn entries(dir: &Path) -> Vec<PathBuf> {
+pub(super) fn entries(dir: &Path) -> Vec<PathBuf> {
     std::fs::read_dir(dir)
         .map(|rd| rd.flatten().map(|e| e.path()).collect())
         .unwrap_or_default()
@@ -118,62 +109,6 @@ pub fn plan(paths: &HostPaths, now_ms: i64) -> Vec<Item> {
     items
 }
 
-/// Refuse anything outside the root, a protected file, a symlink on the way
-/// or inside, or an entry owned by someone else.
-fn check(root: &Path, path: &Path, owner: &std::fs::Metadata) -> io::Result<()> {
-    let rel = path
-        .strip_prefix(root)
-        .map_err(|_| io::Error::other("outside the host directory"))?;
-    if rel.components().any(|c| !matches!(c, Component::Normal(_))) || rel.as_os_str().is_empty() {
-        return Err(io::Error::other(
-            "not a plain path under the host directory",
-        ));
-    }
-    if path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .is_some_and(|n| NEVER.contains(&n))
-    {
-        return Err(io::Error::other("protected file"));
-    }
-    crate::fsx::refuse_symlinks(root, path)?;
-    let meta = std::fs::symlink_metadata(path)?;
-    if !same_owner(&meta, owner) {
-        return Err(io::Error::other("owned by another user"));
-    }
-    if meta.is_dir() {
-        for child in entries(path) {
-            if std::fs::symlink_metadata(&child)?.is_dir() {
-                check(root, &child, owner)?;
-            } else {
-                crate::fsx::refuse_symlinks(root, &child)?;
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Rename into a trash name beside it, then delete. Returns bytes freed.
-pub fn remove(paths: &HostPaths, item: &Item) -> io::Result<u64> {
-    let owner = std::fs::symlink_metadata(&paths.root)?;
-    check(&paths.root, &item.path, &owner)?;
-    let dir = item
-        .path
-        .parent()
-        .ok_or_else(|| io::Error::other("no parent"))?;
-    let stamp = crate::fsx::sha256_hex(
-        format!("{}{}", item.path.display(), super::time_now_ms()).as_bytes(),
-    );
-    let trash = dir.join(format!(".meowkit-trash-{}", &stamp[..8]));
-    std::fs::rename(&item.path, &trash)?;
-    if std::fs::symlink_metadata(&trash)?.is_dir() {
-        std::fs::remove_dir_all(&trash)?;
-    } else {
-        std::fs::remove_file(&trash)?;
-    }
-    Ok(item.bytes)
-}
-
 /// Remove `items`, appending one `clean.log` line per action. Returns the
 /// number removed.
 pub fn execute(paths: &HostPaths, items: &[Item]) -> usize {
@@ -206,9 +141,7 @@ pub fn run_auto(paths: &HostPaths, verdict: Verdict, enabled: bool, now_ms: i64)
         return None;
     }
     let marker = paths.dir("clean.last");
-    let last = std::fs::read_to_string(&marker)
-        .ok()
-        .and_then(|t| t.trim().parse::<i64>().ok());
+    let last: Option<i64> = read_parsed(&marker);
     if last.is_some_and(|at| (0..COOLDOWN_MS).contains(&(now_ms - at))) {
         return None;
     }

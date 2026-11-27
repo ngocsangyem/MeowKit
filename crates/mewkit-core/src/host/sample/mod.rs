@@ -25,6 +25,16 @@ pub struct OsRead {
     pub container: bool,
 }
 
+/// `v` rounded to one decimal place.
+pub fn round1(v: f64) -> f64 {
+    (v * 10.0).round() / 10.0
+}
+
+/// `v` rounded to three decimal places.
+pub fn round3(v: f64) -> f64 {
+    (v * 1000.0).round() / 1000.0
+}
+
 /// Disk rates from `prev` counters to `next`, `dt_s` apart.
 pub fn disk_between(
     os: Os,

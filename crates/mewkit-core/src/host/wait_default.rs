@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};
 
-use super::procs::{basename, runtime_of};
+use super::procs::runtime_of_process;
 
 /// The default wait for `runtime`; an unknown caller gets the shortest.
 pub fn for_runtime(runtime: Option<&str>) -> Duration {
@@ -28,15 +28,7 @@ pub fn calling_runtime() -> Option<String> {
     let mut cursor = sysinfo::get_current_pid().ok();
     for _ in 0..64 {
         let p = sys.process(cursor?)?;
-        let exe = p
-            .exe()
-            .map_or_else(|| basename(std::path::Path::new(p.name())), basename);
-        let args: Vec<String> = p
-            .cmd()
-            .iter()
-            .map(|a| a.to_string_lossy().into_owned())
-            .collect();
-        if let Some(rt) = runtime_of(&exe, &args) {
+        if let Some(rt) = runtime_of_process(p) {
             return Some(rt);
         }
         cursor = p.parent();

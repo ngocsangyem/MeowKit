@@ -83,7 +83,7 @@ fn stop(paths: &HostPaths) -> Result<u8, Failure> {
 }
 
 pub fn run(args: &WatchArgs) -> Result<u8, Failure> {
-    let paths = HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))?;
+    let paths = super::host_paths()?;
     if args.stop {
         return stop(&paths);
     }
