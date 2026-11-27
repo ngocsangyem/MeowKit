@@ -71,6 +71,18 @@ jobs:
 
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
 
+      # The tests write every scratch project under the OS temp dir. On a
+      # Windows runner that is C:\Users\...\Temp, and a probe there measured
+      # 1,000 small files with a flush each at 5.7 s against 0.4 s on D:, the
+      # drive that holds RUNNER_TEMP; one lifecycle pair test took 31 s against
+      # 9.6 s. Rust's temp_dir() reads TMP first, then TEMP.
+      - name: Put the temp dir on the runner's work drive
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+          echo "TEMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+
       # `tests/reader_agreement.rs` runs the shipped `.cjs` config reader under
       # Node and compares it to this crate, fixture by fixture. It FAILS when
       # Node is absent rather than skipping, so the runtime is requested
