@@ -9,7 +9,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi and OMP</strong><br>
-  121 skills &middot; 42 agents &middot; 6 rules &middot; 28 hook scripts
+  121 skills &middot; 42 agents &middot; 6 rules &middot; 29 hook scripts
 </p>
 
 <p align="center">
@@ -190,7 +190,7 @@ meowkit/
 │   ├── agents/               42 specialist agents
 │   ├── skills/               121 skills (mk: namespace) — 121 ship; benchmark is maintainer-only
 │   ├── rules/                6 enforcement rules (always-on)
-│   ├── hooks/                28 hook scripts (dispatch, pre-ship, privacy-block, append-trace + 24 handlers) and their libraries
+│   ├── hooks/                29 hook scripts (dispatch, pre-ship, privacy-block, append-trace + 25 handlers) and their libraries
 │   ├── statusline.cjs
 │   └── settings.json
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)

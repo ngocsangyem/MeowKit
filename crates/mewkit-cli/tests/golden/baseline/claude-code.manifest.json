@@ -9533,8 +9533,8 @@
     },
     {
       "path": ".meowkit/config.yaml",
-      "sha256": "87b3707e3a73622beaf75f90195f62ee7f78fb3c875ee820b01865ec971d2122",
-      "size": 2173
+      "sha256": "692e3e5d05f1e9a7e9d0323ff2cb2b812d365a782179e4862cdf2c5cb8f17571",
+      "size": 2197
     },
     {
       "path": ".meowkit/gitignore.meowkit",

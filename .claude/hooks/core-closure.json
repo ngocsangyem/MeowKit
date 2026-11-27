@@ -39,6 +39,7 @@
   "bundled": [
     "changed-files.cjs",
     "core/completion-check.cjs",
+    "core/host-evidence.cjs",
     "core/plan-state-sync.cjs",
     "core/pre-ship.cjs",
     "core/privacy-paths.cjs",

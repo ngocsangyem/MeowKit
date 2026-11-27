@@ -86,6 +86,7 @@ const HOOK_GOVERNANCE = {
   "auto-checkpoint":       { criticality: "medium",   responsibility: "task-state" },
   "checkpoint-writer":     { criticality: "medium",   responsibility: "task-state" },
   "plan-state-sync":       { criticality: "medium",   responsibility: "task-state" },
+  "host-pressure":         { criticality: "medium",   responsibility: "observability" },
 };
 
 // Known runtime-only dirs that should be skipped (no SKILL.md expected)

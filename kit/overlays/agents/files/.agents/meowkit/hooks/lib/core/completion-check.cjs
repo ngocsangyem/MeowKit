@@ -24,6 +24,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { runInner, finishedJob } = require('./host-evidence.cjs');
 
 const CAP = 2;
 const STATE_FILE = 'completion-evidence.json';
@@ -60,6 +61,8 @@ function classifyCommand(command) {
     if (!segment) continue;
     let prev;
     do { prev = segment; segment = segment.replace(PREFIX, ''); } while (segment !== prev);
+    const inner = runInner(segment);
+    if (inner !== null) return classifyCommand(inner);
     for (const [cls, re] of CLASSES) if (re.test(segment)) return cls;
   }
   return null;
@@ -140,12 +143,16 @@ function sessionState(file, sessionId) {
   return { sessionId: sessionId || '', blocks: 0 };
 }
 
-/** Record a passing verification command. Returns the class recorded, or null. */
-function recordPass({ root, stateFile, sessionId, command, now = Date.now() }) {
-  const cls = classifyCommand(command);
+/**
+ * Record a passing verification command. Returns the class recorded, or null. A
+ * `mewkit host jobs wait` counts only for a done(0) job that ran on this very tree.
+ */
+function recordPass({ root, stateFile, sessionId, command, now = Date.now(), home }) {
+  const job = finishedJob(command, home);
+  const cls = job ? job.cls : classifyCommand(command);
   if (!cls) return null;
   const digest = treeDigest(root);
-  if (!digest) return null;
+  if (!digest || (job && job.digest !== digest)) return null;
   const state = sessionState(stateFile, sessionId);
   writeState(stateFile, { ...state, lastPassAt: new Date(now).toISOString(), lastPassCommandClass: cls, treeDigestAtPass: digest });
   return cls;

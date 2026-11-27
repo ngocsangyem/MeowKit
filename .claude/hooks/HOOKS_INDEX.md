@@ -10,8 +10,8 @@ shell to start and the kit runs on a host that has none. There is no exception: 
 registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` sweeps
 the hook paths for one.
 
-The kit ships 28 node hooks: the 4 entrypoints directly under `hooks/`, which the host
-registers or an agent invokes, and the 24 observers under `hooks/handlers/`, which
+The kit ships 29 node hooks: the 4 entrypoints directly under `hooks/`, which the host
+registers or an agent invokes, and the 25 observers under `hooks/handlers/`, which
 `dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
 neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 
@@ -84,6 +84,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 | `budget-tracker.cjs` | PostToolUse | Bash | budget-tracker | — | Accumulates token and cost estimates; notices are user-only |
 | `review-evidence-tag.cjs` | PostToolUse | Bash | review-evidence-tag | — | Tags review evidence from a command |
 | `verification-evidence.cjs` | PostToolUse, SessionStart | Bash | verification-evidence | — | Records the session's starting tree and the tree at each passing verification command, for the opt-in completion check |
+| `host-pressure.cjs` | PostToolUse, UserPromptSubmit | Bash | host-pressure | — | (beta) Starts the machine-wide watcher when its snapshot is stale; one line when the host is at throttle or worse or this worktree has queued or running jobs, at most every 5 min per session unless it gets worse |
 | `checkpoint-writer.cjs` | Stop | — | checkpoint-writer | — | Writes the end-of-session checkpoint |
 | `post-session.cjs` | Stop | — | post-session | — | Records cost and trace data when a session ends; writes the "verified" marker only for rule and phase-zero files that are present, non-empty and unchanged since session start |
 | `control-probe.cjs` | Stop | — | control-probe | — | A known-good fire, used as a control signal |
