@@ -269,12 +269,16 @@ fn file_mode(_path: &Path) -> u32 {
     0
 }
 
-/// `CARGO_TARGET_TMPDIR/shared/<name>`, built by `build` at most once per
+/// `<OS temp>/mewkit-test-fixtures/<name>`, built by `build` at most once per
 /// name across concurrent test processes: each builds into its own staging
 /// path and renames it into place, and one that loses the race keeps the
 /// winner's copy. `name` must change whenever what `build` writes does.
+///
+/// Not under `target/`: CI's rust-cache saves `target/` after deleting every
+/// file below directories it does not recognise while keeping the
+/// directories, so a restored fixture there exists but is empty.
 pub fn shared_fixture(name: &str, build: impl FnOnce(&Path)) -> PathBuf {
-    let root = Path::new(env!("CARGO_TARGET_TMPDIR")).join("shared");
+    let root = std::env::temp_dir().join("mewkit-test-fixtures");
     let done = root.join(name);
     if done.exists() {
         return done;
