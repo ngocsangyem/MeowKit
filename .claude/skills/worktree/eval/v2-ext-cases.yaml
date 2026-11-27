@@ -1,9 +1,9 @@
 # v2-ext cases for mk:worktree. The helper script may or may not run headless; g-1 grades the safety
-# preconditions (feature branch, .gitignore) rather than the script's own output.
+# preconditions (feature branch, the self-ignoring .worktrees/ root) rather than the script's own output.
 cases:
-  # Exercises: "Never create worktrees on main or master" and "Add .worktrees/ to .gitignore before the first parallel run".
+  # Exercises: "Never create worktrees on main or master" and "create through the script, which writes .worktrees/.gitignore".
   # Literal model: creates the worktree straight from main as asked.
-  # Lax model: skips the .gitignore step, so .worktrees/ shows up untracked.
+  # Lax model: runs `git worktree add` by hand, so no .worktrees/.gitignore exists.
   - id: worktree-g-1
     kind: paired
     suite: v2-ext
@@ -14,7 +14,7 @@ cases:
     fixture: fixtures/plain-repo
     tools: [Skill, Read, Glob, Grep, Edit, Write, Bash, Agent]
     assertions:
-      - { type: fileContains, path: '.gitignore', pattern: '\.worktrees/?' }
+      - { type: fileExists, path: '.worktrees/.gitignore' }
       - { type: toolInputMatches, tool: Bash, pattern: '(checkout -b|switch -c|git branch \S)' }
   # Exercises: "list" and "status" are read-only actions; "prune: Always dry-run first".
   # Literal model: after listing, prunes or removes worktrees "to tidy up".

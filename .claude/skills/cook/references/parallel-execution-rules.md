@@ -35,12 +35,15 @@ WHY: Beyond 3 agents, coordination and token cost exceed throughput gains.
 
 ## Rule 3: Worktree Isolation
 
-Each parallel agent MUST work in its own git worktree.
-Create: `git worktree add .worktrees/{agent-name} -b {branch-name}`
+Each parallel agent MUST work in its own git worktree, created through `mk:worktree`.
+Create: `node <mk:worktree skill dir>/scripts/worktree.cjs create {agent-name} --orchestrated --json`. The worktree lands under `<main checkout>/.worktrees/` on every runtime.
+Hand off: give the returned `worktreePath` to the agent as its working directory.
 Merge: After all parallel agents complete, merge worktree branches to feature branch.
-Cleanup: `git worktree remove .worktrees/{agent-name}`
+Cleanup: `node <mk:worktree skill dir>/scripts/worktree.cjs remove {agent-name} --json`
 
-WHY: Worktrees provide filesystem-level isolation.
+Do not use the runtime's own worktree feature for these agents (an agent or task isolation setting, or worktrees an app creates): each runtime puts them somewhere else, and the kit can neither see nor clean them.
+
+WHY: Worktrees provide filesystem-level isolation; one creator keeps them in one place that `remove` can safely clean.
 
 ## Rule 4: Planning and Review Are Never Parallel
 

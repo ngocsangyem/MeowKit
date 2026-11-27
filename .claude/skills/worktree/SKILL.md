@@ -43,15 +43,13 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs info --json
 node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
 ```
 
-Before the first parallel worktree in a repo, make sure `.worktrees/` is in `.gitignore`;
-if not, append it:
+Every worktree lands under `<main checkout>/.worktrees/`, also when the script runs inside
+a linked worktree; `--worktree-root` or `WORKTREE_ROOT` overrides it, with a warning. The
+script writes `.worktrees/.gitignore` (`*`) itself, so the user's `.gitignore` is never edited.
 
-```bash
-echo '.worktrees/' >> .gitignore
-```
-
-The script places the worktree at `.worktrees/{agent-name}` on branch
+The orchestrated worktree is `.worktrees/{agent-name}` on branch
 `parallel/{agent-name}-{timestamp}` per `.claude/skills/cook/references/parallel-execution-rules.md` Rule 3.
+Give the returned `worktreePath` to the agent as its working directory.
 
 ### merge
 
@@ -84,11 +82,15 @@ in `mk:task-queue`. Then:
 node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" --json
 ```
 
+`remove` acts only on worktrees this script created (`owner` `kit`, or `legacy` for an
+unmarked one under `.worktrees/`). Any other match fails with `FOREIGN_WORKTREE`; a worktree
+with uncommitted or untracked work fails with `WORKTREE_DIRTY` unless `--discard-changes`.
+
 ### list, status, prune, review-pr, review-pr-cleanup
 
 Each is `node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs <verb> ... --json`; options and output fields are in `references/commands.md`.
 
-- `list`: every worktree. `status`: the same plus divergence from base and dirty state.
+- `list`: every worktree with its `owner` (`main`, `kit`, `review`, `legacy`, `foreign`). `status`: the same plus divergence from base and dirty state.
 - `prune`: stale worktree metadata; run `--dry-run` first.
 - `review-pr`: a detached, SHA-bound worktree from a PR head, fetched from the PR's base remote (never a fork) for a review that never touches the user's checkout; writes `tasks/reviews/<session>/manifest.json`.
 - `review-pr-cleanup`: removes a review worktree given only its manifest path; `--sweep` (dry-run unless `--apply`) clears stale sessions.
@@ -98,9 +100,9 @@ Each is `node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs <verb> ... --json`; optio
 One list, each rule with its reason.
 
 - **Never create worktrees on `main` or `master`**; use a feature branch, so parallel work never lands on the protected branch.
-- **Add `.worktrees/` to `.gitignore` before the first parallel run**, or the worktree directories show up as untracked files.
 - **Never force-push from a worktree.** Worktrees share one `.git`, so a force-push rewrites history for the main checkout too.
-- **Never remove a worktree with uncommitted changes**; commit or stash first, or the work is lost. (`review-pr-cleanup` is the exception: review worktrees are legitimately dirty, and the manifest nonce is the guard.)
+- **`remove` refuses uncommitted work** (`WORKTREE_DIRTY`, untracked files included); commit or move it first. Pass `--discard-changes` only when the work is meant to go. Ignored files (a copied `.env`) are not checked and are deleted with the worktree. (`review-pr-cleanup` is the exception: review worktrees are legitimately dirty, and the manifest nonce is the guard.)
+- **`remove` never touches a worktree this script did not create** (`FOREIGN_WORKTREE`): other runtimes keep their own worktrees, and their uncommitted work is theirs. Worktrees left in the old sibling or superproject `worktrees/` roots are `foreign` too; remove them with `git worktree remove`.
 - **Clean up worktrees after merge.** A stale worktree keeps its branch checked out and blocks reuse of the name.
 - **Release the task's ownership in `mk:task-queue` before cleanup**, or the task stays claimed and no other agent can take it.
 - **Keep to three active worktrees**: the cap in `.claude/skills/cook/references/parallel-execution-rules.md` Rule 2. The script does not enforce it; `status` lists the worktrees so you can count.

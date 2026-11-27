@@ -3,7 +3,7 @@
  * Test suite for worktree.cjs
  * Run: node meowkit/.claude/skills/worktree/scripts/worktree.test.cjs
  *
- * All destructive tests use --dry-run; only info/list/status/prune touch live state.
+ * Tests against the live checkout use --dry-run; real create/remove runs in a throwaway repo.
  */
 
 'use strict';
@@ -23,12 +23,17 @@ const TEST_CWD = execSync('git rev-parse --show-toplevel', {
 let passed = 0;
 let failed = 0;
 
+// WORKTREE_ROOT from the caller's shell would redirect every default-root case.
+const BASE_ENV = { ...process.env };
+delete BASE_ENV.WORKTREE_ROOT;
+
 function run(args, options = {}) {
   const cwd = options.cwd || TEST_CWD;
   try {
     const output = execSync(`node "${SCRIPT_PATH}" ${args}`, {
       encoding: 'utf-8',
       cwd,
+      env: { ...BASE_ENV, ...(options.env || {}) },
       stdio: ['pipe', 'pipe', 'pipe']
     });
     return { success: true, output: output.trim(), exitCode: 0 };
@@ -476,6 +481,174 @@ test('status --json never runs shell code from a branch name', () => {
   } finally {
     fs.rmSync(scratch, { recursive: true, force: true });
   }
+});
+
+// ─── Throwaway repo helpers ───────────────────────────────────────────────────
+// Real create/remove runs only here, never in the live checkout.
+
+function withTempRepo(fn) {
+  const fs = require('fs');
+  const os = require('os');
+  const scratch = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'wt-owner-')));
+  const repo = path.join(scratch, 'repo');
+  const gitIn = (gitArgs, cwd = repo) => require('child_process')
+    .execFileSync('git', gitArgs, { cwd, stdio: 'pipe', encoding: 'utf-8' }).trim();
+  try {
+    fs.mkdirSync(repo);
+    gitIn(['init', '-q', '-b', 'main']);
+    gitIn(['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'init']);
+    fn({ fs, scratch, repo, gitIn });
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+const ownership = require('./lib/worktree-ownership.cjs');
+
+// ─── Fixed root ───────────────────────────────────────────────────────────────
+console.log('\n📂 Fixed Worktree Root Tests');
+
+test('feature and orchestrated dry-run default to <main>/.worktrees', () => {
+  withTempRepo(({ repo }) => {
+    const root = path.join(repo, '.worktrees');
+    const feature = assertJSON(run('create login --dry-run --json', { cwd: repo }).output);
+    assert(path.dirname(feature.wouldCreate.worktreePath) === root, `feature path: ${feature.wouldCreate.worktreePath}`);
+    assert(feature.wouldCreate.worktreeRootSource === 'default (.worktrees/)', `source: ${feature.wouldCreate.worktreeRootSource}`);
+    const orch = assertJSON(run('create agent-a --orchestrated --dry-run --json', { cwd: repo }).output);
+    assert(orch.wouldCreate.worktreePath === path.join(root, 'agent-a'), `orchestrated path: ${orch.wouldCreate.worktreePath}`);
+  });
+});
+
+test('dry-run from inside a linked worktree still resolves to the main root', () => {
+  withTempRepo(({ repo, scratch, gitIn }) => {
+    const linked = path.join(scratch, 'linked');
+    gitIn(['worktree', 'add', '-q', '-b', 'side', linked]);
+    const root = path.join(repo, '.worktrees');
+    const feature = assertJSON(run('create login --dry-run --json', { cwd: linked }).output);
+    assert(feature.wouldCreate.worktreePath === path.join(root, 'repo-login'), `feature path: ${feature.wouldCreate.worktreePath}`);
+    const orch = assertJSON(run('create agent-a --orchestrated --dry-run --json', { cwd: linked }).output);
+    assert(orch.wouldCreate.worktreePath === path.join(root, 'agent-a'), `orchestrated path: ${orch.wouldCreate.worktreePath}`);
+    const list = assertJSON(run('list --json', { cwd: linked }).output);
+    const main = list.worktrees.find(w => w.isMainWorktree);
+    assert(main && main.path === repo && main.owner === 'main', `main worktree from linked cwd: ${JSON.stringify(main)}`);
+  });
+});
+
+test('--worktree-root flag and WORKTREE_ROOT env win and warn', () => {
+  withTempRepo(({ repo, scratch }) => {
+    const flagRoot = path.join(scratch, 'flag-root');
+    const viaFlag = assertJSON(run(`create agent-a --orchestrated --worktree-root "${flagRoot}" --dry-run --json`, { cwd: repo }).output);
+    assert(viaFlag.wouldCreate.worktreePath === path.join(flagRoot, 'agent-a'), `flag path: ${viaFlag.wouldCreate.worktreePath}`);
+    assert((viaFlag.warnings || []).some(w => w.includes('--worktree-root flag')), 'flag should warn');
+    const envRoot = path.join(scratch, 'env-root');
+    const viaEnv = assertJSON(run('create login --dry-run --json', { cwd: repo, env: { WORKTREE_ROOT: envRoot } }).output);
+    assert(path.dirname(viaEnv.wouldCreate.worktreePath) === envRoot, `env path: ${viaEnv.wouldCreate.worktreePath}`);
+    assert((viaEnv.warnings || []).some(w => w.includes('WORKTREE_ROOT env')), 'env should warn');
+  });
+});
+
+test('real create writes .worktrees/.gitignore once and leaves main status clean', () => {
+  withTempRepo(({ fs, repo, gitIn }) => {
+    const created = assertJSON(run('create agent-a --orchestrated --json', { cwd: repo }).output);
+    assert(created.success, `create failed: ${JSON.stringify(created)}`);
+    const ignorePath = path.join(repo, '.worktrees', '.gitignore');
+    assert(fs.readFileSync(ignorePath, 'utf-8') === '*\n', 'ignore file should hold *');
+    fs.writeFileSync(ignorePath, '*\n# user edit\n');
+    assert(run('create login --json', { cwd: repo }).success, 'feature create should succeed');
+    assert(fs.readFileSync(ignorePath, 'utf-8') === '*\n# user edit\n', 'ignore file must not be overwritten');
+    assert(gitIn(['status', '--porcelain']) === '', 'main checkout status should be clean');
+  });
+});
+
+// ─── Ownership and safe remove ────────────────────────────────────────────────
+console.log('\n🔐 Ownership and Remove Tests');
+
+test('classifyOwner covers main, kit, review, legacy, foreign', () => {
+  withTempRepo(({ fs, repo, scratch, gitIn }) => {
+    const root = path.join(repo, '.worktrees');
+    const add = (p, extra = []) => gitIn(['worktree', 'add', '-q', ...extra, p]);
+    add(path.join(root, 'owned'), ['-b', 'o']); ownership.writeOwnerMarker(path.join(root, 'owned'), 'feature');
+    add(path.join(root, 'review-pr-1-s'), ['--detach']);
+    add(path.join(root, 'old'), ['-b', 'l']);
+    add(path.join(scratch, 'sibling'), ['-b', 'f']);
+    const envRoot = path.join(scratch, 'env-root');
+    fs.mkdirSync(envRoot);
+    add(path.join(envRoot, 'host'), ['-b', 'h']);
+    const owners = Object.fromEntries(assertJSON(run('list --json', { cwd: repo }).output)
+      .worktrees.map(w => [path.basename(w.path), w.owner]));
+    const want = { repo: 'main', owned: 'kit', 'review-pr-1-s': 'review', old: 'legacy', sibling: 'foreign', host: 'foreign' };
+    Object.entries(want).forEach(([name, owner]) => assert(owners[name] === owner, `${name}: want ${owner}, got ${owners[name]}`));
+    const viaEnv = assertJSON(run('status --json', { cwd: repo, env: { WORKTREE_ROOT: envRoot } }).output);
+    assert(viaEnv.worktrees.find(w => path.basename(w.path) === 'host').owner === 'foreign', 'env root must not make host worktrees removable');
+  });
+});
+
+test('remove refuses a plain git worktree with FOREIGN_WORKTREE', () => {
+  withTempRepo(({ fs, repo, scratch, gitIn }) => {
+    gitIn(['worktree', 'add', '-q', '-b', 'x', path.join(scratch, 'x')]);
+    const result = run('remove x --json', { cwd: repo });
+    const json = assertJSON(result.output);
+    assert(result.exitCode === 1 && json.error.code === 'FOREIGN_WORKTREE', `got: ${result.output}`);
+    assert(fs.existsSync(path.join(scratch, 'x')), 'foreign worktree must stay');
+  });
+});
+
+test('remove refuses a review worktree and names review-pr-cleanup', () => {
+  withTempRepo(({ fs, repo, gitIn }) => {
+    const wt = path.join(repo, '.worktrees', 'review-pr-7-abc');
+    gitIn(['worktree', 'add', '-q', '--detach', wt]);
+    fs.writeFileSync(path.join(wt, '.mewkit-review.json'), '{}');
+    const json = assertJSON(run('remove review-pr-7 --json', { cwd: repo }).output);
+    assert(json.error.code === 'FOREIGN_WORKTREE', `got: ${json.error.code}`);
+    assert(json.error.suggestion.includes('review-pr-cleanup'), `suggestion: ${json.error.suggestion}`);
+  });
+});
+
+test('owned and foreign both matching a term: the owned one is removed', () => {
+  withTempRepo(({ fs, repo, scratch, gitIn }) => {
+    assert(assertJSON(run('create agent-shared --orchestrated --json', { cwd: repo }).output).success, 'create failed');
+    gitIn(['worktree', 'add', '-q', '-b', 'host-agent-shared', path.join(scratch, 'agent-shared-host')]);
+    const json = assertJSON(run('remove agent-shared --json', { cwd: repo }).output);
+    assert(json.success && json.removedPath === path.join(repo, '.worktrees', 'agent-shared'), `got: ${JSON.stringify(json)}`);
+    assert(fs.existsSync(path.join(scratch, 'agent-shared-host')), 'foreign worktree must stay');
+  });
+});
+
+test('remove refuses an untracked file with WORKTREE_DIRTY; --discard-changes removes', () => {
+  withTempRepo(({ fs, repo }) => {
+    assert(assertJSON(run('create agent-d --orchestrated --json', { cwd: repo }).output).success, 'create failed');
+    const wt = path.join(repo, '.worktrees', 'agent-d');
+    fs.writeFileSync(path.join(wt, 'new-module.js'), 'x');
+    const refused = run('remove agent-d --json', { cwd: repo });
+    const json = assertJSON(refused.output);
+    assert(refused.exitCode === 1 && json.error.code === 'WORKTREE_DIRTY', `got: ${refused.output}`);
+    assert(json.error.dirtyPaths.includes('new-module.js'), `dirtyPaths: ${JSON.stringify(json.error.dirtyPaths)}`);
+    assert(fs.existsSync(wt), 'dirty worktree must stay');
+    const forced = assertJSON(run('remove agent-d --discard-changes --json', { cwd: repo }).output);
+    assert(forced.success && !fs.existsSync(wt), `forced remove: ${JSON.stringify(forced)}`);
+  });
+});
+
+test('remove still sees untracked files when status.showUntrackedFiles=no', () => {
+  withTempRepo(({ fs, repo, gitIn }) => {
+    gitIn(['config', 'status.showUntrackedFiles', 'no']);
+    assert(assertJSON(run('create agent-u --orchestrated --json', { cwd: repo }).output).success, 'create failed');
+    const wt = path.join(repo, '.worktrees', 'agent-u');
+    fs.writeFileSync(path.join(wt, 'new.txt'), 'x');
+    const json = assertJSON(run('remove agent-u --json', { cwd: repo }).output);
+    assert(json.error && json.error.code === 'WORKTREE_DIRTY', `got: ${JSON.stringify(json)}`);
+    assert(fs.existsSync(path.join(wt, 'new.txt')), 'untracked file must stay');
+  });
+});
+
+test('legacy (unmarked child of .worktrees) is removed with a warning', () => {
+  withTempRepo(({ fs, repo, gitIn }) => {
+    const wt = path.join(repo, '.worktrees', 'old-agent');
+    gitIn(['worktree', 'add', '-q', '-b', 'old-agent', wt]);
+    const json = assertJSON(run('remove old-agent --json', { cwd: repo }).output);
+    assert(json.success && json.owner === 'legacy' && !fs.existsSync(wt), `got: ${JSON.stringify(json)}`);
+    assert((json.warnings || []).some(w => w.includes('unmarked')), 'legacy remove should warn');
+  });
 });
 
 // ─── Summary ──────────────────────────────────────────────────────────────────
