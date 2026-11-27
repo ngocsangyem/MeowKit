@@ -4005,11 +4005,6 @@
       "size": 4590
     },
     {
-      "path": ".claude/skills/ship/references/rules.md",
-      "sha256": "46155809598d4de20683bfd4887d683bfa01e553c323346919b630e801a19d90",
-      "size": 1261
-    },
-    {
       "path": ".claude/skills/ship/references/test-execution.md",
       "sha256": "6f5325e5487ecd30117aef75c23c41d64b909e0b2ec60a4b4da17e14880d1648",
       "size": 5773
@@ -8800,11 +8795,6 @@
       "path": ".meowkit/cache/.claude/skills/ship/references/rollback-protocol.md",
       "sha256": "b303adc3fed163b0653b71661725e94a2ae08a94813430399240f936c7011a12",
       "size": 4590
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/rules.md",
-      "sha256": "46155809598d4de20683bfd4887d683bfa01e553c323346919b630e801a19d90",
-      "size": 1261
     },
     {
       "path": ".meowkit/cache/.claude/skills/ship/references/test-execution.md",

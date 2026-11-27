@@ -3917,11 +3917,6 @@
       "size": 4590
     },
     {
-      "path": ".cursor/skills/mk-ship/references/rules.md",
-      "sha256": "2c958868213ed8cdcfbd75a57bf4f2cf1d1792a593fd92f58dd61f349eadd891",
-      "size": 1272
-    },
-    {
       "path": ".cursor/skills/mk-ship/references/test-execution.md",
       "sha256": "0487ab336feb7d7e7de8b5c06ed475797cbf701a7771bc056df97385d5e1c254",
       "size": 5807

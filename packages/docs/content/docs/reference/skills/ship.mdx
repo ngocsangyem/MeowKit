@@ -38,16 +38,17 @@ To audit the code before it lands, use `mk:review`. Ship does not re-run the adv
 
 ## Steps
 
-1. Prepare: detect the base branch, run pre-flight checks, merge the base branch, run tests, audit test coverage and plan completion, and review readiness.
+1. Prepare: detect the base branch, run pre-flight checks, fetch and merge the base branch (never rebase or force; with uncommitted changes the merge waits until after the local commit), run tests, audit plan completion, and check review readiness. Review readiness, checked before the merge, includes whether the verdict is current: it compares the commit the verdict reviewed with HEAD and calls the verdict stale when code, test or build files changed since.
 2. Review: apply the structural and design checks and resolve PR comments (`references/pre-landing-review.md`).
-3. Release (on request): version and changelog steps, commit, push, create or edit the PR, then `mk:document-release` so documentation lands in the same PR.
-4. Post-ship: check CI and write rollback steps into the PR body.
+3. Commit: stage only the paths you approved, scan the staged diff for secrets, and ask separately for files that run code elsewhere (CI workflows, git hooks, `.mcp.json`, agent settings).
+4. Release (on request): version and changelog steps (no second bump if the branch already carries one), push, create or edit the PR, then `mk:document-release` so documentation lands in the same PR. If the remote branch has commits the local one lacks, it pushes nothing and never forces.
+5. Post-ship: check CI and write rollback steps into the PR body. Ship never merges the PR; red CI and review comments go to `mk:respond-pr`.
 
-The skill stops on a base branch checkout, merge conflicts it cannot resolve, in-branch test failures, coverage below the target, or plan gaps. It asks you about critical review issues and about uncommitted files, and reports pre-existing test failures instead of accepting them.
+The skill stops on a base branch checkout, merge conflicts it cannot resolve, in-branch test failures, plan gaps, a secret in the staged diff, or a remote branch ahead of the local one. In a run with nobody to answer, it stops and lists each yes still pending. It asks you about critical review issues and about uncommitted files, and reports pre-existing test failures instead of accepting them.
 
 ## Output
 
-A summary lists the scope, pre-flight, tests, coverage, review counts, whether a local commit, push or publish happened, and one deploy classification with a line of evidence: `deployed`, `PR-only` or `not-applicable`.
+A summary lists the scope, pre-flight, tests (how many ran, or that none did; zero tests is not a pass), review counts, whether a local commit, push or publish happened, and one deploy classification with a line of evidence: `deployed`, `PR-only` or `not-applicable`.
 
 If the verdict names `jira_tickets`, the skill offers to post the verdict to Jira, move the ticket to Done and check the business acceptance criteria. Without that field it skips these offers.
 

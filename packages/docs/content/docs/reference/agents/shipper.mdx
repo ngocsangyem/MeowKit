@@ -1,6 +1,6 @@
 ---
 title: "shipper"
-description: "Phase 5 agent. Runs pre-ship checks, commits, opens a PR on a feature branch, verifies CI and documents rollback."
+description: "Phase 5 agent. Runs pre-ship checks and a local commit; pushes and opens a PR only when its brief names release. Verifies CI and documents rollback."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,7 +14,7 @@ description: "Phase 5 agent. Runs pre-ship checks, commits, opens a PR on a feat
 
 {/* GENERATED:reference-facts END */}
 
-The shipper takes reviewed code to a pull request. It never commits to `main` or `master` and never force-pushes to a shared branch.
+The shipper takes reviewed code to a local commit, or to a pull request when its brief names the `release` scope. It never commits to `main` or `master`, never merges and never force-pushes.
 
 It runs on `haiku`. Tools: `Read`, `Grep`, `Glob`, `Bash`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
@@ -24,11 +24,16 @@ It runs in Phase 5 after review. It is not used for implementation. Its sequence
 
 ## Ship sequence
 
-1. Run the test suite, linter and type checker. All must pass.
-2. Commit with a conventional prefix.
-3. Create a feature branch and open a pull request.
-4. Verify CI passes on the PR.
-5. Document the rollback procedure.
+It follows [mk:ship](/reference/skills/ship). A brief that names no scope means `prepare`.
+
+1. On the base branch it stops with BLOCKED; it never creates a branch to get around that.
+2. Run the test suite, linter and type checker through `mk:verify`. All must pass.
+3. `prepare`: show the files and a conventional commit message, then commit locally with your yes.
+4. `release`, only when the brief names it: a yes before the push and another before `gh pr create`. Without them it returns BLOCKED.
+5. Report the PR's CI state; red or pending is never reported as passing.
+6. Document the rollback procedure.
+
+It never runs `publish`: version and changelog stay with you through `mk:ship publish`.
 
 For production changes it supports gradual rollout with monitoring checkpoints and rollback triggers.
 
@@ -41,7 +46,7 @@ It reads the passing review verdict at `tasks/reviews/YYMMDD-name-verdict.md`. I
 - A shipped change (PR created, CI passing) goes to [documenter](/reference/agents/documenter). The hand-off lists the PR URL, branch, commit hash, rollback doc location, CI status and deploy applicability (`deployed`, `not-applicable` or `PR-only`).
 - Failed pre-ship checks go back to [developer](/reference/agents/developer) or [tester](/reference/agents/tester), with the exact failing check.
 - A failing CI is reported with log excerpts and routed back. It does not retry.
-- If the PR cannot be created (no remote, auth failure) it commits and branches locally and asks you to push.
+- If the PR cannot be created (no remote, auth failure) it keeps the local commit and asks you to push.
 
 ## What it does not do
 

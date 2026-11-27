@@ -53,9 +53,9 @@ Uncommitted changes are never included without showing the paths and getting a y
 
 ## Outcomes by scope
 
-**prepare** is done when: the base branch is known (`references/pre-flight.md`), the feature branch is not the base, the review verdict in `tasks/reviews/` is read and its state is reported (missing or FAIL means say so and ask; never ship a FAIL dimension), the merged base passes `mk:verify`, and the user has seen the exact files and the proposed commit message. Plan gaps against `tasks/plans/` are reported with `references/plan-completion-audit.md` when a plan covers this branch. A failing test is classified in-branch or pre-existing (`references/test-execution.md`); in-branch failures stop the run.
+**prepare** is done when: the base branch is known (`references/pre-flight.md`), the feature branch is not the base, the review verdict in `tasks/reviews/` is read and its state is reported (missing or FAIL means say so and ask; never ship a FAIL dimension), the branch, merged with the base when that is possible (`references/pre-flight.md`), passes `mk:verify`, and the user has seen the exact files and the proposed commit message. Plan gaps against `tasks/plans/` are reported with `references/plan-completion-audit.md` when a plan covers this branch. A failing test is classified in-branch or pre-existing (`references/test-execution.md`); in-branch failures stop the run.
 
-**release** is done when: prepare is done; the branch is pushed; the PR exists with review, test, plan and rollback evidence in its body (`references/commit-push-pr.md`); and CI is green or its failure is reported. Red or pending CI is never waved through. Offer `mk:document-release`; the user invokes it.
+**release** is done when: prepare is done; the branch is pushed; the PR exists with review, test, plan and rollback evidence in its body (`references/commit-push-pr.md`); and CI is green or its failure is reported. Red or pending CI is never waved through. Ship never merges the PR: merging is the user's, under the repository's branch rules. Red CI or review comments on the PR go to `mk:respond-pr`; if the host already watches this PR with a tool of its own, ship pushes nothing more to it. Offer `mk:document-release`; the user invokes it.
 
 **publish** is done when: the user has chosen the version (propose from the diff; never write it unasked), the changelog entry is written in the repo's own format, and each issue or tracker action was approved (`references/version-changelog-todos.md`; the action itself is `mk:ghpm`).
 
@@ -63,11 +63,13 @@ The `pre-ship` hook enforces lint, related tests and a type-check on `git commit
 
 ## Stop and report
 
-Stop with BLOCKED when: on the base branch; merge conflicts you cannot resolve safely; an in-branch test fails; the review verdict has a FAIL dimension; plan items are NOT DONE and the user has not decided. Say what failed and what the user can do.
+Stop with BLOCKED when: on the base branch; merge conflicts you cannot resolve safely; an in-branch test fails; the review verdict has a FAIL dimension; plan items are NOT DONE and the user has not decided; the staged diff holds a secret; the remote branch has commits the local one lacks. Say what failed and what the user can do.
+
+When a step needs a yes and nobody can answer (an unattended or headless run), stop BLOCKED and list each yes still pending. Silence is never a yes.
 
 ## Return
 
-End with the four-status block from `.claude/rules/agent-conduct.md` (A1) and one summary of what was done: scope, branch, commit hash, PR URL, CI status, rollback doc location, and a deploy classification with one evidence line: `deployed` (a deployment was performed and verified), `PR-only` (deployment is deferred to CI or a later approval), or `not-applicable` (no deployment target for this change). The shipper agent expects these fields.
+End with the four-status block from `.claude/rules/agent-conduct.md` (A1) and one summary of what was done: scope, branch, commit hash, PR URL, CI status, tests (how many ran, or that none ran and why: zero tests is not a pass), rollback doc location, and a deploy classification with one evidence line: `deployed` (a deployment was performed and verified), `PR-only` (deployment is deferred to CI or a later approval), or `not-applicable` (no deployment target for this change). The shipper agent expects these fields.
 
 ## When the verdict has Jira tickets
 
@@ -81,11 +83,11 @@ At named checkpoints (GUIDE after pre-flight, RESCUE on an exceptional blocker, 
 
 | File | Load when |
 | --- | --- |
-| `references/pre-flight.md` | Always: base branch, ship mode, review readiness |
+| `references/pre-flight.md` | Always: base branch, ship mode, merging the base, review readiness |
 | `references/test-execution.md` | A test fails, or tests must run on the merged base |
 | `references/pre-landing-review.md` | A PR exists with review comments, or the diff has frontend changes and no `mk:review` pass. It uses `.claude/skills/review/references/design-review.md` and `.claude/skills/review/references/fix-first-review.md` |
 | `references/plan-completion-audit.md` | A plan under `tasks/plans/` covers this branch |
-| `references/commit-push-pr.md` | `release`: commits, push, PR body |
+| `references/commit-push-pr.md` | Before any commit (staging and secret scan), and for `release`: push, PR body |
 | `references/version-changelog-todos.md` | `publish` |
 | `references/agile-dod.md` | The verdict lists `jira_tickets` |
 | `references/rollback-protocol.md` | The change is risky, or the PR body needs a rollback section |

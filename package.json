@@ -34,7 +34,7 @@
   },
   "packageManager": "pnpm@10.17.1",
   "license": "MIT",
-  "version": "3.1.2-beta.1",
+  "version": "3.1.2-beta.2",
   "overrides": {
     "npm": "^11.14.1"
   }
