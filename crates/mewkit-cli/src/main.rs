@@ -27,8 +27,7 @@ use commands::{
 };
 use commands::{
     backups::BackupsArgs, capabilities::CapabilitiesArgs, eval::EvalArgs, host::HostArgs,
-    pack::PackArgs,
-    setup::SetupArgs, skill::SkillArgs,
+    pack::PackArgs, setup::SetupArgs, skill::SkillArgs,
 };
 
 #[derive(Parser)]

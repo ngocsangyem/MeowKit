@@ -33,7 +33,8 @@ pub fn parse_psi(text: &str) -> Option<Psi> {
 /// Whole-disk device names: `sda`, `vdb`, `xvda`, `nvme0n1`, `mmcblk0`, not
 /// their partitions (`sda1`, `nvme0n1p2`) or loop/ram devices.
 fn is_whole_disk(name: &str) -> bool {
-    let letters_only = |rest: &str| !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_lowercase());
+    let letters_only =
+        |rest: &str| !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_lowercase());
     if let Some(rest) = name.strip_prefix("nvme") {
         return rest.contains('n') && !rest.contains('p');
     }
@@ -103,14 +104,20 @@ mod tests {
     fn diskstats_keeps_whole_disks_only() {
         let text = "   7       0 loop0 11 0 28 0 0 0 0 0 0 1 0 0 0 0 0 0 0\n   8       0 sda 16632 12983 1244646 6332 3543 5332 3650443 6159 0 4032 12501 146 4 297144 9 0 0\n   8       1 sda1 1 0 1 0 0 0 0 0 0 9 0 0 0 0 0 0 0\n 259       0 nvme0n1 1 2 3 4 5 6 7 8 0 777 0\n 259       1 nvme0n1p1 1 2 3 4 5 6 7 8 0 1 0\n";
         let stats = parse_diskstats(text);
-        assert_eq!(stats.keys().collect::<Vec<_>>(), ["io_ticks:nvme0n1", "io_ticks:sda"]);
+        assert_eq!(
+            stats.keys().collect::<Vec<_>>(),
+            ["io_ticks:nvme0n1", "io_ticks:sda"]
+        );
         assert_eq!(stats["io_ticks:sda"], 4032.0);
     }
 
     #[test]
     fn utilisation_is_clamped_and_picks_the_busiest() {
         let prev = BTreeMap::from([("io_ticks:sda".into(), 0.0), ("io_ticks:vdb".into(), 0.0)]);
-        let next = BTreeMap::from([("io_ticks:sda".into(), 500.0), ("io_ticks:vdb".into(), 5000.0)]);
+        let next = BTreeMap::from([
+            ("io_ticks:sda".into(), 500.0),
+            ("io_ticks:vdb".into(), 5000.0),
+        ]);
         assert_eq!(busiest_util(&prev, &next, 1.0), Some(("vdb".into(), 100.0)));
     }
 

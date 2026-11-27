@@ -1,0 +1,127 @@
+//! The waiting side of `host run`: describe the job, attach to a live
+//! duplicate or hand a new one to a detached supervisor, then follow its log
+//! until it ends or the wait runs out.
+use std::io::{self, Write};
+use std::path::Path;
+use std::time::{Duration, Instant};
+
+use super::jobs::{self, JobDir, JobState, Meta};
+use super::paths::HostPaths;
+use super::queue::Priority;
+use super::{cmd_class, joblog, locks, procs, time_now_ms, tree_digest, worktree};
+
+pub struct Prepared {
+    pub job: JobDir,
+    /// True when an identical live job was found and is being followed.
+    pub attached: bool,
+}
+
+/// Hash of the full argv: identifies "the same command" without storing it.
+pub fn cmd_hash(argv: &[String]) -> String {
+    crate::fsx::sha256_hex(argv.join("\0").as_bytes())[..16].to_string()
+}
+
+/// What the job records about itself: basenames, class and hashes only.
+pub fn describe(argv: &[String], cwd: &Path, priority: Priority, id: &str) -> Meta {
+    Meta {
+        id: id.to_string(),
+        worktree: worktree::git_toplevel(cwd).map(|t| worktree::normalize(&t.to_string_lossy())),
+        tree_digest: tree_digest::tree_digest(cwd),
+        cmd_class: cmd_class::classify(&argv.join(" ")).map(str::to_string),
+        cmd_hash: cmd_hash(argv),
+        exe_base: argv
+            .first()
+            .map_or_else(|| "?".into(), |a| procs::basename(Path::new(a))),
+        priority,
+        enqueued_at_ms: time_now_ms(),
+        ..Meta::default()
+    }
+}
+
+/// Attach to a live identical job, or create the job directory and meta.
+pub fn prepare(
+    paths: &HostPaths,
+    argv: &[String],
+    cwd: &Path,
+    priority: Priority,
+) -> io::Result<Prepared> {
+    paths.ensure()?;
+    let id = jobs::new_id(time_now_ms());
+    let meta = describe(argv, cwd, priority, &id);
+    if let Some(job) = jobs::find_duplicate(paths, &meta) {
+        return Ok(Prepared {
+            job,
+            attached: true,
+        });
+    }
+    let job = JobDir::new(paths, &id);
+    super::paths::create_private_dir(&job.dir)?;
+    job.write_meta(&meta)?;
+    Ok(Prepared {
+        job,
+        attached: false,
+    })
+}
+
+/// After spawning the supervisor: true once it holds the job (or finished).
+pub fn wait_for_supervisor(job: &JobDir, timeout: Duration) -> bool {
+    let started = Instant::now();
+    while started.elapsed() < timeout {
+        if locks::is_held(&job.alive()) || job.exit().exists() {
+            return true;
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    false
+}
+
+/// Stream the job's log (redacted, whole lines) to `out` until the job ends
+/// or `deadline` passes; return the last state seen.
+pub fn follow(job: &JobDir, deadline: Instant, out: &mut dyn Write) -> JobState {
+    let mut offset = 0u64;
+    let mut pending: Vec<u8> = Vec::new();
+    loop {
+        let state = job.state();
+        let (bytes, next) = joblog::read_from(&job.log(), offset);
+        offset = next;
+        pending.extend(bytes);
+        let finished = !state.is_live();
+        let cut = if finished {
+            pending.len()
+        } else {
+            pending
+                .iter()
+                .rposition(|b| *b == b'\n')
+                .map_or(0, |i| i + 1)
+        };
+        if cut > 0 {
+            let _ = out.write_all(joblog::redact(&pending[..cut]).as_bytes());
+            let _ = out.flush();
+            pending.drain(..cut);
+        }
+        if finished || Instant::now() >= deadline {
+            return state;
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
+}
+
+/// Wait without streaming until the job ends or `deadline` passes.
+pub fn wait_quietly(job: &JobDir, deadline: Instant) -> JobState {
+    loop {
+        let state = job.state();
+        if !state.is_live() || Instant::now() >= deadline {
+            return state;
+        }
+        std::thread::sleep(Duration::from_millis(200));
+    }
+}
+
+/// 0-based place in the admission queue, while queued.
+pub fn queue_position(paths: &HostPaths, job: &JobDir) -> Option<usize> {
+    let queue = super::queue::Queue::new(&paths.dir("queue"));
+    queue
+        .ordered(time_now_ms())
+        .iter()
+        .position(|t| t.job_id == job.id)
+}

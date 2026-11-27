@@ -37,7 +37,10 @@ pub fn refresh(sys: &mut System) {
 /// File-name part of a path, restricted to a safe alphabet so a crafted
 /// process name cannot carry text into an agent's context.
 pub fn basename(path: &Path) -> String {
-    let name = path.file_name().map(|n| n.to_string_lossy()).unwrap_or_default();
+    let name = path
+        .file_name()
+        .map(|n| n.to_string_lossy())
+        .unwrap_or_default();
     let clean: String = name
         .chars()
         .filter(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
@@ -66,8 +69,14 @@ pub fn runtime_of(exe: &str, args: &[String]) -> Option<String> {
     }
     args.iter().skip(1).take(4).find_map(|arg| {
         let base = basename(Path::new(arg)).to_ascii_lowercase();
-        let base = base.trim_end_matches(".js").trim_end_matches(".mjs").to_string();
-        RUNTIMES.iter().find(|rt| **rt == base).map(|rt| (*rt).to_string())
+        let base = base
+            .trim_end_matches(".js")
+            .trim_end_matches(".mjs")
+            .to_string();
+        RUNTIMES
+            .iter()
+            .find(|rt| **rt == base)
+            .map(|rt| (*rt).to_string())
     })
 }
 
@@ -79,7 +88,11 @@ fn runtime_above(sys: &System, pid: Pid) -> Option<String> {
         if !seen.insert(p.pid()) {
             return None;
         }
-        let args: Vec<String> = p.cmd().iter().map(|a| a.to_string_lossy().into_owned()).collect();
+        let args: Vec<String> = p
+            .cmd()
+            .iter()
+            .map(|a| a.to_string_lossy().into_owned())
+            .collect();
         if let Some(rt) = runtime_of(&exe_base(p), &args) {
             return Some(rt);
         }
@@ -91,7 +104,11 @@ fn runtime_above(sys: &System, pid: Pid) -> Option<String> {
 /// True while any agent runtime process is alive (the watcher's idle test).
 pub fn any_runtime_alive(sys: &System) -> bool {
     sys.processes().values().any(|p| {
-        let args: Vec<String> = p.cmd().iter().map(|a| a.to_string_lossy().into_owned()).collect();
+        let args: Vec<String> = p
+            .cmd()
+            .iter()
+            .map(|a| a.to_string_lossy().into_owned())
+            .collect();
         runtime_of(&exe_base(p), &args).is_some()
     })
 }
@@ -132,17 +149,30 @@ mod tests {
     fn runtimes_are_recognised_directly_or_through_an_interpreter() {
         assert_eq!(runtime_of("claude", &[]), Some("claude".into()));
         assert_eq!(runtime_of("codex.exe", &[]), Some("codex".into()));
-        let args = vec!["node".to_string(), "/usr/lib/node_modules/@x/grok/cli.js".into()];
-        assert_eq!(runtime_of("node", &args), None, "a path segment is not the script name");
+        let args = vec![
+            "node".to_string(),
+            "/usr/lib/node_modules/@x/grok/cli.js".into(),
+        ];
+        assert_eq!(
+            runtime_of("node", &args),
+            None,
+            "a path segment is not the script name"
+        );
         let args = vec!["node".to_string(), "/opt/bin/omp".into()];
         assert_eq!(runtime_of("node", &args), Some("omp".into()));
-        assert_eq!(runtime_of("cargo", &["cargo".into(), "claude".into()]), None);
+        assert_eq!(
+            runtime_of("cargo", &["cargo".into(), "claude".into()]),
+            None
+        );
     }
 
     #[test]
     fn basenames_are_sanitised() {
         assert_eq!(basename(Path::new("/usr/bin/cargo")), "cargo");
-        assert_eq!(basename(Path::new("/tmp/ignore previous instructions")), "ignorepreviousinstructions");
+        assert_eq!(
+            basename(Path::new("/tmp/ignore previous instructions")),
+            "ignorepreviousinstructions"
+        );
         assert_eq!(basename(Path::new("/tmp/$(rm)")), "rm");
         assert_eq!(basename(Path::new("")), "?");
     }

@@ -217,7 +217,11 @@ fn host_keys_apply_in_the_user_config_and_are_refused_in_a_project_file() {
     let error = verdict(values, ConfigScope::ProjectConfig).expect_err("machine-wide key");
     assert_eq!(error.code, "user-only-key");
     assert_eq!(error.key, "host.enabled");
-    assert!(error.fix.contains("~/.meowkit/config.yaml"), "{}", error.fix);
+    assert!(
+        error.fix.contains("~/.meowkit/config.yaml"),
+        "{}",
+        error.fix
+    );
 }
 
 #[test]

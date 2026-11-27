@@ -36,7 +36,8 @@ impl HostConfig {
     /// file yields the defaults: host admission fails open.
     pub fn load(home: &Path, logical_cores: usize) -> Self {
         let mut config = Self::defaults(logical_cores);
-        let Ok(loaded) = load_config_file(&user_config_path(home), &[], ConfigScope::UserConfig) else {
+        let Ok(loaded) = load_config_file(&user_config_path(home), &[], ConfigScope::UserConfig)
+        else {
             return config;
         };
         if let Some(ConfigValue::Bool(b)) = loaded.values.get("host.enabled") {

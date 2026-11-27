@@ -71,7 +71,10 @@ pub fn evaluate(sample: &MachineSample) -> (Verdict, Vec<Reason>) {
     judge_memory(sample, &mut tally);
     judge_disk(sample, &mut tally);
     for space in sample.space.iter().filter(|s| s.free_gb < MIN_FREE_GB) {
-        let detail = format!("{} has {:.1} GB free (< {MIN_FREE_GB} GB)", space.path, space.free_gb);
+        let detail = format!(
+            "{} has {:.1} GB free (< {MIN_FREE_GB} GB)",
+            space.path, space.free_gb
+        );
         tally.add(Verdict::Clean, "space_low", detail);
     }
     if let Some(t) = sample.thermal {
@@ -89,11 +92,19 @@ pub fn evaluate(sample: &MachineSample) -> (Verdict, Vec<Reason>) {
 
 fn judge_cpu(sample: &MachineSample, tally: &mut Tally) {
     let Some(cpu) = &sample.cpu else {
-        return tally.add(Verdict::Unknown, "cpu_unavailable", "cpu unavailable".into());
+        return tally.add(
+            Verdict::Unknown,
+            "cpu_unavailable",
+            "cpu unavailable".into(),
+        );
     };
     if let Some(psi) = cpu.psi {
         let v = level(psi.some_avg10, PSI_CPU_SOME);
-        tally.add(v, "cpu", format!("cpu stall {:.0}% (psi some avg10)", psi.some_avg10));
+        tally.add(
+            v,
+            "cpu",
+            format!("cpu stall {:.0}% (psi some avg10)", psi.some_avg10),
+        );
     }
     match cpu.busy_pct {
         Some(busy) => {
@@ -101,7 +112,11 @@ fn judge_cpu(sample: &MachineSample, tally: &mut Tally) {
             tally.add(v, "cpu", format!("cpu busy {busy:.0}%"));
         }
         None if cpu.psi.is_none() => {
-            tally.add(Verdict::Unknown, "cpu_unavailable", "cpu unavailable".into());
+            tally.add(
+                Verdict::Unknown,
+                "cpu_unavailable",
+                "cpu unavailable".into(),
+            );
         }
         None => {}
     }
@@ -110,7 +125,11 @@ fn judge_cpu(sample: &MachineSample, tally: &mut Tally) {
 fn judge_memory(sample: &MachineSample, tally: &mut Tally) {
     use super::model::MemPressure;
     let Some(mem) = &sample.memory else {
-        return tally.add(Verdict::Unknown, "memory_unavailable", "memory unavailable".into());
+        return tally.add(
+            Verdict::Unknown,
+            "memory_unavailable",
+            "memory unavailable".into(),
+        );
     };
     if let Some(p) = mem.pressure {
         // macOS: used % misleads (cold pages sit in swap at "normal"), so the
@@ -124,20 +143,32 @@ fn judge_memory(sample: &MachineSample, tally: &mut Tally) {
     }
     if let Some(full) = mem.psi.and_then(|p| p.full_avg10) {
         let v = level(full, PSI_MEM_FULL);
-        return tally.add(v, "memory", format!("memory stall {full:.0}% (psi full avg10)"));
+        return tally.add(
+            v,
+            "memory",
+            format!("memory stall {full:.0}% (psi full avg10)"),
+        );
     }
     match mem.used_pct {
         Some(used) => {
             let v = level(used, (MEM_THROTTLE_PCT, MEM_HOLD_PCT));
             tally.add(v, "memory", format!("memory used {used:.0}%"));
         }
-        None => tally.add(Verdict::Unknown, "memory_unavailable", "memory unavailable".into()),
+        None => tally.add(
+            Verdict::Unknown,
+            "memory_unavailable",
+            "memory unavailable".into(),
+        ),
     }
 }
 
 fn judge_disk(sample: &MachineSample, tally: &mut Tally) {
     let Some(disk) = &sample.disk else {
-        return tally.add(Verdict::Unknown, "disk_unavailable", "disk unavailable".into());
+        return tally.add(
+            Verdict::Unknown,
+            "disk_unavailable",
+            "disk unavailable".into(),
+        );
     };
     if sample.os == Os::Linux {
         // `%util` saturates on multi-queue NVMe, so only stall time is judged.
@@ -147,7 +178,11 @@ fn judge_disk(sample: &MachineSample, tally: &mut Tally) {
                 "disk",
                 format!("io stall {full:.0}% (psi full avg10)"),
             ),
-            None => tally.add(Verdict::Unknown, "disk_unavailable", "io pressure unavailable".into()),
+            None => tally.add(
+                Verdict::Unknown,
+                "disk_unavailable",
+                "io pressure unavailable".into(),
+            ),
         }
         return;
     }
@@ -155,14 +190,19 @@ fn judge_disk(sample: &MachineSample, tally: &mut Tally) {
     let busy = disk.busy_pct.map(|b| level(b, busy_limits));
     let latency = disk.latency_ms.map(|l| level(l, latency_limits));
     match (busy, latency) {
-        (None, None) => tally.add(Verdict::Unknown, "disk_unavailable", "disk unavailable".into()),
+        (None, None) => tally.add(
+            Verdict::Unknown,
+            "disk_unavailable",
+            "disk unavailable".into(),
+        ),
         (b, l) => {
             let v = b.unwrap_or(Verdict::Go).max(l.unwrap_or(Verdict::Go));
             let detail = format!(
                 "disk {}: busy {}, latency {}",
                 disk.device,
                 disk.busy_pct.map_or("n/a".into(), |b| format!("{b:.0}%")),
-                disk.latency_ms.map_or("n/a".into(), |l| format!("{l:.1} ms")),
+                disk.latency_ms
+                    .map_or("n/a".into(), |l| format!("{l:.1} ms")),
             );
             tally.add(v, "disk", detail);
         }

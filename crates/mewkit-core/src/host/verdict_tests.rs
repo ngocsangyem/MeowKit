@@ -44,7 +44,11 @@ fn a_calm_machine_is_go_with_no_reasons() {
 
 #[test]
 fn cpu_thresholds_throttle_then_hold() {
-    for (busy, want) in [(84.9, Verdict::Go), (85.0, Verdict::Throttle), (95.0, Verdict::Hold)] {
+    for (busy, want) in [
+        (84.9, Verdict::Go),
+        (85.0, Verdict::Throttle),
+        (95.0, Verdict::Hold),
+    ] {
         let mut s = calm(Os::Windows);
         s.cpu.as_mut().unwrap().busy_pct = Some(busy);
         assert_eq!(evaluate(&s).0, want, "busy {busy}");
@@ -55,7 +59,11 @@ fn cpu_thresholds_throttle_then_hold() {
 fn macos_disk_uses_device_time_limits_not_percent_of_one() {
     let mut s = calm(Os::Macos);
     s.disk.as_mut().unwrap().busy_pct = Some(150.0);
-    assert_eq!(evaluate(&s).0, Verdict::Go, "150 % device time is ordinary on NVMe");
+    assert_eq!(
+        evaluate(&s).0,
+        Verdict::Go,
+        "150 % device time is ordinary on NVMe"
+    );
     s.disk.as_mut().unwrap().busy_pct = Some(1632.0);
     assert_eq!(evaluate(&s).0, Verdict::Hold);
     let mut s = calm(Os::Windows);
@@ -133,7 +141,11 @@ fn linux_judges_io_stall_and_ignores_util() {
         some_avg10: 3.0,
         full_avg10: Some(2.0),
     });
-    assert_eq!(evaluate(&s).0, Verdict::Go, "saturated %util alone is not pressure");
+    assert_eq!(
+        evaluate(&s).0,
+        Verdict::Go,
+        "saturated %util alone is not pressure"
+    );
     s.disk.as_mut().unwrap().psi = Some(Psi {
         some_avg10: 40.0,
         full_avg10: Some(31.0),

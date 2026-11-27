@@ -4,17 +4,36 @@
 //! Fails open everywhere: a probe that cannot run makes its metric missing
 //! (verdict `unknown`), a state file that cannot be written is skipped, and
 //! nothing here ever blocks a command on its own error.
+pub mod client;
+pub mod cmd_class;
 pub mod collect;
 pub mod config;
+pub mod detach;
+pub mod joblog;
+pub mod jobs;
+pub mod locks;
 pub mod model;
 pub mod paths;
+pub mod priority;
 pub mod probe_cmd;
 pub mod procs;
+pub mod queue;
 pub mod sample;
+pub mod slots;
 pub mod snapshot;
+pub mod stats;
+pub mod supervisor;
+pub mod tree_digest;
 pub mod verdict;
+pub mod wait_default;
 pub mod worktree;
 
+#[cfg(test)]
+mod queue_slots_tests;
+#[cfg(test)]
+mod supervisor_tests;
+#[cfg(test)]
+mod tree_digest_tests;
 #[cfg(test)]
 mod verdict_tests;
 
@@ -27,6 +46,10 @@ use snapshot::Envelope;
 
 /// A snapshot younger than this is served as is by `host status`.
 pub const FRESH_MS: i64 = 10_000;
+
+pub fn time_now() -> i64 {
+    time_now_ms()
+}
 
 pub(crate) fn time_now_ms() -> i64 {
     crate::time_utc::now_millis()
@@ -72,11 +95,20 @@ pub fn status(paths: &HostPaths, fresh: bool, space_paths: &[PathBuf]) -> Envelo
         return env.clone();
     }
     let Some(mut collector) = Collector::new() else {
-        return Envelope::new(unknown_report("sampler_unavailable", "cannot sample this platform"), None);
+        return Envelope::new(
+            unknown_report("sampler_unavailable", "cannot sample this platform"),
+            None,
+        );
     };
-    let baseline = stored.as_ref().and_then(|env| snapshot::usable_baseline(env, now));
+    let baseline = stored
+        .as_ref()
+        .and_then(|env| snapshot::usable_baseline(env, now));
     collector.prime(baseline);
-    std::thread::sleep(if baseline.is_some() { WARM_WAIT } else { COLD_WAIT });
+    std::thread::sleep(if baseline.is_some() {
+        WARM_WAIT
+    } else {
+        COLD_WAIT
+    });
     let (report, counters) = collector.sample(space_paths);
     let env = Envelope::new(report, Some(counters));
     if paths.ensure().is_ok() {

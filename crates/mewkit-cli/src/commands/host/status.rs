@@ -52,26 +52,55 @@ fn pct(v: Option<f64>) -> String {
 }
 
 fn render(r: &Report) {
-    println!("mewkit host (beta) — verdict: {}", r.verdict.as_str().to_uppercase());
+    println!(
+        "mewkit host (beta) — verdict: {}",
+        r.verdict.as_str().to_uppercase()
+    );
     if let Some(cpu) = &r.cpu {
-        let psi = cpu.psi.map_or(String::new(), |p| format!(" · stall {:.0}%", p.some_avg10));
-        println!("  cpu      {} busy · {} cores{psi}", pct(cpu.busy_pct), cpu.cores);
+        let psi = cpu
+            .psi
+            .map_or(String::new(), |p| format!(" · stall {:.0}%", p.some_avg10));
+        println!(
+            "  cpu      {} busy · {} cores{psi}",
+            pct(cpu.busy_pct),
+            cpu.cores
+        );
     }
     if let Some(m) = &r.memory {
-        let pressure = m.pressure.map_or(String::new(), |p| format!("pressure {p:?} · ").to_lowercase());
+        let pressure = m.pressure.map_or(String::new(), |p| {
+            format!("pressure {p:?} · ").to_lowercase()
+        });
         println!("  memory   {pressure}{} used", pct(m.used_pct));
     }
     if let Some(d) = &r.disk {
-        let latency = d.latency_ms.map_or("n/a".into(), |l| format!("{l:.2} ms/op"));
-        let psi = d.psi.and_then(|p| p.full_avg10).map_or(String::new(), |f| format!(" · io stall {f:.0}%"));
-        println!("  disk     {}: busy {} · {latency}{psi}", d.device, pct(d.busy_pct));
+        let latency = d
+            .latency_ms
+            .map_or("n/a".into(), |l| format!("{l:.2} ms/op"));
+        let psi = d
+            .psi
+            .and_then(|p| p.full_avg10)
+            .map_or(String::new(), |f| format!(" · io stall {f:.0}%"));
+        println!(
+            "  disk     {}: busy {} · {latency}{psi}",
+            d.device,
+            pct(d.busy_pct)
+        );
     }
     if let Some(t) = r.thermal {
-        let name = ["nominal", "moderate", "heavy", "trapping", "sleeping"].get(usize::from(t)).copied().unwrap_or("?");
+        let name = ["nominal", "moderate", "heavy", "trapping", "sleeping"]
+            .get(usize::from(t))
+            .copied()
+            .unwrap_or("?");
         println!("  thermal  {t} ({name})");
     }
     for s in &r.space {
-        println!("  space    {} {:.1} GB free of {:.0} GB{}", s.path, s.free_gb, s.total_gb, if s.low { " (low)" } else { "" });
+        println!(
+            "  space    {} {:.1} GB free of {:.0} GB{}",
+            s.path,
+            s.free_gb,
+            s.total_gb,
+            if s.low { " (low)" } else { "" }
+        );
     }
     for reason in &r.reasons {
         println!("  reason   [{}] {}", reason.code, reason.detail);
@@ -85,14 +114,18 @@ fn render(r: &Report) {
                 (None, Some(wt)) => short(wt),
                 (None, None) => String::new(),
             };
-            println!("    {:>7}  {:<24} {:>8.1} MB/s  {owner}", p.pid, p.exe, p.io_mb_s);
+            println!(
+                "    {:>7}  {:<24} {:>8.1} MB/s  {owner}",
+                p.pid, p.exe, p.io_mb_s
+            );
         }
     }
 }
 
 fn short(path: &str) -> String {
     let p = PathBuf::from(path);
-    p.file_name().map_or(path.to_string(), |n| n.to_string_lossy().into_owned())
+    p.file_name()
+        .map_or(path.to_string(), |n| n.to_string_lossy().into_owned())
 }
 
 /// The local beta counters `host run` keeps in `stats.json`, if any.

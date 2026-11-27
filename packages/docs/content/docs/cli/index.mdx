@@ -529,7 +529,7 @@ Subcommands: `list`, `restore`.
 
 (beta) Machine load, who causes it, and admission for heavy commands
 
-Subcommands: `status`.
+Subcommands: `status`, `run`, `jobs`.
 
 ### `mewkit host status`
 
@@ -539,5 +539,41 @@ Subcommands: `status`.
 |---|---|
 | `--json` | Print one JSON document: \{schema_version, kind, data\} |
 | `--fresh` | Sample now even when a recent snapshot exists |
+
+### `mewkit host run`
+
+(beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
+
+| Flag | What it does |
+|---|---|
+| `--priority` `<PRIORITY>` | Queue level. high also runs the command at normal OS priority; low waits behind other levels (a long wait still ages it forward) [default: normal] [possible values: high, normal, low] |
+| `--wait` `<WAIT>` | Return after this long (e.g. 90s, 2m) with exit 75 if not finished. Default: under the calling agent runtime's tool timeout |
+| `--background` | Return at once with the job id (exit 75) |
+
+### `mewkit host jobs`
+
+(beta) List, wait for, read or cancel queued and running jobs
+
+Subcommands: `list`, `wait`, `log`, `cancel`.
+
+### `mewkit host jobs list`
+
+List jobs, newest first
+
+### `mewkit host jobs wait`
+
+Wait for a job: its exit code when done, 75 while queued or running, 70 when lost or cancelled
+
+| Flag | What it does |
+|---|---|
+| `--timeout` `<TIMEOUT>` | Give up after this long (default: under the agent's tool timeout) |
+
+### `mewkit host jobs log`
+
+Print a job's log (secrets masked, last 2 MB at most)
+
+### `mewkit host jobs cancel`
+
+Ask a job's supervisor to stop it
 
 {/* GENERATED:cli-flags END */}

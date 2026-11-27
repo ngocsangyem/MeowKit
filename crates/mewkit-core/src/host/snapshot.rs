@@ -62,7 +62,9 @@ pub fn write(path: &Path, env: &Envelope) -> io::Result<()> {
 pub fn usable_baseline(env: &Envelope, now_ms: i64) -> Option<&Counters> {
     let counters = env.counters.as_ref()?;
     let age = now_ms - counters.taken_ms;
-    (MIN_DELTA_MS..=MAX_DELTA_MS).contains(&age).then_some(counters)
+    (MIN_DELTA_MS..=MAX_DELTA_MS)
+        .contains(&age)
+        .then_some(counters)
 }
 
 /// Milliseconds since the snapshot's counters were taken (`None` without them).

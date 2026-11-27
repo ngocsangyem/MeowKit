@@ -33,9 +33,10 @@ impl ToplevelCache {
 pub fn normalize(path: &str) -> String {
     let unified = path.replace('\\', "/");
     let (prefix, rest) = match unified.as_bytes() {
-        [d, b':', ..] if d.is_ascii_alphabetic() => {
-            (format!("{}:", (*d as char).to_ascii_lowercase()), &unified[2..])
-        }
+        [d, b':', ..] if d.is_ascii_alphabetic() => (
+            format!("{}:", (*d as char).to_ascii_lowercase()),
+            &unified[2..],
+        ),
         _ => (String::new(), unified.as_str()),
     };
     let absolute = rest.starts_with('/');

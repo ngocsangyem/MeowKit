@@ -26,7 +26,12 @@ pub struct OsRead {
 }
 
 /// Disk rates from `prev` counters to `next`, `dt_s` apart.
-pub fn disk_between(os: Os, prev: &BTreeMap<String, f64>, next: &OsRead, dt_s: f64) -> Option<Disk> {
+pub fn disk_between(
+    os: Os,
+    prev: &BTreeMap<String, f64>,
+    next: &OsRead,
+    dt_s: f64,
+) -> Option<Disk> {
     match os {
         Os::Macos => macos_parse::disk_from_counters(prev, &next.counters, dt_s),
         Os::Windows => windows_parse::disk_from_raw(prev, &next.counters),
@@ -51,13 +56,33 @@ pub fn read_os() -> OsRead {
     let t = Duration::from_secs(2);
     let probe = super::probe_cmd::run;
     OsRead {
-        counters: probe("/usr/sbin/ioreg", &["-r", "-c", "IOBlockStorageDriver", "-k", "Statistics", "-d", "1"], t)
-            .and_then(|text| macos_parse::parse_ioreg_stats(&text))
-            .unwrap_or_default(),
-        mem_pressure: probe("/usr/sbin/sysctl", &["-n", "kern.memorystatus_vm_pressure_level"], t)
-            .and_then(|text| macos_parse::parse_pressure(&text)),
-        thermal: probe("/usr/bin/notifyutil", &["-g", "com.apple.system.thermalpressurelevel"], t)
-            .and_then(|text| macos_parse::parse_thermal(&text)),
+        counters: probe(
+            "/usr/sbin/ioreg",
+            &[
+                "-r",
+                "-c",
+                "IOBlockStorageDriver",
+                "-k",
+                "Statistics",
+                "-d",
+                "1",
+            ],
+            t,
+        )
+        .and_then(|text| macos_parse::parse_ioreg_stats(&text))
+        .unwrap_or_default(),
+        mem_pressure: probe(
+            "/usr/sbin/sysctl",
+            &["-n", "kern.memorystatus_vm_pressure_level"],
+            t,
+        )
+        .and_then(|text| macos_parse::parse_pressure(&text)),
+        thermal: probe(
+            "/usr/bin/notifyutil",
+            &["-g", "com.apple.system.thermalpressurelevel"],
+            t,
+        )
+        .and_then(|text| macos_parse::parse_thermal(&text)),
         ..OsRead::default()
     }
 }
@@ -65,7 +90,9 @@ pub fn read_os() -> OsRead {
 #[cfg(target_os = "linux")]
 pub fn read_os() -> OsRead {
     let read = |p: &str| std::fs::read_to_string(p).ok();
-    let psi = |kind: &str| read(&format!("/proc/pressure/{kind}")).and_then(|t| linux_parse::parse_psi(&t));
+    let psi = |kind: &str| {
+        read(&format!("/proc/pressure/{kind}")).and_then(|t| linux_parse::parse_psi(&t))
+    };
     OsRead {
         counters: read("/proc/diskstats")
             .map(|t| linux_parse::parse_diskstats(&t))

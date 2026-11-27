@@ -136,8 +136,17 @@ mod tests {
         assert_eq!(parse_pressure("1\n"), Some(MemPressure::Normal));
         assert_eq!(parse_pressure("4"), Some(MemPressure::Critical));
         assert_eq!(parse_pressure("3"), None);
-        assert_eq!(parse_thermal("com.apple.system.thermalpressurelevel 0\n"), Some(0));
-        assert_eq!(parse_thermal("com.apple.system.thermalpressurelevel 2"), Some(2));
-        assert_eq!(parse_thermal("com.apple.system.thermalpressurelevel 30"), None);
+        assert_eq!(
+            parse_thermal("com.apple.system.thermalpressurelevel 0\n"),
+            Some(0)
+        );
+        assert_eq!(
+            parse_thermal("com.apple.system.thermalpressurelevel 2"),
+            Some(2)
+        );
+        assert_eq!(
+            parse_thermal("com.apple.system.thermalpressurelevel 30"),
+            None
+        );
     }
 }

@@ -45,7 +45,11 @@ impl HostPaths {
     pub fn ensure(&self) -> io::Result<()> {
         create_private_dir(&self.root)?;
         if !self.version().exists() {
-            crate::fsx::atomic_write(&self.version(), format!("{STATE_VERSION}\n").as_bytes(), None)?;
+            crate::fsx::atomic_write(
+                &self.version(),
+                format!("{STATE_VERSION}\n").as_bytes(),
+                None,
+            )?;
         }
         Ok(())
     }

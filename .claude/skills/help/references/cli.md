@@ -708,6 +708,8 @@ Usage: mewkit host <COMMAND>
 
 Commands:
   status  (beta) Sample CPU, memory, disk, thermal and free space; print a verdict
+  run     (beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
+  jobs    (beta) List, wait for, read or cancel queued and running jobs
   help    Print this message or the help of the given subcommand(s)
 
 Options:
@@ -725,4 +727,93 @@ Options:
       --json   Print one JSON document: {schema_version, kind, data}
       --fresh  Sample now even when a recent snapshot exists
   -h, --help   Print help
+```
+
+### mewkit host run
+
+```text
+(beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
+
+Usage: mewkit host run [OPTIONS] -- <COMMAND>...
+
+Arguments:
+  <COMMAND>...  The command and its arguments, run without a shell
+
+Options:
+      --priority <PRIORITY>  Queue level. high also runs the command at normal OS priority; low waits behind other levels (a long wait still ages it forward) [default: normal] [possible values: high, normal, low]
+      --wait <WAIT>          Return after this long (e.g. 90s, 2m) with exit 75 if not finished. Default: under the calling agent runtime's tool timeout
+      --background           Return at once with the job id (exit 75)
+  -h, --help                 Print help
+```
+
+### mewkit host jobs
+
+```text
+(beta) List, wait for, read or cancel queued and running jobs
+
+Usage: mewkit host jobs <COMMAND>
+
+Commands:
+  list    List jobs, newest first
+  wait    Wait for a job: its exit code when done, 75 while queued or running, 70 when lost or cancelled
+  log     Print a job's log (secrets masked, last 2 MB at most)
+  cancel  Ask a job's supervisor to stop it
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+```
+
+#### mewkit host jobs list
+
+```text
+List jobs, newest first
+
+Usage: mewkit host jobs list
+
+Options:
+  -h, --help  Print help
+```
+
+#### mewkit host jobs wait
+
+```text
+Wait for a job: its exit code when done, 75 while queued or running, 70 when lost or cancelled
+
+Usage: mewkit host jobs wait [OPTIONS] <ID>
+
+Arguments:
+  <ID>  
+
+Options:
+      --timeout <TIMEOUT>  Give up after this long (default: under the agent's tool timeout)
+  -h, --help               Print help
+```
+
+#### mewkit host jobs log
+
+```text
+Print a job's log (secrets masked, last 2 MB at most)
+
+Usage: mewkit host jobs log <ID>
+
+Arguments:
+  <ID>  
+
+Options:
+  -h, --help  Print help
+```
+
+#### mewkit host jobs cancel
+
+```text
+Ask a job's supervisor to stop it
+
+Usage: mewkit host jobs cancel <ID>
+
+Arguments:
+  <ID>  
+
+Options:
+  -h, --help  Print help
 ```
