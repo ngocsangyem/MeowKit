@@ -58,6 +58,7 @@ Map the CSV level to a tier per `.claude/skills/agent-detector/references/model-
    - TDD OFF (default): planner → developer → reviewer → shipper → documenter → analyst
    - TDD ON (opt-in): planner → tester → developer → reviewer → shipper → documenter → analyst
    - Architect is inserted after planner when schema, API, or infra changes are involved.
+   - Heavy builds and suites on a shared machine go through host admission (`mewkit host run`, beta) per `.claude/skills/verify/references/heavy-commands.md`.
    - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
    - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `.claude/skills/autobuild/SKILL.md` and CLAUDE.md preference note.
 

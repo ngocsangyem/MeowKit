@@ -24,4 +24,4 @@ Common patterns: null or undefined gets a strict check and a guard; a race gets 
 - The pre-fix state was captured and the fix addresses the root cause, not the symptom.
 - The exact pre-fix commands were re-run and the before/after comparison is written down.
 - The regression test exists (or the omission is justified) and no new warnings or errors appeared.
-- The tests related to the change pass, and the full suite too when a shared contract or shared code changed.
+- The tests related to the change pass, and the full suite too when a shared contract or shared code changed (on a shared machine through `mewkit host run`, per `.claude/skills/verify/references/heavy-commands.md`).

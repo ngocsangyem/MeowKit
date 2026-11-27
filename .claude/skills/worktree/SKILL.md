@@ -50,6 +50,9 @@ script writes `.worktrees/.gitignore` (`*`) itself, so the user's `.gitignore` i
 The orchestrated worktree is `.worktrees/{agent-name}` on branch
 `parallel/{agent-name}-{timestamp}` per `.claude/skills/cook/references/parallel-execution-rules.md` Rule 3.
 Give the returned `worktreePath` to the agent as its working directory.
+Also give it its own `TMPDIR` at `<main checkout>/.worktrees/.tmp/{agent-name}`: outside the
+worktree, so temp files never show in its tree, and already ignored. Heavy commands follow
+`.claude/skills/verify/references/heavy-commands.md` (beta).
 
 ### merge
 

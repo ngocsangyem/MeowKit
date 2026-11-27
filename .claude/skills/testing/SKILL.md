@@ -41,6 +41,7 @@ In TDD mode the cycle is RED → GREEN → REFACTOR (failing tests required befo
 | **[validation-scripts.md](./references/validation-scripts.md)** | After code changes | What the pattern-scan scripts do and when to run them |
 | **[visual-qa.md](./references/visual-qa.md)** | UI testing | Browser-based visual QA, screenshot comparison, responsive testing |
 | **[e2e-best-practices.md](./references/e2e-best-practices.md)** | When creating E2E tests | Tool preference, locator strategy, wait patterns, POM, flaky quarantine, success metrics |
+| `.claude/skills/verify/references/heavy-commands.md` | Before a full suite on a shared machine | Run it through `mewkit host run`; exit 75 is not verified (beta) |
 
 ## Gotchas
 

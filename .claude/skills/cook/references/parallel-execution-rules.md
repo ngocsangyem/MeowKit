@@ -33,6 +33,8 @@ Token costs scale linearly with parallel agents. 3 is the practical ceiling.
 
 WHY: Beyond 3 agents, coordination and token cost exceed throughput gains.
 
+On a shared machine the host can lower this cap, never raise it: when `mewkit host status` reports `throttle`, `unknown`, `clean` or `hold`, or heavy jobs are queued, start fewer agents. Parallel agents run heavy commands through `mewkit host run` per `.claude/skills/verify/references/heavy-commands.md` (beta).
+
 ## Rule 3: Worktree Isolation
 
 Each parallel agent MUST work in its own git worktree, created through `mk:worktree`.

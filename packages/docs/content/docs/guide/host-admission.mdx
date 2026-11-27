@@ -1,0 +1,87 @@
+---
+title: "Host Admission (beta)"
+description: "Several agents on one machine: a fair queue for heavy builds and tests, a bounded wait that never reports an unfinished check as passed, and cleanup of MeowKit's own state."
+---
+
+<Callout title="Beta" type="warn">
+`mewkit host` is a beta. Its commands, exit codes and settings may change before it is stable.
+</Callout>
+
+When several agents share one machine, two full test suites and a release build at once can leave every agent waiting on a tool call it cannot see the end of. `mewkit host` puts heavy commands through one machine-wide queue, returns control within a bounded wait, and tells each agent which worktree and which processes load the host.
+
+## The verdict
+
+`mewkit host status` samples CPU, memory, disk activity, thermal state and free space, and prints one verdict:
+
+| Verdict | Meaning | Heavy jobs admitted at once |
+| --- | --- | --- |
+| `go` | Room for heavy work | `host.max_heavy` |
+| `throttle` | The machine is busy | 1 |
+| `unknown` | A sample could not be taken | 1 |
+| `clean` | Free space is low | 0 |
+| `hold` | The machine is saturated | 0 |
+
+`--json` prints the full sample. `--caches` lists Rust `target/` directories and Cargo cache sizes instead.
+
+## Running a heavy command
+
+```bash
+mewkit host run -- cargo test --workspace
+```
+
+The command runs without a shell, at low OS priority, in its own process group, under a supervisor that outlives the calling tool call. `run` follows its output until the command ends or the wait runs out.
+
+| Option | Effect |
+| --- | --- |
+| `--wait 90s` | How long to follow the job. The default sits under the calling agent runtime's tool timeout |
+| `--background` | Return at once with the job id |
+| `--priority high\|normal\|low` | Queue level. `high` also runs at normal OS priority. A job that waits ages forward one level every 10 minutes |
+
+The same command on the same worktree and the same file tree attaches to the job already running instead of starting a second one.
+
+`mewkit host jobs` lists jobs; `jobs wait <id>` waits for one, `jobs log <id>` prints its output and `jobs cancel <id>` stops it and everything it started.
+
+### Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| The command's own | The command finished; its exit code is passed through |
+| `75` | Not finished. The first line says `QUEUED — NOT STARTED — NOT VERIFIED` or `STILL RUNNING — NOT VERIFIED`, followed by the job id |
+| `70` | The job was cancelled, or its supervisor died. Not verified; run it again once |
+
+Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran on the same file tree as the one being checked.
+
+When admission is switched off, `HOME` is unset, or anything in the queue fails, `run` runs the command directly in the foreground: an internal error never blocks a command.
+
+## The watcher
+
+`mewkit host watch --detach` starts one watcher per machine. It samples every 5 seconds and writes, for each worktree that loads the host, a short note naming the heavy processes (by pid and executable name), queue positions and the slots held. It exits after 30 minutes with no agent runtime running. `mewkit host watch --stop` stops it.
+
+On Claude Code the `host-pressure` hook reads that note and adds one line to the agent's context when the verdict is `throttle` or worse, or when this worktree has jobs. It repeats a line at most every 5 minutes unless the verdict gets worse. The hook starts the watcher only from a `mewkit` installed on `PATH`, never from a build inside a git checkout. `hooks.host-pressure: false` in `.meowkit/config.yaml` switches it off. Other runtimes do not run the hook; their skills tell the agent to run `mewkit host status`.
+
+## Cleanup
+
+| Tier | What | When |
+| --- | --- | --- |
+| 1 | MeowKit's own state under `~/.meowkit/host`: ended jobs older than 24 hours, dead queue tickets, stale inbox notes, orphaned temp files, rotated logs | The watcher on a `clean` verdict, at most every 30 minutes; or `mewkit host clean` |
+| 3 | Rust `target/` directories | Reported only: `mewkit host status --caches` names them and you decide |
+
+Tier 1 never follows a symlink, never deletes a file another user owns, and logs each removal to `~/.meowkit/host/clean.log`. `mewkit host clean --dry-run` lists what it would remove.
+
+Cargo can clean its own caches: since Rust 1.88 it removes old downloaded crates by itself unless `cache.auto-clean-frequency` is `"never"`. `--caches` says so when that setting turns it off.
+
+## Settings
+
+The settings are machine-wide, because the queue and the watcher serve every project on the machine. They live in `~/.meowkit/config.yaml` only; a project's `.meowkit/config.yaml` that sets them is refused.
+
+```yaml
+# ~/.meowkit/config.yaml
+host:
+  enabled: true      # false: run runs commands directly, unqueued
+  auto_clean: true   # false: the watcher never cleans, `host clean` still works
+  max_heavy: 2       # heavy jobs at once under `go`; 1-8, default a quarter of the cores (1-4)
+```
+
+## Platforms
+
+macOS, Linux and Windows. Low priority is `taskpolicy -d throttle` (disk I/O) on macOS, `nice -n 10` and `ionice -c3` on Linux, and below-normal priority on Windows.
