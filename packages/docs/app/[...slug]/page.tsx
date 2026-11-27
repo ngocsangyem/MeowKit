@@ -12,6 +12,7 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { source } from '@/lib/source';
 import { getMDXComponents } from '@/components/mdx';
 import { BreadcrumbJsonLd } from '@/components/json-ld';
+import { ChannelBanner } from '@/components/channel-banner';
 
 interface PageParams {
   params: Promise<{ slug: string[] }>;
@@ -32,6 +33,7 @@ export default async function Page(props: PageParams) {
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <BreadcrumbJsonLd slug={params.slug} />
+      <ChannelBanner pageUrl={page.url} />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <div className="flex flex-row items-center gap-2 border-b border-fd-border pb-4">

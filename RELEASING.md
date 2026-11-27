@@ -133,11 +133,26 @@ the previous beta. Run it by hand from Actions → "Release beta" when needed.
 
 ## Docs channels
 
-`docs-deploy.yml` deploys the one docs site from both branches through Vercel, from the repo root
-(the project's Root Directory is `packages/docs`): `main` → production `docs.meowkit.dev`, `develop` →
-the `DOCS_BETA_DOMAIN` variable (for example `beta.docs.meowkit.dev`), built with
-`NEXT_PUBLIC_DOCS_CHANNEL=beta` so `robots.txt` disallows indexing. Production deploys queue and are
-never cancelled. Secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_DOCS_PROJECT_ID`.
+`docs-deploy.yml` builds the one docs source twice through Vercel, from the repo root, each as its
+own project's production deploy (both projects have Root Directory `packages/docs`):
+
+| Channel | Branch    | Vercel project secret         | Domain                                       |
+| ------- | --------- | ----------------------------- | -------------------------------------------- |
+| Stable  | `main`    | `VERCEL_DOCS_PROJECT_ID`      | `docs.meowkit.dev`                           |
+| Beta    | `develop` | `VERCEL_DOCS_BETA_PROJECT_ID` | `DOCS_BETA_DOMAIN` (`beta.docs.meowkit.dev`) |
+
+The beta is a production deploy of a second project, not a preview of the first: previews sit
+behind Vercel Deployment Protection, and a domain aliased onto the stable project is taken back by
+its next production deploy. A channel whose project secret is unset is skipped with a notice.
+
+Each build gets both channels' versions from the release tags (`next-version.cjs channels`: the
+newest kit stable, and the newest kit beta only while it is ahead). They feed the Stable | Beta
+switcher at the top of the sidebar, which links to the same page on the other site, and the banner
+above each title: always on beta ("features may change… switch to stable"), on stable only while a
+newer beta exists. A push deploys its branch's channel; a finished "Release beta" or "Release
+stable" run redeploys both, since both version labels moved. The beta build also sets
+`NEXT_PUBLIC_DOCS_CHANNEL=beta`, so its `robots.txt` disallows indexing. Stable deploys queue and
+are never cancelled; a newer beta deploy replaces an older one.
 
 ## Repository settings (owner)
 
@@ -149,7 +164,8 @@ never cancelled. Secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_DOCS_PROJECT_
   requires would never run on the release PR. `release-prepare.yml` fails without it. The pin and
   back-merge PRs fall back to the default token and then need a push (or close/reopen) to get CI.
 - Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
-- Variable `DOCS_BETA_DOMAIN` and the Vercel secrets above; the domain must be added to the Vercel project.
+- Variable `DOCS_BETA_DOMAIN` and the Vercel secrets above. `beta.docs.meowkit.dev` must be a domain of
+  the beta project (not the stable one), with no Git branch, since the workflow deploys it.
 
 ## Manual recovery
 

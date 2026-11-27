@@ -63,7 +63,7 @@ These workflows run on a pull request to `develop` or `main`, and the release wo
 | Release prepare | `.github/workflows/release-prepare.yml` | a push to `release/vX.Y.Z` or `hotfix/vX.Y.Z` (validates, commits the version and changelog, dry-runs the release, opens the PR into `main`) |
 | Release stable | `.github/workflows/release-stable.yml` | a merge into `main` whose version is untagged |
 | Binary build | `.github/workflows/binary-build.yml` | called by `release.yml`, or a manual run (builds six targets, publishes nothing) |
-| Docs deploy | `.github/workflows/docs-deploy.yml` | a push to `main` (production) or `develop` (beta docs) that touches the docs or `.claude/` |
+| Docs deploy | `.github/workflows/docs-deploy.yml` | a push to `main` (stable docs) or `develop` (beta docs) that touches the docs or `.claude/`, and after each release (both) |
 
 Run the full local set before you push:
 

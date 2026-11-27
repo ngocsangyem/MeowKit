@@ -1,70 +1,114 @@
 name: Docs deploy
 
-# One docs site, two channels, each built from its branch:
-#   main    → production (docs.meowkit.dev): what stable users run;
-#   develop → beta (the DOCS_BETA_DOMAIN variable, e.g. beta.docs.meowkit.dev), noindex.
-# Deploys from the repo root, as the Vercel project has Root Directory packages/docs and the
-# only pnpm lockfile is at the root. Needs the secrets VERCEL_TOKEN, VERCEL_ORG_ID and
-# VERCEL_DOCS_PROJECT_ID; without them the job reports that and deploys nothing.
+# One docs source, two sites, each built from its branch as its own Vercel project's production:
+#   main    → stable (VERCEL_DOCS_PROJECT_ID,      docs.meowkit.dev)
+#   develop → beta   (VERCEL_DOCS_BETA_PROJECT_ID, the DOCS_BETA_DOMAIN variable), noindex.
+# Each beta deploy is that project's production, not a preview: previews sit behind Vercel
+# Deployment Protection, and a domain aliased by hand on the stable project is taken back by
+# its next production deploy.
+#
+# Every build is told both channels' versions (from the release tags) for the Stable | Beta
+# switcher and the banners, so both sites are rebuilt after each release as well as on a push.
+# Deploys from the repo root: both projects have Root Directory packages/docs and the only
+# pnpm lockfile is at the root. A channel whose secrets are missing reports that and is skipped.
 
 on:
   push:
     branches: [main, develop]
     # The reference pages are rendered from the live .claude/ tree.
     paths: ["packages/docs/**", ".claude/**", "pnpm-lock.yaml", ".github/workflows/docs-deploy.yml"]
+  workflow_run:
+    workflows: ["Release beta", "Release stable"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  # Production deploys queue and are never cancelled; a newer beta deploy replaces an older one.
-  group: docs-deploy-${{ github.ref_name }}
-  cancel-in-progress: ${{ github.ref_name != 'main' }}
-
 jobs:
-  deploy:
-    name: Deploy ${{ github.ref_name == 'main' && 'production' || 'beta' }} docs
-    if: github.ref_name == 'main' || github.ref_name == 'develop'
+  plan:
+    name: Pick the channels
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      channels: ${{ steps.pick.outputs.channels }}
+    steps:
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref_name }}
+        run: |
+          stable='{"channel":"stable","branch":"main"}'
+          beta='{"channel":"beta","branch":"develop"}'
+          case "$EVENT:$REF" in
+            push:main) list="[$stable]" ;;
+            push:develop) list="[$beta]" ;;
+            *) list="[$stable,$beta]" ;; # a release or a manual run: both versions may have moved
+          esac
+          echo "channels=$list" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy ${{ matrix.channel }} docs
+    needs: plan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.channels) }}
+    concurrency:
+      # Stable deploys queue and are never cancelled; a newer beta deploy replaces an older one.
+      group: docs-deploy-${{ matrix.channel }}
+      cancel-in-progress: ${{ matrix.channel == 'beta' }}
     environment:
-      name: ${{ github.ref_name == 'main' && 'docs-production' || 'docs-beta' }}
+      name: docs-${{ matrix.channel == 'stable' && 'production' || 'beta' }}
     env:
+      CHANNEL: ${{ matrix.channel }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DOCS_PROJECT_ID }}
+      VERCEL_PROJECT_ID: ${{ matrix.channel == 'stable' && secrets.VERCEL_DOCS_PROJECT_ID || secrets.VERCEL_DOCS_BETA_PROJECT_ID }}
       BETA_DOMAIN: ${{ vars.DOCS_BETA_DOMAIN }}
       VERCEL: npx --yes vercel@67.0.0
     steps:
       - name: Check the deploy credentials
         id: creds
         run: |
+          project=$([ "$CHANNEL" = stable ] && echo VERCEL_DOCS_PROJECT_ID || echo VERCEL_DOCS_BETA_PROJECT_ID)
           if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "::notice title=Docs not deployed::set VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_DOCS_PROJECT_ID to deploy the docs"
+            echo "::notice title=$CHANNEL docs not deployed::set VERCEL_TOKEN, VERCEL_ORG_ID and $project to deploy them"
             echo "ok=false" >> "$GITHUB_OUTPUT"
           else
             echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.creds.outputs.ok == 'true'
+        with:
+          ref: ${{ matrix.branch }}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: steps.creds.outputs.ok == 'true'
         with:
           node-version: 24
 
-      - name: Deploy production
-        if: steps.creds.outputs.ok == 'true' && github.ref_name == 'main'
-        run: $VERCEL deploy --prod --yes --token "$VERCEL_TOKEN"
-
-      - name: Deploy beta
-        if: steps.creds.outputs.ok == 'true' && github.ref_name == 'develop'
+      - name: Deploy
+        if: steps.creds.outputs.ok == 'true'
         run: |
-          site="${BETA_DOMAIN:+https://$BETA_DOMAIN}"
-          url=$($VERCEL deploy --yes --token "$VERCEL_TOKEN" \
-            --build-env NEXT_PUBLIC_DOCS_CHANNEL=beta ${site:+--build-env NEXT_PUBLIC_SITE_URL=$site})
-          echo "Beta docs deployment: $url"
-          if [ -n "$BETA_DOMAIN" ]; then
-            $VERCEL alias set "$url" "$BETA_DOMAIN" --token "$VERCEL_TOKEN"
-          else
-            echo "::notice title=Beta docs not aliased::set the DOCS_BETA_DOMAIN variable to serve $url at a fixed domain"
+          # Tag names are all the channel versions need; no history is fetched for them.
+          versions=$(git ls-remote --tags --refs origin 'v*' 'mewkit-v*' | sed 's#.*refs/tags/##' |
+            node -e 'const { channels } = require("./scripts/release/next-version.cjs");
+              const tags = require("fs").readFileSync(0, "utf8").split("\n").filter(Boolean);
+              const c = channels(tags);
+              process.stdout.write(`${c.stable}\n${c.beta || ""}\n`);')
+          stable_version=$(echo "$versions" | sed -n 1p)
+          beta_version=$(echo "$versions" | sed -n 2p)
+          echo "Channels: stable $stable_version, beta ${beta_version:-(none ahead)}"
+
+          args=(--build-env "NEXT_PUBLIC_DOCS_CHANNEL=$CHANNEL" --build-env "NEXT_PUBLIC_STABLE_VERSION=$stable_version")
+          if [ -n "$beta_version" ]; then
+            args+=(--build-env "NEXT_PUBLIC_BETA_VERSION=$beta_version")
           fi
+          if [ -n "$BETA_DOMAIN" ]; then
+            args+=(--build-env "NEXT_PUBLIC_BETA_DOCS_URL=https://$BETA_DOMAIN")
+            if [ "$CHANNEL" = beta ]; then
+              args+=(--build-env "NEXT_PUBLIC_SITE_URL=https://$BETA_DOMAIN")
+            fi
+          fi
+          $VERCEL deploy --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" "${args[@]}"
