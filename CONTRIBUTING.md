@@ -52,7 +52,7 @@ Three workflows run on a pull request to `main`.
 | Workflow | File | Runs when |
 | --- | --- | --- |
 | CI | `.github/workflows/ci.yml` | every pull request |
-| Rust CI | `.github/workflows/rust-ci.yml` | a pull request or push to `main` that touches `crates/`, `Cargo.*`, `deny.toml`, `rust-toolchain.toml`, `install.*`, `scripts/release/`, `.claude/hooks/`, the worktree scripts or either Rust workflow |
+| Rust CI | `.github/workflows/rust-ci.yml` | a pull request or push to `main` that touches `crates/`, `Cargo.*`, `deny.toml`, `rust-toolchain.toml`, `install.*`, `scripts/release/`, the kit the tests package (`.claude/`, `kit/overlays/` and the shipped `.meowkit/` files) or either Rust workflow |
 | Rust release | `.github/workflows/rust-release.yml` | a pushed `mewkit-v*` tag, or a manual run (builds, publishes nothing) |
 
 Run the full local set before you push:
