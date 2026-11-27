@@ -151,6 +151,29 @@ pub fn check_no_links(root: &Path, path: &RelPath) -> Result<(), PathError> {
 /// rename, so a reader never sees a half-written file. Creates missing parent
 /// directories. `mode` sets POSIX permissions (default 0644) and is ignored on Windows.
 pub fn atomic_write(dest: &Path, bytes: &[u8], mode: Option<u32>) -> io::Result<()> {
+    write_via_temp(dest, bytes, mode, true)
+}
+
+/// [`atomic_write`] without flushing the file to disk: readers still never see
+/// a half-written file, but a power cut may lose it. For a batch whose caller
+/// makes every file durable once with [`sync_file`] before it relies on them,
+/// because one flush per file costs a disk round trip each (macOS
+/// `F_FULLFSYNC`, Windows `FlushFileBuffers`) and dominates a kit install.
+pub fn atomic_write_unsynced(dest: &Path, bytes: &[u8], mode: Option<u32>) -> io::Result<()> {
+    write_via_temp(dest, bytes, mode, false)
+}
+
+/// Flush a file already written to disk. Windows only flushes a handle opened
+/// for writing; opening one this way neither truncates nor changes the file.
+pub fn sync_file(path: &Path) -> io::Result<()> {
+    #[cfg(windows)]
+    let file = std::fs::OpenOptions::new().write(true).open(path)?;
+    #[cfg(not(windows))]
+    let file = std::fs::File::open(path)?;
+    file.sync_all()
+}
+
+fn write_via_temp(dest: &Path, bytes: &[u8], mode: Option<u32>, sync: bool) -> io::Result<()> {
     let dir = dest
         .parent()
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "destination has no parent"))?;
@@ -159,7 +182,9 @@ pub fn atomic_write(dest: &Path, bytes: &[u8], mode: Option<u32>) -> io::Result<
         .prefix(".mewkit-tmp-")
         .tempfile_in(dir)?;
     tmp.write_all(bytes)?;
-    tmp.as_file().sync_all()?;
+    if sync {
+        tmp.as_file().sync_all()?;
+    }
     set_mode(tmp.path(), mode)?;
     tmp.persist(dest).map_err(|e| e.error)?;
     Ok(())

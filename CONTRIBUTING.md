@@ -72,7 +72,7 @@ cd packages/docs && npm run check && npm run build
 | --- | --- | --- |
 | Format | `cargo fmt --all --check` | `cargo fmt --all` |
 | Clippy | `cargo clippy --workspace --all-targets --locked -- -D warnings` | Fix each warning. `RUSTFLAGS=-D warnings` also fails the build on any rustc warning. Do not add `#[allow]` without a reason in a comment |
-| Test (Linux, macOS, Windows) | `cargo test --workspace --locked` | Run the failing test alone: `cargo test -p <crate> --test <file> <name>`. A Windows-only failure is usually a path separator, a line ending or a POSIX shell assumption. `reader_agreement` needs Node on `PATH` |
+| Test (Linux, macOS, Windows in 3 shards) | `cargo nextest run --workspace --locked --partition slice:<n>/<shards>`, plus `cargo test --workspace --doc --locked` on Linux. `cargo test --workspace --locked` runs the same tests locally | Run the failing test alone: `cargo test -p <crate> --test <file> <name>`. A Windows-only failure is usually a path separator, a line ending or a POSIX shell assumption. `reader_agreement` needs Node on `PATH` |
 | `--locked` fails | any of the above | `Cargo.lock` is out of date: run `cargo build -p mewkit-cli` and commit `Cargo.lock` |
 | cargo-deny | `cargo deny check advisories bans licenses sources` | A new advisory: update the crate (`cargo update -p <crate>`). A licence or source refusal: pick another crate, or change `deny.toml` with the reason in the pull request |
 

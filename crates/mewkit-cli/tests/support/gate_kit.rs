@@ -109,40 +109,50 @@ fn plant(kit_dir: &Path, gate: &GateHook) {
     write_json(&registration, &doc);
 }
 
-/// The previous kit as a directory, built once per test binary.
+/// The current kit's fixture name, which changes with the kit's content.
+fn kit_name() -> String {
+    kit::kit()
+        .dir
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned()
+}
+
+/// A shared zip of `dir` named `name`, with its SHA-256, once per process.
+fn shared_zip(name: &str, dir: &Path) -> (PathBuf, String) {
+    let file = kit::shared_fixture(name, |staging| {
+        super::zip_tree(dir, staging);
+    });
+    let sha = mewkit_core::fsx::sha256_hex(&std::fs::read(&file).unwrap());
+    (file, sha)
+}
+
+/// The previous kit as a directory, built once per kit content.
 fn gate_kit_dir() -> &'static PathBuf {
     static DIR: OnceLock<PathBuf> = OnceLock::new();
     DIR.get_or_init(|| {
-        let out = Path::new(env!("CARGO_TARGET_TMPDIR")).join("gate-kit");
-        let _ = std::fs::remove_dir_all(&out);
-        super::copy_tree(&kit::kit().dir, &out);
-        let contract = out.join(".claude/kit-contract.json");
-        let mut doc = read_json(&contract);
-        doc["kitVersion"] = json!(PREVIOUS_VERSION);
-        write_json(&contract, &doc);
-        for gate in &GATES {
-            plant(&out, gate);
-        }
-        out
+        kit::shared_fixture(&format!("gate-{}", kit_name()), |out| {
+            super::copy_tree(&kit::kit().dir, out);
+            let contract = out.join(".claude/kit-contract.json");
+            let mut doc = read_json(&contract);
+            doc["kitVersion"] = json!(PREVIOUS_VERSION);
+            write_json(&contract, &doc);
+            for gate in &GATES {
+                plant(out, gate);
+            }
+        })
     })
 }
 
-/// `(zip, sha256)` of the previous kit, built once per test binary.
+/// `(zip, sha256)` of the previous kit, built once per kit content.
 pub fn previous_archive() -> &'static (PathBuf, String) {
     static ZIP: OnceLock<(PathBuf, String)> = OnceLock::new();
-    ZIP.get_or_init(|| {
-        let file = Path::new(env!("CARGO_TARGET_TMPDIR")).join("gate-kit.zip");
-        super::zip_tree(gate_kit_dir(), &file)
-    })
+    ZIP.get_or_init(|| shared_zip(&format!("gate-{}.zip", kit_name()), gate_kit_dir()))
 }
 
-/// `(zip, sha256)` of this checkout's kit, built once per test binary.
+/// `(zip, sha256)` of this checkout's kit, built once per kit content.
 pub fn current_archive() -> &'static (PathBuf, String) {
     static ZIP: OnceLock<(PathBuf, String)> = OnceLock::new();
-    ZIP.get_or_init(|| {
-        // Per process: test binaries run at once and share this directory.
-        let file = Path::new(env!("CARGO_TARGET_TMPDIR"))
-            .join(format!("current-kit-{}.zip", std::process::id()));
-        super::zip_tree(&kit::kit().dir, &file)
-    })
+    ZIP.get_or_init(|| shared_zip(&format!("{}.zip", kit_name()), &kit::kit().dir))
 }

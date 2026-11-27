@@ -9,11 +9,16 @@
 //! Pre-images are held in memory: they cover a failed operation inside a
 //! running process. Durable recovery after the process itself dies is the job
 //! of the backup taken before the journal starts.
+//!
+//! Writes are not flushed one by one: [`Journal::commit`] flushes every file
+//! written before it reports success, so the files are on disk before the
+//! caller drops its interrupted-run record, at one flush per file in a batch
+//! rather than a flush interleaved with each write.
 use std::collections::HashSet;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use crate::fsx::{RelPath, atomic_write};
+use crate::fsx::{RelPath, atomic_write, atomic_write_unsynced, sync_file};
 use crate::layout::Layout;
 
 enum PreImage {
@@ -28,6 +33,8 @@ pub struct Journal {
     seen: HashSet<PathBuf>,
     /// Directories this journal created, in creation order.
     created_dirs: Vec<PathBuf>,
+    /// Files written and not yet flushed to disk.
+    unsynced: Vec<PathBuf>,
     done: bool,
 }
 
@@ -38,6 +45,7 @@ impl Journal {
             entries: Vec::new(),
             seen: HashSet::new(),
             created_dirs: Vec::new(),
+            unsynced: Vec::new(),
             done: false,
         }
     }
@@ -50,7 +58,9 @@ impl Journal {
         if let Some(parent) = abs.parent() {
             self.create_dirs(parent)?;
         }
-        atomic_write(&abs, bytes, mode)
+        atomic_write_unsynced(&abs, bytes, mode)?;
+        self.unsynced.push(abs);
+        Ok(())
     }
 
     /// Remove `path` if it exists, recording its pre-image first.
@@ -64,9 +74,21 @@ impl Journal {
         }
     }
 
-    /// Keep every change; nothing is restored when the journal is dropped.
-    pub fn commit(mut self) {
+    /// Flush every written file to disk, then keep every change: nothing is
+    /// restored when the journal is dropped. A failed flush returns the error
+    /// and the dropped journal rolls back, as for a failed write.
+    pub fn commit(mut self) -> io::Result<()> {
+        self.unsynced.sort();
+        self.unsynced.dedup();
+        for abs in &self.unsynced {
+            match sync_file(abs) {
+                // Written, then removed later in the same journal.
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                other => other?,
+            }
+        }
         self.done = true;
+        Ok(())
     }
 
     /// Undo every change, newest first. Keeps going past a failure so one
