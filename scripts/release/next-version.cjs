@@ -14,6 +14,10 @@
  *       Target from a `release/vX.Y.Z` or `hotfix/vX.Y.Z` branch. Fails unless it is
  *       strictly greater than the latest stable and neither `vX.Y.Z` nor `mewkit-vX.Y.Z` exists.
  *
+ *   node scripts/release/next-version.cjs channels
+ *       {"stable": newest kit stable, "beta": newest kit beta when ahead of it, else null},
+ *       for the docs channel switcher.
+ *
  * The decision logic is pure (exported, tested with fixtures); only `main()` reads git.
  */
 
@@ -118,6 +122,23 @@ function stableTarget(branch, tags) {
 	return { version: target, latestStable: stable };
 }
 
+/**
+ * What each docs channel shows: the newest published kit stable, and the newest kit beta only
+ * when it is ahead of that stable (null otherwise). Kit tags only: a release whose kit never
+ * published is not something a reader can install.
+ */
+function channels(tags) {
+	const kit = tags.map((t) => t.trim()).filter((t) => /^v\d/.test(t));
+	const versions = kitVersions(kit);
+	const stable = latestStable(versions);
+	const beta =
+		versions
+			.filter((v) => parse(v).pre.length > 0)
+			.sort(compare)
+			.pop() || null;
+	return { stable, beta: beta && compare(beta, stable) > 0 ? beta : null };
+}
+
 function git(args) {
 	return execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 }
@@ -138,8 +159,11 @@ function main(argv) {
 		result = nextBeta(tags, messages);
 	} else if (mode === "stable") {
 		result = stableTarget(branchIdx >= 0 ? rest[branchIdx + 1] : process.env.GITHUB_REF_NAME, tags);
+	} else if (mode === "channels") {
+		process.stdout.write(`${JSON.stringify(channels(tags))}\n`);
+		return;
 	} else {
-		throw new Error("usage: next-version.cjs <beta|stable --branch release/vX.Y.Z> [--json]");
+		throw new Error("usage: next-version.cjs <beta|stable --branch release/vX.Y.Z|channels> [--json]");
 	}
 	process.stdout.write(json ? `${JSON.stringify(result)}\n` : `${result.version}\n`);
 }
@@ -153,4 +177,4 @@ if (require.main === module) {
 	}
 }
 
-module.exports = { parse, compare, kitVersions, latestStable, bumpLevel, bump, nextBeta, stableTarget };
+module.exports = { parse, compare, kitVersions, latestStable, bumpLevel, bump, nextBeta, stableTarget, channels };

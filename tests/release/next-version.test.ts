@@ -8,6 +8,7 @@ const nv = require("../../scripts/release/next-version.cjs") as {
 	compare: (a: string, b: string) => number;
 	nextBeta: (tags: string[], messages: string[]) => { version: string; latestStable: string };
 	stableTarget: (branch: string, tags: string[]) => { version: string; latestStable: string };
+	channels: (tags: string[]) => { stable: string; beta: string | null };
 };
 
 const TAGS = ["v3.1.0", "mewkit-v0.2.1", "v3.1.1", "v3.1.2-beta.1", "v3.1.2-beta.2"];
@@ -65,5 +66,16 @@ describe("stableTarget", () => {
 		expect(() => nv.stableTarget("release/v3.0.9", TAGS)).toThrow(/not greater/);
 		expect(() => nv.stableTarget("release/3.2.0", TAGS)).toThrow(/not release/);
 		expect(() => nv.stableTarget("release/v3.2.0-beta.1", TAGS)).toThrow(/not release/);
+	});
+});
+
+describe("channels", () => {
+	it("shows the newest beta only while it is ahead of the stable", () => {
+		expect(nv.channels(TAGS)).toEqual({ stable: "3.1.1", beta: "3.1.2-beta.2" });
+		expect(nv.channels([...TAGS, "v3.1.2"])).toEqual({ stable: "3.1.2", beta: null });
+	});
+
+	it("ignores a beta whose kit never published", () => {
+		expect(nv.channels([...TAGS, "mewkit-v3.1.2-beta.3"]).beta).toBe("3.1.2-beta.2");
 	});
 });
