@@ -19,9 +19,11 @@ pub fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
-/// The kit this checkout would publish, built once per test binary: every
-/// git-tracked file under the archive roots minus `base.exclude`, the rule
-/// `scripts/kit-ship-set.cjs` applies to a release.
+/// The kit this checkout would publish: every git-tracked file under the
+/// archive roots minus `base.exclude`, the rule `scripts/kit-ship-set.cjs`
+/// applies to a release. Built once per content and shared by every test
+/// process (see [`shared_fixture`]), since a runner such as nextest starts
+/// one process per test.
 pub fn kit() -> Kit {
     static DIR: OnceLock<PathBuf> = OnceLock::new();
     let dir = DIR.get_or_init(build_kit).clone();
@@ -214,9 +216,6 @@ const ARCHIVE_ROOTS: &[&str] = &[
 
 fn build_kit() -> PathBuf {
     let repo = repo();
-    let out =
-        Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("kit-{}", env!("CARGO_CRATE_NAME")));
-    let _ = std::fs::remove_dir_all(&out);
     let manifest: serde_json::Value =
         serde_json::from_slice(&std::fs::read(repo.join(".meowkit/pack-manifest.json")).unwrap())
             .unwrap();
@@ -234,15 +233,70 @@ fn build_kit() -> PathBuf {
         .unwrap();
     assert!(listed.status.success(), "git ls-files failed");
     let listed = String::from_utf8(listed.stdout).unwrap();
-    let paths: Vec<&str> = listed.split('\0').filter(|p| !p.is_empty()).collect();
+    let paths: Vec<&str> = listed
+        .split('\0')
+        .filter(|p| !p.is_empty() && !excludes.iter().any(|pat| glob(pat, p)))
+        .collect();
+    // Named by what it holds, so an edited checkout gets a new kit and an
+    // unchanged one reuses the kit another process already built.
+    let mut key = Vec::new();
     for path in &paths {
-        if !excludes.iter().any(|pat| glob(pat, path)) {
+        let src = repo.join(path);
+        key.extend_from_slice(path.as_bytes());
+        key.push(0);
+        key.extend_from_slice(&std::fs::read(&src).unwrap());
+        key.extend_from_slice(&file_mode(&src).to_le_bytes());
+        key.push(0);
+    }
+    let name = format!("kit-{}", &sha256_hex(&key)[..16]);
+    shared_fixture(&name, |out| {
+        for path in &paths {
             let dest = out.join(path);
             std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
             std::fs::copy(repo.join(path), dest).unwrap();
         }
+    })
+}
+
+#[cfg(unix)]
+fn file_mode(path: &Path) -> u32 {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::metadata(path).unwrap().permissions().mode()
+}
+
+#[cfg(not(unix))]
+fn file_mode(_path: &Path) -> u32 {
+    0
+}
+
+/// `CARGO_TARGET_TMPDIR/shared/<name>`, built by `build` at most once per
+/// name across concurrent test processes: each builds into its own staging
+/// path and renames it into place, and one that loses the race keeps the
+/// winner's copy. `name` must change whenever what `build` writes does.
+pub fn shared_fixture(name: &str, build: impl FnOnce(&Path)) -> PathBuf {
+    let root = Path::new(env!("CARGO_TARGET_TMPDIR")).join("shared");
+    let done = root.join(name);
+    if done.exists() {
+        return done;
     }
-    out
+    std::fs::create_dir_all(&root).unwrap();
+    let staging = root.join(format!(".staging-{name}-{}", std::process::id()));
+    remove_any(&staging);
+    build(&staging);
+    if std::fs::rename(&staging, &done).is_err() {
+        assert!(
+            done.exists(),
+            "could not move {} into place",
+            staging.display()
+        );
+        remove_any(&staging);
+    }
+    done
+}
+
+fn remove_any(path: &Path) {
+    let _ = std::fs::remove_dir_all(path);
+    let _ = std::fs::remove_file(path);
 }
 
 /// The ship-set pattern rule: `*` matches any run including `/`, `?` one character.
