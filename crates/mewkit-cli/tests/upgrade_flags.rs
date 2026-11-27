@@ -47,12 +47,17 @@ fn check_compares_the_install_with_the_cached_kit_and_changes_nothing() {
     let row = &doc["installed"][0];
     assert_eq!(row["target"], "codex");
     assert!(row["update"].is_null(), "{doc}");
-    assert_eq!(
-        doc["latestStable"]["version"].as_str(),
-        row["kitVersion"]
-            .as_str()
-            .map(|v| v.trim_start_matches('v'))
-    );
+    // The one cached release is the installed kit, at the head of the channel
+    // its version belongs to: a checkout between releases carries a beta.
+    let installed = row["kitVersion"]
+        .as_str()
+        .map(|v| v.trim_start_matches('v'));
+    let channel = if installed.is_some_and(|v| v.contains('-')) {
+        "latestBeta"
+    } else {
+        "latestStable"
+    };
+    assert_eq!(doc[channel]["version"].as_str(), installed, "{doc}");
     assert_eq!(sha_tree(&env.project()), before, "--check writes nothing");
 }
 
