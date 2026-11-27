@@ -55,7 +55,7 @@ pub fn apply(
     for path in removes {
         journal.remove(path).map_err(at(path))?;
     }
-    journal.commit();
+    journal.commit()?;
     Ok(backup)
 }
 
