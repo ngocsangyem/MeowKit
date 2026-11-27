@@ -1,6 +1,5 @@
 //! `host run [--priority] [--wait] [--background] -- <cmd>`: hand a heavy
 //! command to a detached supervisor and follow it for a bounded time.
-use std::path::Path;
 use std::process::Command;
 use std::time::{Duration, Instant};
 
@@ -54,14 +53,7 @@ pub fn run(args: &RunArgs) -> Result<u8, Failure> {
     let Some(paths) = HostPaths::resolve() else {
         return run_directly(&args.command);
     };
-    let home = paths
-        .root
-        .parent()
-        .and_then(Path::parent)
-        .map(Path::to_path_buf)
-        .unwrap_or_default();
-    let cores = std::thread::available_parallelism().map_or(1, |n| n.get());
-    if !HostConfig::load(&home, cores).enabled {
+    if !HostConfig::for_paths(&paths).enabled {
         return run_directly(&args.command);
     }
     jobs::sweep(&paths, time_now());

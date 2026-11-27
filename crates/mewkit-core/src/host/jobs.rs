@@ -4,7 +4,7 @@
 //! when someone asks it to stop and `cancelled` when it did, plus the log.
 //! A job whose supervisor is gone without an `exit` file is `lost`: never a
 //! pass.
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
@@ -186,37 +186,12 @@ pub fn find_duplicate(paths: &HostPaths, meta: &Meta) -> Option<JobDir> {
     })
 }
 
-/// Remove finished and lost job directories older than the retention. Only
-/// real directories directly under `jobs/`; a symlink is never followed.
+/// Remove ended job directories older than the retention (every `host run`
+/// does this, whatever the verdict), through the same no-follow deletion as
+/// the cleanup tier.
 pub fn sweep(paths: &HostPaths, now_ms: i64) -> usize {
-    let mut removed = 0;
-    for job in all(paths) {
-        if job.state().is_live() {
-            continue;
-        }
-        let modified = std::fs::symlink_metadata(&job.dir)
-            .ok()
-            .filter(|m| m.is_dir())
-            .and_then(|m| m.modified().ok())
-            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-            .map(|d| d.as_millis() as i64);
-        if modified.is_some_and(|m| now_ms - m > RETENTION_MS) && remove_flat_dir(&job.dir) {
-            removed += 1;
-        }
-    }
-    removed
-}
-
-/// Delete a job directory's plain files, then the directory. Anything else
-/// inside (a symlink, a subdirectory) leaves the directory in place.
-fn remove_flat_dir(dir: &Path) -> bool {
-    let Ok(entries) = std::fs::read_dir(dir) else {
-        return false;
-    };
-    for entry in entries.flatten() {
-        if entry.file_type().is_ok_and(|t| t.is_file()) {
-            let _ = std::fs::remove_file(entry.path());
-        }
-    }
-    std::fs::remove_dir(dir).is_ok()
+    super::clean::execute(
+        paths,
+        &super::clean::ended_jobs(paths, now_ms, RETENTION_MS),
+    )
 }

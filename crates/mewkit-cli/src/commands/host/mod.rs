@@ -2,6 +2,8 @@
 //! commands. Argument parsing and rendering only; the behaviour lives in
 //! [`mewkit_core::host`].
 mod block;
+mod caches;
+mod clean;
 mod internal;
 mod jobs;
 mod run;
@@ -27,6 +29,8 @@ pub enum HostCommand {
     Run(run::RunArgs),
     /// (beta) List, wait for, read or cancel queued and running jobs.
     Jobs(jobs::JobsArgs),
+    /// (beta) Remove mewkit's own stale host state (jobs, tickets, inbox, logs).
+    Clean(clean::CleanArgs),
     /// (beta) Run the machine-wide watcher: samples every 5 s and writes each
     /// loaded worktree's inbox; exits after 30 min with no agent running.
     Watch(watch::WatchArgs),
@@ -42,6 +46,7 @@ pub fn run(args: &HostArgs) -> Result<u8, Failure> {
         HostCommand::Run(a) => run::run(a),
         HostCommand::Jobs(a) => jobs::run(a),
         HostCommand::Watch(a) => watch::run(a),
+        HostCommand::Clean(a) => clean::run(a),
         HostCommand::Spawn(a) => internal::spawn(a),
         HostCommand::Supervise(a) => internal::supervise(a),
     }

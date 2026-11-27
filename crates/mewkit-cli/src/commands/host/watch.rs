@@ -108,11 +108,13 @@ pub fn run(args: &WatchArgs) -> Result<u8, Failure> {
         }
         return Err(Failure::failed("the watcher did not start within 10 s"));
     }
+    let auto_clean = mewkit_core::host::config::HostConfig::for_paths(&paths).auto_clean;
     let opts = Options {
         interval: watch::INTERVAL,
         idle_exit_ms: watch::IDLE_EXIT_MS,
         binary_path: exe.to_string_lossy().into_owned(),
         version: env!("CARGO_PKG_VERSION").into(),
+        auto_clean,
         max_ticks: None,
     };
     match watch::run(&paths, &opts)? {

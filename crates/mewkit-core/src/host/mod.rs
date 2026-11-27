@@ -4,6 +4,8 @@
 //! Fails open everywhere: a probe that cannot run makes its metric missing
 //! (verdict `unknown`), a state file that cannot be written is skipped, and
 //! nothing here ever blocks a command on its own error.
+pub mod cache_report;
+pub mod clean;
 pub mod client;
 pub mod cmd_class;
 pub mod collect;
@@ -30,6 +32,8 @@ pub mod wait_default;
 pub mod watch;
 pub mod worktree;
 
+#[cfg(test)]
+mod clean_tests;
 #[cfg(test)]
 mod queue_slots_tests;
 #[cfg(test)]

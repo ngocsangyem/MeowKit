@@ -529,7 +529,7 @@ Subcommands: `list`, `restore`.
 
 (beta) Machine load, who causes it, and admission for heavy commands
 
-Subcommands: `status`, `run`, `jobs`, `watch`.
+Subcommands: `status`, `run`, `jobs`, `clean`, `watch`.
 
 ### `mewkit host status`
 
@@ -539,6 +539,7 @@ Subcommands: `status`, `run`, `jobs`, `watch`.
 |---|---|
 | `--json` | Print one JSON document: \{schema_version, kind, data\} |
 | `--fresh` | Sample now even when a recent snapshot exists |
+| `--caches` | Also report Rust space users (target/ dirs, Cargo cache cleaning) |
 
 ### `mewkit host run`
 
@@ -575,6 +576,14 @@ Print a job's log (secrets masked, last 2 MB at most)
 ### `mewkit host jobs cancel`
 
 Ask a job's supervisor to stop it
+
+### `mewkit host clean`
+
+(beta) Remove mewkit's own stale host state (jobs, tickets, inbox, logs)
+
+| Flag | What it does |
+|---|---|
+| `--dry-run` | List what would be removed and remove nothing |
 
 ### `mewkit host watch`
 

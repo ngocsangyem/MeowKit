@@ -32,6 +32,17 @@ impl HostConfig {
         }
     }
 
+    /// The config for the home that holds `paths`, sized to this machine.
+    pub fn for_paths(paths: &super::paths::HostPaths) -> Self {
+        let home = paths
+            .root
+            .parent()
+            .and_then(Path::parent)
+            .unwrap_or(Path::new(""));
+        let cores = std::thread::available_parallelism().map_or(1, |n| n.get());
+        Self::load(home, cores)
+    }
+
     /// The user config's values over the defaults. An unreadable or invalid
     /// file yields the defaults: host admission fails open.
     pub fn load(home: &Path, logical_cores: usize) -> Self {

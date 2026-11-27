@@ -710,6 +710,7 @@ Commands:
   status  (beta) Sample CPU, memory, disk, thermal and free space; print a verdict
   run     (beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
   jobs    (beta) List, wait for, read or cancel queued and running jobs
+  clean   (beta) Remove mewkit's own stale host state (jobs, tickets, inbox, logs)
   watch   (beta) Run the machine-wide watcher: samples every 5 s and writes each loaded worktree's inbox; exits after 30 min with no agent running
   help    Print this message or the help of the given subcommand(s)
 
@@ -725,9 +726,10 @@ Options:
 Usage: mewkit host status [OPTIONS]
 
 Options:
-      --json   Print one JSON document: {schema_version, kind, data}
-      --fresh  Sample now even when a recent snapshot exists
-  -h, --help   Print help
+      --json    Print one JSON document: {schema_version, kind, data}
+      --fresh   Sample now even when a recent snapshot exists
+      --caches  Also report Rust space users (target/ dirs, Cargo cache cleaning)
+  -h, --help    Print help
 ```
 
 ### mewkit host run
@@ -817,6 +819,18 @@ Arguments:
 
 Options:
   -h, --help  Print help
+```
+
+### mewkit host clean
+
+```text
+(beta) Remove mewkit's own stale host state (jobs, tickets, inbox, logs)
+
+Usage: mewkit host clean [OPTIONS]
+
+Options:
+      --dry-run  List what would be removed and remove nothing
+  -h, --help     Print help
 ```
 
 ### mewkit host watch

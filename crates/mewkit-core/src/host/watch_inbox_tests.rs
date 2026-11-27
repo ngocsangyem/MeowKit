@@ -16,6 +16,7 @@ fn opts(ticks: u64) -> Options {
         idle_exit_ms: i64::MAX,
         binary_path: "/test/mewkit".into(),
         version: "test".into(),
+        auto_clean: false,
         max_ticks: Some(ticks),
     }
 }

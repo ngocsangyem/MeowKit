@@ -38,14 +38,7 @@ pub fn spawn(args: &SpawnArgs) -> Result<u8, Failure> {
 pub fn supervise(args: &SuperviseArgs) -> Result<u8, Failure> {
     let paths = HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))?;
     let job = JobDir::new(&paths, &args.id);
-    let home = paths
-        .root
-        .parent()
-        .and_then(std::path::Path::parent)
-        .map(std::path::Path::to_path_buf)
-        .unwrap_or_default();
-    let cores = std::thread::available_parallelism().map_or(1, |n| n.get());
-    let max_heavy = usize::from(HostConfig::load(&home, cores).max_heavy);
+    let max_heavy = usize::from(HostConfig::for_paths(&paths).max_heavy);
     let space: Vec<std::path::PathBuf> = std::env::current_dir().into_iter().collect();
     let admission = || {
         let verdict = status(&paths, false, &space).data.verdict;

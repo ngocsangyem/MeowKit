@@ -12,7 +12,7 @@ use super::collect::Collector;
 use super::joblog::CappedLog;
 use super::paths::HostPaths;
 use super::snapshot::{self, Envelope};
-use super::{inbox, locks, procs, time_now_ms};
+use super::{clean, inbox, locks, procs, time_now_ms};
 
 /// Sampling interval (fixed for the beta).
 pub const INTERVAL: Duration = Duration::from_secs(5);
@@ -75,6 +75,8 @@ pub struct Options {
     pub idle_exit_ms: i64,
     pub binary_path: String,
     pub version: String,
+    /// Run tier 1 cleanup under a `clean` verdict (`host.auto_clean`).
+    pub auto_clean: bool,
     /// Stop after this many ticks (tests); `None` runs until stop or idle.
     pub max_ticks: Option<u64>,
 }
@@ -159,6 +161,9 @@ fn tick_loop(paths: &HostPaths, opts: &Options, f: &Files, log: &mut Option<Capp
             log_line(log, &format!("snapshot write failed: {e}"));
         }
         inbox::publish(paths, &inbox::entries(paths, &report, now), now);
+        if let Some(n) = clean::run_auto(paths, report.verdict, opts.auto_clean, now) {
+            log_line(log, &format!("low free space: removed {n} kit state items"));
+        }
         ticks += 1;
         if opts.max_ticks.is_some_and(|max| ticks >= max) {
             return Outcome::TickLimit;

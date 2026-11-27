@@ -1,4 +1,4 @@
-//! `host status [--json] [--fresh]`. The verdict is data, so the exit code is
+//! `host status [--json] [--fresh] [--caches]`. The verdict is data, so the exit code is
 //! 0 whatever it says; a script reads `data.verdict` from `--json`.
 use std::path::PathBuf;
 
@@ -18,6 +18,9 @@ pub struct StatusArgs {
     /// Sample now even when a recent snapshot exists.
     #[arg(long)]
     pub fresh: bool,
+    /// Also report Rust space users (target/ dirs, Cargo cache cleaning).
+    #[arg(long, conflicts_with = "json")]
+    pub caches: bool,
 }
 
 pub fn run(args: &StatusArgs) -> Result<u8, Failure> {
@@ -33,6 +36,11 @@ pub fn run(args: &StatusArgs) -> Result<u8, Failure> {
     // The stored counters are the next sample's baseline, not output.
     env.counters = None;
     print_or_render(&env, args.json, paths.as_ref());
+    if args.caches
+        && let Some(paths) = &paths
+    {
+        super::caches::print(paths, &env.data);
+    }
     Ok(OK)
 }
 
