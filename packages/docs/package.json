@@ -17,7 +17,7 @@
     "check:frontmatter": "node scripts/check-frontmatter-contract.mjs"
   },
   "dependencies": {
-    "fumadocs-core": "16.19.4",
+    "fumadocs-core": "16.19.5",
     "fumadocs-mdx": "15.2.0",
     "fumadocs-ui": "16.19.4",
     "mermaid": "^11.17.2",
