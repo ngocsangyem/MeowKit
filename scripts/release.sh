@@ -118,6 +118,15 @@ fi
 # Only these two assets are ever uploaded. Never upload meowkit-kit-*.tar.gz, kit-manifest.json
 # or *.sig: CLIs that understand the signed artifact have an empty keyring and would refuse it.
 echo "[7/7] Publishing GitHub Release..."
+# A version with a `-` (3.1.2-beta.1) is a prerelease: never `latest`, so
+# releases/latest and every `mewkit init`/`upgrade` without --beta keep the stable kit.
+# Bash 3.2 (macOS /bin/bash) under `set -u` rejects an empty "${arr[@]}", hence the
+# ${arr[@]+...} form where the array is expanded.
+RELEASE_FLAGS=()
+BETA_FLAG=""
+case "$VERSION" in
+  *-*) RELEASE_FLAGS=(--prerelease --latest=false); BETA_FLAG=" --beta" ;;
+esac
 RELEASE_NOTES="## $TITLE
 
 See [changelog](https://docs.meowkit.dev/changelog) for full details.
@@ -125,9 +134,9 @@ See [changelog](https://docs.meowkit.dev/changelog) for full details.
 ### Install
 
 \`\`\`bash
-mewkit init
+mewkit init$BETA_FLAG
 # or upgrade:
-mewkit upgrade
+mewkit upgrade$BETA_FLAG
 \`\`\`"
 
 if gh release view "v$VERSION" >/dev/null 2>&1; then
@@ -143,11 +152,11 @@ if gh release view "v$VERSION" >/dev/null 2>&1; then
       gh release upload "v$VERSION" "dist/$ASSET"
     fi
   done
-  gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES"
+  gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES" ${RELEASE_FLAGS[@]+"${RELEASE_FLAGS[@]}"}
 else
   gh release create "v$VERSION" dist/meowkit-release.zip dist/checksums.txt \
     --title "v$VERSION — $TITLE" \
-    --notes "$RELEASE_NOTES"
+    --notes "$RELEASE_NOTES" ${RELEASE_FLAGS[@]+"${RELEASE_FLAGS[@]}"}
 fi
 
 # Verify
