@@ -144,6 +144,8 @@ own project's production deploy (both projects have Root Directory `packages/doc
 The beta is a production deploy of a second project, not a preview of the first: previews sit
 behind Vercel Deployment Protection, and a domain aliased onto the stable project is taken back by
 its next production deploy. A channel whose project secret is unset is skipped with a notice.
+A Vercel token limited to one project needs a second one for beta: `VERCEL_TOKEN` for stable and
+`VERCEL_DOCS_BETA_TOKEN` for beta (when unset, beta uses `VERCEL_TOKEN`).
 
 Each build gets both channels' versions from the release tags (`next-version.cjs channels`: the
 newest kit stable, and the newest kit beta only while it is ahead). They feed the Stable | Beta

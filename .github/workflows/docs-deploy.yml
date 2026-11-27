@@ -3,6 +3,7 @@ name: Docs deploy
 # One docs source, two sites, each built from its branch as its own Vercel project's production:
 #   main    → stable (VERCEL_DOCS_PROJECT_ID,      docs.meowkit.dev)
 #   develop → beta   (VERCEL_DOCS_BETA_PROJECT_ID, the DOCS_BETA_DOMAIN variable), noindex.
+# Tokens: VERCEL_TOKEN, and VERCEL_DOCS_BETA_TOKEN for beta when the token is per project.
 # Each beta deploy is that project's production, not a preview: previews sit behind Vercel
 # Deployment Protection, and a domain aliased by hand on the stable project is taken back by
 # its next production deploy.
@@ -78,7 +79,8 @@ jobs:
       name: docs-${{ matrix.channel == 'stable' && 'production' || 'beta' }}
     env:
       CHANNEL: ${{ matrix.channel }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Vercel tokens can be limited to one project, so beta may have its own; VERCEL_TOKEN otherwise.
+      VERCEL_TOKEN: ${{ matrix.channel == 'beta' && secrets.VERCEL_DOCS_BETA_TOKEN || secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ matrix.channel == 'stable' && secrets.VERCEL_DOCS_PROJECT_ID || secrets.VERCEL_DOCS_BETA_PROJECT_ID }}
       BETA_DOMAIN: ${{ vars.DOCS_BETA_DOMAIN }}
