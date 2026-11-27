@@ -1,0 +1,140 @@
+name: Binary build
+
+# Builds the mewkit binary for six targets and uploads one archive per target as an
+# artifact. It publishes nothing: release.yml calls it, gates the kit with the linux build,
+# then publishes the archives as `mewkit-v<version>`. Kit and binary share one version, so
+# the version is stamped into Cargo.toml before building (CARGO_PKG_VERSION is the binary's
+# own version). Archives are `.tar.gz` named `mewkit-*` (never `.zip`), so no kit consumer
+# can mistake a binary release for a kit.
+#
+# Run it by hand (workflow_dispatch) to build every target from a branch without publishing.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version to stamp and build (X.Y.Z or X.Y.Z-beta.N)
+        type: string
+        required: true
+      ref:
+        description: Commit to build
+        type: string
+        required: true
+    outputs:
+      version:
+        value: ${{ jobs.version.outputs.version }}
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  version:
+    name: Resolve the build version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+      - id: v
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          v="$INPUT_VERSION"
+          [ -n "$v" ] || v=$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml)
+          if ! printf '%s' "$v" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::not a release version: '$v'"; exit 1
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: version
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest }
+          - { target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm }
+          - { target: x86_64-apple-darwin, os: macos-latest }
+          - { target: aarch64-apple-darwin, os: macos-latest }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { target: aarch64-pc-windows-msvc, os: windows-11-arm }
+    runs-on: ${{ matrix.os }}
+    env:
+      TARGET: ${{ matrix.target }}
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Stamp the version into Cargo.toml and Cargo.lock
+        shell: bash
+        run: node scripts/sync-versions.cjs --set "$VERSION"
+
+      - name: Install rustup when the image has none
+        shell: bash
+        run: |
+          command -v rustup >/dev/null && exit 0
+          case "$RUNNER_OS" in
+            Windows)
+              case "$RUNNER_ARCH" in ARM64) host=aarch64-pc-windows-msvc ;; *) host=x86_64-pc-windows-msvc ;; esac
+              curl -fsSLo "$RUNNER_TEMP/rustup-init.exe" \
+                "https://static.rust-lang.org/rustup/dist/$host/rustup-init.exe"
+              "$RUNNER_TEMP/rustup-init.exe" -y --default-toolchain none --profile minimal
+              printf '%s\n' "$USERPROFILE\\.cargo\\bin" >> "$GITHUB_PATH" ;;
+            *)
+              curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain none --profile minimal
+              echo "$HOME/.cargo/bin" >> "$GITHUB_PATH" ;;
+          esac
+
+      - name: Install the pinned toolchain and target
+        shell: bash
+        run: |
+          rustup toolchain install
+          rustup target add "$TARGET"
+
+      - name: Install musl tools
+        if: contains(matrix.target, 'linux-musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Build
+        shell: bash
+        run: |
+          # Windows: link the C runtime statically so no VC++ redistributable is needed.
+          case "$TARGET" in *windows*) export RUSTFLAGS="-C target-feature=+crt-static" ;; esac
+          # musl: compile ring's C with musl-gcc, not the glibc cc.
+          case "$TARGET" in *linux-musl) export "CC_${TARGET//-/_}=musl-gcc" ;; esac
+          cargo build --release --locked --target "$TARGET" -p mewkit-cli
+          if [[ "$TARGET" == *linux-musl ]]; then
+            # `file` reports a static PIE, which x86_64 musl builds are, as "static-pie linked".
+            file "target/$TARGET/release/mewkit" | tee /dev/stderr | grep -Eq 'statically linked|static-pie linked' \
+              || { echo "::error::the musl binary is not statically linked"; exit 1; }
+          fi
+
+      - name: Package
+        shell: bash
+        run: |
+          exe=mewkit; case "$TARGET" in *windows*) exe=mewkit.exe ;; esac
+          name="mewkit-$VERSION-$TARGET"
+          mkdir -p "dist/$name"
+          cp "target/$TARGET/release/$exe" LICENSE "dist/$name/"
+          tar -C dist -czf "dist/$name.tar.gz" "$name"
+          ls -l "dist/$name/$exe" "dist/$name.tar.gz"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mewkit-${{ matrix.target }}
+          path: dist/mewkit-${{ needs.version.outputs.version }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error

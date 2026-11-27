@@ -13,6 +13,7 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    target-branch: develop
 
   - package-ecosystem: cargo
     directory: /
@@ -21,6 +22,7 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    target-branch: develop
 
   - package-ecosystem: npm
     directory: /
@@ -29,3 +31,4 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    target-branch: develop

@@ -1,5 +1,5 @@
 // The ship set has exactly one source, read by the release zip builder. Kit
-// releases are cut by scripts/release.sh with a zip and checksums.txt.
+// releases are cut by scripts/release/build-kit.sh with a zip and checksums.txt.
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

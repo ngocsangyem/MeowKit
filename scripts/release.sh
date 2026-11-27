@@ -1,133 +1,44 @@
 #!/bin/bash
-# MeowKit Release Script
+# MeowKit manual kit release — recovery only.
+# Releases normally run in GitHub Actions: a merge into `develop` publishes a beta, and a
+# merged `release/vX.Y.Z` pull request publishes the stable from `main` (see RELEASING.md).
+# Use this script only to finish a kit release that a workflow could not, from a clean
+# checkout of the exact commit to release. It never commits or pushes a branch, and it does
+# not build the binaries: the `mewkit-v<version>` release must already exist.
+#
 # Usage: ./scripts/release.sh <version> "<release title>"
-# Example: ./scripts/release.sh 2.3.2 "The Agent-Skills Integration Release"
-
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
 VERSION="${1:-}"
 TITLE="${2:-}"
-
 if [ -z "$VERSION" ] || [ -z "$TITLE" ]; then
-  echo "Usage: ./scripts/release.sh <version> \"<release title>\""
-  echo "Example: ./scripts/release.sh 2.3.2 \"The Agent-Skills Integration Release\""
+  echo "Usage: ./scripts/release.sh <version> \"<release title>\"" >&2
   exit 1
 fi
-
-# Validate version format
-if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; then
-  echo "Error: Invalid version format: $VERSION"
-  echo "Expected: X.Y.Z or X.Y.Z-beta.N"
-  exit 1
-fi
-
-# Ensure we're in the meowkit root
-if [ ! -f "package.json" ] || [ ! -d ".claude" ]; then
-  echo "Error: Run this script from the meowkit project root"
-  exit 1
-fi
-
-# Check required tools
-for cmd in node npm gh git; do
-  if ! command -v "$cmd" &>/dev/null; then
-    echo "Error: $cmd is required but not installed"
-    exit 1
-  fi
+for cmd in node npm gh git cargo; do
+  command -v "$cmd" >/dev/null || { echo "Error: $cmd is required" >&2; exit 1; }
 done
-
-# Check for uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
-  echo "Warning: You have uncommitted changes."
-  read -p "Continue anyway? [y/N] " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
-fi
-
-echo "=== MeowKit Release v$VERSION ==="
-echo ""
-
-# Step 0: Version-source assertion → stamp derived surfaces → release-readiness gate.
-# Root package.json is the single source of truth for the kit version; the release version MUST
-# match it (bump package.json first). We then stamp the derived surfaces from root
-# (.claude/kit-contract.json) so the version bump is applied consistently, and run the full gate.
-echo "[0/7] Release-readiness gate..."
-ROOT_VERSION=$(node -p "require('./package.json').version")
-if [ "$VERSION" != "$ROOT_VERSION" ]; then
-  echo "Error: release version ($VERSION) != root package.json ($ROOT_VERSION)."
-  echo "Root package.json is the single source of truth — bump it first, then release the matching version."
+  echo "Error: the working tree is not clean; release from a clean checkout." >&2
   exit 1
 fi
-node scripts/sync-versions.cjs --write   # stamp .claude/kit-contract.json (+ manifest if present)
-bash scripts/release-check.sh
-
-# Step 1: Bump version (metadata only — the mewkit binary is released separately)
-echo "[1/7] Bumping version to $VERSION..."
-# metadata.json is updated by prepare-release-assets.cjs in step 3
-
-# Step 2: Build and verify (harness-only — skip CLI packages)
-echo "[2/7] Verifying harness files..."
-# Validate settings.json is valid JSON
-node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))" || { echo "Error: settings.json is invalid JSON"; exit 1; }
-# Validate handlers.json is valid JSON
-node -e "JSON.parse(require('fs').readFileSync('.claude/hooks/handlers.json','utf8'))" || { echo "Error: handlers.json is invalid JSON"; exit 1; }
-# Validate metadata.json is valid JSON
-node -e "JSON.parse(require('fs').readFileSync('.claude/metadata.json','utf8'))" || { echo "Error: metadata.json is invalid JSON"; exit 1; }
-echo "  All JSON configs valid."
-
-# Step 3: Build release assets
-echo "[3/7] Building release assets..."
-node scripts/prepare-release-assets.cjs "$VERSION"
-
-# Verify the assets about to be published: contract inside the zip, checksum matches,
-# and no signed-artifact asset in dist/ (artifact-aware CLIs would refuse the install).
-node scripts/verify-release-assets.cjs "$VERSION" dist
-
-ZIP_SIZE=$(python3 -c "import os; print(f'{os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f}')")
-echo "  Release zip: ${ZIP_SIZE} KB"
-
-# Step 4: Docs build check
-echo "[4/7] Verifying docs build..."
-npm run build -w packages/docs 2>&1 | tail -1
-
-# Step 5: Commit and tag (idempotent — reuse existing tag if present)
-echo "[5/7] Committing and tagging..."
-git add -A
-if git diff --cached --quiet; then
-  echo "  No staged changes — skipping commit."
-else
-  git commit -m "chore: release v$VERSION"
+SHA="$(git rev-parse HEAD)"
+if [ -z "$(git branch -r --contains "$SHA" 2>/dev/null)" ]; then
+  echo "Error: HEAD $SHA is not on any remote branch; push it through a reviewed PR first." >&2
+  exit 1
 fi
-if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-  echo "  Tag v$VERSION already exists — reusing it."
-else
-  git tag -a "v$VERSION" -m "v$VERSION — $TITLE"
+if ! gh release view "mewkit-v$VERSION" >/dev/null 2>&1; then
+  echo "Error: binary release mewkit-v$VERSION does not exist; kit and binary share one version." >&2
+  exit 1
 fi
 
-# Step 6: Push (skip tag push if already on remote)
-echo "[6/7] Pushing to GitHub..."
-git push origin main
-if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION" 2>/dev/null)" ]; then
-  echo "  Remote already has tag v$VERSION — skipping tag push."
-else
-  git push origin "v$VERSION"
-fi
+bash scripts/release/build-kit.sh "$VERSION"
 
-# Step 7: Create or update GitHub Release (overwrite assets on existing tag).
-# Only these two assets are ever uploaded. Never upload meowkit-kit-*.tar.gz, kit-manifest.json
-# or *.sig: CLIs that understand the signed artifact have an empty keyring and would refuse it.
-echo "[7/7] Publishing GitHub Release..."
-# A version with a `-` (3.1.2-beta.1) is a prerelease: never `latest`, so
-# releases/latest and every `mewkit init`/`upgrade` without --beta keep the stable kit.
-# Bash 3.2 (macOS /bin/bash) under `set -u` rejects an empty "${arr[@]}", hence the
-# ${arr[@]+...} form where the array is expanded.
-RELEASE_FLAGS=()
-BETA_FLAG=""
-case "$VERSION" in
-  *-*) RELEASE_FLAGS=(--prerelease --latest=false); BETA_FLAG=" --beta" ;;
-esac
-RELEASE_NOTES="## $TITLE
+NOTES="$(mktemp)"
+BETA_FLAG=""; case "$VERSION" in *-*) BETA_FLAG=" --beta" ;; esac
+cat > "$NOTES" <<NOTES_EOF
+## $TITLE
 
 See [changelog](https://docs.meowkit.dev/changelog) for full details.
 
@@ -137,33 +48,7 @@ See [changelog](https://docs.meowkit.dev/changelog) for full details.
 mewkit init$BETA_FLAG
 # or upgrade:
 mewkit upgrade$BETA_FLAG
-\`\`\`"
-
-if gh release view "v$VERSION" >/dev/null 2>&1; then
-  # A published asset is never replaced: `mewkit init` trusts the checksums.txt that sits
-  # beside the zip, so swapping both would hand every later install a different kit under
-  # the same version. A re-run only adds an asset that is still missing.
-  EXISTING_ASSETS="$(gh release view "v$VERSION" --json assets --jq '.assets[].name')"
-  for ASSET in meowkit-release.zip checksums.txt; do
-    if printf '%s\n' "$EXISTING_ASSETS" | grep -qx "$ASSET"; then
-      echo "  Release v$VERSION already has $ASSET — leaving it as published."
-    else
-      echo "  Release v$VERSION is missing $ASSET — uploading it."
-      gh release upload "v$VERSION" "dist/$ASSET"
-    fi
-  done
-  gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES" ${RELEASE_FLAGS[@]+"${RELEASE_FLAGS[@]}"}
-else
-  gh release create "v$VERSION" dist/meowkit-release.zip dist/checksums.txt \
-    --title "v$VERSION — $TITLE" \
-    --notes "$RELEASE_NOTES" ${RELEASE_FLAGS[@]+"${RELEASE_FLAGS[@]}"}
-fi
-
-# Verify
-echo ""
-echo "=== Release v$VERSION Complete ==="
-echo ""
-echo "Verify:"
-echo "  Tag:   $(git tag | grep "v$VERSION")"
-echo "  Assets (expect meowkit-release.zip, checksums.txt): $(gh release view "v$VERSION" --json assets -q '.assets[].name' | tr '\n' ' ')"
-echo "  URL:   $(gh release view "v$VERSION" --json url -q '.url')"
+\`\`\`
+NOTES_EOF
+bash scripts/release/publish-kit.sh "$VERSION" "$TITLE" "$NOTES" "$SHA"
+git checkout -- package.json Cargo.toml Cargo.lock .claude/kit-contract.json 2>/dev/null || true

@@ -1,0 +1,117 @@
+name: Release prepare
+
+# A stable release starts by pushing `release/vX.Y.Z` (cut from develop) or `hotfix/vX.Y.Z`
+# (cut from main). This workflow:
+#   1. validates X.Y.Z: strictly above the latest stable, never tagged or published;
+#   2. commits the release to the branch: one version in package.json, Cargo.toml,
+#      Cargo.lock and the kit contract, and the changelog section built from changes/*.md;
+#   3. opens the pull request into main. CI on that PR runs the full release validation
+#      (ci.yml release-gate: six-target binary build, kit gate, assets, docs build), and
+#      the rules on main hold the merge until it and an approval pass; merging it runs
+#      release-stable.yml.
+#
+# RELEASE_PR_TOKEN is required: a commit or pull request made with the default token starts
+# no workflow, so the checks main requires would never run and the PR could never merge.
+
+on:
+  push:
+    branches: ["release/v*", "hotfix/v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-prepare-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Validate and commit the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      sha: ${{ steps.commit.outputs.sha }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: RELEASE_PR_TOKEN must be set
+        env:
+          PAT: ${{ secrets.RELEASE_PR_TOKEN }}
+        run: |
+          if [ -z "$PAT" ]; then
+            echo "::error::set the RELEASE_PR_TOKEN secret (fine-grained: contents + pull requests write); without it CI never runs on the release PR (RELEASING.md, Repository settings)"
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{ secrets.RELEASE_PR_TOKEN }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - id: v
+        name: Validate the target version
+        run: |
+          version=$(node scripts/release/next-version.cjs stable --branch "$GITHUB_REF_NAME")
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" "refs/tags/mewkit-v$version" >/dev/null; then
+            echo "::error::v$version or mewkit-v$version is already tagged on origin"; exit 1
+          fi
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "::error::release v$version is already published"; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - id: commit
+        name: Commit the version and changelog to the release branch
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          current=$(node -p "require('./package.json').version")
+          if [ "$current" = "$VERSION" ]; then
+            echo "Branch already carries v$VERSION."
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node scripts/sync-versions.cjs --set "$VERSION"
+          node scripts/release/assemble-changelog.cjs stable "$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A package.json Cargo.toml Cargo.lock .claude/kit-contract.json changes packages/docs/content/docs/changelog/index.mdx
+          git commit -m "chore(release): v$VERSION"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  pull-request:
+    name: Open the release pull request
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+      - name: Open or update the pull request into main
+        run: |
+          if gh pr view "$GITHUB_REF_NAME" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "Release PR for $GITHUB_REF_NAME is already open."; exit 0
+          fi
+          {
+            echo "Stable release **v$VERSION** (kit and \`mewkit\` binary)."
+            echo
+            echo "Merging publishes \`mewkit-v$VERSION\` and \`v$VERSION\` from main, deploys the docs, opens the installer pin PR and the back-merge into develop."
+            echo
+            echo "## Changelog"
+            echo
+            node scripts/release/assemble-changelog.cjs section "$VERSION"
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --base main --head "$GITHUB_REF_NAME" --title "release: v$VERSION" --body-file "$RUNNER_TEMP/body.md"

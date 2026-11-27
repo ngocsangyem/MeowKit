@@ -1,0 +1,109 @@
+name: Release beta
+
+# Every merge into develop publishes the next beta (kit + binary, one version), so each
+# integrated change reaches `mewkit init --beta` / `self-update` on the beta channel.
+# The version comes from tags (scripts/release/next-version.cjs); nothing is committed back
+# to develop, so no pull request ever edits a version and no bot needs to bypass the
+# branch rules. One beta runs at a time. GitHub keeps one pending run per group, so when
+# merges land faster than a release, the newest pending run replaces older pending ones and
+# its beta carries all of them; a run whose commit is already tagged exits.
+
+on:
+  push:
+    branches: [develop]
+    # Only a change that can reach users releases: docs and landing deploy on their own
+    # (docs-deploy.yml, Vercel), and root prose files ship in neither the kit nor the binary.
+    paths:
+      - "**"
+      - "!packages/docs/**"
+      - "!packages/landing/**"
+      - "!tasks/**"
+      - "!*.md"
+      - "!docs/**"
+      - "!.github/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-beta
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Compute the beta version
+    if: github.ref_name == 'develop'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      skip: ${{ steps.v.outputs.skip }}
+      notes: ${{ steps.v.outputs.notes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - id: v
+        run: |
+          if git tag --points-at HEAD | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+-'; then
+            echo "HEAD is already released as $(git tag --points-at HEAD | grep -E '^v' | head -1)"
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # Release only what reaches users. A back-merge of a stable brings only its version
+          # and changelog, so the diff from the last release tag on this line is empty here.
+          last=$(git describe --tags --match 'v[0-9]*' --abbrev=0 HEAD 2>/dev/null || true)
+          if [ -n "$last" ] && ! git diff --name-only "$last" HEAD \
+              | grep -E '^(\.claude/|kit/|crates/|\.meowkit/|install\.(sh|ps1)$|Cargo\.(toml|lock)$)' \
+              | grep -vqx '.claude/kit-contract.json'; then
+            echo "No shipped change since $last; no beta."
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          version=$(node scripts/release/next-version.cjs beta)
+          prev=$(git tag --list 'v*-beta.*' --sort=-v:refname | head -1)
+          {
+            echo "skip=false"
+            echo "version=$version"
+            eof="NOTES_$(openssl rand -hex 8)"
+            echo "notes<<$eof"
+            echo "A beta: \`mewkit init\` and \`mewkit upgrade\` skip it unless you pass \`--beta\`; \`mewkit self-update\` installs the matching binary on the beta channel."
+            echo
+            node scripts/release/assemble-changelog.cjs notes ${prev:+--since "$prev"}
+            echo
+            echo "### Install"
+            echo
+            echo '```bash'
+            echo 'mewkit init --beta'
+            echo '# or upgrade:'
+            echo 'mewkit upgrade --beta'
+            echo '```'
+            echo "$eof"
+          } >> "$GITHUB_OUTPUT"
+          echo "Next beta: $version"
+
+  validate:
+    needs: plan
+    if: needs.plan.outputs.skip != 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      version: ${{ needs.plan.outputs.version }}
+      ref: ${{ github.sha }}
+
+  release:
+    needs: [plan, validate]
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/release-publish.yml
+    with:
+      version: ${{ needs.plan.outputs.version }}
+      ref: ${{ github.sha }}
+      title: Beta ${{ needs.plan.outputs.version }}
+      notes: ${{ needs.plan.outputs.notes }}
+    secrets: inherit
+

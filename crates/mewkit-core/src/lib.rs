@@ -66,13 +66,25 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 mod tests {
     #[test]
     fn version_is_semver_shaped() {
-        let parts: Vec<&str> = super::VERSION.split('.').collect();
+        // The binary carries the kit's version, betas included (`3.2.0-beta.1`).
+        let (core, pre) = match super::VERSION.split_once('-') {
+            Some((core, pre)) => (core, Some(pre)),
+            None => (super::VERSION, None),
+        };
+        let parts: Vec<&str> = core.split('.').collect();
         assert_eq!(
             parts.len(),
             3,
-            "workspace version {} is not x.y.z",
+            "workspace version {} is not x.y.z[-pre]",
             super::VERSION
         );
         assert!(parts.iter().all(|p| p.parse::<u64>().is_ok()));
+        if let Some(pre) = pre {
+            assert!(
+                !pre.is_empty() && pre.split('.').all(|id| !id.is_empty()),
+                "workspace version {} has an empty prerelease identifier",
+                super::VERSION
+            );
+        }
     }
 }

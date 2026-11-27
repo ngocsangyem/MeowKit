@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # release-check.sh — the single release-readiness gate. Contributors run it via
-# `npm run release:check` to see readiness before tagging; `scripts/release.sh` runs it after it
+# `npm run release:check` to see readiness before tagging; `scripts/release/build-kit.sh` runs it after it
 # has stamped the version bump. Runs ALL gates and reports every failing one (not fail-fast), then
 # exits non-zero if any failed. Exit 0 = release-ready.
 #
@@ -91,16 +91,16 @@ else
   rm -rf "$GATE_TMP"
 fi
 
-# Built assets are checked only when a zip for THIS version exists. release.sh runs this gate
+# Built assets are checked only when a zip for THIS version exists. build-kit.sh runs this gate
 # after the version bump and before it rebuilds dist/, which is gitignored and persists, so a zip
 # left from an earlier version is expected there: it is reported and skipped, not failed.
-# release.sh verifies the rebuilt assets itself before uploading.
+# build-kit.sh verifies the rebuilt assets itself after building them.
 if [ -f dist/meowkit-release.zip ]; then
   step "Built release assets (dist/)"
   KIT_VERSION="$(node -p "require('./package.json').version")"
   BUILT_VERSION="$(unzip -p dist/meowkit-release.zip .claude/kit-contract.json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(String(JSON.parse(s).kitVersion||""))}catch{}})')"
   if [ "$BUILT_VERSION" != "$KIT_VERSION" ]; then
-    ok "dist/ holds a ${BUILT_VERSION:-unversioned} build, not $KIT_VERSION — skipped (release.sh rebuilds and verifies it)"
+    ok "dist/ holds a ${BUILT_VERSION:-unversioned} build, not $KIT_VERSION — skipped (build-kit.sh rebuilds and verifies it)"
   else
     node scripts/verify-release-assets.cjs "$KIT_VERSION" dist && ok "zip contract + checksums.txt" || bad "release assets (rebuild with prepare-release-assets.cjs)"
   fi

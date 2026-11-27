@@ -1,0 +1,70 @@
+name: Docs deploy
+
+# One docs site, two channels, each built from its branch:
+#   main    → production (docs.meowkit.dev): what stable users run;
+#   develop → beta (the DOCS_BETA_DOMAIN variable, e.g. beta.docs.meowkit.dev), noindex.
+# Deploys from the repo root, as the Vercel project has Root Directory packages/docs and the
+# only pnpm lockfile is at the root. Needs the secrets VERCEL_TOKEN, VERCEL_ORG_ID and
+# VERCEL_DOCS_PROJECT_ID; without them the job reports that and deploys nothing.
+
+on:
+  push:
+    branches: [main, develop]
+    # The reference pages are rendered from the live .claude/ tree.
+    paths: ["packages/docs/**", ".claude/**", "pnpm-lock.yaml", ".github/workflows/docs-deploy.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Production deploys queue and are never cancelled; a newer beta deploy replaces an older one.
+  group: docs-deploy-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.ref_name == 'main' && 'production' || 'beta' }} docs
+    if: github.ref_name == 'main' || github.ref_name == 'develop'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'main' && 'docs-production' || 'docs-beta' }}
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DOCS_PROJECT_ID }}
+      BETA_DOMAIN: ${{ vars.DOCS_BETA_DOMAIN }}
+      VERCEL: npx --yes vercel@67.0.0
+    steps:
+      - name: Check the deploy credentials
+        id: creds
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::notice title=Docs not deployed::set VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_DOCS_PROJECT_ID to deploy the docs"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.creds.outputs.ok == 'true'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.creds.outputs.ok == 'true'
+        with:
+          node-version: 24
+
+      - name: Deploy production
+        if: steps.creds.outputs.ok == 'true' && github.ref_name == 'main'
+        run: $VERCEL deploy --prod --yes --token "$VERCEL_TOKEN"
+
+      - name: Deploy beta
+        if: steps.creds.outputs.ok == 'true' && github.ref_name == 'develop'
+        run: |
+          site="${BETA_DOMAIN:+https://$BETA_DOMAIN}"
+          url=$($VERCEL deploy --yes --token "$VERCEL_TOKEN" \
+            --build-env NEXT_PUBLIC_DOCS_CHANNEL=beta ${site:+--build-env NEXT_PUBLIC_SITE_URL=$site})
+          echo "Beta docs deployment: $url"
+          if [ -n "$BETA_DOMAIN" ]; then
+            $VERCEL alias set "$url" "$BETA_DOMAIN" --token "$VERCEL_TOKEN"
+          else
+            echo "::notice title=Beta docs not aliased::set the DOCS_BETA_DOMAIN variable to serve $url at a fixed domain"
+          fi

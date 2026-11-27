@@ -130,8 +130,8 @@ The binary and the kit reach your machine from this repository's releases. These
 | File | Defence |
 | --- | --- |
 | `.github/workflows/*.yml` | Every action is pinned to a commit hash, and each workflow's token is read-only (`contents: read`); only the release job asks for write access |
-| `.github/workflows/rust-release.yml` | Publishes only a tag whose commit is on the default branch, and attests each binary archive before the release is created, so an archive that cannot be attested is never published |
-| `scripts/release.sh` | Does not replace an asset of a release that is already published |
+| `.github/workflows/release.yml` | Publishes only a commit that is on `main` or `develop`, and attests each binary archive before the release is created, so an archive that cannot be attested is never published |
+| `scripts/release/publish-kit.sh` | Does not replace an asset of a release that is already published |
 | `pnpm-workspace.yaml` | `minimumReleaseAge: 10080`: pnpm installs no package version published less than seven days (10,080 minutes) ago |
 | `.github/dependabot.yml` | A seven-day cooldown on GitHub Actions, Cargo and npm updates: Dependabot proposes a new version only after it has been public for a week |
 | `SECURITY.md` | How to report a vulnerability privately, what is in scope, and how to verify a download |
