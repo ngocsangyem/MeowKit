@@ -133,22 +133,6 @@ function detectBaseBranch(cwd) {
   return 'main';
 }
 
-const MAX_SUPERPROJECT_DEPTH = 10;
-
-function findTopmostSuperproject(gitRoot) {
-  let current = gitRoot;
-  let topmost = gitRoot;
-  let depth = 0;
-  while (depth < MAX_SUPERPROJECT_DEPTH) {
-    const result = git(['rev-parse', '--show-superproject-working-tree'], { silent: true, cwd: current });
-    if (!result.success || !result.output) break;
-    topmost = result.output;
-    current = result.output;
-    depth++;
-  }
-  return topmost;
-}
-
 function validateWorktreeRoot(rootPath) {
   if (typeof rootPath !== 'string' || rootPath.trim().length === 0) {
     return { valid: false, error: 'Worktree root path is empty' };
@@ -177,41 +161,43 @@ function validateWorktreeRoot(rootPath) {
   return { valid: false, error: `Cannot create worktree directory: parent path does not exist: ${parent}` };
 }
 
-function getWorktreeRoot(gitRoot, isMonorepo, explicitRoot, orchestratedDir, outputError) {
-  // Orchestrated mode always uses .worktrees/ inside repo root (parallel-execution-rules Rule 3)
-  if (orchestratedDir) return { dir: orchestratedDir, source: 'orchestrated (.worktrees/)' };
+const WORKTREES_DIR = '.worktrees';
 
-  if (explicitRoot) {
-    const validation = validateWorktreeRoot(explicitRoot);
-    if (!validation.valid) {
-      outputError('INVALID_WORKTREE_ROOT', validation.error, {
-        suggestion: 'Provide a valid directory path that exists or can be created'
-      });
-    }
-    return { dir: validation.path, source: '--worktree-root flag' };
-  }
-
-  const envRoot = process.env.WORKTREE_ROOT;
-  if (envRoot) {
-    const validation = validateWorktreeRoot(envRoot);
-    if (!validation.valid) {
-      outputError('INVALID_WORKTREE_ROOT', validation.error, {
-        suggestion: 'Fix WORKTREE_ROOT env var or unset it'
-      });
-    }
-    return { dir: validation.path, source: 'WORKTREE_ROOT env' };
-  }
-
-  const topmostRoot = findTopmostSuperproject(gitRoot);
-  if (topmostRoot !== gitRoot) {
+// Root order: --worktree-root > WORKTREE_ROOT > <main checkout>/.worktrees. The default
+// is a fixed convention, not a config key: one place on every runtime, inside the
+// repo, ignored by its own .gitignore. The main checkout comes from the common git
+// dir, so a call made from inside a linked worktree still lands in the same root.
+function getWorktreeRoot(gitRoot, explicitRoot, outputError) {
+  const mainRoot = getMainWorktreePath(gitRoot, gitRoot);
+  const redirected = (rootPath, source, suggestion) => {
+    const validation = validateWorktreeRoot(rootPath);
+    if (!validation.valid) outputError('INVALID_WORKTREE_ROOT', validation.error, { suggestion });
     return {
-      dir: path.join(topmostRoot, 'worktrees'),
-      source: `superproject (${path.basename(topmostRoot)})`
+      dir: validation.path, source, isDefault: false, mainRoot,
+      warning: `Worktree root comes from ${source}, not the default ${path.join(mainRoot, WORKTREES_DIR)}`
     };
+  };
+  if (explicitRoot) {
+    return redirected(explicitRoot, '--worktree-root flag', 'Provide a valid directory path that exists or can be created');
   }
+  if (process.env.WORKTREE_ROOT) {
+    return redirected(process.env.WORKTREE_ROOT, 'WORKTREE_ROOT env', 'Fix WORKTREE_ROOT env var or unset it');
+  }
+  return { dir: path.join(mainRoot, WORKTREES_DIR), source: 'default (.worktrees/)', isDefault: true, mainRoot };
+}
 
-  if (isMonorepo) return { dir: path.join(gitRoot, 'worktrees'), source: 'monorepo internal' };
-  return { dir: path.join(path.dirname(gitRoot), 'worktrees'), source: 'sibling directory' };
+// Creates the root and a `.gitignore` holding `*` inside it, so the directory hides
+// itself from git and ripgrep without touching the user's own .gitignore. An existing
+// ignore file is never overwritten.
+function ensureWorktreeRootIgnored(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  const ignorePath = path.join(dir, '.gitignore');
+  if (fs.existsSync(ignorePath)) return;
+  try {
+    fs.writeFileSync(ignorePath, '*\n', { flag: 'wx' });
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+  }
 }
 
 // ─── Dirty state ─────────────────────────────────────────────────────────────
@@ -254,12 +240,16 @@ function getGitCommonDir(cwd) {
   return path.resolve(cwd, result.output);
 }
 
+// The main checkout, wherever `cwd` sits. `--show-toplevel` returns the linked
+// worktree when run inside one; the common git dir does not. A submodule keeps its
+// git dir under the superproject's `.git/modules/` and names its checkout in
+// `core.worktree`; a bare repo has no main checkout, so it falls back to gitRoot.
 function getMainWorktreePath(gitRoot, cwd) {
   const gitCommonDir = getGitCommonDir(cwd);
   if (!gitCommonDir) return gitRoot;
   const configResult = git(['config', '--file', path.join(gitCommonDir, 'config'), '--get', 'core.worktree'], { silent: true, cwd });
-  if (!configResult.success || !configResult.output) return gitRoot;
-  return path.resolve(gitCommonDir, configResult.output);
+  if (configResult.success && configResult.output) return path.resolve(gitCommonDir, configResult.output);
+  return path.basename(gitCommonDir) === '.git' ? path.dirname(gitCommonDir) : gitRoot;
 }
 
 function parseWorktreeListPorcelain(output, options = {}) {
@@ -404,9 +394,10 @@ module.exports = {
   checkGitRepo,
   checkGitVersion,
   detectBaseBranch,
-  findTopmostSuperproject,
   validateWorktreeRoot,
+  WORKTREES_DIR,
   getWorktreeRoot,
+  ensureWorktreeRootIgnored,
   checkDirtyState,
   getDirtyStateDetails,
   branchExists,

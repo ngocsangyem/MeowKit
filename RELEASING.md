@@ -63,6 +63,7 @@ tooling do it automatically.
 | Stream | Tag | GitHub Release | Marked `latest` |
 | ------ | --- | -------------- | --------------- |
 | Kit | `v<version>` | Stable release, with `meowkit-release.zip` and `checksums.txt` | Yes |
+| Kit prerelease | `v<version>-beta.N` | Pre-release with the same two assets; `release.sh` passes `--prerelease --latest=false` for any version with a `-`. Installed only with `mewkit init --beta` / `mewkit upgrade --beta` | Never |
 | Binary | `mewkit-v<version>` | Stable release, no `.zip` asset | Never |
 | Binary prerelease | `mewkit-v<version>-beta.N` | Pre-release on the beta channel (the `-` in the version makes it one) | Never |
 

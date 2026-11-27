@@ -29,16 +29,34 @@ Run the commands as `node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs <action> ... 
 | Action | What it does |
 |---|---|
 | `info` | Reports repository state. Run it before `create`. |
-| `create "{agent-name}" --orchestrated` | Creates `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`. |
+| `create "{agent-name}" --orchestrated` | Creates `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`. Give the returned `worktreePath` to the agent as its working directory. |
 | `merge` | `git merge --no-ff {branch}` into the feature branch. On conflict it stops and reports to the orchestrator, with no auto-resolve. After a clean merge, run the full test suite, then delegate a status report to `project-manager` in the background unless `MEOWKIT_PM_AUTO=off`. |
-| `remove "{agent-name}"` (cleanup) | Removes the worktree. Release the agent's `mk:task-queue` ownership first, and commit or stash uncommitted changes. |
-| `list` | Lists worktrees. |
+| `remove "{agent-name}"` (cleanup) | Removes a worktree MeowKit created. Release the agent's `mk:task-queue` ownership first. Refuses uncommitted or untracked work unless `--discard-changes`. |
+| `list` | Lists worktrees, each with its `owner`. |
 | `status` | Shows ahead and behind divergence and dirty state, and the count of active worktrees. |
 | `prune --dry-run`, then `prune` | Cleans stale worktree metadata. Dry run first. |
 | `review-pr --pr N --remote <name> --session <id>` | Creates a detached worktree pinned to a PR head for assured review. Add `--dry-run` to validate only. |
 | `review-pr-cleanup --manifest <path>` | Removes a review worktree. `--sweep --dry-run` finds stale sessions, and `--apply` executes. |
 
-Before the first parallel worktree, make sure `.worktrees/` is in `.gitignore`.
+## Where worktrees go
+
+Every worktree lands under `<main checkout>/.worktrees/`, on every runtime, and also when the script runs from inside a linked worktree. `--worktree-root` or the `WORKTREE_ROOT` environment variable moves it, and the script warns when they do. On the first create the script writes `.worktrees/.gitignore` holding `*`, so the directory hides itself from git and ripgrep and your own `.gitignore` is left alone. Test runners that do not read `.gitignore` (some jest and vitest setups) may still scan `.worktrees/`; exclude it in their config.
+
+## Who owns a worktree
+
+Each worktree the script creates gets a `meowkit-owner.json` marker in its private git dir, outside the working tree. `list` and `status` report an `owner` for every worktree:
+
+| Owner | Meaning | `remove` |
+|---|---|---|
+| `main` | The main checkout | never |
+| `kit` | Has the marker | yes |
+| `review` | A `review-pr` worktree | no, use `review-pr-cleanup` |
+| `legacy` | No marker, directly under `<main>/.worktrees/` | yes, with a warning |
+| `foreign` | Anything else, such as another runtime's worktree | never |
+
+A term that matches only `review` or `foreign` worktrees fails with `FOREIGN_WORKTREE`. A worktree with uncommitted or untracked files fails with `WORKTREE_DIRTY` and lists the files; `--discard-changes` deletes them. Ignored files, such as a copied `.env`, are not checked and go with the worktree.
+
+Parallel agents use these worktrees, not a host's own isolation (Claude Code agent frontmatter `isolation: worktree`, OMP and Antigravity task isolation, Codex and Cursor app worktrees). Each host keeps those somewhere else, and MeowKit cannot see or clean them.
 
 `review-pr` fetches `pull/N/head` from the PR's base remote, never a fork. It writes `tasks/reviews/<session>/manifest.json` and a `.mewkit-review.json` back-reference inside the worktree. Cleanup runs only when the manifest's nonce matches that back-reference and the target is a detached `.worktrees/review-pr-*` worktree, so it can never remove the main checkout or a feature worktree. Force is allowed, since review worktrees are dirty after builds.
 
@@ -47,6 +65,7 @@ Before the first parallel worktree, make sure `.worktrees/` is in `.gitignore`.
 - Create worktrees only on feature branches, never on `main` or `master`.
 - Keep at most 3 active worktrees.
 - Remove worktrees after the merge. Stale ones keep their branches checked out.
+- `remove` only deletes worktrees MeowKit created, and keeps uncommitted work unless told otherwise.
 - Never force-push from a worktree. It shares `.git` with the main checkout.
 
 ## Gotchas

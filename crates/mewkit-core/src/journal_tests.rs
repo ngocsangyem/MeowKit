@@ -46,13 +46,28 @@ fn commit_keeps_changes() {
     j.write(&rel("a/keep.txt"), b"changed", None).unwrap();
     j.write(&rel("new/deep/file.txt"), b"new", None).unwrap();
     j.remove(&rel("top.txt")).unwrap();
-    j.commit();
+    j.commit().unwrap();
     assert_eq!(
         std::fs::read(dir.path().join("a/keep.txt")).unwrap(),
         b"changed"
     );
     assert!(dir.path().join("new/deep/file.txt").exists());
     assert!(!dir.path().join("top.txt").exists());
+}
+
+#[test]
+fn commit_flushes_past_a_file_written_then_removed() {
+    let dir = seeded();
+    let mut j = Journal::new(&Layout::at(dir.path()));
+    j.write(&rel("gone.txt"), b"brief", None).unwrap();
+    j.remove(&rel("gone.txt")).unwrap();
+    j.write(&rel("stays.txt"), b"kept", None).unwrap();
+    j.commit().unwrap();
+    assert!(!dir.path().join("gone.txt").exists());
+    assert_eq!(
+        std::fs::read(dir.path().join("stays.txt")).unwrap(),
+        b"kept"
+    );
 }
 
 #[test]

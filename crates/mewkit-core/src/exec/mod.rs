@@ -255,7 +255,9 @@ pub fn execute_merging(
             .write(&scope.index_file, bytes, None)
             .map_err(io("writing the ownership index"))?,
     }
-    journal.commit();
+    journal
+        .commit()
+        .map_err(io("flushing the written files to disk"))?;
     interrupted::end(&record).map_err(io("finishing the run"))?;
     // A removal that found its file already gone (a rerun after a crash)
     // prunes too: the crashed run never got that far.

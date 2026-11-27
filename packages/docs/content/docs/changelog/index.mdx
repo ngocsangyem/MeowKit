@@ -13,6 +13,25 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
+## 3.1.2-beta.1 (2026-11-27)
+
+A beta kit: `mewkit init` and `mewkit upgrade` skip it unless you pass `--beta`. It needs no new binary.
+
+### Improvements
+
+- `mk:worktree` puts every worktree under `<main checkout>/.worktrees/`, for feature and orchestrated worktrees alike, on every runtime, and also when it runs from inside a linked worktree. The directory carries its own `.gitignore` (`*`), so the skill no longer asks you to edit your `.gitignore`. `--worktree-root` and `WORKTREE_ROOT` still override the root and now print a warning.
+- `list` and `status` report an `owner` for each worktree: `main`, `kit`, `review`, `legacy` or `foreign`.
+- The cook parallel-execution rule creates agent worktrees through `mk:worktree` and hands the returned `worktreePath` to each agent as its working directory, instead of a bare `git worktree add`.
+
+### Bug Fixes
+
+- `mk:worktree remove` could delete another runtime's worktree, and its uncommitted work, when the search term matched it. It now removes only worktrees MeowKit created (`FOREIGN_WORKTREE` otherwise, with a pointer to `review-pr-cleanup` for review worktrees), and refuses a worktree with uncommitted or untracked files (`WORKTREE_DIRTY`) unless you pass `--discard-changes`.
+- Run from inside a linked worktree, `list` and `status` marked that worktree as the main one. They now find the main checkout from the shared git dir.
+
+### Migration Notes
+
+- The sibling `../worktrees/`, superproject `worktrees/` and monorepo `worktrees/` defaults are gone. Worktrees already there keep working, but `remove` treats them as `foreign`; remove them with `git worktree remove <path>`.
+
 ## 3.1.1 (2026-11-26)
 
 Kit 3.1.1 ships with `mewkit` 0.2.1. Run `mewkit self-update`, then `mewkit upgrade`: the install changes below need the new binary.

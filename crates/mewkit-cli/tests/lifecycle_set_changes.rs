@@ -3,8 +3,9 @@
 //! every ordered pair and for the full set taken down one runtime at a time.
 mod support;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
+use std::sync::Mutex;
 
 use support::kit::sha_tree;
 use support::temp_home::TempHome;
@@ -33,11 +34,23 @@ fn run(env: &TempHome, args: &[&str], step: &str) {
     assert_eq!(code(&out), 0, "{step}: {}", text(&out));
 }
 
-/// What a fresh install of `set` leaves in an empty project.
+/// What a fresh install of `set` leaves in an empty project. Installed once
+/// per set in a process: the pair tests compare against the same seven
+/// single-runtime installs over and over.
 fn fresh(set: &[&str]) -> BTreeMap<PathBuf, String> {
+    static SEEN: Mutex<Option<HashMap<String, BTreeMap<PathBuf, String>>>> = Mutex::new(None);
+    let key = set.join(",");
+    if let Some(tree) = SEEN.lock().unwrap().get_or_insert_default().get(&key) {
+        return tree.clone();
+    }
     let env = TempHome::new();
-    run(&env, &["init", "--target", &set.join(",")], "fresh init");
-    kit_files(&env)
+    run(&env, &["init", "--target", &key], "fresh init");
+    let tree = kit_files(&env);
+    SEEN.lock()
+        .unwrap()
+        .get_or_insert_default()
+        .insert(key, tree.clone());
+    tree
 }
 
 /// The paths on which two trees differ, for a failure message short enough to read.
@@ -52,62 +65,101 @@ fn differing(a: &BTreeMap<PathBuf, String>, b: &BTreeMap<PathBuf, String>) -> Ve
         .collect()
 }
 
-/// `first` installed, each other runtime added and `first` removed: what is
-/// left is a fresh install of the other one.
-fn leaving_after_each_other_runtime_joins(first: &str) {
-    for stays in RUNTIMES.iter().filter(|r| **r != first) {
-        let alone = fresh(&[stays]);
-        let env = TempHome::new();
-        let pair = format!("{first} then {stays}");
-        run(&env, &["init", "--target", first], &pair);
-        run(&env, &["init", "--target", stays], &pair);
-        run(&env, &["uninstall", "--target", first, "--yes"], &pair);
-        let left = kit_files(&env);
-        assert!(
-            left == alone,
-            "{pair}, {first} removed: differs from a fresh {stays} install at {:?}",
-            differing(&left, &alone)
-        );
-        run(&env, &["uninstall", "--target", stays, "--yes"], &pair);
-        let left = kit_files(&env);
-        assert!(left.is_empty(), "{pair}, both removed: left {left:?}");
+/// `first` installed, `stays` added and `first` removed: what is left is a
+/// fresh install of `stays`; removing `stays` too leaves nothing.
+fn leaving_after_other_runtime_joins(first: &str, stays: &str) {
+    let alone = fresh(&[stays]);
+    let env = TempHome::new();
+    let pair = format!("{first} then {stays}");
+    run(&env, &["init", "--target", first], &pair);
+    run(&env, &["init", "--target", stays], &pair);
+    run(&env, &["uninstall", "--target", first, "--yes"], &pair);
+    let left = kit_files(&env);
+    assert!(
+        left == alone,
+        "{pair}, {first} removed: differs from a fresh {stays} install at {:?}",
+        differing(&left, &alone)
+    );
+    run(&env, &["uninstall", "--target", stays, "--yes"], &pair);
+    let left = kit_files(&env);
+    assert!(left.is_empty(), "{pair}, both removed: left {left:?}");
+}
+
+/// One test per ordered pair of distinct runtimes, so a runner can spread
+/// the pairs across processes and machines instead of six to a test.
+macro_rules! pairs {
+    ($($name:ident: $first:literal then $stays:literal;)*) => {$(
+        #[test]
+        fn $name() {
+            leaving_after_other_runtime_joins($first, $stays);
+        }
+    )*};
+}
+
+pairs! {
+    claude_code_then_codex: "claude-code" then "codex";
+    claude_code_then_cursor: "claude-code" then "cursor";
+    claude_code_then_grok: "claude-code" then "grok";
+    claude_code_then_pi: "claude-code" then "pi";
+    claude_code_then_omp: "claude-code" then "omp";
+    claude_code_then_antigravity: "claude-code" then "antigravity";
+    codex_then_claude_code: "codex" then "claude-code";
+    codex_then_cursor: "codex" then "cursor";
+    codex_then_grok: "codex" then "grok";
+    codex_then_pi: "codex" then "pi";
+    codex_then_omp: "codex" then "omp";
+    codex_then_antigravity: "codex" then "antigravity";
+    cursor_then_claude_code: "cursor" then "claude-code";
+    cursor_then_codex: "cursor" then "codex";
+    cursor_then_grok: "cursor" then "grok";
+    cursor_then_pi: "cursor" then "pi";
+    cursor_then_omp: "cursor" then "omp";
+    cursor_then_antigravity: "cursor" then "antigravity";
+    grok_then_claude_code: "grok" then "claude-code";
+    grok_then_codex: "grok" then "codex";
+    grok_then_cursor: "grok" then "cursor";
+    grok_then_pi: "grok" then "pi";
+    grok_then_omp: "grok" then "omp";
+    grok_then_antigravity: "grok" then "antigravity";
+    pi_then_claude_code: "pi" then "claude-code";
+    pi_then_codex: "pi" then "codex";
+    pi_then_cursor: "pi" then "cursor";
+    pi_then_grok: "pi" then "grok";
+    pi_then_omp: "pi" then "omp";
+    pi_then_antigravity: "pi" then "antigravity";
+    omp_then_claude_code: "omp" then "claude-code";
+    omp_then_codex: "omp" then "codex";
+    omp_then_cursor: "omp" then "cursor";
+    omp_then_grok: "omp" then "grok";
+    omp_then_pi: "omp" then "pi";
+    omp_then_antigravity: "omp" then "antigravity";
+    antigravity_then_claude_code: "antigravity" then "claude-code";
+    antigravity_then_codex: "antigravity" then "codex";
+    antigravity_then_cursor: "antigravity" then "cursor";
+    antigravity_then_grok: "antigravity" then "grok";
+    antigravity_then_pi: "antigravity" then "pi";
+    antigravity_then_omp: "antigravity" then "omp";
+}
+
+/// The pair list above names every ordered pair of distinct runtimes once.
+#[test]
+fn the_pair_tests_cover_every_ordered_pair() {
+    let listed: Vec<(&str, &str)> = PAIR_SOURCE
+        .lines()
+        .filter_map(|l| l.split_once(": \""))
+        .filter_map(|(_, rest)| rest.split_once("\" then \""))
+        .map(|(a, b)| (a, b.trim_end_matches("\";")))
+        .collect();
+    let mut want = Vec::new();
+    for a in RUNTIMES {
+        for b in RUNTIMES.iter().filter(|b| **b != a) {
+            want.push((a, *b));
+        }
     }
+    assert_eq!(listed, want);
 }
 
-#[test]
-fn claude_code_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("claude-code");
-}
-
-#[test]
-fn codex_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("codex");
-}
-
-#[test]
-fn cursor_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("cursor");
-}
-
-#[test]
-fn grok_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("grok");
-}
-
-#[test]
-fn pi_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("pi");
-}
-
-#[test]
-fn omp_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("omp");
-}
-
-#[test]
-fn antigravity_leaves_a_fresh_install_of_each_other_runtime() {
-    leaving_after_each_other_runtime_joins("antigravity");
-}
+const PAIR_SOURCE: &str = include_str!("lifecycle_set_changes.rs");
 
 #[test]
 fn the_full_set_taken_down_one_runtime_at_a_time_matches_a_fresh_install_each_time() {

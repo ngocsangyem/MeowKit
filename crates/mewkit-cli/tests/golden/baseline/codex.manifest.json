@@ -4024,18 +4024,23 @@
     },
     {
       "path": ".agents/skills/mk-worktree/scripts/lib/worktree-git-helpers.cjs",
-      "sha256": "17c63b9396fd03fec600ef876707bd67e7c0172d7067ed35cb86374cd4bac4d9",
-      "size": 15414
+      "sha256": "39161bef84213931acfef8899928c71715236d943c519ac83fc0980357c547fc",
+      "size": 16260
+    },
+    {
+      "path": ".agents/skills/mk-worktree/scripts/lib/worktree-ownership.cjs",
+      "sha256": "e78f6a60e8dfce13527bc23cf497ff14d5fcfb3fd24734dddf54f0cd5e93adea",
+      "size": 8833
     },
     {
       "path": ".agents/skills/mk-worktree/scripts/lib/worktree-review-pr.cjs",
-      "sha256": "87ec13caae5db32670f061af2ca93f483d9ac3f31012c4570ae9ff248d68d5a7",
-      "size": 18636
+      "sha256": "473d0727c6148347980c4ca5dc6620055e593b674115502066300e0665e94f5b",
+      "size": 18625
     },
     {
       "path": ".agents/skills/mk-worktree/scripts/worktree.cjs",
-      "sha256": "dc90185e269cb7cd7a7ec55282e4f8a093cdd51ab6e7d350de8481ed88ca407d",
-      "size": 30021
+      "sha256": "669f5e8a1d6c8dcd8a55f77eccbd8fac474c7efcef4ef58056e11a0730213ffc",
+      "size": 28458
     },
     {
       "path": ".agents/skills/mk-worktree/scripts/worktree.test.cjs",

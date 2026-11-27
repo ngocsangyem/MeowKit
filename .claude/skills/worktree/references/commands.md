@@ -33,8 +33,8 @@ node scripts/worktree.cjs info --json
 | `repoType` | `"standalone" \| "monorepo"` | Detected via `.gitmodules` |
 | `gitRoot` | `string` | Absolute path to git root |
 | `baseBranch` | `string` | Auto-detected: `dev → develop → main → master` |
-| `worktreeRoot` | `string` | Where worktrees will be created by default |
-| `worktreeRootSource` | `string` | Why this location was chosen |
+| `worktreeRoot` | `string` | Where worktrees will be created: `<main checkout>/.worktrees` unless `WORKTREE_ROOT` is set |
+| `worktreeRootSource` | `string` | `default (.worktrees/)` or `WORKTREE_ROOT env` |
 | `projects` | `array` | Monorepo submodule list (empty for standalone) |
 | `envFiles` | `string[]` | `.env*` files found at repo root |
 | `projectEnvFiles` | `object` | Per-project env files (monorepo only) |
@@ -66,6 +66,7 @@ node scripts/worktree.cjs list --json
 | `branch` | `string` | Checked-out branch name or `"detached"` / `"bare"` |
 | `commit` | `string \| null` | HEAD commit SHA |
 | `isMainWorktree` | `boolean` | Whether this is the primary worktree |
+| `owner` | `string` | `main`; `kit` (ownership marker); `review` (review-pr worktree); `legacy` (unmarked, directly under `<main>/.worktrees/`); `foreign` (anything else) |
 | `locked` | `boolean` | Whether worktree is locked |
 | `prunable` | `boolean` | Whether git considers it stale |
 
@@ -111,8 +112,17 @@ Creates a worktree. Two modes:
 node scripts/worktree.cjs create "{agent-name}" --orchestrated [--dry-run] --json
 ```
 
-Places worktree at `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`.
+Places worktree at `<root>/{agent-name}` (default `<main>/.worktrees/{agent-name}`) on branch `parallel/{agent-name}-{timestamp}`.
 Matches `.claude/skills/cook/references/parallel-execution-rules.md` Rule 3 exactly.
+
+### Root and ownership (both modes)
+
+The root is `<main checkout>/.worktrees/`, found from the common git dir, so a create run
+inside a linked worktree lands in the same place. `--worktree-root`, then `WORKTREE_ROOT`,
+override it and add a warning. On a real create in the default root the script writes
+`.worktrees/.gitignore` holding `*` (never overwriting one), and after `git worktree add`
+it writes `meowkit-owner.json` into the new worktree's private git dir. `remove` trusts that
+marker. Dry-run writes nothing.
 
 ### Feature mode (standard)
 
@@ -130,7 +140,7 @@ node scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
 | `--prefix <type>` | `feat` | Branch prefix: `feat\|fix\|refactor\|docs\|test\|chore\|perf` |
 | `--base <branch>` | auto | Override base branch detection |
 | `--no-prefix` | off | Use feature name as-is (no prefix, preserves case/slashes) |
-| `--worktree-root <path>` | auto | Explicit directory for worktrees |
+| `--worktree-root <path>` | `<main>/.worktrees` | Explicit directory for worktrees (warns) |
 | `--checkout-submodules` | off | Run `git submodule update --init` after create |
 | `--env <files>` | none | Comma-separated `.env` files to copy (legacy) |
 | `--dry-run` | off | Show what would happen without executing |
@@ -141,7 +151,8 @@ node scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
 |-------|------|-------------|
 | `success` | `true` | |
 | `dryRun` | `boolean` | Present and `true` when `--dry-run` |
-| `worktreePath` | `string` | Absolute path of new worktree |
+| `worktreePath` | `string` | Absolute path of new worktree; give it to the agent as its working directory |
+| `worktreeRootSource` | `string` | `default (.worktrees/)`, `--worktree-root flag` or `WORKTREE_ROOT env` |
 | `branch` | `string` | Created/checked-out branch name |
 | `baseBranch` | `string` | Branch worktree was created from |
 | `agentName` | `string` | Agent name (orchestrated mode only) |
@@ -154,13 +165,20 @@ node scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
 
 ## remove
 
-Removes a worktree and deletes its branch. Supports fuzzy matching by name, path, or branch.
+Removes a worktree this script created and deletes its branch. Supports fuzzy matching by name, path, or branch.
 
 ```bash
-node scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
+node scripts/worktree.cjs remove "{agent-name}" [--discard-changes] [--dry-run] --json
 ```
 
-**Match priority:** exact → prefix → contains (≥4 chars). Errors on 0 or >1 matches.
+**Candidates:** only worktrees whose `owner` is `kit` or `legacy` (`legacy` removal adds a warning).
+**Match priority:** exact → prefix → contains (≥4 chars) over the candidates. Errors on 0 or >1 matches.
+A term that matches only other worktrees fails with `FOREIGN_WORKTREE`; for a review worktree
+the suggestion names `review-pr-cleanup --manifest`.
+
+**Dirty guard:** `git status --porcelain` in the target must be empty (untracked files count),
+or the command fails with `WORKTREE_DIRTY` and lists up to 10 paths. `--discard-changes` skips the
+guard and passes `--force` to git. Ignored files are not checked and are deleted with the worktree.
 
 ### JSON Output Fields (success)
 
@@ -169,6 +187,7 @@ node scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
 | `success` | `true` | |
 | `dryRun` | `boolean` | Present when `--dry-run` |
 | `removedPath` | `string` | Path of removed worktree |
+| `owner` | `string` | `kit` or `legacy` |
 | `branchDeleted` | `string \| null` | Branch name if deleted |
 | `branchKept` | `string \| null` | Branch name if kept (not fully merged) |
 | `warnings` | `string[]` | Non-fatal issues |
@@ -226,6 +245,7 @@ Removal proceeds only when the manifest nonce matches the in-worktree `.mewkit-r
 |--------|-------------|
 | `--json` | Emit JSON on stdout (all commands). Required for LLM consumption. |
 | `--dry-run` | Show what would happen without modifying git state. |
+| `--discard-changes` | `remove` only: delete a worktree that holds uncommitted work. |
 | `--help`, `-h` | Show help text. |
 
 ---
@@ -259,6 +279,8 @@ All errors emit `{ success: false, error: { code, message, ...details } }` and e
 | `MISSING_WORKTREE` | remove | No name/path argument provided |
 | `WORKTREE_NOT_FOUND` | remove | No worktree matches search term |
 | `MULTIPLE_WORKTREES_MATCH` | remove | Search term matches >1 worktree |
+| `FOREIGN_WORKTREE` | remove | Term matches only worktrees this script did not create (`review`, `foreign`) |
+| `WORKTREE_DIRTY` | remove | Target has uncommitted or untracked work and `--discard-changes` was not given |
 | `WORKTREE_REMOVE_FAILED` | remove | `git worktree remove` failed |
 | `WORKTREE_LIST_ERROR` | list/status/remove | `git worktree list` failed |
 | `WORKTREE_PRUNE_FAILED` | prune | `git worktree prune` failed |

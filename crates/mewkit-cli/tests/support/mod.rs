@@ -23,16 +23,24 @@ impl TempHome {
     /// (`--kit-dir`) for a project, and as a verified archive for `--global`,
     /// where a local directory needs a person at a terminal to confirm it.
     pub fn with_kit(&self, args: &[&str]) -> Output {
-        let kit = kit::kit();
-        let dir = kit.dir.to_string_lossy().into_owned();
-        let (zip, sha) = gate_kit::current_archive();
-        let zip = zip.to_string_lossy().into_owned();
-        let mut all: Vec<&str> = args.to_vec();
+        let mut all: Vec<String> = args.iter().map(|a| a.to_string()).collect();
         if args.contains(&"--global") {
-            all.extend(["--kit-archive", &zip, "--kit-sha256", sha]);
+            // Zipped only when asked for: most tests install from the directory.
+            let (zip, sha) = gate_kit::current_archive();
+            all.extend([
+                "--kit-archive".into(),
+                zip.to_string_lossy().into_owned(),
+                "--kit-sha256".into(),
+                sha.clone(),
+            ]);
         } else {
-            all.extend(["--kit-dir", &dir, "--allow-unverified-kit"]);
+            all.extend([
+                "--kit-dir".into(),
+                kit::kit().dir.to_string_lossy().into_owned(),
+                "--allow-unverified-kit".into(),
+            ]);
         }
+        let all: Vec<&str> = all.iter().map(String::as_str).collect();
         self.mewkit(&all)
     }
 

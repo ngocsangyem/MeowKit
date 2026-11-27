@@ -27,7 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
-const { checkGitRepo, checkGitVersion, detectBaseBranch, getWorktreeRecords } = require('./worktree-git-helpers.cjs');
+const { checkGitRepo, checkGitVersion, detectBaseBranch, getWorktreeRecords, ensureWorktreeRootIgnored } = require('./worktree-git-helpers.cjs');
 
 const SCHEMA_VERSION = '1.0.0';
 const WT_DIR = '.worktrees';
@@ -216,7 +216,7 @@ function cmdReviewPr(ctx) {
 
   // 2. Create the detached worktree. Transactional: any failure after this point
   //    runs the owned teardown before exiting non-zero (no litter).
-  try { fs.mkdirSync(path.join(gitRoot, WT_DIR), { recursive: true }); } catch { /* best effort */ }
+  try { ensureWorktreeRootIgnored(path.join(gitRoot, WT_DIR)); } catch { /* best effort */ }
   const addRes = gitExec(['worktree', 'add', '--detach', worktreeAbs, headSha], { cwd: gitRoot });
   if (!addRes.success) { gitExec(['update-ref', '-d', ref], { cwd: gitRoot }); return outputError('WORKTREE_ADD_FAILED', 'Failed to add review worktree', { gitError: addRes.stderr }); }
 
