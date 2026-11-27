@@ -13,6 +13,23 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
+## 3.1.2-beta.2 (2026-11-27)
+
+A beta kit: `mewkit init` and `mewkit upgrade` skip it unless you pass `--beta`. It needs no new binary.
+
+### Improvements
+
+- `mk:ship` checks that the review verdict still describes what ships. `mk:review` now records the reviewed commit (and, for a review of uncommitted work, a hash of each file), and ship names the code files changed since the review and asks whether to review again or ship anyway. Committing reviewed work, or merging the base, does not make the verdict stale.
+- `mk:ship` merges the base branch before it verifies, so tests run on what the PR will become. With uncommitted changes being shipped it merges after the local commit and before the push. A conflict outside a lockfile or version file aborts the merge and stops the run.
+- `mk:ship` stages only the paths you approved, each by name, scans the staged diff for secrets before each commit, and asks separately about files that run code elsewhere (CI workflows, git hooks, `.mcp.json`, agent settings, install scripts). It pushes nothing when the remote branch has commits the local one lacks, and never force-pushes.
+- `mk:ship` never merges the PR, hands red CI and review comments to `mk:respond-pr`, and in an unattended run stops BLOCKED with the list of answers it still needs: silence is never a yes. Its summary reports how many tests ran; zero tests is not a pass.
+- The `shipper` agent runs `prepare` (checks and a local commit) by default, and push and PR only when its brief names `release`, still with a yes before each.
+- The ship check hook says "Tests did not run: no test relates to the changed files (lint and type-check only)." when Vitest or Jest find no related test, instead of reporting a pass, and reports the test count when tests ran.
+
+### Removals
+
+- `mk:ship` no longer ships `references/rules.md`, which nothing loaded and which contradicted the skill.
+
 ## 3.1.2-beta.1 (2026-11-27)
 
 A beta kit: `mewkit init` and `mewkit upgrade` skip it unless you pass `--beta`. It needs no new binary.
