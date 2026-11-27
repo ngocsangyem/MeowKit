@@ -60,7 +60,8 @@ pub const STATE_ONLY_KEYS: &[(&str, &str)] = &[(
 )];
 
 pub use super::key_surface::{
-    AUTOBUILD_MODES, KEY_DOC, KeySpec, SCALAR_KEYS, TELEMETRY_MODES, ValueKind, key_doc, known_keys,
+    AUTOBUILD_MODES, KEY_DOC, KeySpec, SCALAR_KEYS, TELEMETRY_MODES, USER_ONLY_KEYS, ValueKind,
+    is_user_only_key, key_doc, known_keys,
 };
 
 /// The reason a namespace does not exist, when it is one of the refused ones.

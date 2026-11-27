@@ -58,6 +58,20 @@ const SCALAR_KEYS = {
 };
 
 /**
+ * Machine-wide keys, legal only in ~/.meowkit/config.yaml: they tune a watcher
+ * and a queue every project on the machine shares, so a committed project file
+ * must not change them. Kept out of SCALAR_KEYS so no project stub offers them.
+ */
+const USER_ONLY_KEYS = {
+  'host.enabled': { type: 'boolean' },
+  'host.auto_clean': { type: 'boolean' },
+  'host.max_heavy': { type: 'integer' },
+};
+
+/** True for a key only the user config may set. */
+const isUserOnlyKey = (key) => key.split('.')[0] === 'host';
+
+/**
  * Observer toggle names, kebab-case, taken from the registry. The registry is
  * required here rather than at module load because the registry reader asks this
  * module for the toggle rules, and a top-level require either way would leave
@@ -78,9 +92,9 @@ function observerNames(root) {
   return [...names].sort();
 }
 
-/** Every legal key for one project, scalar keys plus one toggle per observer. */
+/** Every legal key: scalar keys, user-only keys, one toggle per observer. */
 function knownKeys(root) {
-  const keys = { ...SCALAR_KEYS };
+  const keys = { ...SCALAR_KEYS, ...USER_ONLY_KEYS };
   for (const name of observerNames(root)) keys[`hooks.${name}`] = { type: 'boolean' };
   return keys;
 }
@@ -91,6 +105,8 @@ module.exports = {
   PROTECTED_REASON,
   FORBIDDEN_NAMESPACES,
   SCALAR_KEYS,
+  USER_ONLY_KEYS,
+  isUserOnlyKey,
   observerNames,
   knownKeys,
 };

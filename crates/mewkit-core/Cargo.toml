@@ -54,6 +54,12 @@ serde = { version = "1.0.229", features = ["derive"] }
 serde-saphyr = { version = "=2.2.0", default-features = false, features = ["deserialize"] }
 serde_json = { version = "1.0.154", features = ["preserve_order"] }
 sha2 = "0.11.1"
+# Host sampling for `mewkit host` (beta): CPU, memory, free space and per-process
+# I/O, cwd and parent through safe APIs, which this workspace needs because it
+# forbids `unsafe`. Pinned EXACTLY: a sampler's semantics (zero for a denied
+# process, delta definitions) are what the verdict trusts. Only the `system` and
+# `disk` features: no components, GPUs, networks or users.
+sysinfo = { version = "=0.40.4", default-features = false, features = ["system", "disk"] }
 tar = { version = "0.4", default-features = false }
 tempfile = "3.27.0"
 thiserror = "2.0.21"
@@ -63,6 +69,13 @@ toml_edit = "0.25.19"
 unicode-normalization = "0.1.26"
 ureq = "3.5.1"
 zip = { version = "9.5.0", default-features = false, features = ["deflate"] }
+
+# Windows disk idle % and latency for `mewkit host`: sysinfo has no disk-busy
+# counter, and the `windows` crate's PDH/IOCTL bindings are `unsafe fn`. The
+# `wmi` query API is safe Rust (COM stays inside the crate). Pinned EXACTLY;
+# no default features, which would pull `chrono` (RUSTSEC-2026-0543, unmaintained).
+[target.'cfg(windows)'.dependencies]
+wmi = { version = "=0.18.4", default-features = false }
 
 [dev-dependencies]
 proptest = "1.12.0"

@@ -698,3 +698,31 @@ Options:
       --yes      `restore`: proceed without a terminal to confirm in
   -h, --help     Print help
 ```
+
+## mewkit host
+
+```text
+(beta) Machine load, who causes it, and admission for heavy commands
+
+Usage: mewkit host <COMMAND>
+
+Commands:
+  status  (beta) Sample CPU, memory, disk, thermal and free space; print a verdict
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+```
+
+### mewkit host status
+
+```text
+(beta) Sample CPU, memory, disk, thermal and free space; print a verdict
+
+Usage: mewkit host status [OPTIONS]
+
+Options:
+      --json   Print one JSON document: {schema_version, kind, data}
+      --fresh  Sample now even when a recent snapshot exists
+  -h, --help   Print help
+```

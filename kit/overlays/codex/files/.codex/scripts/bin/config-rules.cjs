@@ -14,6 +14,7 @@ const {
   PROTECTED_REASON,
   FORBIDDEN_NAMESPACES,
   STATE_ONLY_KEYS,
+  isUserOnlyKey,
   knownKeys,
 } = require('./config-keys.cjs');
 
@@ -100,6 +101,15 @@ function applyRules(values, { root, scope = 'project config' } = {}) {
         key,
         `${key} is not a config key in the ${scope}: ${STATE_ONLY_KEYS[key]}`,
         `remove the key and run .claude/hooks/lib/workflow-config set ${key} true, which records it in .meowkit/state/`,
+      );
+    }
+
+    if (scope === 'project config' && isUserOnlyKey(key)) {
+      return reject(
+        'user-only-key',
+        key,
+        `${key} in the ${scope}: host settings are machine-wide, so a project file cannot change them`,
+        `remove ${key} here and set it in ~/.meowkit/config.yaml`,
       );
     }
 

@@ -525,4 +525,19 @@ Subcommands: `list`, `restore`.
 | `--dry-run` | `restore`: print the plan and change nothing |
 | `--yes` | `restore`: proceed without a terminal to confirm in |
 
+### `mewkit host`
+
+(beta) Machine load, who causes it, and admission for heavy commands
+
+Subcommands: `status`.
+
+### `mewkit host status`
+
+(beta) Sample CPU, memory, disk, thermal and free space; print a verdict
+
+| Flag | What it does |
+|---|---|
+| `--json` | Print one JSON document: \{schema_version, kind, data\} |
+| `--fresh` | Sample now even when a recent snapshot exists |
+
 {/* GENERATED:cli-flags END */}

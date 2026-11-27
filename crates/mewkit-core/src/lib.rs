@@ -14,6 +14,7 @@ pub mod config;
 pub mod eval;
 pub mod exec;
 pub mod fsx;
+pub mod host;
 pub mod journal;
 pub mod js_number;
 pub mod js_regex;

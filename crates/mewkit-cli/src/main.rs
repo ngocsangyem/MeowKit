@@ -26,7 +26,8 @@ use commands::{
     uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs, versions::VersionsArgs,
 };
 use commands::{
-    backups::BackupsArgs, capabilities::CapabilitiesArgs, eval::EvalArgs, pack::PackArgs,
+    backups::BackupsArgs, capabilities::CapabilitiesArgs, eval::EvalArgs, host::HostArgs,
+    pack::PackArgs,
     setup::SetupArgs, skill::SkillArgs,
 };
 
@@ -96,6 +97,8 @@ enum Command {
     Capabilities(CapabilitiesArgs),
     /// List or restore the backups lifecycle commands left behind.
     Backups(BackupsArgs),
+    /// (beta) Machine load, who causes it, and admission for heavy commands.
+    Host(HostArgs),
 }
 
 fn main() -> ExitCode {
@@ -123,6 +126,7 @@ fn main() -> ExitCode {
         Command::Pack(args) => commands::pack::run(&args),
         Command::Capabilities(args) => commands::capabilities::run(&args),
         Command::Backups(args) => commands::backups::run(&args),
+        Command::Host(args) => commands::host::run(&args),
     };
     match result {
         Ok(code) => ExitCode::from(code),
