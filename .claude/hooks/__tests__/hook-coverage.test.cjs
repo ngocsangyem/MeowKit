@@ -41,10 +41,13 @@ const ENTRY_DIRS = {
   antigravity: ['kit/overlays/antigravity/files/.agents/meowkit-antigravity/hooks'],
 };
 
-/** The installed path (first word of a `where`) exists in one of the runtime's bundles, or in the repo for a projection the CLI writes. */
+// The always-on file every install writes; a projection into it has no hook script to point at.
+const INSTALL_WRITTEN = ['AGENTS.md'];
+
+/** The installed path (first word of a `where`) exists in one of the runtime's bundles, or is a file every install writes. */
 function whereExists(runtime, where) {
   const file = where.split(' ')[0];
-  return [...BUNDLE_ROOTS[runtime], '.'].some((root) => fs.existsSync(path.join(ROOT, root, file)));
+  return INSTALL_WRITTEN.includes(file) || BUNDLE_ROOTS[runtime].some((root) => fs.existsSync(path.join(ROOT, root, file)));
 }
 
 /** `runtime: path` for each hook entry a bundle ships that no coverage row names. */
