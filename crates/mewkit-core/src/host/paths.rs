@@ -47,12 +47,18 @@ impl HostPaths {
     /// Create the root owner-only and stamp `VERSION` when absent.
     pub fn ensure(&self) -> io::Result<()> {
         create_private_dir(&self.root)?;
-        if !self.version().exists() {
-            crate::fsx::atomic_write(
+        if !self.version().exists()
+            && let Err(e) = crate::fsx::atomic_write(
                 &self.version(),
                 format!("{STATE_VERSION}\n").as_bytes(),
                 None,
-            )?;
+            )
+            // Callers starting at once on a fresh machine all write it; on
+            // Windows a rename onto a file another rename is replacing fails
+            // with "access denied". The file a winner wrote is just as good.
+            && !self.version().exists()
+        {
+            return Err(e);
         }
         Ok(())
     }
