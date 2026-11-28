@@ -7,7 +7,7 @@ mod support;
 use support::archive;
 use support::kit::sha_tree;
 use support::temp_home::TempHome;
-use support::{code, text};
+use support::{code, json, text};
 
 /// A project with codex installed from a local archive, which also caches it.
 fn installed_from_archive() -> (TempHome, tempfile::TempDir) {
@@ -26,10 +26,6 @@ fn installed_from_archive() -> (TempHome, tempfile::TempDir) {
     ]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     (env, scratch)
-}
-
-fn json(out: &std::process::Output) -> serde_json::Value {
-    serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {}", text(out)))
 }
 
 #[test]

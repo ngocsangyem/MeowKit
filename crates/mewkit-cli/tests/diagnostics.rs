@@ -4,11 +4,7 @@ mod support;
 
 use serde_json::Value;
 use support::temp_home::TempHome;
-use support::{archive, code, text, write};
-
-fn json(out: &std::process::Output) -> Value {
-    serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {}", text(out)))
-}
+use support::{archive, code, json, text, write};
 
 #[test]
 fn versions_lists_installed_and_cached_kits_offline() {

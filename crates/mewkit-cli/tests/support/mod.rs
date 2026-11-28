@@ -97,6 +97,11 @@ pub fn text(out: &Output) -> String {
     )
 }
 
+/// `out`'s stdout parsed as JSON; on a parse failure the panic shows the output.
+pub fn json(out: &Output) -> serde_json::Value {
+    serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {}", text(out)))
+}
+
 /// This checkout's kit as a release zip in `dir`, with its SHA-256.
 pub fn archive(dir: &Path) -> (PathBuf, String) {
     zip_tree(&kit::kit().dir, &dir.join("meowkit-release.zip"))
