@@ -5,13 +5,13 @@ mod support;
 use std::collections::BTreeMap;
 
 use mewkit_adapters::codex::Codex;
-use mewkit_adapters::contract::{EmitError, Kit, Op, Plan, Runtime, Scope};
+use mewkit_adapters::contract::{EmitError, Kit, Plan, Runtime, Scope};
 use mewkit_adapters::omp::{CONFIG, HOOK, Omp};
 use mewkit_adapters::pi::{EXTENSION, Pi};
 use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::surface_table::table;
 use mewkit_adapters::{EmitRequest, Emitter, agents_tree};
-use support::{Project, kit, request, sha_tree};
+use support::{Project, kit, request, sha_tree, written};
 
 /// `emitter`'s plan for a project where `set` is installed.
 fn plan_among(emitter: &dyn Emitter, kit: &Kit, scope: &Scope, set: &[Runtime]) -> Plan {
@@ -21,16 +21,6 @@ fn plan_among(emitter: &dyn Emitter, kit: &Kit, scope: &Scope, set: &[Runtime]) 
         ..request(kit, scope, &[], &[])
     };
     emitter.prepare(&req).unwrap()
-}
-
-fn written(plan: &Plan) -> BTreeMap<&str, &[u8]> {
-    plan.ops
-        .iter()
-        .filter_map(|op| match op {
-            Op::WriteFile { path, bytes, .. } => Some((path.as_str(), bytes.as_slice())),
-            _ => None,
-        })
-        .collect()
 }
 
 fn text<'a>(files: &BTreeMap<&str, &'a [u8]>, path: &str) -> &'a str {
