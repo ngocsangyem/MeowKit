@@ -7,7 +7,6 @@
 //! of what the handler does. If the handler rejects the output (wrong shape,
 //! empty, non-zero exit, untrusted executable) it falls back to the checkpoint
 //! cache, and this test sees that fallback label instead of an orientation.
-use std::path::Path;
 
 use crate::npm;
 
@@ -22,18 +21,7 @@ const handler = require(path.join(root, '.claude', 'hooks', 'handlers', 'orienta
 process.stdout.write(handler({ source: 'resume' }) || '');
 "#;
 
-fn copy_tree(source: &Path, dest: &Path) {
-    std::fs::create_dir_all(dest).expect("create a directory");
-    for entry in std::fs::read_dir(source).expect("read a directory") {
-        let entry = entry.expect("a directory entry");
-        let target = dest.join(entry.file_name());
-        if entry.path().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            std::fs::copy(entry.path(), &target).expect("copy a file");
-        }
-    }
-}
+use super::hook_mirrors::copy_tree;
 
 #[test]
 fn the_session_start_handler_accepts_the_rust_orientation() {

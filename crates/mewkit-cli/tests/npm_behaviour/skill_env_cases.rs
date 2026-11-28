@@ -10,12 +10,7 @@ use crate::npm;
 
 /// PATH with a fixture's `stub-bin/` in front.
 #[cfg(unix)]
-pub(crate) fn stubbed_path() -> String {
-    format!(
-        "stub-bin:{}",
-        std::env::var("PATH").unwrap_or_else(|_| "/usr/bin:/bin".to_string())
-    )
-}
+pub(crate) use super::review_cases::stubbed_path;
 
 const OWN_HELP: &str = "help text is rendered by each CLI's own parser";
 
