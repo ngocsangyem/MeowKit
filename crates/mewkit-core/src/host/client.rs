@@ -23,27 +23,38 @@ pub struct Prepared {
 /// creating its job before going ahead on its own (fail open).
 const KEY_LOCK_WAIT: Duration = Duration::from_secs(10);
 
-/// Variables that differ between two shells running the same command and
-/// never change what it does; everything else in the environment is part of
-/// the command's identity.
+/// Variables that differ between two shells, or two agent sessions, running
+/// the same command and never change what it does; everything else in the
+/// environment is part of the command's identity.
 const VOLATILE_ENV: &[&str] = &[
-    "PWD",
-    "OLDPWD",
-    "SHLVL",
-    "_",
-    "TERM_SESSION_ID",
-    "ITERM_SESSION_ID",
-    "WINDOWID",
-    "SECURITYSESSIONID",
-    "COLUMNS",
-    "LINES",
+    "PWD", "OLDPWD", "SHLVL", "_", "WINDOWID", "COLUMNS", "LINES", "TMPDIR", "TMP", "TEMP",
 ];
+/// Prefixes of variables an agent runtime or terminal sets per session.
+const VOLATILE_PREFIXES: &[&str] = &[
+    "CLAUDE",
+    "CODEX",
+    "CURSOR",
+    "GEMINI",
+    "VSCODE_",
+    "TERM_",
+    "ITERM_",
+    "MEOWKIT_SESSION",
+];
+/// Name parts that mark a per-session or per-process value.
+const VOLATILE_PARTS: &[&str] = &["SESSION", "TOKEN", "_PID", "SOCK", "NONCE"];
 
-/// Hash of the environment the command runs with, minus [`VOLATILE_ENV`]:
+fn volatile(name: &str) -> bool {
+    let upper = name.to_ascii_uppercase();
+    VOLATILE_ENV.contains(&upper.as_str())
+        || VOLATILE_PREFIXES.iter().any(|p| upper.starts_with(p))
+        || VOLATILE_PARTS.iter().any(|p| upper.contains(p))
+}
+
+/// Hash of the environment the command runs with, minus volatile variables:
 /// a build with another `GOOS`, toolchain or feature flag is another command.
 pub fn env_hash(vars: impl Iterator<Item = (std::ffi::OsString, std::ffi::OsString)>) -> String {
     let mut pairs: Vec<(std::ffi::OsString, std::ffi::OsString)> = vars
-        .filter(|(k, _)| !k.to_str().is_some_and(|k| VOLATILE_ENV.contains(&k)))
+        .filter(|(k, _)| !k.to_str().is_some_and(volatile))
         .collect();
     pairs.sort();
     let mut input = Vec::new();

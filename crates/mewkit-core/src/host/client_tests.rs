@@ -81,11 +81,16 @@ fn another_environment_is_another_command_but_volatile_variables_are_not() {
             ("PWD", "/x"),
             ("SHLVL", "3"),
             ("PATH", "/bin"),
+            ("CLAUDE_CODE_SESSION_ID", "s1"),
+            ("CLAUDE_PID", "42"),
+            ("TMPDIR", "/w/.tmp/agent-a"),
+            ("POSH_SESSION_ID", "p"),
+            ("SSH_AUTH_SOCK", "/tmp/sock"),
         ])
         .into_iter(),
     );
     assert_ne!(base, other, "GOOS changes the build");
-    assert_eq!(base, noisy, "order and volatile variables do not");
+    assert_eq!(base, noisy, "order and per-session variables do not");
 }
 
 #[test]

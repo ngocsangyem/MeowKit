@@ -27,41 +27,10 @@ const STALE_MS = 30000;
 const rank = (verdict) => VERDICTS.indexOf(verdict);
 const isInt = (n) => Number.isInteger(n) && n >= 0;
 
-/** Same spelling as the Rust side (`host::worktree::normalize`); shared fixture keeps them equal. */
-function normalize(p) {
-  const unified = String(p).replace(/\\/g, '/');
-  let prefix = '';
-  let rest = unified;
-  if (/^[A-Za-z]:/.test(unified)) {
-    prefix = `${unified[0].toLowerCase()}:`;
-    rest = unified.slice(2);
-  }
-  const absolute = rest.startsWith('/');
-  const parts = [];
-  for (const seg of rest.split('/')) {
-    if (seg === '' || seg === '.') continue;
-    if (seg === '..') parts.pop();
-    else parts.push(seg);
-  }
-  const joined = parts.join('/');
-  if (absolute) return joined ? `${prefix}/${joined}` : `${prefix}/`;
-  return `${prefix}${joined}`;
-}
+const { normalize, worktreeOf } = require('./host-evidence.cjs');
 
 const inboxKey = (toplevel) => crypto.createHash('sha256').update(normalize(toplevel)).digest('hex').slice(0, 16);
 
-/** The worktree root above `dir` (a `.git` dir or file), real path, or null. */
-function worktreeOf(dir) {
-  let cur = path.resolve(dir);
-  for (;;) {
-    if (fs.existsSync(path.join(cur, '.git'))) {
-      try { return fs.realpathSync(cur); } catch { return cur; }
-    }
-    const up = path.dirname(cur);
-    if (up === cur) return null;
-    cur = up;
-  }
-}
 
 function readJson(file) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }

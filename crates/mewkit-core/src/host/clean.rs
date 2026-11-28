@@ -12,13 +12,14 @@ use super::locks;
 use super::model::Verdict;
 use super::paths::{HostPaths, read_parsed};
 
-pub use super::clean_remove::remove;
+pub use super::clean_remove::{can_remove, remove};
 
 /// Ended jobs older than this go under a `clean` verdict.
 pub const JOB_AGE_MS: i64 = 24 * 3600 * 1000;
-/// False where file owners cannot be checked yet (Windows): there cleanup,
-/// the retention sweep and the automatic tier list items but remove none.
-pub const REMOVES: bool = cfg!(unix);
+/// Key locks unused this long are removed by every sweep.
+pub const KEY_AGE_MS: i64 = 24 * 3600 * 1000;
+/// Ended jobs kept at most, newest first, whatever their age.
+pub const MAX_ENDED_JOBS: usize = 200;
 /// Automatic runs are at least this far apart.
 pub const COOLDOWN_MS: i64 = 30 * 60 * 1000;
 
@@ -81,9 +82,31 @@ pub fn ended_jobs(paths: &HostPaths, now_ms: i64, age_ms: i64) -> Vec<Item> {
         .collect()
 }
 
+/// Key locks (one per command identity) not used for `age_ms` and not held
+/// now. A caller that races the removal at worst makes a duplicate job.
+pub fn stale_keys(paths: &HostPaths, now_ms: i64, age_ms: i64) -> Vec<Item> {
+    entries(&paths.dir("keys"))
+        .into_iter()
+        .filter(|p| p.extension().is_some_and(|e| e == "lock"))
+        .filter(|p| older_than(p, now_ms, age_ms) && !locks::is_held(p))
+        .map(|p| item(p, "key"))
+        .collect()
+}
+
+/// Ended jobs beyond the newest `keep`, so a busy week cannot fill the disk.
+pub fn excess_jobs(paths: &HostPaths, keep: usize) -> Vec<Item> {
+    jobs::all(paths)
+        .into_iter()
+        .filter(|job| !job.state().is_live())
+        .skip(keep)
+        .map(|job| item(job.dir, "job"))
+        .collect()
+}
+
 /// Everything tier 1 would remove now.
 pub fn plan(paths: &HostPaths, now_ms: i64) -> Vec<Item> {
     let mut items = ended_jobs(paths, now_ms, JOB_AGE_MS);
+    items.extend(stale_keys(paths, now_ms, KEY_AGE_MS));
     let queue = paths.dir("queue");
     for p in entries(&queue) {
         if p.extension().is_some_and(|e| e == "json") && !locks::is_held(&p.with_extension("lock"))
@@ -115,7 +138,7 @@ pub fn plan(paths: &HostPaths, now_ms: i64) -> Vec<Item> {
 /// Remove `items`, appending one `clean.log` line per action. Returns the
 /// number removed.
 pub fn execute(paths: &HostPaths, items: &[Item]) -> usize {
-    if items.is_empty() || !REMOVES {
+    if items.is_empty() || !can_remove(paths) {
         return 0;
     }
     let mut log = super::joblog::CappedLog::open(&paths.dir("clean.log")).ok();

@@ -559,7 +559,11 @@ Subcommands: `list`, `wait`, `log`, `cancel`.
 
 ### `mewkit host jobs list`
 
-List jobs, newest first
+List this worktree's jobs, newest first
+
+| Flag | What it does |
+|---|---|
+| `--all` | Every worktree's jobs on this machine, with the worktree path |
 
 ### `mewkit host jobs wait`
 
@@ -576,6 +580,10 @@ Print a job's log (secrets masked, last 2 MB at most)
 ### `mewkit host jobs cancel`
 
 Ask a job's supervisor to stop it
+
+| Flag | What it does |
+|---|---|
+| `--any-worktree` | Also stop a job started from another worktree |
 
 ### `mewkit host clean`
 

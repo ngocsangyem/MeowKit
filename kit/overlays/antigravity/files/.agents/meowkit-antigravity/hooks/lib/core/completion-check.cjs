@@ -148,7 +148,7 @@ function sessionState(file, sessionId) {
  * `mewkit host jobs wait` counts only for a done(0) job that ran on this very tree.
  */
 function recordPass({ root, stateFile, sessionId, command, now = Date.now(), home }) {
-  const job = finishedJob(command, home);
+  const job = finishedJob(command, home, root);
   const cls = job ? job.cls : classifyCommand(command);
   if (!cls) return null;
   const digest = treeDigest(root);

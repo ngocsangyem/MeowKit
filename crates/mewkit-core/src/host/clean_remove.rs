@@ -15,11 +15,28 @@ fn same_owner(a: &std::fs::Metadata, b: &std::fs::Metadata) -> bool {
     use std::os::unix::fs::MetadataExt;
     a.uid() == b.uid()
 }
-/// No owner check without `unsafe` here yet, so nothing is ever owned by
-/// "the same user": cleanup removes nothing on this platform (report-only).
+/// No per-file owner check without `unsafe` here: [`can_remove`] allows
+/// removal only for a host root inside the user's own profile.
 #[cfg(not(unix))]
 fn same_owner(_: &std::fs::Metadata, _: &std::fs::Metadata) -> bool {
-    false
+    true
+}
+
+/// True where removal is safe: always on Unix (every entry's owner is
+/// checked); on Windows only when the host root lies inside `USERPROFILE`,
+/// which by default only that user and administrators can write.
+pub fn can_remove(paths: &HostPaths) -> bool {
+    if cfg!(unix) {
+        return true;
+    }
+    let profile = std::env::var_os("USERPROFILE").map(std::path::PathBuf::from);
+    match (
+        profile.and_then(|p| p.canonicalize().ok()),
+        paths.root.canonicalize(),
+    ) {
+        (Some(profile), Ok(root)) => root.starts_with(profile),
+        _ => false,
+    }
 }
 
 /// Refuse anything outside the root, a protected file, a symlink on the way
@@ -55,6 +72,9 @@ fn check(root: &Path, path: &Path, owner: &std::fs::Metadata) -> io::Result<()> 
 
 /// Rename into a trash name beside it, then delete. Returns bytes freed.
 pub fn remove(paths: &HostPaths, item: &Item) -> io::Result<u64> {
+    if !can_remove(paths) {
+        return Err(io::Error::other("file owners cannot be checked here"));
+    }
     let owner = std::fs::symlink_metadata(&paths.root)?;
     check(&paths.root, &item.path, &owner)?;
     let dir = item

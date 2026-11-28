@@ -757,7 +757,7 @@ Options:
 Usage: mewkit host jobs <COMMAND>
 
 Commands:
-  list    List jobs, newest first
+  list    List this worktree's jobs, newest first
   wait    Wait for a job: its exit code when done, 75 while queued or running, 70 when lost or cancelled
   log     Print a job's log (secrets masked, last 2 MB at most)
   cancel  Ask a job's supervisor to stop it
@@ -770,11 +770,12 @@ Options:
 #### mewkit host jobs list
 
 ```text
-List jobs, newest first
+List this worktree's jobs, newest first
 
-Usage: mewkit host jobs list
+Usage: mewkit host jobs list [OPTIONS]
 
 Options:
+      --all   Every worktree's jobs on this machine, with the worktree path
   -h, --help  Print help
 ```
 
@@ -812,13 +813,14 @@ Options:
 ```text
 Ask a job's supervisor to stop it
 
-Usage: mewkit host jobs cancel <ID>
+Usage: mewkit host jobs cancel [OPTIONS] <ID>
 
 Arguments:
   <ID>  
 
 Options:
-  -h, --help  Print help
+      --any-worktree  Also stop a job started from another worktree
+  -h, --help          Print help
 ```
 
 ### mewkit host clean

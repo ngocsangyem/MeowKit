@@ -23,10 +23,12 @@ pub fn run(args: &CleanArgs) -> Result<u8, Failure> {
     }
     clean::describe(&items, &mut std::io::stdout());
     let bytes: u64 = items.iter().map(|i| i.bytes).sum();
-    if args.dry_run || !clean::REMOVES {
-        if !clean::REMOVES {
+    let removes = clean::can_remove(&paths);
+    if args.dry_run || !removes {
+        if !removes {
             println!(
-                "cleanup is report-only on this platform (beta): file owners cannot be checked yet"
+                "cleanup is report-only here (beta): {} is outside your user profile, so file owners cannot be checked",
+                paths.root.display()
             );
         }
         println!(

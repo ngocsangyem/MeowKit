@@ -37,13 +37,22 @@ The command runs without a shell, at low OS priority, in its own process group, 
 | `--background` | Return at once with the job id |
 | `--priority high\|normal\|low` | Queue level. `high` also runs at normal OS priority. A job that waits ages forward one level every 10 minutes |
 
-The same command, with the same arguments, in the same directory of the same worktree, on the same file tree and with the same environment, attaches to the job already running instead of starting a second one. Shell bookkeeping variables such as `PWD` and `SHLVL` do not count; any other variable, `GOOS` or a feature flag for example, makes it another command. Several callers that start the same command at once share one job.
+The same command, with the same arguments, in the same directory of the same worktree, on the same file tree and with the same environment, attaches to the job already running instead of starting a second one. Variables that differ per shell or per agent session do not count: `PWD`, `SHLVL`, `TMPDIR`, anything starting with `CLAUDE`, `CODEX`, `CURSOR` or `GEMINI`, and any name containing `SESSION`, `TOKEN`, `_PID` or `SOCK`. Any other variable, `GOOS` or a feature flag for example, makes it another command. Several callers that start the same command at once share one job.
 
 The job's log keeps at most 2 MB. Output is stored line by line through the same secret scrubber that `jobs log` uses, so the file on disk holds no token or address that the scrubber would mask.
 
 When the command exits but a process it started keeps its output open, the job waits up to 10 seconds for that output, then stops what is left and frees its slot. A cancel during that time still ends the job as cancelled (exit 70).
 
-`mewkit host jobs` lists jobs; `jobs wait <id>` waits for one, `jobs log <id>` prints its output and `jobs cancel <id>` stops it and everything it started.
+### Several projects on one machine
+
+The queue, the slots, the watcher and `~/.meowkit/host` are shared by every project on the machine, because the load is the machine's. Each job records the worktree it was started from, and the commands keep to it:
+
+- `mewkit host jobs list` shows this worktree's jobs; `--all` shows every worktree's, with the full path.
+- `jobs wait <id>` and `jobs log <id>` on another worktree's job say so on stderr. `jobs cancel <id>` refuses another worktree's job unless you pass `--any-worktree`.
+- A command never attaches to another worktree's job, and the completion check never credits one.
+- Each worktree has its own inbox note; only the verdict (`go`, `hold`, ...) is machine-wide.
+
+`jobs wait <id>` waits for a job, `jobs log <id>` prints its output and `jobs cancel <id>` stops it and everything it started.
 
 ### Exit codes
 
@@ -53,7 +62,7 @@ When the command exits but a process it started keeps its output open, the job w
 | `75` | Not finished. The first line says `QUEUED — NOT STARTED — NOT VERIFIED` or `STILL RUNNING — NOT VERIFIED`, followed by the job id |
 | `70` | The job was cancelled, or its supervisor died. Not verified; run it again once |
 
-A command that itself exits 75 or 70 shows its own output instead of those lines, so read the first line, not the code alone. Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran on the same file tree as the one being checked: the tree is recorded when the command starts and again when it exits, and a job whose tree changed in between, or whose tree is not the current one, earns no credit. The `mk` alias counts like `mewkit`.
+A command that itself exits 75 or 70 shows its own output instead of those lines, so read the first line, not the code alone. Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran in this worktree on the same file tree as the one being checked: the tree is recorded when the command starts and again when it exits, and a job whose tree changed in between, or whose tree is not the current one, earns no credit. The `mk` alias counts like `mewkit`.
 
 If the agent runtime ends the call with SIGTERM or SIGHUP while `run` or `jobs wait` is waiting, it prints the exit-75 block and exits 75; the job keeps running. Ctrl-C at a terminal cancels the job and exits 70 once it has stopped. On Windows these signals keep their default behaviour for now.
 
@@ -74,9 +83,9 @@ On Claude Code the `host-pressure` hook reads that note and adds one line to the
 
 Tier 1 never follows a symlink, never deletes a file another user owns (each file and folder inside an item is checked), and logs each removal to `~/.meowkit/host/clean.log`. `mewkit host clean --dry-run` lists what it would remove.
 
-Two kinds of bookkeeping always expire, whatever `host.auto_clean` says: ended jobs older than 7 days (removed through tier 1 rules and logged) and inbox notes older than 10 minutes. `host.auto_clean` switches off only the tier 1 run on low free space.
+Some bookkeeping always expires, whatever `host.auto_clean` says, through the same tier 1 rules and logged: ended jobs older than 7 days or beyond the newest 200, command key locks unused for a day, and inbox notes older than 10 minutes. `host.auto_clean` switches off only the tier 1 run on low free space.
 
-On Windows, cleanup is report-only in this beta: file owners cannot be checked there yet, so `host clean`, the 7-day expiry and the automatic run list items and remove none.
+On Windows a file's owner cannot be checked yet, so cleanup removes files only when `~/.meowkit/host` lies inside your user profile (`USERPROFILE`), which by default only you and administrators can write. Elsewhere `host clean`, the expiry and the automatic run list items and remove none.
 
 Cargo can clean its own caches: since Rust 1.88 it removes old downloaded crates by itself unless `cache.auto-clean-frequency` is `"never"`. `--caches` says so when that setting turns it off.
 
@@ -86,7 +95,7 @@ The kit files of this feature (the skill references and the hook) are installed,
 
 The watcher and `~/.meowkit/host` belong to the machine, not to one project:
 
-- After `mewkit self-update` or a package upgrade replaces the binary, the running watcher exits within one sample, and the hook starts the new one. A watcher, `run` or supervisor that finds host state written by a newer mewkit leaves it alone: the watcher exits and `run` runs the command directly. `mewkit host watch --detach` also replaces a watcher from another version at once.
+- After `mewkit self-update` or a package upgrade replaces the binary, the running watcher exits within one sample, and the hook starts the new one. Host state written by a newer release is left alone by an older binary: its watcher exits and its `run` runs the command directly. `mewkit host watch --detach` also replaces a watcher from another version at once.
 - When `mewkit uninstall --yes` removes the last runtime of an install, it stops the watcher and names `~/.meowkit/host`. The folder stays, because other projects on the machine may use it: `mewkit host clean` removes its stale parts, and you can delete it when no project uses MeowKit any more.
 - `mewkit doctor` has a `host watcher (beta)` row: running or not, its version, and the size of the state.
 

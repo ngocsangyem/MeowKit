@@ -204,12 +204,18 @@ pub fn find_duplicate(paths: &HostPaths, meta: &Meta) -> Option<JobDir> {
     })
 }
 
-/// Remove ended job directories older than the retention (every `host run`
-/// does this, whatever the verdict), through the same no-follow deletion as
-/// the cleanup tier.
+/// Remove ended job directories older than the retention or beyond the
+/// newest [`super::clean::MAX_ENDED_JOBS`], and unused key locks (every
+/// `host run` and the watcher do this, whatever the verdict), through the
+/// same no-follow deletion as the cleanup tier.
 pub fn sweep(paths: &HostPaths, now_ms: i64) -> usize {
-    super::clean::execute(
-        paths,
-        &super::clean::ended_jobs(paths, now_ms, RETENTION_MS),
-    )
+    use super::clean;
+    let mut items = clean::ended_jobs(paths, now_ms, RETENTION_MS);
+    for extra in clean::excess_jobs(paths, clean::MAX_ENDED_JOBS) {
+        if !items.contains(&extra) {
+            items.push(extra);
+        }
+    }
+    items.extend(clean::stale_keys(paths, now_ms, clean::KEY_AGE_MS));
+    clean::execute(paths, &items)
 }

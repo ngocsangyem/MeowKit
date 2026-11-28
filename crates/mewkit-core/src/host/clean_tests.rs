@@ -42,7 +42,7 @@ fn ended_jobs_dead_tickets_and_rotated_logs_go_and_are_logged() {
         kinds.contains(&"job") && kinds.contains(&"ticket") && kinds.contains(&"rotated-log"),
         "{kinds:?}"
     );
-    if !clean::REMOVES {
+    if !clean::can_remove(&paths) {
         // Report-only where owners cannot be checked: nothing goes.
         assert_eq!(clean::execute(&paths, &items), 0);
         assert!(job.dir.exists());
@@ -76,7 +76,7 @@ fn a_symlink_inside_an_item_aborts_it_and_the_target_survives() {
     assert!(job.dir.exists());
     assert_eq!(std::fs::read_to_string(&precious).unwrap(), "keep");
     assert!(
-        !clean::REMOVES
+        !clean::can_remove(&paths)
             || std::fs::read_to_string(paths.dir("clean.log"))
                 .unwrap()
                 .contains("skipped job")
@@ -115,7 +115,7 @@ fn automatic_runs_only_under_clean_when_enabled_and_after_the_cooldown() {
     assert_eq!(clean::run_auto(&paths, Verdict::Go, true, now), None);
     assert_eq!(clean::run_auto(&paths, Verdict::Clean, false, now), None);
     assert!(paths.dir("watch.1").exists());
-    let one = usize::from(clean::REMOVES);
+    let one = usize::from(clean::can_remove(&paths));
     assert_eq!(
         clean::run_auto(&paths, Verdict::Clean, true, now),
         Some(one)
@@ -131,4 +131,32 @@ fn automatic_runs_only_under_clean_when_enabled_and_after_the_cooldown() {
         Some(one)
     );
     assert!(paths.stats().exists());
+}
+
+#[test]
+fn sweeps_drop_unused_key_locks_and_jobs_past_the_cap() {
+    let (_home, paths) = setup();
+    if !clean::can_remove(&paths) {
+        return;
+    }
+    super::paths::create_private_dir(&paths.dir("keys")).unwrap();
+    let old_key = paths.dir("keys").join("aaaa.lock");
+    std::fs::write(&old_key, "").unwrap();
+    let held_key = paths.dir("keys").join("bbbb.lock");
+    let _held = super::locks::try_hold(&held_key).unwrap().unwrap();
+    let later = time_now_ms() + clean::KEY_AGE_MS + 60_000;
+    let keys: Vec<_> = clean::stale_keys(&paths, later, clean::KEY_AGE_MS)
+        .into_iter()
+        .map(|i| i.path)
+        .collect();
+    assert_eq!(keys, vec![old_key], "a held key stays");
+
+    for n in 0..(clean::MAX_ENDED_JOBS + 3) {
+        ended_job(&paths, &format!("j{n:04}"));
+    }
+    let excess = clean::excess_jobs(&paths, clean::MAX_ENDED_JOBS);
+    assert_eq!(excess.len(), 3);
+    assert!(excess.iter().all(|i| i.path.ends_with("j0000")
+        || i.path.ends_with("j0001")
+        || i.path.ends_with("j0002")));
 }

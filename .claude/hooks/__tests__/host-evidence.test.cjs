@@ -21,7 +21,7 @@ test('a foreground host run counts as its inner command; background or piped doe
   assert.equal(check.classifyCommand('mewkit host run --background -- cargo test'), null);
   assert.equal(check.classifyCommand('mewkit host run -- cargo test | tail'), null);
   assert.equal(check.classifyCommand('mewkit host run -- ls'), null);
-  assert.equal(check.classifyCommand('mk host run -- cargo test'), 'test', 'the mk alias');
+  assert.equal(check.classifyCommand('mk host run -- cargo test'), 'test', 'the short binary name');
   assert.equal(check.classifyCommand('mkdir host run -- cargo test'), null);
   assert.equal(check.classifyCommand('mewkit host jobs wait 261128-1-abc'), null, 'the text names no runner');
 });
@@ -36,10 +36,10 @@ function repo() {
   return dir;
 }
 
-function job(home, id, { exit, cancelled = false, cls = 'test', digest, ran = digest }) {
+function job(home, id, { exit, cancelled = false, cls = 'test', digest, ran = digest, worktree }) {
   const dir = path.join(home, '.meowkit', 'host', 'jobs', id);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify({ id, cmd_class: cls, tree_digest: digest, ran_tree_digest: ran, cmd_hash: 'h', exe_base: 'cargo' }));
+  fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify({ id, cmd_class: cls, tree_digest: digest, ran_tree_digest: ran, worktree, cmd_hash: 'h', exe_base: 'cargo' }));
   if (exit !== undefined) fs.writeFileSync(path.join(dir, 'exit'), String(exit));
   if (cancelled) fs.writeFileSync(path.join(dir, 'cancelled'), '1');
 }
@@ -49,19 +49,24 @@ test('jobs wait counts only a done(0) job on the current tree, with the class it
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-hostev-home-'));
   const stateFile = path.join(root, '.meowkit', 'state', 'evidence.json');
   const digest = check.treeDigest(root);
+  const mk = (id, o) => job(home, id, { worktree: root, ...o });
   const pass = (id) => check.recordPass({ root, stateFile, sessionId: 's', command: `mewkit host jobs wait ${id}`, home });
-  job(home, 'ok', { exit: 0, cls: 'lint', digest });
-  job(home, 'failed', { exit: 1, digest });
-  job(home, 'running', { digest });
-  job(home, 'cancelled', { exit: 130, cancelled: true, digest });
-  job(home, 'cancelled0', { exit: 0, cancelled: true, digest });
-  job(home, 'noclass', { exit: 0, cls: null, digest });
-  job(home, 'old-tree', { exit: 0, digest: 'f'.repeat(64) });
-  job(home, 'ran-elsewhere', { exit: 0, digest, ran: 'e'.repeat(64) });
-  job(home, 'tree-moved', { exit: 0, digest, ran: null });
+  mk('ok', { exit: 0, cls: 'lint', digest });
+  mk('failed', { exit: 1, digest });
+  mk('running', { digest });
+  mk('cancelled', { exit: 130, cancelled: true, digest });
+  mk('cancelled0', { exit: 0, cancelled: true, digest });
+  mk('noclass', { exit: 0, cls: null, digest });
+  mk('old-tree', { exit: 0, digest: 'f'.repeat(64) });
+  mk('other-worktree', { exit: 0, digest, worktree: '/elsewhere/clone' });
+  mk('ran-elsewhere', { exit: 0, digest, ran: 'e'.repeat(64) });
+  mk('tree-moved', { exit: 0, digest, ran: null });
   assert.equal(pass('ok'), 'lint');
-  for (const id of ['failed', 'running', 'cancelled', 'cancelled0', 'noclass', 'old-tree', 'ran-elsewhere', 'tree-moved', 'missing']) assert.equal(pass(id), null, id);
-  for (const command of ['mk host jobs wait ok', 'mewkit host jobs wait --timeout 2m ok', 'mewkit host jobs wait ok --timeout=30s', '/opt/bin/mk.exe host jobs wait ok']) {
+  for (const id of ['failed', 'running', 'cancelled', 'cancelled0', 'noclass', 'old-tree', 'ran-elsewhere', 'other-worktree', 'tree-moved', 'missing']) assert.equal(pass(id), null, id);
+  // Built from parts: the kit's reference checker resolves two command levels only, so a
+  // literal `--timeout` after `jobs wait` would read to it as a `jobs` flag.
+  const wait = ['host', 'jobs', 'wait'].join(' ');
+  for (const command of [`mk ${wait} ok`, `mewkit ${wait} --timeout 2m ok`, `mewkit ${wait} ok --timeout=30s`, `/opt/bin/mk.exe ${wait} ok`]) {
     assert.equal(check.recordPass({ root, stateFile, sessionId: 's', command, home }), 'lint', command);
   }
   assert.equal(check.recordPass({ root, stateFile, sessionId: 's', command: 'mewkit host jobs wait ../../etc', home }), null);

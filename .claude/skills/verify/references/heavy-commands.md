@@ -43,7 +43,7 @@ you can tell whether the load is yours.
 - A command can itself exit 75 or 70. Read those codes as the runner's only with its
   `NOT VERIFIED` first line or its `lost`/`cancelled` stderr line; otherwise they are the command's own failure.
 - `mewkit host jobs log <id>` shows a job's output (secrets masked); `mewkit host jobs list`
-  shows all jobs. Read only the jobs you started.
+  shows this worktree's jobs (`--all`: every project's). Read only the jobs you started.
 
 ## Never
 
