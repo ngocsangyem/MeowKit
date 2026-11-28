@@ -37,7 +37,7 @@ The command runs without a shell, at low OS priority, in its own process group, 
 | `--background` | Return at once with the job id |
 | `--priority high\|normal\|low` | Queue level. `high` also runs at normal OS priority. A job that waits ages forward one level every 10 minutes |
 
-The same command, with the same arguments, in the same directory of the same worktree, on the same file tree and with the same environment, attaches to the job already running instead of starting a second one. Variables that differ per shell or per agent session do not count: `PWD`, `SHLVL`, `TMPDIR`, anything starting with `CLAUDE`, `CODEX`, `CURSOR` or `GEMINI`, and any name containing `SESSION`, `TOKEN`, `_PID` or `SOCK`. Any other variable, `GOOS` or a feature flag for example, makes it another command. Several callers that start the same command at once share one job.
+The same command, with the same arguments, in the same directory of the same worktree, on the same file tree and with the same environment, attaches to the job already running instead of starting a second one. Variables that differ per shell or per agent session do not count: `PWD`, `SHLVL`, `TMPDIR`, anything starting with `CLAUDE`, `CODEX`, `CURSOR`, `GEMINI` or `HERDR_` (herdr gives each pane its own id), and any name containing `SESSION`, `TOKEN`, `_PID` or `SOCK` (omp's `OMP_BASH_SESSION`, for example). Any other variable, `GOOS` or a feature flag for example, makes it another command. Several callers that start the same command at once share one job.
 
 The job's log keeps at most 2 MB. Output is stored line by line through the same secret scrubber that `jobs log` uses, so the file on disk holds no token or address that the scrubber would mask.
 
@@ -67,6 +67,118 @@ A command that itself exits 75 or 70 shows its own output instead of those lines
 If the agent runtime ends the call with SIGTERM or SIGHUP while `run` or `jobs wait` is waiting, it prints the exit-75 block and exits 75; the job keeps running. Ctrl-C at a terminal cancels the job and exits 70 once it has stopped. On Windows these signals keep their default behaviour for now.
 
 When admission is switched off, `HOME` is unset, or anything in the queue fails, `run` runs the command directly in the foreground: an internal error never blocks a command.
+
+## Use cases
+
+Each diagram shows what the host does in one common setup. The host never changes what a command does; it decides when the command starts, how long the caller waits, and who may reuse or credit the result.
+
+### One agent, one heavy command
+
+With a free slot the command starts at once, and its own exit code comes back as if it ran directly.
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant H as host run
+    participant S as Supervisor
+    A->>H: host run -- cargo test
+    H->>H: verdict go, slot free
+    H->>S: start job (low priority, own process group)
+    S-->>H: output, exit 0
+    H-->>A: output, exit 0
+```
+
+### Several agents in their own worktrees
+
+Each worktree gets its own job. Slots cap how many heavy jobs run together (`host.max_heavy` under `go`, 1 under `throttle`); the rest wait in the queue. A caller whose wait runs out gets exit 75 and a job id, not a pass.
+
+```mermaid
+sequenceDiagram
+    participant A1 as Agent 1 (wt-a)
+    participant A2 as Agent 2 (wt-b)
+    participant Q as Queue and slots
+    A1->>Q: host run -- cargo test
+    Q-->>A1: slot 1, running
+    A2->>Q: host run -- cargo test
+    Q-->>A2: verdict throttle, queued
+    Note over A2: wait runs out
+    Q-->>A2: exit 75, QUEUED, NOT VERIFIED, job id
+    A1-->>Q: job ends, slot freed
+    Q->>Q: Agent 2 job starts
+    A2->>Q: jobs wait (job id)
+    Q-->>A2: exit code of the real run
+```
+
+### A chief-of-staff agent and omp workers in herdr
+
+A Claude Code agent talks to you and never edits; it starts omp workers in herdr panes and reads their reports. By default herdr starts a worker in a sibling pane in the same checkout, so workers and the coordinator share one worktree.
+
+- Two workers running the same command on the same tree share one job: herdr's per-pane `HERDR_*` variables and omp's `OMP_BASH_SESSION` do not make it another command.
+- An omp worker waits 50 seconds by default, under omp's 300-second bash timeout, so the tool call returns with output or with exit 75 before omp cuts it off.
+- The coordinator's `host-pressure` hook names the worktree's jobs and the machine verdict in its context, so it knows the workers are waiting on the queue, not stuck. It can follow a worker's job with `jobs wait` and `jobs log`.
+- omp runs no completion check and no `host-pressure` hook; its skills tell the worker to read `mewkit host status`, and to treat exit 75 as not verified.
+- Workers on a herdr worktree (`herdr worktree create`) are another worktree: they get their own jobs, and the coordinator sees them with `mewkit host jobs list` and `--all`.
+
+```mermaid
+sequenceDiagram
+    participant U as You
+    participant C as Coordinator (Claude Code)
+    participant W1 as omp worker 1
+    participant W2 as omp worker 2
+    participant H as host
+    U->>C: task
+    C->>W1: herdr agent start (same checkout)
+    C->>W2: herdr agent start (same checkout)
+    W1->>H: host run -- cargo test
+    H-->>W1: job J, running
+    W2->>H: host run -- cargo test (same tree)
+    H-->>W2: attached to job J
+    H-->>C: hook note: 1 job in this worktree, verdict
+    H-->>W1: exit 0 (or 75 after 50 s)
+    H-->>W2: exit 0
+    W1->>C: report
+    C->>U: summary
+```
+
+### A long suite that outlives the tool call
+
+The job keeps running when the runtime ends the call. The completion check credits the later `jobs wait` only for exit 0, on the tree the job ran on.
+
+```mermaid
+flowchart LR
+    R[host run] -->|wait runs out or SIGTERM| E75[exit 75, job keeps running]
+    E75 --> W[jobs wait]
+    W -->|exit 0, same tree, same worktree| OK[credited]
+    W -->|failed, cancelled, tree changed| NO[not credited]
+```
+
+### Several projects on one machine
+
+The load is the machine's, so the queue and slots are shared; jobs, attach, credit and inbox notes stay with their worktree.
+
+```mermaid
+flowchart TB
+    subgraph M[One machine: ~/.meowkit/host]
+      Q[Queue and slots]
+      V[Verdict]
+    end
+    P1[Project A worktree] -->|its jobs, its inbox note| Q
+    P2[Project B worktree] -->|its jobs, its inbox note| Q
+    V --> P1
+    V --> P2
+```
+
+### Low free space
+
+On a `clean` verdict no heavy job is admitted. The watcher removes MeowKit's own stale state and only reports `target/` folders and Cargo caches.
+
+```mermaid
+flowchart LR
+    D[free space low] --> CL[verdict clean, 0 slots]
+    CL --> T1[tier 1: remove own stale state, logged]
+    CL --> T3["--caches: report target/ sizes, you decide"]
+    T1 --> G[space back, verdict go]
+```
 
 ## The watcher
 

@@ -29,7 +29,8 @@ const KEY_LOCK_WAIT: Duration = Duration::from_secs(10);
 const VOLATILE_ENV: &[&str] = &[
     "PWD", "OLDPWD", "SHLVL", "_", "WINDOWID", "COLUMNS", "LINES", "TMPDIR", "TMP", "TEMP",
 ];
-/// Prefixes of variables an agent runtime or terminal sets per session.
+/// Prefixes of variables an agent runtime, terminal or multiplexer sets per
+/// session or pane (herdr gives each pane its own `HERDR_PANE_ID`).
 const VOLATILE_PREFIXES: &[&str] = &[
     "CLAUDE",
     "CODEX",
@@ -38,6 +39,7 @@ const VOLATILE_PREFIXES: &[&str] = &[
     "VSCODE_",
     "TERM_",
     "ITERM_",
+    "HERDR_",
     "MEOWKIT_SESSION",
 ];
 /// Name parts that mark a per-session or per-process value.

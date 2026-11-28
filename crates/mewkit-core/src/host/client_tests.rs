@@ -86,6 +86,9 @@ fn another_environment_is_another_command_but_volatile_variables_are_not() {
             ("TMPDIR", "/w/.tmp/agent-a"),
             ("POSH_SESSION_ID", "p"),
             ("SSH_AUTH_SOCK", "/tmp/sock"),
+            ("HERDR_PANE_ID", "w1:p2"),
+            ("HERDR_TAB_ID", "w1:t1"),
+            ("OMP_BASH_SESSION", "abc@77"),
         ])
         .into_iter(),
     );
