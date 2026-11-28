@@ -55,7 +55,7 @@ pub fn tree_digest(files: &[TreeFile]) -> String {
         h.update(f.sha256.as_bytes());
         h.update(b"\n");
     }
-    h.finalize().iter().map(|b| format!("{b:02x}")).collect()
+    crate::fsx::hex(&h.finalize())
 }
 
 #[cfg(unix)]

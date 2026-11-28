@@ -193,10 +193,12 @@ fn write_via_temp(dest: &Path, bytes: &[u8], mode: Option<u32>, sync: bool) -> i
 /// Lower-case hex SHA-256 of `bytes`.
 pub fn sha256_hex(bytes: &[u8]) -> String {
     use sha2::Digest;
-    sha2::Sha256::digest(bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
+    hex(&sha2::Sha256::digest(bytes))
+}
+
+/// `bytes` as lower-case hex, two digits per byte.
+pub fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 #[cfg(unix)]

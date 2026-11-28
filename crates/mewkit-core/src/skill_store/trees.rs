@@ -68,7 +68,7 @@ pub fn capture(skill_dir: &Path, files: &[TreeFile]) -> io::Result<Option<Vec<u8
         }
         let (text, hex) = match String::from_utf8(bytes) {
             Ok(text) => (Some(text), None),
-            Err(e) => (None, Some(to_hex(e.as_bytes()))),
+            Err(e) => (None, Some(crate::fsx::hex(e.as_bytes()))),
         };
         kept.files.push(KeptFile {
             path: f.path.clone(),
@@ -132,10 +132,6 @@ pub fn load(file: &Path, digest: &str) -> Result<Option<Vec<RestoredFile>>, Stor
         return Err(invalid(format!("the files do not make up {digest}")));
     }
     Ok(Some(out))
-}
-
-fn to_hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 fn from_hex(text: &str) -> Option<Vec<u8>> {

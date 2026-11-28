@@ -5,6 +5,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use sha2::{Digest, Sha256};
 
 use super::record::Sidecar;
+use crate::fsx::hex;
 use crate::ownership::OwnershipIndex;
 
 /// Every ledger at one scope, by runtime name.
@@ -70,10 +71,6 @@ pub fn ledger_rows(ledgers: &Ledgers) -> BTreeMap<String, Rows> {
 /// The hash a record carries when no ledger row lies under it.
 pub fn no_rows_hash() -> String {
     hex(&Sha256::new().finalize())
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 /// `prior` with every record whose ledger rows changed since it was written

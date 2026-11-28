@@ -13,7 +13,6 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
 
 use crate::time_utc::{iso_seconds, now_millis};
 
@@ -80,8 +79,7 @@ pub fn plain_copies(root: &Path) -> Vec<String> {
 }
 
 fn sha256_file(path: &Path) -> io::Result<String> {
-    let digest = Sha256::digest(std::fs::read(path)?);
-    Ok(digest.iter().map(|b| format!("{b:02x}")).collect())
+    Ok(crate::fsx::sha256_hex(&std::fs::read(path)?))
 }
 
 /// Read one manifest, or `None` when the id names nothing readable.
