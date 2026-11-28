@@ -52,6 +52,7 @@ hooks:
 | `budget.cap` | none | Overrides `budget.block`, lower or higher |
 | `buildVerify.timeoutMs` | per language | Timeout for each `build-verify` command, in milliseconds |
 | `projectContext.maxBytes` | `12288` | Size above which the project-context file warns; `0` disables the warning |
+| `host.enabled`, `host.auto_clean`, `host.max_heavy` | `true`, `true`, a quarter of the cores | Beta, user config only: refused in a project file. See [Host Admission](/guide/host-admission) |
 | `workflow.telemetry` | `off` | `off`, `community` or `anonymous` |
 | `workflow.proactive` | none | Whether skills volunteer suggestions |
 | `hooks.<name>` | `true` | `false` switches one observer off; see below |

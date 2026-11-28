@@ -15,6 +15,7 @@
     { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budget-tracker" },
     { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/review-evidence-tag.cjs", "toggleKey": "review-evidence-tag" },
     { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/verification-evidence.cjs", "toggleKey": "verification-evidence" },
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/host-pressure.cjs", "toggleKey": "host-pressure" },
 
     { "event": "Stop", "handler": "./handlers/checkpoint-writer.cjs", "toggleKey": "checkpoint-writer" },
     { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "post-session" },
@@ -31,6 +32,7 @@
 
     { "event": "UserPromptSubmit", "handler": "./handlers/safety-sentinel-inject.cjs", "toggleKey": "safety-sentinel-inject" },
     { "event": "UserPromptSubmit", "handler": "./handlers/tdd-flag-detector.cjs", "toggleKey": "tdd-flag-detector" },
+    { "event": "UserPromptSubmit", "handler": "./handlers/host-pressure.cjs", "toggleKey": "host-pressure" },
 
     { "event": "PreCompact", "handler": "./handlers/precompact-probe.cjs", "toggleKey": "precompact-probe" },
 

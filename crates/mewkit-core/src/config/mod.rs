@@ -51,8 +51,8 @@ pub use precedence::{
 };
 pub use removed_env_names::{REMOVED_ENV_NAMES, replacement_for};
 pub use schema::{
-    AUTOBUILD_MODES, KEY_DOC, KeySpec, SCALAR_KEYS, SCHEMA_URL, TELEMETRY_MODES, ValueKind,
-    known_keys,
+    AUTOBUILD_MODES, KEY_DOC, KeySpec, SCALAR_KEYS, SCHEMA_URL, TELEMETRY_MODES, USER_ONLY_KEYS,
+    ValueKind, is_user_only_key, known_keys,
 };
 pub use shape_check::{ShapeViolation, check_shape};
 pub use write_stub::render_config_stub;

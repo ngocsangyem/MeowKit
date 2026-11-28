@@ -12,7 +12,7 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Tool access | ✅ covered | 1 | 1 | jira-env-loader |
 | Project memory | ✅ covered | 1 | 1 | learning-observer |
 | Task state | ✅ covered | 4 | 4 | agent-conduct, auto-checkpoint, checkpoint-writer |
-| Observability | ✅ covered | 6 | 6 | append-trace, dispatch, control-probe |
+| Observability | ✅ covered | 7 | 7 | append-trace, dispatch, control-probe |
 | Failure attribution | ✅ covered | 2 | 2 | loop-detection, posttoolfailure-probe |
 | Verification | ✅ covered | 7 | 7 | development-rules, pre-ship, build-verify |
 | Permissions | ✅ covered | 3 | 3 | injection-rules, security-rules, privacy-block |

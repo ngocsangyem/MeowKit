@@ -351,6 +351,8 @@ function cmdCreate() {
     const worktreeRoot = getWorktreeRoot(gitRoot, explicitWorktreeRoot, outputError);
     if (worktreeRoot.warning) warnings.push(worktreeRoot.warning);
     const worktreePath = path.join(worktreeRoot.dir, sanitizedAgent);
+    // The agent's TMPDIR: beside the worktrees, so temp files never show in its tree.
+    const tmpDir = path.join(worktreeRoot.dir, '.tmp', sanitizedAgent);
     const baseBranch = explicitBase || detectBaseBranch(gitRoot);
 
     if (isBranchCheckedOut(branchName, gitRoot)) {
@@ -364,7 +366,7 @@ function cmdCreate() {
         success: true, dryRun: true,
         message: 'Dry run - no changes made',
         wouldCreate: {
-          worktreePath, worktreeRootSource: worktreeRoot.source,
+          worktreePath, tmpDir, worktreeRootSource: worktreeRoot.source,
           branch: branchName, agentName: sanitizedAgent,
           baseBranch, orchestrated: true
         },
@@ -383,6 +385,7 @@ function cmdCreate() {
       });
     }
     markOwned(worktreePath, 'orchestrated', warnings);
+    fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
 
     const envResult = copyEnvTemplates(gitRoot, worktreePath);
     envResult.warnings.forEach(w => warnings.push(w));
@@ -390,7 +393,7 @@ function cmdCreate() {
     output({
       success: true,
       message: 'Parallel agent worktree created',
-      worktreePath, worktreeRootSource: worktreeRoot.source,
+      worktreePath, tmpDir, worktreeRootSource: worktreeRoot.source,
       branch: branchName, agentName: sanitizedAgent, baseBranch,
       orchestrated: true,
       envTemplatesCopied: envResult.copied.length > 0 ? envResult.copied : undefined,

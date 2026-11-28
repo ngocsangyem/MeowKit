@@ -99,11 +99,27 @@ pub const SCALAR_KEYS: &[(&str, KeySpec)] = &[
     ("workflow.proactive", KeySpec::boolean()),
 ];
 
-/// Every legal dotted key for one project: the scalars above plus one toggle per
-/// registered observer, in that order.
+/// Machine-wide keys: legal only in `~/.meowkit/config.yaml`. They tune a
+/// watcher and a queue shared by every project on the machine, so a committed
+/// project file must not be able to change them; the rules refuse them there.
+/// Not in [`SCALAR_KEYS`], so the project stub and schema never offer them.
+pub const USER_ONLY_KEYS: &[(&str, KeySpec)] = &[
+    ("host.enabled", KeySpec::boolean()),
+    ("host.auto_clean", KeySpec::boolean()),
+    ("host.max_heavy", KeySpec::integer()),
+];
+
+/// True for a key only the user config may set.
+pub fn is_user_only_key(key: &str) -> bool {
+    key.split('.').next() == Some("host")
+}
+
+/// Every legal dotted key: the scalars above, the user-only keys, and one toggle
+/// per registered observer, in that order. Scope is the rules' business.
 pub fn known_keys(observer_names: &[String]) -> Vec<(String, KeySpec)> {
     let mut keys: Vec<(String, KeySpec)> = SCALAR_KEYS
         .iter()
+        .chain(USER_ONLY_KEYS)
         .map(|(key, spec)| ((*key).to_string(), *spec))
         .collect();
     for name in observer_names {
@@ -142,7 +158,7 @@ mod tests {
     fn an_observer_gets_one_boolean_toggle_each() {
         let names = vec!["budget-tracker".to_string(), "post-write".to_string()];
         let keys = known_keys(&names);
-        assert_eq!(keys.len(), SCALAR_KEYS.len() + 2);
+        assert_eq!(keys.len(), SCALAR_KEYS.len() + USER_ONLY_KEYS.len() + 2);
         for name in &names {
             let key = format!("hooks.{name}");
             let spec = keys.iter().find(|(k, _)| *k == key).map(|(_, spec)| *spec);

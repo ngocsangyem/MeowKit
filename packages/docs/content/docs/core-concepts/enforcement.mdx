@@ -39,8 +39,8 @@ An Enforced cell means a registered hook refuses the action. Advisory means an i
 | Writes to protected paths | Absent | Absent | Enforced | Absent | Absent | Absent | Absent |
 | Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
-| Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent | Absent |
-| Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Drift line at ship check | Drift line at ship check | Drift line at ship check | Drift line at ship check |
+| Completion check | Opt-in | Opt-in | Opt-in | Absent | Opt-in, unverified (from documentation) | Opt-in | Absent |
+| Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Drift line at ship check | Synced at turn end, unverified (from documentation) | Synced at turn end | Drift line at ship check |
 | Archived-plan reads | Enforced on Read, Grep, Glob and Bash | Enforced on Bash only | Enforced on file reads, search tools and shell | Enforced on every tool | Enforced on every tool call | Enforced on every tool call | Unverified on every tool (from documentation) |
 
 Cells that say Absent mean the host's own permissions are the only control. On Claude Code the `careful` and `freeze` skills block destructive commands only while the skill is active.
@@ -64,6 +64,8 @@ The credential guard does not see files attached with `@` in the prompt, because
 ## The completion check (opt-in)
 
 With `hooks.pre-completion-check: true` in `.meowkit/config.yaml`, a turn that ends with files changed since the last passing test, build, lint or type-check run is continued, at most twice, and then ends with a notice. It is off by default. It shows that the agent ran a check, not that the check proves anything: a trivial passing command satisfies it.
+
+On Pi and OMP the extension runs the same rule at `agent_end` and sends the reason as a follow-up message, which starts another turn; a bash result counts as a pass only when the runtime reports it as a success. The cap of two reminders is the only loop guard there, because neither host passes one. OMP was run live (19.2.1, 2026-11-28). `omp -p` exits before the follow-up is sent, so a print-mode run gets no reminder. Pi follows its documentation and has not been run live. Grok and Antigravity document a way to continue a turn, but not the shape of a shell result, so they record no pass and have no check yet.
 
 ## When a check blocks you
 

@@ -35,6 +35,7 @@ Sets up parallel agent execution when a COMPLEX task splits into independent sub
 5. **Start the agents.** Build each agent's brief with `mk:delegate` (goal, owned files, acceptance, return shape).
 
 Limits (agent count, COMPLEX-only, zero overlap, no parallel planning or review, integration test) are owned by `.claude/skills/cook/references/parallel-execution-rules.md`; follow it rather than restating them here.
+Each agent runs heavy builds and suites through `mewkit host run` per `.claude/skills/verify/references/heavy-commands.md` (beta).
 
 ## Team Coordination Rules
 

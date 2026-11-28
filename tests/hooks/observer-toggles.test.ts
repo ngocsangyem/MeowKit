@@ -73,8 +73,8 @@ function selectedEverywhere(root: string): RegistryEntry[] {
 
 describe("the registry's shape is the config surface", () => {
 	it("has the registrations it had, over distinct kebab-case keys", () => {
-		expect(registry.handlers.length).toBe(26);
-		expect(toggleKeys.length).toBe(24);
+		expect(registry.handlers.length).toBe(28);
+		expect(toggleKeys.length).toBe(25);
 		for (const key of toggleKeys) expect(key, key).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
 	});
 

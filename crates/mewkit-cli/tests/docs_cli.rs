@@ -189,7 +189,8 @@ fn a_planted_bad_flag_is_caught() {
     fs::write(
         dir.path().join("a.md"),
         "Run `mewkit plan archive x --dry-run --sign`, then `mk upgrade --check | head`.\n\
-         `mewkit budget --monthly --nope` and `mewkit task new --type feature \"x\"`.\n",
+         `mewkit budget --monthly --nope` and `mewkit task new --type feature \"x\"`.\n\
+         `mewkit host run --wait 2m -- cargo test --workspace` wraps a command.\n",
     )
     .expect("write");
     let s = scan(dir.path(), &["a.md"], &[], true);

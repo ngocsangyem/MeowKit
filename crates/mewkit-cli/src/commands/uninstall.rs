@@ -121,6 +121,9 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
         },
         args.common.json,
     )?;
+    if staying.is_empty() {
+        super::host::after_uninstall(args.yes);
+    }
     if !args.yes && outcomes.iter().any(|o| !o.report.removed.is_empty()) {
         eprintln!("dry run: nothing was removed; run again with --yes to apply");
     }

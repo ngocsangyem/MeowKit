@@ -103,6 +103,7 @@ Stop and tell the user, rather than working around it, when: the plan is rejecte
 | --- | --- |
 | Step 0 | the density matrix, `references/adaptive-density-matrix.md` (table and override order) |
 | Step 3, only when generation is parallelized | `.claude/skills/cook/references/parallel-execution-rules.md` |
+| Step 3, before a heavy build or full suite on a shared machine | `.claude/skills/verify/references/heavy-commands.md` |
 | Steps 5 and 6, before a project-manager delegation | `.claude/skills/cook/references/post-phase-delegation.md` |
 | A teams-versus-subagents question | `references/agent-teams-vs-subagents.md` |
 

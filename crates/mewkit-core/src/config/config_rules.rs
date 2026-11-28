@@ -9,7 +9,9 @@
 //! Each message names the key, the scope it came from, and what to do instead,
 //! because "invalid config" tells a user nothing they can act on.
 use super::config_values::{ConfigValue, ConfigValues};
-use super::schema::{ValueKind, forbidden_namespace, known_keys, protected_hook, state_only_key};
+use super::schema::{
+    ValueKind, forbidden_namespace, is_user_only_key, known_keys, protected_hook, state_only_key,
+};
 use super::yaml_grammar::SCHEMA_KEY;
 use crate::path_shape::is_absolute_path;
 
@@ -201,6 +203,17 @@ pub fn apply_rules(
                 format!(
                     "remove the key and run .claude/hooks/lib/workflow-config set {key} true, which records it in .meowkit/state/"
                 ),
+            );
+        }
+
+        if scope == ConfigScope::ProjectConfig && is_user_only_key(key) {
+            return reject(
+                "user-only-key",
+                key,
+                format!(
+                    "{key} in the {scope}: host settings are machine-wide, so a project file cannot change them"
+                ),
+                format!("remove {key} here and set it in ~/.meowkit/config.yaml"),
             );
         }
 

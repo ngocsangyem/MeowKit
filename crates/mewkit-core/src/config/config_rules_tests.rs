@@ -205,3 +205,31 @@ fn the_first_offending_key_in_file_order_is_the_one_reported() {
     .expect_err("two offences");
     assert_eq!(error.key, "sparkles");
 }
+
+#[test]
+fn host_keys_apply_in_the_user_config_and_are_refused_in_a_project_file() {
+    let values = vec![
+        ("host.enabled", ConfigValue::Bool(true)),
+        ("host.auto_clean", ConfigValue::Bool(false)),
+        ("host.max_heavy", ConfigValue::Int(2)),
+    ];
+    assert!(verdict(values.clone(), ConfigScope::UserConfig).is_ok());
+    let error = verdict(values, ConfigScope::ProjectConfig).expect_err("machine-wide key");
+    assert_eq!(error.code, "user-only-key");
+    assert_eq!(error.key, "host.enabled");
+    assert!(
+        error.fix.contains("~/.meowkit/config.yaml"),
+        "{}",
+        error.fix
+    );
+}
+
+#[test]
+fn an_unknown_host_key_is_still_unknown_in_the_user_config() {
+    let error = verdict(
+        vec![("host.interval", ConfigValue::Int(5))],
+        ConfigScope::UserConfig,
+    )
+    .expect_err("not a key");
+    assert_eq!(error.code, "unknown-key");
+}

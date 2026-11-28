@@ -525,4 +525,81 @@ Subcommands: `list`, `restore`.
 | `--dry-run` | `restore`: print the plan and change nothing |
 | `--yes` | `restore`: proceed without a terminal to confirm in |
 
+### `mewkit host`
+
+(beta) Machine load, who causes it, and admission for heavy commands
+
+Subcommands: `status`, `run`, `jobs`, `clean`, `watch`.
+
+### `mewkit host status`
+
+(beta) Sample CPU, memory, disk, thermal and free space; print a verdict
+
+| Flag | What it does |
+|---|---|
+| `--json` | Print one JSON document: \{schema_version, kind, data\} |
+| `--fresh` | Sample now even when a recent snapshot exists |
+| `--caches` | Also report Rust space users (target/ dirs, Cargo cache cleaning) |
+
+### `mewkit host run`
+
+(beta) Run a heavy command through the machine-wide queue; returns within a bounded wait (exit 75 = not finished, NOT VERIFIED)
+
+| Flag | What it does |
+|---|---|
+| `--priority` `<PRIORITY>` | Queue level. high also runs the command at normal OS priority; low waits behind other levels (a long wait still ages it forward) [default: normal] [possible values: high, normal, low] |
+| `--wait` `<WAIT>` | Return after this long (e.g. 90s, 2m) with exit 75 if not finished. Default: under the calling agent runtime's tool timeout |
+| `--background` | Return at once with the job id (exit 75) |
+
+### `mewkit host jobs`
+
+(beta) List, wait for, read or cancel queued and running jobs
+
+Subcommands: `list`, `wait`, `log`, `cancel`.
+
+### `mewkit host jobs list`
+
+List this worktree's jobs, newest first
+
+| Flag | What it does |
+|---|---|
+| `--all` | Every worktree's jobs on this machine, with the worktree path |
+
+### `mewkit host jobs wait`
+
+Wait for a job: its exit code when done, 75 while queued or running, 70 when lost or cancelled
+
+| Flag | What it does |
+|---|---|
+| `--timeout` `<TIMEOUT>` | Give up after this long (default: under the agent's tool timeout) |
+
+### `mewkit host jobs log`
+
+Print a job's log (secrets masked, last 2 MB at most)
+
+### `mewkit host jobs cancel`
+
+Ask a job's supervisor to stop it
+
+| Flag | What it does |
+|---|---|
+| `--any-worktree` | Also stop a job started from another worktree |
+
+### `mewkit host clean`
+
+(beta) Remove mewkit's own stale host state (jobs, tickets, inbox, logs)
+
+| Flag | What it does |
+|---|---|
+| `--dry-run` | List what would be removed and remove nothing |
+
+### `mewkit host watch`
+
+(beta) Run the machine-wide watcher: samples every 5 s and writes each loaded worktree's inbox; exits after 30 min with no agent running
+
+| Flag | What it does |
+|---|---|
+| `--detach` | Start the watcher in the background and print its pid |
+| `--stop` | Stop the running watcher |
+
 {/* GENERATED:cli-flags END */}

@@ -50,6 +50,7 @@ hooks:
 #  capability-bootstrap: false
 #  checkpoint-writer: false
 #  control-probe: false
+#  host-pressure: false
 #  jira-env-loader: false
   learning-observer: true
 #  loop-detection: false

@@ -64,6 +64,9 @@ For anything that needs care, collect every field: ask the user for each, always
 | 10 | Return | ask (the shape of the answer: file path, verdict, list) |
 | 11 | Reports and Plans paths | derive from the work context: `{work_context}/tasks/reports/` and `{work_context}/tasks/plans/` |
 
+When the acceptance criteria run a full build or suite, the brief tells the subagent to run it
+through `mewkit host run` and to report exit 75 as not verified, per `.claude/skills/verify/references/heavy-commands.md` (beta).
+
 When the work context differs from the current working directory, every path in the prompt uses
 the **work context** root. A subagent handed the wrong root writes into the wrong project.
 

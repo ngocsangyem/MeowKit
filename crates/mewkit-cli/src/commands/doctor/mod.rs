@@ -25,6 +25,7 @@ mod hook_commands;
 mod hook_lines;
 mod hooks;
 mod host_config;
+mod host_watcher;
 mod installs;
 mod integrity;
 mod overlap;
@@ -152,6 +153,7 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
     checks.push(integrity::check(&scopes, &targets));
     checks.push(rule_text::check(&scopes, &targets));
     checks.push(skill_store_check::check(&scopes));
+    checks.push(host_watcher::check());
     let root = extras::project_root();
     if args.providers {
         checks.extend(extras::provider_checks());

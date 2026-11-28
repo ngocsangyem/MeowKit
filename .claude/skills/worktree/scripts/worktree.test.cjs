@@ -209,6 +209,12 @@ test('create agent-x --orchestrated worktreePath contains .worktrees/agent-x', (
   assert(p.includes('.worktrees') && p.endsWith('agent-x'), `.worktreePath should end with .worktrees/agent-x: ${p}`);
 });
 
+test('create agent-x --orchestrated names its TMPDIR under .worktrees/.tmp/agent-x', () => {
+  const json = assertJSON(run('create agent-x --orchestrated --dry-run --json').output);
+  const p = json.wouldCreate.tmpDir;
+  assert(typeof p === 'string' && p.endsWith(path.join('.worktrees', '.tmp', 'agent-x')), `tmpDir: ${p}`);
+});
+
 test('orchestrated branch timestamp portion is numeric', () => {
   const json = assertJSON(run('create timer-agent --orchestrated --dry-run --json').output);
   const branch = json.wouldCreate.branch; // parallel/timer-agent-{ts}

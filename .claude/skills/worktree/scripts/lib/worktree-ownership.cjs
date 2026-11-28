@@ -176,6 +176,12 @@ function removeOwnedWorktree({ records, term, mainRoot, discardChanges, dryRun }
     });
   }
 
+  // The agent's TMPDIR beside the worktrees goes with it; a symlink there is left alone.
+  const tmpDir = path.join(path.dirname(worktreePath), '.tmp', path.basename(worktreePath));
+  try {
+    if (fs.lstatSync(tmpDir).isDirectory()) fs.rmSync(tmpDir, { recursive: true, force: true });
+  } catch { /* absent */ }
+
   let branchDeleted = false;
   if (branchName) {
     const deleteResult = git(['branch', '-d', branchName], { silent: true, cwd: mainRoot });
