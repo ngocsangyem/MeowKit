@@ -37,9 +37,12 @@ const KILL_SWITCH: &str = "MEWKIT_CURSOR_HOOKS_KILL_SWITCH";
 const KILL_SWITCH_ON: [&str; 4] = ["1", "true", "yes", "on"];
 /// Claude Code settings files, nearest last: the value after precedence decides,
 /// so a project `false` overrides a user `true`.
-const CLAUDE_SETTINGS: [&str; 2] = [".claude/settings.json", ".claude/settings.local.json"];
+const CLAUDE_SETTINGS: [&str; 2] = [
+    mewkit_adapters::claude_code::SETTINGS,
+    ".claude/settings.local.json",
+];
 /// Codex's own config, and the file that can narrow it to managed hooks.
-const CODEX_CONFIG: &str = ".codex/config.toml";
+const CODEX_CONFIG: &str = mewkit_adapters::codex::CONFIG_TOML;
 const CODEX_REQUIREMENTS: &str = ".codex/requirements.toml";
 
 pub fn check(places: &[&Place]) -> Check {

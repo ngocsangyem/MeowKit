@@ -54,15 +54,17 @@ pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Ch
     out
 }
 
+/// The file each adapter writes `runtime`'s hook registrations to.
 pub(super) fn hook_file(runtime: Runtime) -> &'static str {
+    use mewkit_adapters::{antigravity, claude_code, codex, cursor, grok, omp, pi};
     match runtime {
-        Runtime::ClaudeCode => ".claude/settings.json",
-        Runtime::Codex => ".codex/hooks.json",
-        Runtime::Cursor => ".cursor/hooks.json",
-        Runtime::Grok => ".grok/hooks/meowkit.json",
-        Runtime::Pi => ".pi/extensions/meowkit.ts",
-        Runtime::Omp => ".omp/hooks/pre/meowkit.ts",
-        Runtime::Antigravity => ".agents/hooks.json",
+        Runtime::ClaudeCode => claude_code::SETTINGS,
+        Runtime::Codex => codex::HOOKS_JSON,
+        Runtime::Cursor => cursor::HOOKS_JSON,
+        Runtime::Grok => grok::HOOKS_JSON,
+        Runtime::Pi => pi::EXTENSION,
+        Runtime::Omp => omp::HOOK,
+        Runtime::Antigravity => antigravity::HOOK_FILE,
     }
 }
 
