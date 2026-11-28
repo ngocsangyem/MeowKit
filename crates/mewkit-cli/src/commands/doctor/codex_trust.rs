@@ -9,12 +9,7 @@ use super::{Check, Status};
 pub fn check(root: &Path) -> Check {
     let home = std::env::var_os("CODEX_HOME")
         .map(PathBuf::from)
-        .or_else(|| {
-            ["HOME", "USERPROFILE"]
-                .iter()
-                .find_map(|v| std::env::var_os(v).filter(|h| !h.is_empty()))
-                .map(|h| PathBuf::from(h).join(".codex"))
-        });
+        .or_else(|| mewkit_core::config::home_dir().map(|h| h.join(".codex")));
     let trusted = home
         .and_then(|h| std::fs::read_to_string(h.join("config.toml")).ok())
         .and_then(|t| t.parse::<toml_edit::DocumentMut>().ok())
