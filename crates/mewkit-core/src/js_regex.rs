@@ -54,6 +54,11 @@ pub fn is_js_whitespace(ch: char) -> bool {
     )
 }
 
+/// `String.prototype.trim`, which trims the same set as `\s`.
+pub fn js_trim(text: &str) -> &str {
+    text.trim_matches(is_js_whitespace)
+}
+
 /// ECMAScript `\w`, as a character-class body.
 const JS_WORD: &str = "0-9A-Za-z_";
 

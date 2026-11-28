@@ -9,6 +9,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::js_regex::js_trim;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolvedAnchor {
     pub file: String,
@@ -49,11 +51,6 @@ fn norm(text: &str) -> String {
         .filter(|part| !part.is_empty())
         .collect::<Vec<_>>()
         .join(" ")
-}
-
-/// `String.prototype.trim`, which uses the same set as `\s`.
-fn js_trim(text: &str) -> &str {
-    text.trim_matches(crate::js_regex::is_js_whitespace)
 }
 
 pub fn resolve_anchor(
