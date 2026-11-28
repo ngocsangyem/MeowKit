@@ -62,7 +62,7 @@ The queue, the slots, the watcher and `~/.meowkit/host` are shared by every proj
 | `75` | Not finished. The first line says `QUEUED — NOT STARTED — NOT VERIFIED` or `STILL RUNNING — NOT VERIFIED`, followed by the job id |
 | `70` | The job was cancelled, or its supervisor died. Not verified; run it again once |
 
-A command that itself exits 75 or 70 shows its own output instead of those lines, so read the first line, not the code alone. Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran in this worktree on the same file tree as the one being checked: the tree is recorded when the command starts and again when it exits, and a job whose tree changed in between, or whose tree is not the current one, earns no credit. The `mk` alias counts like `mewkit`.
+A command that itself exits 75 or 70 shows its own output instead of those lines, so read the first line, not the code alone. Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. The opt-in completion check (Claude Code, Codex, Cursor and OMP; Pi unverified) credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran in this worktree on the same file tree as the one being checked: the tree is recorded when the command starts and again when it exits, and a job whose tree changed in between, or whose tree is not the current one, earns no credit. The `mk` alias counts like `mewkit`.
 
 If the agent runtime ends the call with SIGTERM or SIGHUP while `run` or `jobs wait` is waiting, it prints the exit-75 block and exits 75; the job keeps running. Ctrl-C at a terminal cancels the job and exits 70 once it has stopped. On Windows these signals keep their default behaviour for now.
 
@@ -116,7 +116,7 @@ A Claude Code agent talks to you and never edits; it starts omp workers in herdr
 - Two workers running the same command on the same tree share one job: herdr's per-pane `HERDR_*` variables and omp's `OMP_BASH_SESSION` do not make it another command.
 - An omp worker waits 50 seconds by default, under omp's 300-second bash timeout, so the tool call returns with output or with exit 75 before omp cuts it off.
 - The coordinator's `host-pressure` hook names the worktree's jobs and the machine verdict in its context, so it knows the workers are waiting on the queue, not stuck. It can follow a worker's job with `jobs wait` and `jobs log`.
-- omp runs no completion check and no `host-pressure` hook; its skills tell the worker to read `mewkit host status`, and to treat exit 75 as not verified.
+- omp runs the opt-in completion check: a worker that ends its turn with an unverified edit gets one follow-up, and a passing `host run` or `jobs wait` counts as its check. omp runs no `host-pressure` hook; its skills tell the worker to read `mewkit host status`, and to treat exit 75 as not verified.
 - Workers on a herdr worktree (`herdr worktree create`) are another worktree: they get their own jobs, and the coordinator sees them with `mewkit host jobs list` and `--all`.
 
 ```mermaid

@@ -144,7 +144,9 @@ Each `lib/core` module is a pure decision. It reads the project tree, never touc
 
 ## Runtime parity
 
-The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi, OMP and Antigravity, and a test checks that each one appears there. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session. The Antigravity entries carry the status `unverified`: the guard is installed and runs the shared decision, but it was built from the vendor's documentation (https://antigravity.google/docs/hooks, read 2026-11-22) and no live run has shown it deny. A test refuses an Antigravity row marked `ported` without a recorded probe that saw a denial, and `mewkit init` and `mewkit doctor` name every unverified guard.
+The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi, OMP and Antigravity, and a test checks that each one appears there. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces and what has not been run live. The Grok and Pi entries follow the vendors' documentation and have not been run in a live session; OMP's guards and completion check were run live. The Antigravity entries carry the status `unverified`: the guard is installed and runs the shared decision, but it was built from the vendor's documentation (https://antigravity.google/docs/hooks, read 2026-11-22) and no live run has shown it deny. A test refuses an Antigravity row marked `ported` without a recorded probe that saw a denial, and `mewkit init` and `mewkit doctor` name every unverified guard.
+
+The same test keeps the file honest in both directions. A handler marked anything but `not-ported` must name, in `where`, a hook file that exists in that runtime's bundle, and an `unverified` one must cite its source. Every hook script a runtime's bundle ships must be named by some row, or listed under `runtimeOnly` when it has no Claude Code counterpart (Cursor's MCP allowlist and subagent lifecycle hooks). The runtimes are read from the adapters' surface table, so a new adapter without a column in the file fails the test.
 
 | Behavior | Claude Code | Codex | Cursor | Grok | Pi | OMP | Antigravity |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -154,13 +156,13 @@ The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-covera
 
 Of the 25 observers, `hook-coverage.json` ports or maps only these off Claude Code:
 
-| Observer | Codex | Cursor | Grok, Pi, OMP, Antigravity |
-| --- | --- | --- | --- |
-| `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
-| `plan-state-sync` | Ported: `completion-check.cjs` on Stop, line as `systemMessage` | Ported: `stop-followup.cjs`, line on stderr | Equivalent: the ship check prints the drift line, read-only |
-| `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
-| `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported |
-| `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported |
+| Observer | Codex | Cursor | Pi | OMP | Grok, Antigravity |
+| --- | --- | --- | --- | --- | --- |
+| `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Unverified, from documentation: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Ported: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Not ported |
+| `plan-state-sync` | Ported: `completion-check.cjs` on Stop, line as `systemMessage` | Ported: `stop-followup.cjs`, line on stderr | Unverified, from documentation: `completion.cjs` on `agent_end`, line as a notification | Ported: `completion.cjs` on `agent_end`, line as a notification | Equivalent: the ship check prints the drift line, read-only |
+| `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Unverified, from documentation: `completion.cjs` on a successful bash `tool_result` | Ported: `completion.cjs` on a successful bash `tool_result` | Not ported |
+| `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported | Not ported | Not ported |
+| `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported | Not ported | Not ported |
 
 Every other observer is not ported to any runtime other than Claude Code. The `reason` for each is in `hook-coverage.json`.
 

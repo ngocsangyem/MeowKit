@@ -17,16 +17,56 @@ const handlersFile = JSON.parse(fs.readFileSync(path.join(HOOKS, 'handlers.json'
 const handlers = Array.isArray(handlersFile) ? handlersFile : handlersFile.handlers;
 const closure = JSON.parse(fs.readFileSync(path.join(HOOKS, 'core-closure.json'), 'utf8'));
 
-const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp', 'antigravity'];
-const BUNDLE_ROOT = {
-  codex: 'kit/overlays/codex/files',
-  cursor: 'kit/overlays/cursor/files',
-  grok: 'kit/overlays/grok/files',
-  // Pi and OMP run the guard in the tree they share with Codex.
-  pi: 'kit/overlays/agents/files',
-  omp: 'kit/overlays/agents/files',
-  antigravity: 'kit/overlays/antigravity/files',
+// Every runtime the adapters know that has a hook surface, read from the adapters' own table,
+// so a new adapter without a coverage column fails here instead of shipping unrecorded.
+const SURFACE = JSON.parse(fs.readFileSync(path.join(ROOT, 'crates/mewkit-adapters/src/surface_table.json'), 'utf8'));
+const RUNTIMES = SURFACE.runtimes.filter((r) => r.kinds && r.kinds.hooks && r.name !== 'claude-code').map((r) => r.name);
+// Where each runtime's installed files come from. Pi and OMP run the scripts in the tree they
+// share with Codex, from a module in their own folder.
+const BUNDLE_ROOTS = {
+  codex: ['kit/overlays/codex/files'],
+  cursor: ['kit/overlays/cursor/files'],
+  grok: ['kit/overlays/grok/files'],
+  pi: ['kit/overlays/agents/files', 'kit/overlays/pi/files'],
+  omp: ['kit/overlays/agents/files', 'kit/overlays/omp/files'],
+  antigravity: ['kit/overlays/antigravity/files'],
 };
+// The hook entry points each bundle ships: scripts a host or a runtime module runs, not libraries.
+const ENTRY_DIRS = {
+  codex: ['kit/overlays/codex/files/.codex/hooks'],
+  cursor: ['kit/overlays/cursor/files/.cursor/hooks'],
+  grok: ['kit/overlays/grok/files/.grok/meowkit/hooks'],
+  pi: ['kit/overlays/agents/files/.agents/meowkit/hooks', 'kit/overlays/pi/files/.pi/extensions'],
+  omp: ['kit/overlays/agents/files/.agents/meowkit/hooks', 'kit/overlays/omp/files/.omp/hooks/pre', 'kit/overlays/omp/files/.omp/hooks/post'],
+  antigravity: ['kit/overlays/antigravity/files/.agents/meowkit-antigravity/hooks'],
+};
+
+/** The installed path (first word of a `where`) exists in one of the runtime's bundles, or in the repo for a projection the CLI writes. */
+function whereExists(runtime, where) {
+  const file = where.split(' ')[0];
+  return [...BUNDLE_ROOTS[runtime], '.'].some((root) => fs.existsSync(path.join(ROOT, root, file)));
+}
+
+/** `runtime: path` for each hook entry a bundle ships that no coverage row names. */
+function unrecordedEntries(doc) {
+  const named = [];
+  for (const row of Object.values(doc.safety || {})) for (const entry of Object.values(row)) named.push(entry.where || '', entry.note || '');
+  for (const row of Object.values(doc.handlers || {})) named.push(...Object.values(row.where || {}));
+  const out = [];
+  for (const runtime of RUNTIMES) {
+    const extra = Object.keys((doc.runtimeOnly || {})[runtime] || {});
+    for (const dir of ENTRY_DIRS[runtime] || []) {
+      const abs = path.join(ROOT, dir);
+      if (!fs.existsSync(abs)) continue;
+      for (const name of fs.readdirSync(abs)) {
+        if (!/\.(cjs|mjs|js|ts)$/.test(name)) continue;
+        const rel = path.relative(BUNDLE_ROOTS[runtime].find((r) => dir.startsWith(r)), path.join(dir, name)).split(path.sep).join('/');
+        if (!named.some((text) => text.includes(rel)) && !extra.includes(rel)) out.push(`${runtime}: ${rel}`);
+      }
+    }
+  }
+  return out;
+}
 
 // Runtimes whose guards were written from documentation. A row there says `ported` only
 // with a record of the live run that showed it deny; until then it says `unverified`.
@@ -74,7 +114,7 @@ test('every shared behaviour is classified, and a ported one names a hook that e
         continue;
       }
       const file = entry.where.split(' ')[0];
-      assert.ok(fs.existsSync(path.join(ROOT, BUNDLE_ROOT[runtime], file)), `${name}.${runtime}: ${file} is missing`);
+      assert.ok(whereExists(runtime, entry.where), `${name}.${runtime}: ${file} is missing`);
     }
   }
 });
@@ -105,4 +145,35 @@ test('an unverified row says where its documentation came from', () => {
 
 test('the node-missing behaviour is recorded for every runtime', () => {
   for (const runtime of ['claude-code', ...RUNTIMES]) assert.ok(coverage.nodeMissing[runtime], runtime);
+});
+
+test('every runtime with a hook surface has a bundle and entry list here', () => {
+  for (const runtime of RUNTIMES) {
+    assert.ok(BUNDLE_ROOTS[runtime] && ENTRY_DIRS[runtime], `${runtime}: add its bundle and hook folders to this test and a column to hook-coverage.json`);
+  }
+});
+
+test('a handler cell other than not-ported names a hook that exists; an unverified one cites its source', () => {
+  for (const [name, row] of Object.entries(coverage.handlers)) {
+    for (const runtime of RUNTIMES) {
+      if (row[runtime] === 'not-ported') continue;
+      const where = row.where && row.where[runtime];
+      assert.ok(typeof where === 'string' && where.trim(), `${name}.${runtime} is ${row[runtime]} but names no hook in where.${runtime}`);
+      assert.ok(whereExists(runtime, where), `${name}.${runtime}: ${where.split(' ')[0]} is missing`);
+      if (row[runtime] === 'unverified') assert.ok(row.notes && row.notes[runtime] && row.notes[runtime].trim(), `${name}.${runtime} needs notes.${runtime} citing its source`);
+    }
+    for (const runtime of Object.keys(row.where || {})) {
+      assert.notEqual(row[runtime], 'not-ported', `${name}.${runtime} names a hook but says not-ported`);
+    }
+  }
+});
+
+test('every hook a runtime bundle ships is recorded', () => {
+  assert.deepEqual(unrecordedEntries(coverage), []);
+});
+
+test('the shipped-hook rule catches a hook no row names', () => {
+  const doc = structuredClone(coverage);
+  delete doc.runtimeOnly.cursor['.cursor/hooks/mcp-gate.cjs'];
+  assert.deepEqual(unrecordedEntries(doc), ['cursor: .cursor/hooks/mcp-gate.cjs']);
 });
