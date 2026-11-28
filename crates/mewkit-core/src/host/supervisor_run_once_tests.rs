@@ -2,15 +2,21 @@
 //! a client that gave up on it runs the command, the tree is credited only
 //! when unchanged from start to exit, the log on disk is scrubbed, and a
 //! cancel while leftovers hold the output still ends the job as cancelled.
+#[cfg(unix)]
 use std::path::Path;
+#[cfg(unix)]
 use std::process::Command;
+#[cfg(unix)]
 use std::time::{Duration, Instant};
 
 use super::model::Verdict;
 use super::paths::HostPaths;
-use super::supervisor::{Options, run};
+#[cfg(unix)]
+use super::supervisor::Options;
+use super::supervisor::run;
 use super::supervisor_tests::{argv, fast, new_job};
 
+#[cfg(unix)]
 fn repo() -> Option<tempfile::TempDir> {
     let dir = tempfile::tempdir().unwrap();
     let git = |args: &[&str]| {
@@ -35,6 +41,7 @@ fn repo() -> Option<tempfile::TempDir> {
     ok.then_some(dir)
 }
 
+#[cfg(unix)]
 fn in_tree(root: &Path) -> Options {
     Options {
         tree_root: Some(root.to_path_buf()),
