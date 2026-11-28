@@ -196,7 +196,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[18]{skill,owner,trigger}
+[19]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:research`|researcher (delegated)|Deep multi-source technical research producing one cited report — technology evaluation, ecosystem comparison, standards fact-finding, "how do others solve X". Delegates to researcher subagent(s) under primary-source discipline + a retrieval-call cap; optional editorial HTML via `--html`. NOT single-library docs (see mk:docs-finder); NOT project-only Q&A (see mk:ask-me).
 `mk:careful`|any agent|Before destructive commands
@@ -215,6 +215,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:arch`|architect|Architecture Decision Record lifecycle — new/list/review/impact over `docs/architecture/adr/`. NOT codebase deepening (see mk:improve-codebase-architecture); NOT trade-off debate (see mk:party)
 `mk:delegate`|orchestrator|Build one context-isolated subagent prompt for review — no session history, injection-guarded fields, emitted rather than invoked. NOT a parallel team launcher (see mk:team-config)
 `mk:orchestrate`|orchestrator|Coordinate staged or parallel jobs across live-verified coding-agent runtimes (Claude Code, Codex, Cursor, other CLIs) and in-session subagents — capability/risk routing, worktree-isolated parallel writers, resumable runs, arbiter verification before handoff. NOT single-agent work or the in-session 7-phase flow (see mk:cook / mk:workflow-orchestrator)
+`mk:deliver`|orchestrator|User-invoked: take one goal end to end unattended — confirmed brief with runnable acceptance checks, prerequisite sweep, plan with disjoint ownership, host-sized waves of worktree writers, ledger-based resume, fresh-context review, cleanup receipt, honest partial report. NOT one scoped task (see mk:cook), a green-field product (see mk:autobuild) or a cross-CLI split (see mk:orchestrate)
 ```
 
 ## Summary
@@ -235,7 +236,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**121**
+**Total**|**122**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

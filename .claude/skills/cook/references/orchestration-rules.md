@@ -24,7 +24,7 @@ These rules apply when the agent spawns subagents or coordinates parallel work.
 
 ## Orchestrator Entry Point Rule
 
-Two entry skills run the lifecycle: `mk:cook` (explicit invocation, one scoped task) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `mk:autobuild` is the entry for a green-field product build, and `mk:orchestrate` splits a job across agent CLIs, so neither competes for the same session. To avoid running the same phases twice:
+Two entry skills run the lifecycle: `mk:cook` (explicit invocation, one scoped task) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `mk:autobuild` is the entry for a green-field product build, `mk:orchestrate` splits a job across agent CLIs, and `mk:deliver` (user-invoked) takes one goal end to end and calls the plan and review skills itself, so none of them competes for the same session: while one runs, `mk:cook` and `mk:workflow-orchestrator` do not start their own phase loop. To avoid running the same phases twice:
 
 - **Explicit `/mk:cook` invocation** → `mk:cook` owns the full pipeline. `mk:workflow-orchestrator` does NOT activate for the remainder of the session.
 - **Session start with complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` activates via autoInvoke and routes through the 7-phase flow. It defers to `mk:cook` for single-task requests.

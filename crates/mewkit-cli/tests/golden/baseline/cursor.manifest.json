@@ -1541,6 +1541,36 @@
       "size": 4261
     },
     {
+      "path": ".cursor/skills/mk-deliver/SKILL.md",
+      "sha256": "b412297dc528aa22bcfee0bfc48c203f9a853a65c0b4c943c90537d624414b32",
+      "size": 6227
+    },
+    {
+      "path": ".cursor/skills/mk-deliver/references/brief-and-acceptance.md",
+      "sha256": "4cc1631bca465441c2556f71f41d2f6dd7135dba98d4792a598ed009414c5e46",
+      "size": 2445
+    },
+    {
+      "path": ".cursor/skills/mk-deliver/references/execution-ledger.md",
+      "sha256": "5af723f70d2a94350edf17566edf1bbc034c650b80d4add7a5b95ecdc9239f46",
+      "size": 4226
+    },
+    {
+      "path": ".cursor/skills/mk-deliver/references/host-and-cleanup.md",
+      "sha256": "62b141c9e7897607fc934ea7cbf5ad2539e88f84a999551533c7debf00a6da41",
+      "size": 4071
+    },
+    {
+      "path": ".cursor/skills/mk-deliver/references/prerequisites.md",
+      "sha256": "33d1b6e9ec49036093f1c1b1dd884c0a1c12ce779e2a9c6d3ef34f57f5fbed66",
+      "size": 2453
+    },
+    {
+      "path": ".cursor/skills/mk-deliver/references/review-and-done.md",
+      "sha256": "3dfec88899dde2c20e8817f02b0203d724ecef0d1a7132d3a3ff5a6ca8c4f4a8",
+      "size": 1803
+    },
+    {
       "path": ".cursor/skills/mk-development/SKILL.md",
       "sha256": "5fdea6ddb693a36338ff710197c0e488f7d040ece55f5811ee21cceccac8c044",
       "size": 1745

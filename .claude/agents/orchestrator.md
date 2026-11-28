@@ -61,6 +61,7 @@ Map the CSV level to a tier per `.claude/skills/agent-detector/references/model-
    - Heavy builds and suites on a shared machine go through host admission (`mewkit host run`, beta) per `.claude/skills/verify/references/heavy-commands.md`.
    - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
    - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `.claude/skills/autobuild/SKILL.md` and CLAUDE.md preference note.
+   - **Hand-off delivery** (signals: "deliver this end to end", "take it from here, I'll be away", "finish this goal unattended"): the user starts `mk:deliver` themselves; suggest it, do not route to it automatically. See `.claude/skills/deliver/SKILL.md`.
 
 4. **Read budget context.** At session start, read `.meowkit/telemetry/cost-log.json` for model-tier
    decisions. Do not read the team memory store here — the read-set skills (`mk:fix`,

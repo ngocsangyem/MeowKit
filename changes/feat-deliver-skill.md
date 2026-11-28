@@ -1,0 +1,4 @@
+---
+section: New Skills
+---
+- `mk:deliver` (user-invoked): hand off one goal and come back to it delivered. It asks its questions once, locks a brief with runnable "Done when" checks and an acceptance list, verifies every prerequisite before starting, plans pieces with disjoint file ownership, runs up to three writers in their own worktrees, checks each worker's claim against git and the exit codes of its checks, merges one branch at a time with a gate after each merge, has the result reviewed in a fresh context and reports done or partial with a cleanup receipt. It resumes from its run directory. On a shared machine it sizes each wave from the `mewkit host status` verdict, runs builds, gates and acceptance checks through `mewkit host run`, and never counts a queued or running check (exit 75) as a pass.
