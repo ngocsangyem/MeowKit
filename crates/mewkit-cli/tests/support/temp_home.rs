@@ -86,3 +86,11 @@ pub fn assert_home_is_temp(home: &Path) {
 fn canonical(path: &Path) -> PathBuf {
     std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf())
 }
+
+/// A project with `targets` installed from this checkout's kit.
+pub fn installed(targets: &str) -> TempHome {
+    let env = TempHome::new();
+    let out = env.with_kit(&["init", "--target", targets]);
+    assert_eq!(super::code(&out), 0, "{}", super::text(&out));
+    env
+}

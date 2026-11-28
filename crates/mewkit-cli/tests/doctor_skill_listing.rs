@@ -5,15 +5,8 @@
 mod support;
 
 use serde_json::Value;
-use support::temp_home::TempHome;
+use support::temp_home::{TempHome, installed};
 use support::{code, text};
-
-fn installed(targets: &str) -> TempHome {
-    let env = TempHome::new();
-    let out = env.with_kit(&["init", "--target", targets]);
-    assert_eq!(code(&out), 0, "{}", text(&out));
-    env
-}
 
 fn listing_rows(env: &TempHome, targets: &str) -> Vec<Value> {
     let out = env.mewkit(&["doctor", "--json", "--target", targets]);
