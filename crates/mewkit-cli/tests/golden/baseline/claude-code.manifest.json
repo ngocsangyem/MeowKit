@@ -1705,13 +1705,13 @@
     },
     {
       "path": ".claude/skills/deliver/references/execution-ledger.md",
-      "sha256": "e0d1c51e70e56bac960cc5ce80583f7075b8b7649f21a328d4b80d7fd6e037b2",
-      "size": 4216
+      "sha256": "f3de7d70a6b62d9b6dad4a7fce58078686da5c821d33eb9d57151edcd29b5ecc",
+      "size": 4223
     },
     {
       "path": ".claude/skills/deliver/references/host-and-cleanup.md",
-      "sha256": "8867edabea86db2ce205d0413dfef98fcaa1452912760f3f04a7d969a51fdb6f",
-      "size": 4054
+      "sha256": "45391b81414aade8105288c03cd32c25b1549e863a5e8067df1ac18a8881471b",
+      "size": 4068
     },
     {
       "path": ".claude/skills/deliver/references/prerequisites.md",

@@ -31,7 +31,7 @@ verdict stays `go`.
 and report the job id of any check that has not finished. A worker in its own worktree has its
 own jobs.
 
-**Monitoring.** `mewkit host jobs list --all` shows the jobs of every worktree on the machine.
+**Monitoring.** `mewkit host jobs list` with `--all` shows the jobs of every worktree on the machine.
 Read only the jobs of the run's worktrees. A worker waiting in the queue is waiting, not stuck:
 do not re-dispatch it. Do not stop a job or a process the run did not start, even when it loads
 the machine.
@@ -58,7 +58,7 @@ receipt into the report:
 
 ```markdown
 ## Cleanup receipt
-- Host jobs of this run: none queued or running (`mewkit host jobs list --all`), or <ids, why>
+- Host jobs of this run: none queued or running (`mewkit host jobs list` with `--all`), or <ids, why>
 - Worktrees created: merged pieces removed through `mk:worktree` (`remove`, no
   `--discard-changes`); unmerged or dirty ones kept, with their branches: <paths>
 - Processes started (dev servers, watchers, from the ledger): <n> stopped

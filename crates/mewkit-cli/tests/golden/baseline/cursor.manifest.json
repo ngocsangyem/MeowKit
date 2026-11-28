@@ -1552,13 +1552,13 @@
     },
     {
       "path": ".cursor/skills/mk-deliver/references/execution-ledger.md",
-      "sha256": "d5152d6646aa934ee8af36a2373a84ec7ec4306cd798068f144846be88bb977f",
-      "size": 4219
+      "sha256": "5af723f70d2a94350edf17566edf1bbc034c650b80d4add7a5b95ecdc9239f46",
+      "size": 4226
     },
     {
       "path": ".cursor/skills/mk-deliver/references/host-and-cleanup.md",
-      "sha256": "d09ca5c28028419929e44d63adb8a510999f87bc2ea1b4eff2b35c24db6c9cd8",
-      "size": 4057
+      "sha256": "62b141c9e7897607fc934ea7cbf5ad2539e88f84a999551533c7debf00a6da41",
+      "size": 4071
     },
     {
       "path": ".cursor/skills/mk-deliver/references/prerequisites.md",

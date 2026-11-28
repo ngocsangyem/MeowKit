@@ -90,7 +90,7 @@ runner.
 ## Resume
 
 Reread `brief.md`, `acceptance.json`, `ledger.md`. Then reconcile: `git log` of each piece
-branch, `git worktree list`, `mewkit host jobs list --all`. First make sure the worker of an
+branch, `git worktree list`, `mewkit host jobs list` with `--all`. First make sure the worker of an
 open attempt has stopped (its session or subagent is gone, no job of its worktree is running).
 An attempt with commits on disk is then checked, not repeated; one with nothing on disk is
 dispatched again.
