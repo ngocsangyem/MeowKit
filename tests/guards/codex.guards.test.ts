@@ -1,5 +1,5 @@
-// Codex guards, replayed from kit/overlays/codex/files/.codex/hooks.json: privacy on Bash
-// and the ship check.
+// Codex guards, replayed from kit/overlays/codex/files/.codex/hooks.json: privacy on Bash,
+// the ship check, and the Stop hook that leaves the opt-in completion check off.
 import path from "node:path";
 import { describe, expect } from "vitest";
 import {
@@ -82,24 +82,23 @@ describe("codex guards (.codex/hooks.json)", () => {
 		expect(fireShell(fx, RT, "git commit -m x").blocked).toBe(true);
 	});
 
-	guardCase("codex: completion check, when on, continues a turn with unverified edits until a check passes", () => {
+	guardCase("codex: completion check, when on, does not continue a turn it cannot verify", () => {
+		// Codex sends a shell command's PostToolUse result as its output text, with no exit code,
+		// so no pass can be recorded and the Stop hook must not block on the missing evidence.
 		const fx = makeFixture([RT]);
 		fx.write(".meowkit/config.yaml", "hooks:\n  pre-completion-check: true\n");
-		const ev = (event: string, extra: Record<string, unknown> = {}) =>
-			fireEvent(fx, RT, event, { hook_event_name: event, session_id: "s1", ...extra }, { toolName: "Bash" });
-		const stopDecision = () =>
-			JSON.parse(
-				ev("Stop")
-					.results.map((r) => r.stdout)
-					.join("")
-					.trim() || "{}",
-			) as { decision?: string };
-		ev("SessionStart");
+		expect(
+			registeredHooks(RT)
+				.filter((h) => scriptOf(h).endsWith("completion-check.cjs"))
+				.map((h) => h.event),
+		).toEqual(["Stop"]);
 		fx.write("src/add.cjs", "module.exports = (a, b) => b + a;\n");
-		expect(stopDecision().decision).toBe("block");
-		ev("PostToolUse", { tool_name: "Bash", tool_input: { command: "npm test" }, tool_response: { exit_code: 1 } });
-		expect(stopDecision().decision, "a failing run records no pass").toBe("block");
-		ev("PostToolUse", { tool_name: "Bash", tool_input: { command: "npm test" }, tool_response: { exit_code: 0 } });
-		expect(stopDecision().decision).toBeUndefined();
+		const stop = fireEvent(fx, RT, "Stop", { hook_event_name: "Stop", session_id: "s1" }, { toolName: "Bash" });
+		const out = stop.results
+			.map((r) => r.stdout)
+			.join("")
+			.trim();
+		expect(stop.blocked).toBe(false);
+		expect(JSON.parse(out).decision).toBeUndefined();
 	});
 });

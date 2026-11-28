@@ -25,7 +25,7 @@
     "cc: ship check sees: git ci -m x",
     "cc: with no related-test mode the ship check says tests did not run",
     "codex: a source Write with no plan is allowed by every registered hook",
-    "codex: completion check, when on, continues a turn with unverified edits until a check passes",
+    "codex: completion check, when on, does not continue a turn it cannot verify",
     "codex: every registered PreToolUse guard has a case",
     "codex: privacy allows an ordinary command",
     "codex: privacy blocks a command that reads .env",
@@ -72,6 +72,10 @@
     {
       "id": "cc: privacy blocks a Read of .kube/config",
       "reason": "gap closed; the name is in the shared privacy corpus case on all three runtimes"
+    },
+    {
+      "id": "codex: completion check, when on, continues a turn with unverified edits until a check passes",
+      "reason": "the case fed an exit_code field Codex never sends; Codex passes the shell output as a string, so the check no longer runs there"
     }
   ]
 }

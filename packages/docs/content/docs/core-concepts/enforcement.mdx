@@ -39,7 +39,7 @@ An Enforced cell means a registered hook refuses the action. Advisory means an i
 | Writes to protected paths | Absent | Absent | Enforced | Absent | Absent | Absent | Absent |
 | Plan before building | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
 | Review before shipping | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory | Advisory |
-| Completion check | Opt-in | Opt-in | Opt-in | Absent | Absent | Absent | Absent |
+| Completion check | Opt-in | Absent | Opt-in | Absent | Absent | Absent | Absent |
 | Plan state follows checkboxes | Synced at stop | Synced at stop | Synced at stop | Drift line at ship check | Drift line at ship check | Drift line at ship check | Drift line at ship check |
 | Archived-plan reads | Enforced on Read, Grep, Glob and Bash | Enforced on Bash only | Enforced on file reads, search tools and shell | Enforced on every tool | Enforced on every tool call | Enforced on every tool call | Unverified on every tool (from documentation) |
 
@@ -64,6 +64,8 @@ The credential guard does not see files attached with `@` in the prompt, because
 ## The completion check (opt-in)
 
 With `hooks.pre-completion-check: true` in `.meowkit/config.yaml`, a turn that ends with files changed since the last passing test, build, lint or type-check run is continued, at most twice, and then ends with a notice. It is off by default. It shows that the agent ran a check, not that the check proves anything: a trivial passing command satisfies it.
+
+The check does not run on Codex. Codex hands a hook the output of a shell command but not its exit code, so a passing test run cannot be told from a failing one, and a check that could never see a pass would continue every turn that changed files.
 
 ## When a check blocks you
 

@@ -155,9 +155,9 @@ Of the 24 observers, `hook-coverage.json` ports or maps only these off Claude Co
 
 | Observer | Codex | Cursor | Grok, Pi, OMP, Antigravity |
 | --- | --- | --- | --- |
-| `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
+| `pre-completion-check` | Not ported: no passing check can be recorded (see `verification-evidence`) | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
 | `plan-state-sync` | Ported: `completion-check.cjs` on Stop, line as `systemMessage` | Ported: `stop-followup.cjs`, line on stderr | Equivalent: the ship check prints the drift line, read-only |
-| `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
+| `verification-evidence` | Not ported: the shell result Codex passes to PostToolUse has no exit code | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
 | `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported |
 | `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported |
 
