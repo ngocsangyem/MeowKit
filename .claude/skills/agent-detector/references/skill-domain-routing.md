@@ -11,6 +11,7 @@ The orchestrator routes by skill names:
 | Quick codebase search or architecture fingerprint | `mk:scout` |
 | Implementation pipeline | `mk:plan-creator` → `mk:cook` |
 | Split work across multiple headless CLI runtimes or in-session subagents (staged/parallel jobs, runtime/model diversity, worktree isolation, independent arbiter review) | `mk:orchestrate` — NOT for a single-task pipeline (`mk:cook`) or the in-session 7-phase flow (`mk:workflow-orchestrator`) |
+| Hand off one goal and come back to it delivered (confirmed brief, prerequisites, parallel writers sized by host load, review, honest report) | `mk:deliver` — NOT for one scoped task the user watches (`mk:cook`), a green-field product build (`mk:autobuild`) or a cross-CLI job split (`mk:orchestrate`) |
 | Bug investigation / root cause | `mk:investigate` → `mk:fix` |
 | Current library/API documentation | `mk:docs-finder` |
 | Deep multi-source technical research with cited report (technology evaluation, ecosystem comparison, fact-finding) | `mk:research` — NOT for library/API doc lookup (`mk:docs-finder`) or project-only Q&A (`mk:ask-me`) |

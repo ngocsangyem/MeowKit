@@ -1694,6 +1694,36 @@
       "size": 4790
     },
     {
+      "path": ".claude/skills/deliver/SKILL.md",
+      "sha256": "c035105e3fd34e89b3bf905ecb7908420ba0dc52c2b64209e8bb330221bb6286",
+      "size": 6645
+    },
+    {
+      "path": ".claude/skills/deliver/references/brief-and-acceptance.md",
+      "sha256": "4cc1631bca465441c2556f71f41d2f6dd7135dba98d4792a598ed009414c5e46",
+      "size": 2445
+    },
+    {
+      "path": ".claude/skills/deliver/references/execution-ledger.md",
+      "sha256": "e0d1c51e70e56bac960cc5ce80583f7075b8b7649f21a328d4b80d7fd6e037b2",
+      "size": 4216
+    },
+    {
+      "path": ".claude/skills/deliver/references/host-and-cleanup.md",
+      "sha256": "8867edabea86db2ce205d0413dfef98fcaa1452912760f3f04a7d969a51fdb6f",
+      "size": 4054
+    },
+    {
+      "path": ".claude/skills/deliver/references/prerequisites.md",
+      "sha256": "33d1b6e9ec49036093f1c1b1dd884c0a1c12ce779e2a9c6d3ef34f57f5fbed66",
+      "size": 2453
+    },
+    {
+      "path": ".claude/skills/deliver/references/review-and-done.md",
+      "sha256": "2a5e465a5bbf835b73f22c85c70fc97396e1e5265909ed6a3f904c400e1e5bce",
+      "size": 1803
+    },
+    {
       "path": ".claude/skills/development/SKILL.md",
       "sha256": "6d4fc737c642f55522656ad7df9eaf6be12b28d869f789d8e03773c91009a4e3",
       "size": 1986

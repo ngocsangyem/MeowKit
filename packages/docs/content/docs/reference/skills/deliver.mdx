@@ -1,0 +1,57 @@
+---
+title: "mk:deliver"
+description: "Takes one goal end to end while you are away: a confirmed brief, a prerequisite sweep, host-sized parallel writers, a fresh review and an honest report."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/deliver/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/deliver/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
+## What it does
+
+You give it a goal, answer its questions once and confirm a brief. From then on it runs without you: it plans, dispatches writers in their own worktrees, checks their work against git and the exit codes of their checks, merges one branch at a time, has the result reviewed in a fresh context, and reports. When something it cannot decide comes up it logs a ruling and continues; it stops only for the reasons in its stop list.
+
+It is user-invoked only. The session that runs it is the orchestrator and never writes product code.
+
+## When not to use
+
+- One scoped task you will watch: `mk:cook`.
+- A green-field product from a spec: `mk:autobuild`.
+- No clear goal yet, or a decision to make: `mk:advise`.
+- One job split across several agent CLIs: `mk:orchestrate`.
+
+## Usage
+
+```bash
+/mk:deliver "add CSV export to the reports page"
+/mk:deliver https://github.com/owner/repo/issues/42
+/mk:deliver --resume tasks/reports/deliver-<timestamp>
+```
+
+## Stages
+
+| Stage | What happens |
+|---|---|
+| Fit | Checks there is one goal, a repository and checks that run here; otherwise names the skill to use |
+| Lock | Scout-grounded questions, then a brief with runnable "Done when" commands and an `acceptance.json`. Only an explicit Confirm continues; the brief is frozen after it |
+| Prepare | Every input the run needs and cannot get alone (access, secret presence, quotas, authority, decisions you own, environment, the machine) is verified or waived. Unknown blocks |
+| Plan | `mk:plan-creator` and `mk:validate-plan`; the confirmed brief stands in for agreeing the plan, and open questions become logged rulings; pieces with disjoint file ownership |
+| Execute | Writer worktrees and an integration branch from `mk:worktree` (never your checked-out or default branch); each attempt is written to the ledger before dispatch; at most 3 writers, fewer when the host says so; serial merge with a gate after each merge |
+| Review | `mk:review` in branch-diff mode, in a fresh context in the integration worktree, at most 3 rounds; reported side effects stop the run for your decision |
+| Done | Every acceptance check run on the integrated tree, a cleanup receipt, and the report: done or partial |
+
+## On a shared machine
+
+The run sizes each wave of writers from the `mewkit host status` verdict and runs builds, gates and acceptance checks through `mewkit host run`. A check that is queued or still running, or a runner exit 75, never counts as a pass. The cleanup receipt lists the run's host jobs, the worktrees it removed (unmerged ones are kept) and the caches it found; it deletes no cache and stops nothing it did not start. Without `mewkit host` it runs checks directly with at most 2 writers. See [Host Admission](/guide/host-admission).
+
+## Run directory
+
+`tasks/reports/deliver-<timestamp>/` holds `brief.md`, `acceptance.json` and `ledger.md`. `--resume` reads them back, reconciles with git, the worktree list and the run's host jobs, and continues from the first open item.

@@ -168,6 +168,10 @@ flowchart TB
     V --> P2
 ```
 
+### A delivery run with several writers
+
+`mk:deliver` reads the verdict before each wave of writers: on `go` it starts up to three, on `throttle` or `unknown` only one does heavy work, and on `clean` or `hold` it starts no new heavy work. Writers run their checks through `host run`; the orchestrator checks a worker's "tests pass" against the job's exit with `jobs wait`, runs the gate after each merge and the final acceptance checks the same way, and lists the run's jobs in its cleanup receipt. A queued or running check is reported as not verified.
+
 ### Low free space
 
 On a `clean` verdict no heavy job is admitted. The watcher removes MeowKit's own stale state and only reports `target/` folders and Cargo caches.
