@@ -22,7 +22,7 @@ The verdict can only lower the number, never raise it.
 
 Check `mewkit host status --json` before each new dispatch. Hold new jobs while:
 
-- more heavy jobs are queued than twice the slots running (`mewkit host jobs list --all`: the queue is machine-wide), or
+- more heavy jobs are queued than twice the slots running (`mewkit host jobs list` with `--all`: the queue is machine-wide), or
 - `data.thermal` is 2 or more (heavy thermal pressure).
 
 Running jobs continue; dispatch resumes when the condition clears.
