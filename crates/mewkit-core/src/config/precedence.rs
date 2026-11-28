@@ -180,11 +180,6 @@ pub fn home_dir() -> Option<PathBuf> {
     None
 }
 
-/// The process environment as the map `ResolveOptions` takes.
-pub fn process_env() -> BTreeMap<String, String> {
-    std::env::vars().collect()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

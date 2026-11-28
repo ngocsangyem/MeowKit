@@ -21,7 +21,7 @@ mod shape;
 use std::path::Path;
 
 pub use crate::project_root::{resolve_project_root, resolve_project_root_bounded};
-pub use append::{NOTE_FILES, NoteError, NoteFile, append_note, note_lock_path};
+pub use append::{NoteError, NoteFile, append_note, note_lock_path};
 pub use shape::{USAGE, validate_note_shape};
 
 use crate::memory::scan_memory_content_capped;
