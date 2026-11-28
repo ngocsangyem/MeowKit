@@ -75,21 +75,6 @@
 			},
 			"additionalProperties": false
 		},
-		"host": {
-			"type": "object",
-			"properties": {
-				"enabled": {
-					"type": "boolean"
-				},
-				"auto_clean": {
-					"type": "boolean"
-				},
-				"max_heavy": {
-					"type": "integer"
-				}
-			},
-			"additionalProperties": false
-		},
 		"hooks": {
 			"type": "object",
 			"properties": {

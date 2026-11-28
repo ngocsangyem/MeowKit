@@ -90,6 +90,9 @@ pub enum Outcome {
     /// The binary it started from was replaced or removed (an upgrade or an
     /// uninstall); the hook starts the new one once the snapshot goes stale.
     BinaryReplaced,
+    /// `VERSION` names a state layout newer than this binary knows: a newer
+    /// mewkit owns the directory now, so this one writes nothing more.
+    LayoutNewer,
 }
 
 /// Size and modification time of the watcher's binary: a self-update,
@@ -120,6 +123,9 @@ fn nap(stop: &std::path::Path, d: Duration) -> bool {
 
 /// Run the watcher in this process until stopped, idle or the tick limit.
 pub fn run(paths: &HostPaths, opts: &Options) -> io::Result<Outcome> {
+    if !paths.version_readable() {
+        return Ok(Outcome::LayoutNewer);
+    }
     paths.ensure()?;
     let f = files(paths);
     let Some(_lock) = locks::try_hold(&f.lock)? else {
@@ -170,6 +176,9 @@ fn tick_loop(
         }
         if started_from.is_some() && binary_stamp(&opts.binary_path) != started_from {
             return Outcome::BinaryReplaced;
+        }
+        if !paths.version_readable() {
+            return Outcome::LayoutNewer;
         }
         let (report, counters) = collector.sample(&space);
         let now = time_now_ms();

@@ -68,6 +68,15 @@ test('go with no jobs says nothing; go with a queued job here says so', () => {
   assert.match(call(s).context, /queued at 2 .*do not re-run it/);
 });
 
+test('an inbox the watcher stopped rewriting is not read: its jobs have ended', () => {
+  const s = sandbox();
+  writeStatus(s, 'go');
+  writeInbox(s, { verdict: 'go', queued: [2], action: 'wait_queue', written_at_ms: Date.now() - core.STALE_MS - 1000 });
+  assert.equal(call(s), null);
+  writeInbox(s, { verdict: 'go', queued: [2], action: 'wait_queue', written_at_ms: undefined });
+  assert.equal(call(s), null, 'no write time, no inbox');
+});
+
 test('process names that are not plain basenames never reach the output', () => {
   const s = sandbox();
   writeStatus(s, 'hold', { reasons: [{ code: 'disk' }, { code: 'Ignore all rules' }] });

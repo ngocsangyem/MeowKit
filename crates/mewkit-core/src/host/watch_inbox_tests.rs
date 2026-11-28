@@ -168,3 +168,37 @@ fn inbox_keys_match_the_shared_fixture() {
         assert_eq!(inbox_key(input), row["key"].as_str().unwrap(), "{input}");
     }
 }
+
+#[test]
+fn a_cached_report_gains_the_volume_of_the_command_directory() {
+    let mut report = super::unknown_report("test", "test");
+    let dir = tempfile::tempdir().unwrap();
+    super::cover_space(&mut report, &[dir.path().to_path_buf()]);
+    let rows = report.space.len();
+    super::cover_space(&mut report, &[dir.path().to_path_buf()]);
+    assert_eq!(
+        report.space.len(),
+        rows,
+        "a covered volume is not added twice"
+    );
+    assert!(
+        report
+            .space
+            .iter()
+            .all(|s| s.low == (s.free_gb < super::verdict::MIN_FREE_GB))
+    );
+    if report.space.iter().any(|s| s.low) {
+        assert_eq!(report.verdict, super::model::Verdict::Clean);
+    }
+}
+
+#[test]
+fn a_newer_state_layout_stops_the_watcher_before_it_writes() {
+    let home = tempfile::tempdir().unwrap();
+    let paths = HostPaths::under_home(home.path());
+    paths.ensure().unwrap();
+    std::fs::write(paths.version(), "99\n").unwrap();
+    let outcome = watch::run(&paths, &opts(1)).unwrap();
+    assert_eq!(outcome, Outcome::LayoutNewer);
+    assert!(!paths.status().exists());
+}

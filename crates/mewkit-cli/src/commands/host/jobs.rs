@@ -39,10 +39,8 @@ pub enum JobsCommand {
 }
 
 fn find(paths: &HostPaths, id: &str) -> Result<JobDir, Failure> {
-    let job = JobDir::new(paths, id);
-    let safe = !id.is_empty() && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-');
-    if safe && job.meta().exists() {
-        Ok(job)
+    if jobs::valid_id(id) && JobDir::new(paths, id).meta().exists() {
+        Ok(JobDir::new(paths, id))
     } else {
         Err(Failure::failed(format!(
             "no job {id}; see `mewkit host jobs list`"

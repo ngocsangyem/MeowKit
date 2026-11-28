@@ -18,7 +18,12 @@ pub const RETENTION_MS: i64 = 7 * 24 * 3600 * 1000;
 pub struct Meta {
     pub id: String,
     pub worktree: Option<String>,
+    /// The tree when the job was enqueued: the attach key, not evidence.
     pub tree_digest: Option<String>,
+    /// The tree the command ran on, recorded only when it was the same at
+    /// start and at exit: the one digest a pass may be credited to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ran_tree_digest: Option<String>,
     pub cmd_class: Option<String>,
     pub cmd_hash: String,
     pub exe_base: String,
@@ -81,6 +86,9 @@ impl JobDir {
     pub fn cancel(&self) -> PathBuf {
         self.dir.join("cancel")
     }
+    pub fn claim(&self) -> PathBuf {
+        self.dir.join("claim")
+    }
     pub fn cancelled(&self) -> PathBuf {
         self.dir.join("cancelled")
     }
@@ -122,10 +130,28 @@ impl JobDir {
         self.finished().unwrap_or(JobState::Lost)
     }
 
+    /// Take the right to run the command: true for exactly one caller. The
+    /// supervisor claims before it queues; a client that gave up waiting for
+    /// the supervisor claims before running the command itself, and runs it
+    /// only when the claim is its own.
+    pub fn claim_run(&self) -> bool {
+        std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(self.claim())
+            .is_ok()
+    }
+
     /// When the command started, for elapsed-time display.
     pub fn admitted_at_ms(&self) -> Option<i64> {
         read_parsed(&self.admitted())
     }
+}
+
+/// True for a name `new_id` could have made: ASCII letters, digits and
+/// dashes, at most 64. Checked before any path is built from an id.
+pub fn valid_id(id: &str) -> bool {
+    !id.is_empty() && id.len() <= 64 && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
 }
 
 /// A fresh id: UTC stamp plus a short hash of pid and clock, unique enough

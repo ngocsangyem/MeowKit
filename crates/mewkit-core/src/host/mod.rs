@@ -27,6 +27,7 @@ pub mod slots;
 pub mod snapshot;
 pub mod stats;
 pub mod supervisor;
+mod supervisor_drain;
 pub mod tree_digest;
 pub mod verdict;
 pub mod wait_default;
@@ -39,6 +40,8 @@ mod clean_tests;
 mod client_tests;
 #[cfg(test)]
 mod queue_slots_tests;
+#[cfg(test)]
+mod supervisor_run_once_tests;
 #[cfg(test)]
 mod supervisor_tests;
 #[cfg(test)]
@@ -83,6 +86,34 @@ pub fn unknown_report(code: &str, detail: &str) -> Report {
     }
 }
 
+/// Add free space for volumes holding `space_paths` that the stored report
+/// does not cover (the watcher samples only the home volume), raising the
+/// verdict to `clean` when one is low. Without this, a build in a worktree on
+/// another volume would be admitted on the home volume's space.
+pub fn cover_space(report: &mut Report, space_paths: &[PathBuf]) {
+    if space_paths.is_empty() {
+        return;
+    }
+    for row in collect::space_report(space_paths) {
+        if report.space.iter().any(|r| r.path == row.path) {
+            continue;
+        }
+        if row.low {
+            report.verdict = report.verdict.max(Verdict::Clean);
+            report.reasons.push(Reason {
+                code: "space_low".into(),
+                detail: format!(
+                    "{} has {:.1} GB free (< {} GB)",
+                    row.path,
+                    row.free_gb,
+                    verdict::MIN_FREE_GB
+                ),
+            });
+        }
+        report.space.push(row);
+    }
+}
+
 /// The current status: the stored snapshot when fresh (unless `fresh`), else
 /// a new sample, stored for the next caller.
 pub fn status(paths: &HostPaths, fresh: bool, space_paths: &[PathBuf]) -> Envelope {
@@ -99,7 +130,9 @@ pub fn status(paths: &HostPaths, fresh: bool, space_paths: &[PathBuf]) -> Envelo
         && let Some(env) = &stored
         && snapshot::age_ms(env, now).is_some_and(|age| (0..=FRESH_MS).contains(&age))
     {
-        return env.clone();
+        let mut env = env.clone();
+        cover_space(&mut env.data, space_paths);
+        return env;
     }
     let Some(mut collector) = Collector::new() else {
         return Envelope::new(

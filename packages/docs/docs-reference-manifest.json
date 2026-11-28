@@ -2838,7 +2838,7 @@
       "title": "mk:worktree",
       "description": "Git worktree lifecycle for agents. NOT for mk:team-config.",
       "sourcePath": "skills/worktree/SKILL.md",
-      "sourceHash": "219818f2401dc8ff122ef8e19419e1edf6ccd067c4833ec55f1723c373261b9c",
+      "sourceHash": "49e8569e88d7ea3a73b942b52d69431e7b7014745ad3e70efcf2d545ade42b75",
       "aliases": [],
       "owner": "git",
       "phase": null,

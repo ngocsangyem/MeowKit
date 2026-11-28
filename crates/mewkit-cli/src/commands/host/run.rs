@@ -50,7 +50,8 @@ pub fn run(args: &RunArgs) -> Result<u8, Failure> {
     let Some(paths) = HostPaths::resolve() else {
         return run_directly(&args.command);
     };
-    if !HostConfig::for_paths(&paths).enabled {
+    // A layout written by a newer mewkit is never touched by this one.
+    if !HostConfig::for_paths(&paths).enabled || !paths.version_readable() {
         return run_directly(&args.command);
     }
     jobs::sweep(&paths, time_now_ms());
@@ -74,12 +75,26 @@ pub fn run(args: &RunArgs) -> Result<u8, Failure> {
         sup.push("--".into());
         sup.extend(args.command.iter().cloned());
         let spawned = std::env::current_exe().and_then(|exe| detach::spawn_detached(&exe, &sup));
-        if spawned.is_err() || !wait_for_supervisor(&job, Duration::from_secs(5)) {
+        // Whoever claims the job runs it. A supervisor that is merely slow
+        // to start has not claimed yet, so this caller takes the claim and
+        // the supervisor exits when it gets there: never two runs.
+        if (spawned.is_err() || !wait_for_supervisor(&job, Duration::from_secs(5)))
+            && job.claim_run()
+        {
+            drop(prepared.key_lock);
             eprintln!("mewkit host: could not start the job supervisor; running directly");
-            return run_directly(&args.command);
+            let code = run_directly(&args.command);
+            let recorded = code.as_ref().map_or(1, |c| i32::from(*c));
+            let _ = mewkit_core::fsx::atomic_write(
+                &job.exit(),
+                recorded.to_string().as_bytes(),
+                Some(0o600),
+            );
+            return code;
         }
         eprintln!("mewkit host: job {} queued", job.id);
     }
+    drop(prepared.key_lock);
     let deadline = if args.background {
         started
     } else {

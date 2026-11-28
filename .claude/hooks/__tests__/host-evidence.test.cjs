@@ -21,6 +21,8 @@ test('a foreground host run counts as its inner command; background or piped doe
   assert.equal(check.classifyCommand('mewkit host run --background -- cargo test'), null);
   assert.equal(check.classifyCommand('mewkit host run -- cargo test | tail'), null);
   assert.equal(check.classifyCommand('mewkit host run -- ls'), null);
+  assert.equal(check.classifyCommand('mk host run -- cargo test'), 'test', 'the mk alias');
+  assert.equal(check.classifyCommand('mkdir host run -- cargo test'), null);
   assert.equal(check.classifyCommand('mewkit host jobs wait 261128-1-abc'), null, 'the text names no runner');
 });
 
@@ -34,10 +36,10 @@ function repo() {
   return dir;
 }
 
-function job(home, id, { exit, cancelled = false, cls = 'test', digest }) {
+function job(home, id, { exit, cancelled = false, cls = 'test', digest, ran = digest }) {
   const dir = path.join(home, '.meowkit', 'host', 'jobs', id);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify({ id, cmd_class: cls, tree_digest: digest, cmd_hash: 'h', exe_base: 'cargo' }));
+  fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify({ id, cmd_class: cls, tree_digest: digest, ran_tree_digest: ran, cmd_hash: 'h', exe_base: 'cargo' }));
   if (exit !== undefined) fs.writeFileSync(path.join(dir, 'exit'), String(exit));
   if (cancelled) fs.writeFileSync(path.join(dir, 'cancelled'), '1');
 }
@@ -55,8 +57,13 @@ test('jobs wait counts only a done(0) job on the current tree, with the class it
   job(home, 'cancelled0', { exit: 0, cancelled: true, digest });
   job(home, 'noclass', { exit: 0, cls: null, digest });
   job(home, 'old-tree', { exit: 0, digest: 'f'.repeat(64) });
+  job(home, 'ran-elsewhere', { exit: 0, digest, ran: 'e'.repeat(64) });
+  job(home, 'tree-moved', { exit: 0, digest, ran: null });
   assert.equal(pass('ok'), 'lint');
-  for (const id of ['failed', 'running', 'cancelled', 'cancelled0', 'noclass', 'old-tree', 'missing']) assert.equal(pass(id), null, id);
+  for (const id of ['failed', 'running', 'cancelled', 'cancelled0', 'noclass', 'old-tree', 'ran-elsewhere', 'tree-moved', 'missing']) assert.equal(pass(id), null, id);
+  for (const command of ['mk host jobs wait ok', 'mewkit host jobs wait --timeout 2m ok', 'mewkit host jobs wait ok --timeout=30s', '/opt/bin/mk.exe host jobs wait ok']) {
+    assert.equal(check.recordPass({ root, stateFile, sessionId: 's', command, home }), 'lint', command);
+  }
   assert.equal(check.recordPass({ root, stateFile, sessionId: 's', command: 'mewkit host jobs wait ../../etc', home }), null);
   fs.writeFileSync(path.join(root, 'a.txt'), 'changed\n');
   assert.equal(pass('ok'), null, 'the tree changed since the job ran');

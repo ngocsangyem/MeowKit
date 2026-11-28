@@ -79,9 +79,12 @@ function readStatus(hostDir, now) {
 }
 
 /** This worktree's inbox entry when valid; null otherwise. */
-function readInbox(hostDir, toplevel) {
+function readInbox(hostDir, toplevel, now = Date.now()) {
   const e = readJson(path.join(hostDir, 'inbox', `${inboxKey(toplevel)}.json`));
   if (!e || e.schema_version !== 1 || rank(e.verdict) < 0) return null;
+  // The watcher rewrites a loaded worktree's entry every tick and stops once the worktree
+  // is quiet, so an old entry describes jobs that have since ended.
+  if (!isInt(e.written_at_ms) || now - e.written_at_ms > STALE_MS) return null;
   if (!Array.isArray(e.heavy) || !Array.isArray(e.queued) || !isInt(e.held_slots)) return null;
   if (e.action !== null && !Object.hasOwn(ACTIONS, e.action)) return null;
   const heavy = e.heavy

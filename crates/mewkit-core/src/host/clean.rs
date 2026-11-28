@@ -16,6 +16,9 @@ pub use super::clean_remove::remove;
 
 /// Ended jobs older than this go under a `clean` verdict.
 pub const JOB_AGE_MS: i64 = 24 * 3600 * 1000;
+/// False where file owners cannot be checked yet (Windows): there cleanup,
+/// the retention sweep and the automatic tier list items but remove none.
+pub const REMOVES: bool = cfg!(unix);
 /// Automatic runs are at least this far apart.
 pub const COOLDOWN_MS: i64 = 30 * 60 * 1000;
 
@@ -112,7 +115,7 @@ pub fn plan(paths: &HostPaths, now_ms: i64) -> Vec<Item> {
 /// Remove `items`, appending one `clean.log` line per action. Returns the
 /// number removed.
 pub fn execute(paths: &HostPaths, items: &[Item]) -> usize {
-    if items.is_empty() {
+    if items.is_empty() || !REMOVES {
         return 0;
     }
     let mut log = super::joblog::CappedLog::open(&paths.dir("clean.log")).ok();

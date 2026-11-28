@@ -124,7 +124,7 @@ impl Collector {
 }
 
 /// Free space for the volumes holding `paths`, one row per volume.
-fn space_report(paths: &[PathBuf]) -> Vec<Space> {
+pub(super) fn space_report(paths: &[PathBuf]) -> Vec<Space> {
     let Ok(disks) = Disks::new_with_refreshed_list() else {
         return Vec::new();
     };

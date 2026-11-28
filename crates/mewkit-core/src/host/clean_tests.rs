@@ -42,6 +42,12 @@ fn ended_jobs_dead_tickets_and_rotated_logs_go_and_are_logged() {
         kinds.contains(&"job") && kinds.contains(&"ticket") && kinds.contains(&"rotated-log"),
         "{kinds:?}"
     );
+    if !clean::REMOVES {
+        // Report-only where owners cannot be checked: nothing goes.
+        assert_eq!(clean::execute(&paths, &items), 0);
+        assert!(job.dir.exists());
+        return;
+    }
     assert_eq!(clean::execute(&paths, &items), items.len());
     assert!(!job.dir.exists());
     assert!(paths.stats().exists() && paths.version().exists());
@@ -70,9 +76,10 @@ fn a_symlink_inside_an_item_aborts_it_and_the_target_survives() {
     assert!(job.dir.exists());
     assert_eq!(std::fs::read_to_string(&precious).unwrap(), "keep");
     assert!(
-        std::fs::read_to_string(paths.dir("clean.log"))
-            .unwrap()
-            .contains("skipped job")
+        !clean::REMOVES
+            || std::fs::read_to_string(paths.dir("clean.log"))
+                .unwrap()
+                .contains("skipped job")
     );
 }
 
@@ -108,7 +115,11 @@ fn automatic_runs_only_under_clean_when_enabled_and_after_the_cooldown() {
     assert_eq!(clean::run_auto(&paths, Verdict::Go, true, now), None);
     assert_eq!(clean::run_auto(&paths, Verdict::Clean, false, now), None);
     assert!(paths.dir("watch.1").exists());
-    assert_eq!(clean::run_auto(&paths, Verdict::Clean, true, now), Some(1));
+    let one = usize::from(clean::REMOVES);
+    assert_eq!(
+        clean::run_auto(&paths, Verdict::Clean, true, now),
+        Some(one)
+    );
     std::fs::write(paths.dir("watch.1"), "old").unwrap();
     assert_eq!(
         clean::run_auto(&paths, Verdict::Clean, true, now + 1_000),
@@ -117,7 +128,7 @@ fn automatic_runs_only_under_clean_when_enabled_and_after_the_cooldown() {
     );
     assert_eq!(
         clean::run_auto(&paths, Verdict::Clean, true, now + clean::COOLDOWN_MS),
-        Some(1)
+        Some(one)
     );
     assert!(paths.stats().exists());
 }

@@ -2,7 +2,6 @@
 //! that stops waiting (or is killed) never drops the job. It holds the job's
 //! `alive.lock`, waits its turn in the queue, takes a slot, runs the command
 //! at low priority with output in a capped log, and records the exit code.
-use std::io::Read;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -12,6 +11,7 @@ use super::model::Verdict;
 use super::paths::HostPaths;
 use super::queue::{Queue, Ticket};
 use super::slots::Slots;
+use super::supervisor_drain::{self as drain, pump};
 use super::{locks, priority, stats, time_now_ms};
 
 /// After this long in the queue the job runs anyway, with a warning: the
@@ -19,12 +19,14 @@ use super::{locks, priority, stats, time_now_ms};
 pub const MAX_WAIT_MS: i64 = 30 * 60 * 1000;
 /// Exit code recorded for a job cancelled before or while running.
 pub const CANCELLED_EXIT: i32 = 130;
-
 pub struct Options {
     /// Lower the command's priority (`--priority high` turns this off).
     pub lower: bool,
     pub max_wait_ms: i64,
     pub poll: Duration,
+    /// The directory the command runs in, whose tree is recorded at start
+    /// and exit; `None` records nothing (no credit for a pass).
+    pub tree_root: Option<std::path::PathBuf>,
 }
 
 impl Default for Options {
@@ -33,31 +35,20 @@ impl Default for Options {
             lower: true,
             max_wait_ms: MAX_WAIT_MS,
             poll: Duration::from_millis(250),
+            tree_root: None,
         }
     }
 }
 
-fn note(log: &Mutex<CappedLog>, line: &str) {
+pub(super) fn note(log: &Mutex<CappedLog>, line: &str) {
     if let Ok(mut log) = log.lock() {
         let _ = log.write(format!("mewkit host: {line}\n").as_bytes());
     }
 }
 
-fn pump(
-    mut from: impl Read + Send + 'static,
-    log: Arc<Mutex<CappedLog>>,
-) -> std::thread::JoinHandle<()> {
-    std::thread::spawn(move || {
-        let mut buf = [0u8; 8192];
-        while let Ok(n) = from.read(&mut buf) {
-            if n == 0 {
-                break;
-            }
-            if let Ok(mut log) = log.lock() {
-                let _ = log.write(&buf[..n]);
-            }
-        }
-    })
+/// The tree under `root`, for the record of what the command ran on.
+fn tree_now(root: Option<&std::path::Path>) -> Option<String> {
+    root.and_then(super::tree_digest::tree_digest)
 }
 
 fn finish(job: &JobDir, code: i32, cancelled: bool) {
@@ -81,6 +72,14 @@ pub fn run(
     let Ok(Some(_alive)) = locks::try_hold(&job.alive()) else {
         return 1; // another supervisor already owns this job
     };
+    if !paths.version_readable() {
+        return 1; // a newer mewkit owns the state layout now
+    }
+    if !job.claim_run() {
+        // The client gave up waiting for this supervisor and runs the
+        // command itself: running it here too would run it twice.
+        return 1;
+    }
     let Some(mut meta) = job.read_meta() else {
         finish(job, 1, false);
         return 1;
@@ -144,6 +143,7 @@ pub fn run(
         ticket.leave();
     }
     let started = time_now_ms();
+    let tree_at_start = tree_now(opts.tree_root.as_deref());
     let _ = crate::fsx::atomic_write(&job.admitted(), started.to_string().as_bytes(), Some(0o600));
     let mut child = match priority::spawn(argv, opts.lower) {
         Ok(child) => child,
@@ -153,7 +153,8 @@ pub fn run(
             return 127;
         }
     };
-    meta.child_pid = Some(child.id());
+    let leader = child.id();
+    meta.child_pid = Some(leader);
     meta.child_start_ms = Some(started);
     let _ = job.write_meta(&meta);
     let pumps: Vec<_> = [
@@ -176,10 +177,17 @@ pub fn run(
         }
         std::thread::sleep(Duration::from_millis(100));
     };
-    for p in pumps {
-        let _ = p.join();
-    }
+    let cancelled = drain::drain(pumps, job, leader, &log, cancelled);
     drop(slot);
+    // A cancel that arrived any time before the exit file is written wins.
+    let cancelled = cancelled || job.cancel().exists();
+    if !cancelled
+        && let Some(tree) = tree_at_start
+        && tree_now(opts.tree_root.as_deref()).as_ref() == Some(&tree)
+    {
+        meta.ran_tree_digest = Some(tree);
+        let _ = job.write_meta(&meta);
+    }
     let code = if cancelled { CANCELLED_EXIT } else { code };
     finish(job, code, cancelled);
     if cancelled {

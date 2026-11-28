@@ -3,7 +3,7 @@
 //! be launched detached through it.
 use clap::Args;
 use mewkit_core::host::config::HostConfig;
-use mewkit_core::host::jobs::JobDir;
+use mewkit_core::host::jobs::{self, JobDir};
 use mewkit_core::host::slots::k_for;
 use mewkit_core::host::supervisor::{self, Options};
 use mewkit_core::host::{detach, status};
@@ -35,16 +35,21 @@ pub fn spawn(args: &SpawnArgs) -> Result<u8, Failure> {
 }
 
 pub fn supervise(args: &SuperviseArgs) -> Result<u8, Failure> {
+    if !jobs::valid_id(&args.id) {
+        return Err(Failure::usage(format!("not a job id: {}", args.id)));
+    }
     let paths = super::host_paths()?;
     let job = JobDir::new(&paths, &args.id);
     let max_heavy = usize::from(HostConfig::for_paths(&paths).max_heavy);
-    let space: Vec<std::path::PathBuf> = std::env::current_dir().into_iter().collect();
+    let cwd = std::env::current_dir().ok();
+    let space: Vec<std::path::PathBuf> = cwd.iter().cloned().collect();
     let admission = || {
         let verdict = status(&paths, false, &space).data.verdict;
         (k_for(verdict, max_heavy), verdict)
     };
     let opts = Options {
         lower: !args.no_lower,
+        tree_root: cwd,
         ..Options::default()
     };
     let code = supervisor::run(&paths, &job, &args.command, &opts, &admission);

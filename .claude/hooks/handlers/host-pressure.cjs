@@ -89,7 +89,7 @@ module.exports = function hostPressure(ctx, _state, { home = os.homedir(), now =
       return null;
     }
     const toplevel = core.worktreeOf(ctx.cwd || ctx.root);
-    const inbox = toplevel ? core.readInbox(hostDir, toplevel) : null;
+    const inbox = toplevel ? core.readInbox(hostDir, toplevel, now) : null;
     const line = core.buildLine(status, inbox);
     if (!line || !dueAndRecord(ctx.root, ctx.session_id || '', core.rank(status.verdict), now)) return null;
     return { context: line };

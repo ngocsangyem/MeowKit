@@ -15,9 +15,11 @@ fn same_owner(a: &std::fs::Metadata, b: &std::fs::Metadata) -> bool {
     use std::os::unix::fs::MetadataExt;
     a.uid() == b.uid()
 }
+/// No owner check without `unsafe` here yet, so nothing is ever owned by
+/// "the same user": cleanup removes nothing on this platform (report-only).
 #[cfg(not(unix))]
 fn same_owner(_: &std::fs::Metadata, _: &std::fs::Metadata) -> bool {
-    true
+    false
 }
 
 /// Refuse anything outside the root, a protected file, a symlink on the way
@@ -45,11 +47,7 @@ fn check(root: &Path, path: &Path, owner: &std::fs::Metadata) -> io::Result<()> 
     }
     if meta.is_dir() {
         for child in entries(path) {
-            if std::fs::symlink_metadata(&child)?.is_dir() {
-                check(root, &child, owner)?;
-            } else {
-                crate::fsx::refuse_symlinks(root, &child)?;
-            }
+            check(root, &child, owner)?;
         }
     }
     Ok(())

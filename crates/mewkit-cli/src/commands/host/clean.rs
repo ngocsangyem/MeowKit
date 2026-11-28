@@ -23,7 +23,12 @@ pub fn run(args: &CleanArgs) -> Result<u8, Failure> {
     }
     clean::describe(&items, &mut std::io::stdout());
     let bytes: u64 = items.iter().map(|i| i.bytes).sum();
-    if args.dry_run {
+    if args.dry_run || !clean::REMOVES {
+        if !clean::REMOVES {
+            println!(
+                "cleanup is report-only on this platform (beta): file owners cannot be checked yet"
+            );
+        }
         println!(
             "dry run: {} items, {bytes} bytes would be removed",
             items.len()

@@ -12,7 +12,7 @@ use super::slots::Slots;
 use super::supervisor::{CANCELLED_EXIT, Options, run};
 use super::time_now_ms;
 
-fn argv(parts: &[&str]) -> Vec<String> {
+pub(super) fn argv(parts: &[&str]) -> Vec<String> {
     parts.iter().map(|s| (*s).to_string()).collect()
 }
 
@@ -33,7 +33,7 @@ fn exit_argv(code: i32) -> Vec<String> {
     argv(&["cmd", "/C", &format!("echo out& exit {code}")])
 }
 
-fn new_job(paths: &HostPaths, n: usize) -> JobDir {
+pub(super) fn new_job(paths: &HostPaths, n: usize) -> JobDir {
     let job = JobDir::new(paths, &format!("{}-{n}", new_id(time_now_ms())));
     super::paths::create_private_dir(&job.dir).unwrap();
     job.write_meta(&Meta {
@@ -47,7 +47,7 @@ fn new_job(paths: &HostPaths, n: usize) -> JobDir {
     job
 }
 
-fn fast() -> Options {
+pub(super) fn fast() -> Options {
     Options {
         poll: Duration::from_millis(20),
         ..Options::default()
