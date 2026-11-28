@@ -10,6 +10,7 @@ mod failure;
 mod kit_args;
 mod minimist_flags;
 mod output;
+mod path_lookup;
 mod place;
 mod prompt;
 mod rebuild;
