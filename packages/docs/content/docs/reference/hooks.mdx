@@ -158,9 +158,9 @@ Of the 25 observers, `hook-coverage.json` ports or maps only these off Claude Co
 
 | Observer | Codex | Cursor | Pi | OMP | Grok, Antigravity |
 | --- | --- | --- | --- | --- | --- |
-| `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Unverified, from documentation: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Ported: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Not ported |
+| `pre-completion-check` | Not ported: no passing check can be recorded (see `verification-evidence`) | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Unverified, from documentation: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Ported: `completion.cjs` on `agent_end`, reason sent as a follow-up message | Not ported |
 | `plan-state-sync` | Ported: `completion-check.cjs` on Stop, line as `systemMessage` | Ported: `stop-followup.cjs`, line on stderr | Unverified, from documentation: `completion.cjs` on `agent_end`, line as a notification | Ported: `completion.cjs` on `agent_end`, line as a notification | Equivalent: the ship check prints the drift line, read-only |
-| `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Unverified, from documentation: `completion.cjs` on a successful bash `tool_result` | Ported: `completion.cjs` on a successful bash `tool_result` | Not ported |
+| `verification-evidence` | Not ported: the shell result Codex passes to PostToolUse has no exit code | Ported: `completion-check.cjs` on `postToolUse` Shell | Unverified, from documentation: `completion.cjs` on a successful bash `tool_result` | Ported: `completion.cjs` on a successful bash `tool_result` | Not ported |
 | `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported | Not ported | Not ported |
 | `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported | Not ported | Not ported |
 

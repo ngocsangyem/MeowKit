@@ -21,33 +21,6 @@
 				]
 			}
 		],
-		"SessionStart": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
-						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
-						"timeout": 15,
-						"statusMessage": "Completion check (session baseline, opt-in)"
-					}
-				]
-			}
-		],
-		"PostToolUse": [
-			{
-				"matcher": "Bash",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
-						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
-						"timeout": 15,
-						"statusMessage": "Completion check (verification evidence, opt-in)"
-					}
-				]
-			}
-		],
 		"Stop": [
 			{
 				"hooks": [
@@ -56,7 +29,7 @@
 						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
 						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
 						"timeout": 15,
-						"statusMessage": "Completion check (unverified edits, opt-in)"
+						"statusMessage": "Plan state sync"
 					}
 				]
 			}
