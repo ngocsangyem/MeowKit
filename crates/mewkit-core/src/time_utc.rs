@@ -45,6 +45,14 @@ pub fn iso_seconds(unix_millis: i64) -> String {
     format!("{y:04}-{mo:02}-{d:02}T{h:02}:{mi:02}:{s:02}Z")
 }
 
+/// `YYYY-MM-DDTHH:MM:SS.mmmZ` — `Date#toISOString`: the instant with its
+/// milliseconds.
+pub fn iso_millis(unix_millis: i64) -> String {
+    let (y, mo, d, h, mi, s) = utc_parts(unix_millis.div_euclid(1000));
+    let ms = unix_millis.rem_euclid(1000);
+    format!("{y:04}-{mo:02}-{d:02}T{h:02}:{mi:02}:{s:02}.{ms:03}Z")
+}
+
 /// `YYYY-MM-DD` — `toISOString().slice(0, 10)`, the calendar DAY a receipt
 /// records. UTC like every other stamp here: a local date would make one
 /// approval read as a different day depending on who ran it.
