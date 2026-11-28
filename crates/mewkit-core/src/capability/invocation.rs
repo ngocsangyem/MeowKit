@@ -8,14 +8,7 @@
 use serde_json::{Map, Value, json};
 
 /// The closed set of logical ids frontmatter may name.
-pub const INVOCATION_IDS: [&str; 6] = [
-    "invoke-skill",
-    "invoke-agent",
-    "invoke-command",
-    "invoke-workflow",
-    "lifecycle-hook",
-    "none",
-];
+pub use crate::schema::capability::KNOWN_INVOCATION_IDS as INVOCATION_IDS;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct InvocationShape {

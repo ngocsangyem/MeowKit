@@ -12,11 +12,7 @@ use std::process::Command;
 use serde_json::Value;
 use support::kit::sha_tree;
 use support::temp_home::TempHome;
-use support::{code, text, write};
-
-fn json(out: &std::process::Output) -> Value {
-    serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {}", text(out)))
-}
+use support::{code, json, text, write};
 
 fn installed(env: &TempHome, pack: &str) -> bool {
     let out = env.with_kit(&["pack", "list", "--json"]);

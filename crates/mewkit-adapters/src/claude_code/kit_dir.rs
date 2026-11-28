@@ -27,7 +27,9 @@ const SHIPPED: [&str; 5] = [
 /// committed by accident. The ownership index is shared: without it a clone
 /// cannot tell the kit's files from the user's, and an upgrade there would
 /// leave every file a newer kit dropped.
-pub const GITIGNORE: &str = "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n!state/\n!state/ownership/\n!state/ownership/*.json\n";
+/// `setup` judges the file current by comparing it to this same text, so the
+/// two must never differ.
+pub const GITIGNORE: &str = mewkit_core::setup::KIT_DIR_GITIGNORE;
 
 pub const PLUGIN_MANIFEST: &str = ".claude-plugin/plugin.json";
 

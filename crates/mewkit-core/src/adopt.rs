@@ -18,7 +18,7 @@ use std::path::Path;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-use crate::fsx::{RelPath, sha256_hex};
+use crate::fsx::{RelPath, hex, sha256_hex};
 
 /// Larger than any real install record; a bigger file is refused unread.
 const MAX_RECORD_BYTES: u64 = 16 * 1024 * 1024;
@@ -204,10 +204,6 @@ fn walk(dir: &Path, prefix: &str, out: &mut Vec<(String, String)>) -> io::Result
 
 fn file_sha(path: &Path) -> io::Result<String> {
     Ok(sha256_hex(&std::fs::read(path)?))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 fn read_record(root: &Path, rel: &str) -> Result<Option<Vec<u8>>, AdoptError> {

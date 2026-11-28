@@ -114,10 +114,11 @@ const NORMALIZERS = {
   isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, '{{DATE}}'),
 };
 
-function applyNormalizers(text, names, ctx) {
+/** Apply the named normalizers from `table` (this corpus's set by default) in order. */
+function applyNormalizers(text, names, ctx, table = NORMALIZERS) {
   let out = text;
   for (const name of names) {
-    const fn = NORMALIZERS[name];
+    const fn = table[name];
     if (!fn) throw new Error(`unknown normalizer: ${name}`);
     out = fn(out, ctx);
   }

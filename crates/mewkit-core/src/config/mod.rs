@@ -47,7 +47,7 @@ pub use load_config::{
 pub use observer_names::{REGISTRY_REL, observer_names};
 pub use precedence::{
     ENV_OVERRIDES, Level, ResolveOptions, Resolved, config_value, env_boolean, home_dir,
-    process_env, resolve_config,
+    resolve_config,
 };
 pub use removed_env_names::{REMOVED_ENV_NAMES, replacement_for};
 pub use schema::{

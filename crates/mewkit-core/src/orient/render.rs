@@ -10,6 +10,7 @@
 use std::path::Path;
 
 use crate::js_regex::is_js_whitespace;
+use crate::memory::utf16_len;
 use crate::repo_context::{is_within_boundary, lexical_resolve};
 
 use super::envelope::{OrientEnvelope, OrientOutcome};
@@ -61,11 +62,6 @@ pub fn sanitize_field(value: &str, max_field_chars: usize) -> String {
     }
     let cut = slice_utf16(&collapsed, max_field_chars.saturating_sub(1));
     format!("{}…", trim_end_js(&cut))
-}
-
-/// UTF-16 code units, the unit JavaScript string lengths are measured in.
-fn utf16_len(text: &str) -> usize {
-    text.chars().map(char::len_utf16).sum()
 }
 
 /// The first `units` UTF-16 code units, never splitting a surrogate pair — a

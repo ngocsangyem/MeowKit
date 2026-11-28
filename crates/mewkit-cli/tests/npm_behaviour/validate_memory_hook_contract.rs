@@ -9,7 +9,6 @@
 //! Both verdicts are exercised. A guard that blocked everything would pass a
 //! block-only test, and a guard that blocked nothing would pass a pass-only
 //! test; only the pair proves it reads the exit code.
-use std::path::Path;
 
 use crate::npm;
 
@@ -25,18 +24,7 @@ const result = lintMemoryStore({ root, env: { MEOWKIT_CLI: process.env.MEOWKIT_C
 process.stdout.write(`${result.exit}\n${result.stderr.join('\n')}\n`);
 "#;
 
-fn copy_tree(source: &Path, dest: &Path) {
-    std::fs::create_dir_all(dest).expect("create a directory");
-    for entry in std::fs::read_dir(source).expect("read a directory") {
-        let entry = entry.expect("a directory entry");
-        let target = dest.join(entry.file_name());
-        if entry.path().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            std::fs::copy(entry.path(), &target).expect("copy a file");
-        }
-    }
-}
+use super::hook_mirrors::copy_tree;
 
 /// Run the shipped guard over one fixture and return what it reported.
 fn run_guard(fixture: &'static str) -> String {

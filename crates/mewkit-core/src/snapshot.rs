@@ -13,7 +13,6 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
 
 use crate::time_utc::{iso_seconds, now_millis};
 
@@ -80,8 +79,7 @@ pub fn plain_copies(root: &Path) -> Vec<String> {
 }
 
 fn sha256_file(path: &Path) -> io::Result<String> {
-    let digest = Sha256::digest(std::fs::read(path)?);
-    Ok(digest.iter().map(|b| format!("{b:02x}")).collect())
+    Ok(crate::fsx::sha256_hex(&std::fs::read(path)?))
 }
 
 /// Read one manifest, or `None` when the id names nothing readable.
@@ -148,13 +146,7 @@ pub fn list_snapshots(root: &Path) -> Vec<Manifest> {
 }
 
 /// `Date#toISOString`: the instant with its milliseconds.
-pub fn iso_millis(unix_millis: i64) -> String {
-    format!(
-        "{}.{:03}Z",
-        iso_seconds(unix_millis).trim_end_matches('Z'),
-        unix_millis.rem_euclid(1000)
-    )
-}
+pub use crate::time_utc::iso_millis;
 
 /// A sortable id: the instant plus the command that took it.
 fn snapshot_id(command: &str, now_ms: i64, suffix: &str) -> String {

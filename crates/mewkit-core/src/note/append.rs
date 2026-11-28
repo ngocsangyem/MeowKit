@@ -10,9 +10,6 @@ use crate::state_paths::{StateClass, resolve_state_dir};
 
 use super::shape::js_trim;
 
-/// The two-file contract. Anything else is not memory.
-pub const NOTE_FILES: [&str; 2] = ["decisions", "gotchas"];
-
 /// Which of the two store files an entry is for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NoteFile {

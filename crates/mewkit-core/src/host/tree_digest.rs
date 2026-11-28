@@ -8,6 +8,8 @@ use std::process::{Command, Stdio};
 
 use sha2::{Digest, Sha256};
 
+use crate::fsx::hex;
+
 /// Paths excluded from the digest (the hook's `IGNORED_PATHS`).
 pub const IGNORED_PATHS: &[&str] = &[
     ".meowkit/state",
@@ -93,8 +95,4 @@ pub fn tree_digest(root: &Path) -> Option<String> {
         hash.update(format!("untracked:{rel}:{stamp}\n"));
     }
     Some(hex(&hash.finalize()))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }

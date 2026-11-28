@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::OnceLock;
 
-use mewkit_adapters::contract::{Kit, OwnershipIndex, Plan, RelPath, written_hashes};
+use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, written_hashes};
 use mewkit_adapters::{EmitRequest, Emitter, Scope};
 use mewkit_core::exec::{ExecOptions, Scope as ExecScope, execute};
 use mewkit_core::fsx::sha256_hex;
@@ -324,4 +324,15 @@ fn glob(pattern: &str, text: &str) -> bool {
         }
     }
     p[pi..].iter().all(|c| *c == '*')
+}
+
+/// The files `plan` writes, by path.
+pub fn written(plan: &Plan) -> BTreeMap<&str, &[u8]> {
+    plan.ops
+        .iter()
+        .filter_map(|op| match op {
+            Op::WriteFile { path, bytes, .. } => Some((path.as_str(), bytes.as_slice())),
+            _ => None,
+        })
+        .collect()
 }

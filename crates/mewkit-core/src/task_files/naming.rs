@@ -1,5 +1,5 @@
 //! Task types, slugs and the two date stamps a new task file carries.
-use crate::time_utc::{now_millis, utc_parts};
+use crate::time_utc::now_millis;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskType {
@@ -100,10 +100,7 @@ pub fn today_iso() -> String {
     stamp_iso(now_millis())
 }
 
-pub fn stamp_iso(unix_millis: i64) -> String {
-    let (y, mo, d, ..) = utc_parts(unix_millis.div_euclid(1000));
-    format!("{y:04}-{mo:02}-{d:02}")
-}
+pub use crate::time_utc::utc_date as stamp_iso;
 
 /// An instant in a named zone, falling back to UTC for an instant or a zone the
 /// library cannot resolve.

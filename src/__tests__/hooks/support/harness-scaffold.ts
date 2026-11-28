@@ -30,14 +30,6 @@ function copyClaudeHarness(srcRoot: string, destRoot: string): void {
 	fs.copyFileSync(path.join(claudeSrc, "settings.json"), path.join(claudeDst, "settings.json"));
 }
 
-/** True if `<srcRoot>/.claude/settings.json` and the hooks tree exist. */
-export function hasHarness(srcRoot: string): boolean {
-	return (
-		fs.existsSync(path.join(srcRoot, ".claude", "settings.json")) &&
-		fs.existsSync(path.join(srcRoot, ".claude", "hooks"))
-	);
-}
-
 export function scaffoldHarnessProject(srcRoot: string): HarnessProject {
 	const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mewkit-harness-"));
 	copyClaudeHarness(srcRoot, dir);

@@ -16,14 +16,15 @@ use mewkit_core::fsx::sha256_hex;
 
 use super::coexistence::installed;
 use super::coexistence_scan as scan;
+use super::hook_commands::SCRIPT_EXTENSIONS;
 use super::hooks;
 use super::{Check, Status};
 use crate::place::Place;
 
 const NAME: &str = "guards: integrity";
-/// What a host loads out of a hook tree: the executables, and the JSON a
-/// dispatcher reads to decide which of them runs.
-const GUARD_SUFFIXES: [&str; 6] = [".cjs", ".js", ".mjs", ".sh", ".py", ".json"];
+/// What a host loads out of a hook tree besides the scripts themselves: the
+/// JSON a dispatcher reads to decide which of them runs.
+const DISPATCH_CONFIG_SUFFIX: &str = ".json";
 
 pub fn check(places: &[&Place], targets: &[Runtime]) -> Check {
     let mut guards = 0usize;
@@ -114,7 +115,8 @@ pub fn check(places: &[&Place], targets: &[Runtime]) -> Check {
 /// under it counts, because a guard that loads it is only as sound as it is.
 fn is_guard(path: &str) -> bool {
     path.split('/').any(|segment| segment == "hooks")
-        && GUARD_SUFFIXES.iter().any(|s| path.ends_with(s))
+        && (SCRIPT_EXTENSIONS.iter().any(|s| path.ends_with(s))
+            || path.ends_with(DISPATCH_CONFIG_SUFFIX))
 }
 
 #[cfg(test)]

@@ -11,8 +11,6 @@ mod runtime;
 
 use std::path::{Path, PathBuf};
 
-use crate::js_regex::is_js_whitespace;
-
 pub use provision::{
     EnsureOutcome, PackageVerification, ensure_env, install_pip_packages, verify_packages,
 };
@@ -140,9 +138,7 @@ pub fn env_skills(project: &Path) -> Vec<String> {
 }
 
 /// `str.trim()` with JavaScript's whitespace set.
-pub(crate) fn js_trim(text: &str) -> &str {
-    text.trim_matches(is_js_whitespace)
-}
+pub(crate) use crate::js_regex::js_trim;
 
 #[cfg(test)]
 #[path = "tests.rs"]

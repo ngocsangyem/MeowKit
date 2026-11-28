@@ -85,7 +85,7 @@ impl Overlay {
             }
             h.update(b"\n");
         }
-        h.finalize().iter().map(|b| format!("{b:02x}")).collect()
+        crate::fsx::hex(&h.finalize())
     }
 }
 

@@ -28,7 +28,6 @@ const write = (filePath) => toolPayload('Write', { file_path: filePath });
 const read = (filePath) => toolPayload('Read', { file_path: filePath });
 const bash = (command) => toolPayload('Bash', { command });
 const postEdit = (filePath) => toolPayload('Edit', { file_path: filePath }, 'PostToolUse');
-const stopEvent = () => payload({ hook_event_name: 'Stop' });
 
 module.exports = {
   CONTRACT,
@@ -41,7 +40,6 @@ module.exports = {
   payload,
   postEdit,
   read,
-  stopEvent,
   toolPayload,
   write,
 };

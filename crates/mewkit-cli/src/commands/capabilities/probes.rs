@@ -39,35 +39,9 @@ fn escapes(from: &Path, to: &Path) -> bool {
     !to.starts_with(from)
 }
 
-#[cfg(unix)]
-fn is_executable(p: &Path) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    p.metadata()
-        .is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-}
-
-#[cfg(not(unix))]
-fn is_executable(p: &Path) -> bool {
-    p.is_file()
-}
-
-fn on_path(name: &str) -> bool {
-    let exts: &[&str] = if cfg!(windows) {
-        &[".exe", ".cmd", ".bat", ""]
-    } else {
-        &[""]
-    };
-    std::env::var_os("PATH").is_some_and(|path| {
-        std::env::split_paths(&path).any(|dir| {
-            exts.iter()
-                .any(|e| is_executable(&dir.join(format!("{name}{e}"))))
-        })
-    })
-}
-
 impl Probes for HostProbes {
     fn command_exists(&self, cmd: &str) -> bool {
-        on_path(cmd)
+        crate::path_lookup::which(cmd).is_some()
     }
 
     fn is_self(&self, binary: &str) -> bool {

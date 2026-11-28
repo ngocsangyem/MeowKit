@@ -89,16 +89,6 @@ impl Normaliser {
         }
     }
 
-    /// Fold only the temp directories to `<project>`: what a recording keeps of
-    /// a run, because the directories are random per run and nothing else is.
-    pub fn strip_roots(&self, raw: &str) -> String {
-        let mut out = raw.replace("\r\n", "\n");
-        for root in &self.roots {
-            out = out.replace(root, "<project>");
-        }
-        out
-    }
-
     /// A path in a written tree: a file named by the day it was written.
     pub fn path(&self, raw: &str) -> String {
         RUN_DATE.replace_all(raw, "<date>").into_owned()

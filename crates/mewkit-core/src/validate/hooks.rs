@@ -9,6 +9,7 @@ use std::fs;
 use std::path::Path;
 
 use super::result::{CheckResult, Section, Status, ok};
+use super::target_helpers::is_executable;
 
 const HOOK_EXTENSIONS: [&str; 4] = ["sh", "cjs", "js", "mjs"];
 const EXCLUDED_BASENAMES: [&str; 2] = ["HOOKS_INDEX.md", "handlers.json"];
@@ -84,17 +85,6 @@ fn any_execute_bit(metadata: &fs::Metadata) -> bool {
 #[cfg(not(unix))]
 fn any_execute_bit(_metadata: &fs::Metadata) -> bool {
     true
-}
-
-#[cfg(unix)]
-fn is_executable(path: &Path) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    fs::metadata(path).is_ok_and(|m| m.permissions().mode() & 0o111 != 0)
-}
-
-#[cfg(not(unix))]
-fn is_executable(path: &Path) -> bool {
-    path.exists()
 }
 
 /// One row per hook script, then one summary row for the non-script entries

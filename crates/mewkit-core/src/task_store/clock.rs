@@ -5,14 +5,10 @@
 //! npm CLI writes `new Date().toISOString()` here and strips the fraction
 //! there, and a record whose stamp changed shape would read as a different
 //! writer to anything comparing the two CLIs' output.
-use crate::time_utc::{now_millis, utc_parts};
+use crate::time_utc::now_millis;
 
 /// `YYYY-MM-DDTHH:MM:SS.mmmZ` for a unix-millisecond instant.
-pub fn iso_millis(unix_millis: i64) -> String {
-    let (y, mo, d, h, mi, s) = utc_parts(unix_millis.div_euclid(1000));
-    let ms = unix_millis.rem_euclid(1000);
-    format!("{y:04}-{mo:02}-{d:02}T{h:02}:{mi:02}:{s:02}.{ms:03}Z")
-}
+pub use crate::time_utc::iso_millis;
 
 /// The current instant in that shape.
 pub fn now_iso_millis() -> String {

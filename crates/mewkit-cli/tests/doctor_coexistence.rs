@@ -14,7 +14,7 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 
 use serde_json::Value;
-use support::temp_home::TempHome;
+use support::temp_home::{TempHome, installed};
 use support::{code, text, write};
 
 const OUTWARD: [&str; 5] = [
@@ -76,14 +76,6 @@ fn assert_shape(rows: &[Value]) {
     for name in OUTWARD.iter().chain([&WEAKENED, &INTEGRITY]) {
         assert_ne!(status(rows, name), "fail", "{name} never fails");
     }
-}
-
-/// A project with one runtime installed from this checkout's kit.
-fn installed(targets: &str) -> TempHome {
-    let env = TempHome::new();
-    let out = env.with_kit(&["init", "--target", targets]);
-    assert_eq!(code(&out), 0, "{}", text(&out));
-    env
 }
 
 /// A skill directory whose frontmatter costs `padding` characters of description.

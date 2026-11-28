@@ -15,17 +15,7 @@ use mewkit_adapters::contract::{EmitError, Op, Plan, Runtime, Scope};
 use mewkit_adapters::placement_resolver::resolve;
 use mewkit_adapters::surface_table::table;
 use mewkit_adapters::{EmitRequest, agents_block, agents_tree};
-use support::{Project, kit, request, sha_tree};
-
-fn written(plan: &Plan) -> BTreeMap<&str, &[u8]> {
-    plan.ops
-        .iter()
-        .filter_map(|op| match op {
-            Op::WriteFile { path, bytes, .. } => Some((path.as_str(), bytes.as_slice())),
-            _ => None,
-        })
-        .collect()
-}
+use support::{Project, kit, request, sha_tree, written};
 
 #[test]
 fn installs_beside_the_users_files_and_strips_back_byte_for_byte() {

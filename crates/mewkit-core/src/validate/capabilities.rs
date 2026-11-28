@@ -11,16 +11,8 @@ use std::path::Path;
 pub use super::capability_build::build_capabilities;
 use super::inventory_build::build_inventory;
 
-/// The logical invocation ids frontmatter may name. A closed set is the whole
-/// point: hostile frontmatter can name an id at most, never smuggle a command.
-pub const KNOWN_INVOCATION_IDS: [&str; 6] = [
-    "invoke-skill",
-    "invoke-agent",
-    "invoke-command",
-    "invoke-workflow",
-    "lifecycle-hook",
-    "none",
-];
+/// The logical invocation ids frontmatter may name.
+pub use crate::schema::capability::KNOWN_INVOCATION_IDS;
 
 /// One built capability — the fields validation and the generated view read.
 #[derive(Clone, Debug, PartialEq, Eq)]

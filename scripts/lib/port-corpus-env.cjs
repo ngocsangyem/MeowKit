@@ -19,7 +19,8 @@ const { execFileSync, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { NORMALIZERS: HOOK_NORMALIZERS, runScript } = require('./hook-corpus-env.cjs');
+const { NORMALIZERS: HOOK_NORMALIZERS, applyNormalizers: applyFrom, runScript } = require('./hook-corpus-env.cjs');
+const { newProject, writeFile } = require('./hook-corpus-fs.cjs');
 
 /**
  * Interpreters to try, newest name first, across the directories a developer
@@ -72,13 +73,7 @@ const NORMALIZERS = {
 };
 
 function applyNormalizers(text, names, ctx) {
-  let out = text;
-  for (const name of names) {
-    const fn = NORMALIZERS[name];
-    if (!fn) throw new Error(`unknown normalizer: ${name}`);
-    out = fn(out, ctx);
-  }
-  return out;
+  return applyFrom(text, names, ctx, NORMALIZERS);
 }
 
 /**
@@ -95,22 +90,6 @@ function extractBase(repoRoot, baseSha, destDir) {
   const tar = spawnSync('tar', ['-x', '-C', destDir], { input: archive });
   if (tar.status !== 0) throw new Error(`tar -x failed: ${tar.stderr && tar.stderr.toString()}`);
   return destDir;
-}
-
-/** A fresh throwaway project holding a copy of the extracted tree. */
-function newProject(baseTree, projectDir) {
-  fs.mkdirSync(projectDir, { recursive: true });
-  fs.cpSync(baseTree, projectDir, { recursive: true });
-  fs.mkdirSync(path.join(projectDir, 'home'), { recursive: true });
-  return projectDir;
-}
-
-/** Write `content` to `rel` inside `root`, creating parent directories. */
-function writeFile(root, rel, content) {
-  const abs = path.join(root, rel);
-  fs.mkdirSync(path.dirname(abs), { recursive: true });
-  fs.writeFileSync(abs, content);
-  return abs;
 }
 
 module.exports = {

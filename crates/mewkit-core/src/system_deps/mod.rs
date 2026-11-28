@@ -15,9 +15,6 @@ pub use metadata::{
     parse_optional_system_deps_from_skill_md, skill_declared_deps, validate_skill_declared_keys,
 };
 
-/// The skill that drives a browser, and therefore owns the browser.
-pub const PLAYWRIGHT_SKILL: &str = "web-to-markdown";
-
 /// A registered dependency.
 #[derive(Debug, Clone, Copy)]
 pub struct SystemDep {

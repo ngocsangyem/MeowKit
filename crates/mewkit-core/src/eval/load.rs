@@ -144,6 +144,6 @@ pub fn load_cases(root: &Path) -> Result<CaseSet, LoadError> {
         h.update((bytes.len() as u64).to_le_bytes());
         h.update(bytes);
     }
-    let hash = h.finalize().iter().map(|b| format!("{b:02x}")).collect();
+    let hash = crate::fsx::hex(&h.finalize());
     Ok(CaseSet { cases, hash })
 }

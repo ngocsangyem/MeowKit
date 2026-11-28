@@ -85,7 +85,9 @@ pub struct Invocation {
     pub id: String,
 }
 
-/// Known logical invocation IDs. Frontmatter may reference only these.
+/// Known logical invocation IDs. Frontmatter may reference only these. A closed
+/// set is the whole point: hostile frontmatter can name an id at most, never
+/// smuggle a command.
 pub const KNOWN_INVOCATION_IDS: &[&str] = &[
     "invoke-skill",
     "invoke-agent",

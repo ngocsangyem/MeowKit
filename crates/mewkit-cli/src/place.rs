@@ -149,10 +149,6 @@ impl Place {
 }
 
 fn home_dir() -> Result<PathBuf, Failure> {
-    ["HOME", "USERPROFILE"]
-        .iter()
-        .filter_map(std::env::var_os)
-        .find(|v| !v.is_empty())
-        .map(PathBuf::from)
+    mewkit_core::config::home_dir()
         .ok_or_else(|| Failure::failed("cannot find your home directory: HOME is not set"))
 }

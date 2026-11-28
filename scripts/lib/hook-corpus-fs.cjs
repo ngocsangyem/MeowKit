@@ -23,17 +23,6 @@ function removePath(root, rel) {
   fs.rmSync(path.join(root, rel), { recursive: true, force: true });
 }
 
-/**
- * Remove a library by its extension-less path, so one case definition expresses
- * "this library is absent" for whichever implementation the tree under test
- * holds. The recorder runs against the shell tree and the replay harness against
- * the node tree; without this the two would delete different files and the case
- * would stop testing the same thing.
- */
-function removeLib(ctx, relWithoutExt) {
-  removePath(ctx.projectDir, `${relWithoutExt}${ctx.ext || '.sh'}`);
-}
-
 /** Copy the extracted BASE tree into a fresh project directory. */
 function newProject(baseTree, projectDir) {
   fs.mkdirSync(projectDir, { recursive: true });
@@ -69,23 +58,10 @@ function initGit(projectDir, home, { commit = [], stage = [], untracked = [] } =
   return git(projectDir, ['rev-parse', '--short', 'HEAD'], home).trim();
 }
 
-/** A node stub standing in for the resolved mewkit CLI (`MEOWKIT_CLI`). */
-function writeFakeCli(projectDir, rel, { exitCode, output }) {
-  const abs = writeFile(
-    projectDir,
-    rel,
-    ['#!/usr/bin/env node', `process.stdout.write(${JSON.stringify(output)});`, `process.exit(${exitCode});`, ''].join('\n'),
-  );
-  fs.chmodSync(abs, 0o755);
-  return abs;
-}
-
 module.exports = {
   git,
   initGit,
   newProject,
-  removeLib,
   removePath,
-  writeFakeCli,
   writeFile,
 };
