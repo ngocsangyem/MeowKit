@@ -49,7 +49,9 @@ The same command on the same worktree and the same file tree attaches to the job
 | `75` | Not finished. The first line says `QUEUED — NOT STARTED — NOT VERIFIED` or `STILL RUNNING — NOT VERIFIED`, followed by the job id |
 | `70` | The job was cancelled, or its supervisor died. Not verified; run it again once |
 
-Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran on the same file tree as the one being checked.
+A command that itself exits 75 or 70 shows its own output instead of those lines, so read the first line, not the code alone. Exit 75 is never a pass. Wait for the job with `mewkit host jobs wait <id>` and read its exit code. On Claude Code the opt-in completion check credits a `jobs wait` only when the job ended with 0, was not cancelled, and ran on the same file tree as the one being checked.
+
+If the agent runtime ends the call with SIGTERM or SIGHUP while `run` or `jobs wait` is waiting, it prints the exit-75 block and exits 75; the job keeps running. Ctrl-C at a terminal cancels the job and exits 70 once it has stopped. On Windows these signals keep their default behaviour for now.
 
 When admission is switched off, `HOME` is unset, or anything in the queue fails, `run` runs the command directly in the foreground: an internal error never blocks a command.
 
@@ -57,7 +59,7 @@ When admission is switched off, `HOME` is unset, or anything in the queue fails,
 
 `mewkit host watch --detach` starts one watcher per machine. It samples every 5 seconds and writes, for each worktree that loads the host, a short note naming the heavy processes (by pid and executable name), queue positions and the slots held. It exits after 30 minutes with no agent runtime running. `mewkit host watch --stop` stops it; on Claude Code the hook starts it again on a prompt more than a minute later. To keep it off, set `host.enabled: false`.
 
-On Claude Code the `host-pressure` hook reads that note and adds one line to the agent's context when the verdict is `throttle` or worse, or when this worktree has jobs. It repeats a line at most every 5 minutes unless the verdict gets worse. The hook starts the watcher only from a `mewkit` installed on `PATH`, never from a build inside a git checkout. `hooks.host-pressure: false` in `.meowkit/config.yaml` switches it off. Other runtimes do not run the hook; their skills tell the agent to run `mewkit host status`.
+On Claude Code the `host-pressure` hook reads that note and adds one line to the agent's context when the verdict is `throttle` or worse, or when this worktree has jobs. It repeats a line at most every 5 minutes unless the verdict gets worse. The hook starts the watcher only from a `mewkit` installed on `PATH`, never from a build inside a git checkout. A git repository whose root is your home directory (dotfiles) does not count as a checkout. On Windows only `mewkit.exe` is started, not a `.cmd` shim. `hooks.host-pressure: false` in `.meowkit/config.yaml` switches it off. Other runtimes do not run the hook; their skills tell the agent to run `mewkit host status`.
 
 ## Cleanup
 
@@ -69,6 +71,16 @@ On Claude Code the `host-pressure` hook reads that note and adds one line to the
 Tier 1 never follows a symlink, never deletes a file another user owns, and logs each removal to `~/.meowkit/host/clean.log`. `mewkit host clean --dry-run` lists what it would remove.
 
 Cargo can clean its own caches: since Rust 1.88 it removes old downloaded crates by itself unless `cache.auto-clean-frequency` is `"never"`. `--caches` says so when that setting turns it off.
+
+## Upgrade and uninstall
+
+The kit files of this feature (the skill references and the hook) are installed, upgraded and removed with the kit like any other file.
+
+The watcher and `~/.meowkit/host` belong to the machine, not to one project:
+
+- After `mewkit self-update` or a package upgrade replaces the binary, the running watcher exits within one sample, and the hook starts the new one. `mewkit host watch --detach` also replaces a watcher from another version at once.
+- When `mewkit uninstall --yes` removes the last runtime of an install, it stops the watcher and names `~/.meowkit/host`. The folder stays, because other projects on the machine may use it: `mewkit host clean` removes its stale parts, and you can delete it when no project uses MeowKit any more.
+- `mewkit doctor` has a `host watcher (beta)` row: running or not, its version, and the size of the state.
 
 ## Settings
 

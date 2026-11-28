@@ -25,26 +25,33 @@ function markerFresh(file, now) {
   try { const at = Number(fs.readFileSync(file, 'utf8').trim()); return now - at >= 0 && now - at < MARKER_TTL_MS; } catch { return false; }
 }
 
-/** The first `mewkit` on PATH that is not inside a git checkout, or null. */
-function installedMewkit() {
-  const names = process.platform === 'win32' ? ['mewkit.exe', 'mewkit.cmd'] : ['mewkit'];
+/**
+ * The first `mewkit` on PATH that is not inside a git checkout, or null. A repository
+ * whose root is the home directory itself (dotfiles) does not count as a checkout.
+ */
+function installedMewkit(home) {
+  let homeReal = null;
+  try { homeReal = fs.realpathSync(home); } catch { /* no home */ }
+  // Not `mewkit.cmd`: Node will not spawn a batch shim without a shell.
+  const names = process.platform === 'win32' ? ['mewkit.exe'] : ['mewkit'];
   for (const dir of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
     for (const name of names) {
       const file = path.join(dir, name);
       try {
         const real = fs.realpathSync(file);
-        if (fs.statSync(real).isFile() && !core.worktreeOf(path.dirname(real))) return file;
+        const top = core.worktreeOf(path.dirname(real));
+        if (fs.statSync(real).isFile() && (!top || top === homeReal)) return file;
       } catch { /* not here */ }
     }
   }
   return null;
 }
 
-function startWatcher(hostDir, now) {
+function startWatcher(hostDir, now, home) {
   if (markerFresh(path.join(hostDir, 'no-autostart'), now)) return;
   const marker = path.join(hostDir, 'watch.spawn');
   if (markerFresh(marker, now)) return;
-  const bin = installedMewkit();
+  const bin = installedMewkit(home);
   if (!bin) return;
   try {
     fs.mkdirSync(hostDir, { recursive: true, mode: 0o700 });
@@ -78,7 +85,7 @@ module.exports = function hostPressure(ctx, _state, { home = os.homedir(), now =
     const hostDir = path.join(home, '.meowkit', 'host');
     const status = core.readStatus(hostDir, now);
     if (!status || status.ageMs > core.STALE_MS) {
-      startWatcher(hostDir, now);
+      startWatcher(hostDir, now, home);
       return null;
     }
     const toplevel = core.worktreeOf(ctx.cwd || ctx.root);

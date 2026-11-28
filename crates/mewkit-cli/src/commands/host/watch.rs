@@ -8,6 +8,8 @@ use mewkit_core::host::{detach, worktree};
 
 use crate::failure::{Failure, OK};
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Args, Debug)]
 pub struct WatchArgs {
     /// Start the watcher in the background and print its pid.
@@ -22,11 +24,16 @@ pub struct WatchArgs {
 }
 
 /// The watcher runs with the user's rights for hours, so it starts only from
-/// an installed `mewkit`, never from a binary inside a project checkout.
+/// an installed `mewkit`, never from a binary inside a project checkout. A
+/// repository rooted at the home directory itself (dotfiles) is not one.
 fn installed_exe(dev: bool) -> Result<std::path::PathBuf, Failure> {
     let exe = std::env::current_exe()?;
     let exe = exe.canonicalize().unwrap_or(exe);
-    let in_checkout = exe.parent().and_then(worktree::git_toplevel).is_some();
+    let home = mewkit_core::config::home_dir().and_then(|h| h.canonicalize().ok());
+    let in_checkout = exe
+        .parent()
+        .and_then(worktree::git_toplevel)
+        .is_some_and(|top| Some(&top) != home.as_ref());
     if in_checkout && !dev {
         return Err(Failure::failed(format!(
             "refusing to start the watcher from {}: it is inside a git checkout; use the installed mewkit",
@@ -58,14 +65,17 @@ fn terminate(pid: u32) {
         .status();
 }
 
-fn stop(paths: &HostPaths) -> Result<u8, Failure> {
+/// Stop the running watcher; false when none was running. `hold_autostart`
+/// also keeps the hook from starting a new one for the next minute.
+pub(crate) fn stop_watcher(paths: &HostPaths, hold_autostart: bool) -> std::io::Result<bool> {
     let f = watch::files(paths);
     if !watch::is_running(paths) {
-        println!("watcher not running");
-        return Ok(OK);
+        return Ok(false);
     }
     let before = watch::read_pid(paths);
-    watch::mark(&f.no_autostart)?;
+    if hold_autostart {
+        watch::mark(&f.no_autostart)?;
+    }
     watch::mark(&f.stop)?;
     if !wait_until(Duration::from_secs(20), || !watch::is_running(paths)) {
         // Kill only the watcher we asked to stop: same pid, same lock epoch,
@@ -78,7 +88,19 @@ fn stop(paths: &HostPaths) -> Result<u8, Failure> {
         }
     }
     let _ = std::fs::remove_file(&f.stop);
-    println!("watcher stopped");
+    Ok(true)
+}
+
+fn stop(paths: &HostPaths) -> Result<u8, Failure> {
+    let stopped = stop_watcher(paths, true)?;
+    println!(
+        "{}",
+        if stopped {
+            "watcher stopped"
+        } else {
+            "watcher not running"
+        }
+    );
     Ok(OK)
 }
 
@@ -89,9 +111,22 @@ pub fn run(args: &WatchArgs) -> Result<u8, Failure> {
     }
     let exe = installed_exe(args.dev_binary)?;
     if watch::is_running(&paths) {
-        let pid = watch::read_pid(&paths).map_or("?".into(), |p| p.pid.to_string());
-        println!("watcher already running, pid {pid}");
-        return Ok(OK);
+        match watch::read_pid(&paths) {
+            // A watcher from another version or another binary is replaced, so an
+            // upgrade never leaves the old one sampling.
+            Some(p) if p.version != VERSION || p.binary_path != exe.to_string_lossy() => {
+                eprintln!(
+                    "replacing the watcher from mewkit {} ({})",
+                    p.version, p.binary_path
+                );
+                stop_watcher(&paths, false)?;
+            }
+            p => {
+                let pid = p.map_or("?".into(), |p| p.pid.to_string());
+                println!("watcher already running, pid {pid}");
+                return Ok(OK);
+            }
+        }
     }
     if args.detach {
         let mut child_args = vec!["host".to_string(), "watch".into()];
@@ -113,7 +148,7 @@ pub fn run(args: &WatchArgs) -> Result<u8, Failure> {
         interval: watch::INTERVAL,
         idle_exit_ms: watch::IDLE_EXIT_MS,
         binary_path: exe.to_string_lossy().into_owned(),
-        version: env!("CARGO_PKG_VERSION").into(),
+        version: VERSION.into(),
         auto_clean,
         max_ticks: None,
     };

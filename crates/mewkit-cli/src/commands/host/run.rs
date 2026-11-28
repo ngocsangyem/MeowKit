@@ -4,7 +4,7 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 
 use clap::Args;
-use mewkit_core::host::client::{follow, prepare, wait_for_supervisor};
+use mewkit_core::host::client::{follow, prepare, wait_for_supervisor, wait_quietly};
 use mewkit_core::host::config::HostConfig;
 use mewkit_core::host::jobs::{self, JobState};
 use mewkit_core::host::paths::HostPaths;
@@ -12,6 +12,7 @@ use mewkit_core::host::queue::Priority;
 use mewkit_core::host::{detach, stats, time_now_ms};
 
 use super::block;
+use super::signals::{CANCEL_GRACE, Signals};
 use crate::failure::{FAILED, Failure};
 
 #[derive(Args, Debug)]
@@ -84,7 +85,13 @@ pub fn run(args: &RunArgs) -> Result<u8, Failure> {
     } else {
         started + wait
     };
-    let state = follow(&job, deadline, &mut std::io::stdout());
+    let signals = Signals::install();
+    let mut state = follow(&job, deadline, &mut std::io::stdout(), &|| {
+        signals.arrived()
+    });
+    if state.is_live() && signals.cancel_if_interactive(&job) {
+        state = wait_quietly(&job, Instant::now() + CANCEL_GRACE, &|| false);
+    }
     match state {
         JobState::Queued | JobState::Running => {
             stats::bump(

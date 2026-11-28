@@ -19,6 +19,8 @@ use super::{clean, inbox, jobs, locks, procs, time_now_ms};
 pub const INTERVAL: Duration = Duration::from_secs(5);
 /// Exit after this long with no agent runtime process alive.
 pub const IDLE_EXIT_MS: i64 = 30 * 60 * 1000;
+/// How often the watcher sweeps job directories past their retention.
+const SWEEP_EVERY_MS: i64 = 60_000;
 /// A stop file or no-autostart marker older than this is ignored.
 pub const MARKER_TTL_MS: i64 = 60_000;
 
@@ -85,6 +87,16 @@ pub enum Outcome {
     Stopped,
     Idle,
     TickLimit,
+    /// The binary it started from was replaced or removed (an upgrade or an
+    /// uninstall); the hook starts the new one once the snapshot goes stale.
+    BinaryReplaced,
+}
+
+/// Size and modification time of the watcher's binary: a self-update,
+/// package upgrade or removal changes one of them.
+fn binary_stamp(path: &str) -> Option<(u64, std::time::SystemTime)> {
+    let meta = std::fs::metadata(path).ok()?;
+    Some((meta.len(), meta.modified().ok()?))
 }
 
 fn log_line(log: &mut Option<CappedLog>, line: &str) {
@@ -113,6 +125,10 @@ pub fn run(paths: &HostPaths, opts: &Options) -> io::Result<Outcome> {
     let Some(_lock) = locks::try_hold(&f.lock)? else {
         return Ok(Outcome::AlreadyRunning(read_pid(paths).map(|p| p.pid)));
     };
+    // Taken before the pid file is published, so a replacement that lands
+    // as soon as the watcher looks started is still seen. A path that cannot
+    // be read (tests) is never checked.
+    let started_from = binary_stamp(&opts.binary_path);
     let pid = PidFile {
         pid: std::process::id(),
         binary_path: opts.binary_path.clone(),
@@ -126,13 +142,19 @@ pub fn run(paths: &HostPaths, opts: &Options) -> io::Result<Outcome> {
     )?;
     let mut log = CappedLog::open(&f.log).ok();
     log_line(&mut log, &format!("watcher started pid {}", pid.pid));
-    let outcome = tick_loop(paths, opts, &f, &mut log);
+    let outcome = tick_loop(paths, opts, &f, &mut log, started_from);
     log_line(&mut log, &format!("watcher exiting: {outcome:?}"));
     let _ = std::fs::remove_file(&f.pid);
     Ok(outcome)
 }
 
-fn tick_loop(paths: &HostPaths, opts: &Options, f: &Files, log: &mut Option<CappedLog>) -> Outcome {
+fn tick_loop(
+    paths: &HostPaths,
+    opts: &Options,
+    f: &Files,
+    log: &mut Option<CappedLog>,
+    started_from: Option<(u64, std::time::SystemTime)>,
+) -> Outcome {
     let Some(mut collector) = Collector::new() else {
         log_line(log, "cannot sample this platform");
         return Outcome::Stopped;
@@ -141,9 +163,13 @@ fn tick_loop(paths: &HostPaths, opts: &Options, f: &Files, log: &mut Option<Capp
     collector.prime(None);
     let mut last_runtime_ms = time_now_ms();
     let mut ticks = 0u64;
+    let mut last_sweep_ms = i64::MIN / 2;
     loop {
         if nap(&f.stop, opts.interval) {
             return Outcome::Stopped;
+        }
+        if started_from.is_some() && binary_stamp(&opts.binary_path) != started_from {
+            return Outcome::BinaryReplaced;
         }
         let (report, counters) = collector.sample(&space);
         let now = time_now_ms();
@@ -159,10 +185,11 @@ fn tick_loop(paths: &HostPaths, opts: &Options, f: &Files, log: &mut Option<Capp
             log_line(log, &format!("snapshot write failed: {e}"));
         }
         inbox::publish(paths, &inbox::entries(paths, &report, now), now);
-        // Ended jobs past retention go every tick, except while the disk is
+        // Ended jobs past retention go once a minute, never while the disk is
         // saturated: deleting adds I/O exactly when the host can least spare it.
-        if report.verdict != Verdict::Hold {
+        if report.verdict != Verdict::Hold && now - last_sweep_ms >= SWEEP_EVERY_MS {
             jobs::sweep(paths, now);
+            last_sweep_ms = now;
         }
         if let Some(n) = clean::run_auto(paths, report.verdict, opts.auto_clean, now) {
             log_line(log, &format!("low free space: removed {n} kit state items"));

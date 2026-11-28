@@ -780,6 +780,7 @@ dependencies = [
  "mewkit-core",
  "regex",
  "serde_json",
+ "signal-hook",
  "tar",
  "tempfile",
  "toml_edit",

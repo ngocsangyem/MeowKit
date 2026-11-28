@@ -112,6 +112,9 @@ pub fn plan(paths: &HostPaths, now_ms: i64) -> Vec<Item> {
 /// Remove `items`, appending one `clean.log` line per action. Returns the
 /// number removed.
 pub fn execute(paths: &HostPaths, items: &[Item]) -> usize {
+    if items.is_empty() {
+        return 0;
+    }
     let mut log = super::joblog::CappedLog::open(&paths.dir("clean.log")).ok();
     let mut removed = 0;
     for it in items {

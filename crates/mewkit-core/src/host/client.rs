@@ -92,9 +92,14 @@ pub fn wait_for_supervisor(job: &JobDir, timeout: Duration) -> bool {
     false
 }
 
-/// Stream the job's log (redacted, whole lines) to `out` until the job ends
-/// or `deadline` passes; return the last state seen.
-pub fn follow(job: &JobDir, deadline: Instant, out: &mut dyn Write) -> JobState {
+/// Stream the job's log (redacted, whole lines) to `out` until the job ends,
+/// `deadline` passes or `stop` says so (a signal); return the last state seen.
+pub fn follow(
+    job: &JobDir,
+    deadline: Instant,
+    out: &mut dyn Write,
+    stop: &dyn Fn() -> bool,
+) -> JobState {
     let mut offset = 0u64;
     let mut pending: Vec<u8> = Vec::new();
     loop {
@@ -116,18 +121,19 @@ pub fn follow(job: &JobDir, deadline: Instant, out: &mut dyn Write) -> JobState 
             let _ = out.flush();
             pending.drain(..cut);
         }
-        if finished || Instant::now() >= deadline {
+        if finished || Instant::now() >= deadline || stop() {
             return state;
         }
         std::thread::sleep(Duration::from_millis(100));
     }
 }
 
-/// Wait without streaming until the job ends or `deadline` passes.
-pub fn wait_quietly(job: &JobDir, deadline: Instant) -> JobState {
+/// Wait without streaming until the job ends, `deadline` passes or `stop`
+/// says so.
+pub fn wait_quietly(job: &JobDir, deadline: Instant, stop: &dyn Fn() -> bool) -> JobState {
     loop {
         let state = job.state();
-        if !state.is_live() || Instant::now() >= deadline {
+        if !state.is_live() || Instant::now() >= deadline || stop() {
             return state;
         }
         std::thread::sleep(Duration::from_millis(200));

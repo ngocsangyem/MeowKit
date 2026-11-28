@@ -8,6 +8,7 @@ use mewkit_core::host::paths::HostPaths;
 use mewkit_core::host::{joblog, time_now_ms};
 
 use super::block;
+use super::signals::{CANCEL_GRACE, Signals};
 use crate::failure::{Failure, OK};
 
 /// How much of a finished job's log `jobs wait` prints.
@@ -74,7 +75,11 @@ pub fn run(args: &JobsArgs) -> Result<u8, Failure> {
         JobsCommand::Wait { id, timeout } => {
             let job = find(&paths, id)?;
             let wait = block::wait_for("--timeout", timeout.as_deref())?;
-            let state = wait_quietly(&job, Instant::now() + wait);
+            let signals = Signals::install();
+            let mut state = wait_quietly(&job, Instant::now() + wait, &|| signals.arrived());
+            if state.is_live() && signals.cancel_if_interactive(&job) {
+                state = wait_quietly(&job, Instant::now() + CANCEL_GRACE, &|| false);
+            }
             match state {
                 JobState::Done(_) => print!("{}", joblog::tail(&job.log(), WAIT_TAIL)),
                 JobState::Queued | JobState::Running => {

@@ -22,6 +22,24 @@ fn opts(ticks: u64) -> Options {
 }
 
 #[test]
+fn a_replaced_binary_ends_the_watcher() {
+    let home = tempfile::tempdir().unwrap();
+    let paths = HostPaths::under_home(home.path());
+    let bin = home.path().join("mewkit");
+    std::fs::write(&bin, b"old").unwrap();
+    let mut o = opts(10_000);
+    o.binary_path = bin.to_string_lossy().into_owned();
+    let p = paths.clone();
+    let watcher = std::thread::spawn(move || watch::run(&p, &o).unwrap());
+    while watch::read_pid(&paths).is_none() {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    // A self-update writes a new file at the same path.
+    std::fs::write(&bin, b"new binary").unwrap();
+    assert_eq!(watcher.join().unwrap(), Outcome::BinaryReplaced);
+}
+
+#[test]
 fn one_watcher_at_a_time_and_a_stop_file_ends_it() {
     let home = tempfile::tempdir().unwrap();
     let paths = HostPaths::under_home(home.path());

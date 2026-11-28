@@ -39,7 +39,9 @@ you can tell whether the load is yours.
   `QUEUED — NOT STARTED — NOT VERIFIED` or `STILL RUNNING — NOT VERIFIED`. The job keeps
   going on its own. Do other work, then run `mewkit host jobs wait <id>`. Do not re-run the
   same command: an identical command on the same tree attaches to the running job anyway.
-- **Exit 70**: the job was lost (its supervisor died) or cancelled. Re-run it once.
+- **Exit 70**: the job was lost (its supervisor died) or cancelled; stderr says which. Re-run it once.
+- A command can itself exit 75 or 70. Read those codes as the runner's only with its
+  `NOT VERIFIED` first line or its `lost`/`cancelled` stderr line; otherwise they are the command's own failure.
 - `mewkit host jobs log <id>` shows a job's output (secrets masked); `mewkit host jobs list`
   shows all jobs. Read only the jobs you started.
 

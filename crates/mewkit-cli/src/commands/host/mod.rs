@@ -7,6 +7,7 @@ mod clean;
 mod internal;
 mod jobs;
 mod run;
+mod signals;
 mod status;
 mod watch;
 
@@ -18,6 +19,33 @@ use crate::failure::Failure;
 /// The host state directory, or a failure when there is no home to hold it.
 fn host_paths() -> Result<HostPaths, Failure> {
     HostPaths::resolve().ok_or_else(|| Failure::failed("HOME is not set"))
+}
+
+/// After the last runtime leaves an install: stop the machine-wide watcher
+/// (nothing here would restart it; another install's hook still may) and say
+/// where the shared host state is, which stays because other projects on the
+/// machine may use it. Notes go to stderr so `--json` output is unchanged.
+pub fn after_uninstall(apply: bool) {
+    let Some(paths) = HostPaths::resolve() else {
+        return;
+    };
+    if !paths.root.exists() {
+        return;
+    }
+    if !apply {
+        if mewkit_core::host::watch::is_running(&paths) {
+            eprintln!("would also stop the host watcher (beta)");
+        }
+        return;
+    }
+    if let Ok(true) = watch::stop_watcher(&paths, true) {
+        eprintln!("stopped the host watcher (beta)");
+    }
+    eprintln!(
+        "host state stays at {} for other projects on this machine: `mewkit host clean` \
+         removes its stale parts; delete the folder when no project uses MeowKit any more",
+        paths.root.display()
+    );
 }
 
 #[derive(Args, Debug)]
