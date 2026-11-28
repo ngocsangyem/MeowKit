@@ -234,6 +234,11 @@
       "size": 9546
     },
     {
+      "path": ".cursor/hooks/lib/core/host-evidence.cjs",
+      "sha256": "d49e5cf7e0dd9c3ca4e4cbd2b61569d01992a1e56d626f84daa35f0493e13c98",
+      "size": 2535
+    },
+    {
       "path": ".cursor/hooks/lib/core/plan-state-sync.cjs",
       "sha256": "d2d2ab8418cc471188b119892c125aa1c8ee357fe128095213bad8f972268b66",
       "size": 12959
@@ -2829,6 +2834,11 @@
       "size": 8075
     },
     {
+      "path": ".cursor/skills/mk-orchestrate/references/host-admission.md",
+      "sha256": "3adc8ded3ffecbfc2ddd2401abca8b0215ad9e46e050f82a586ca9d08f19a548",
+      "size": 1509
+    },
+    {
       "path": ".cursor/skills/mk-orchestrate/references/internal-routing.md",
       "sha256": "0261695ede62b940e0bc30944f787be5959548613e601cf52c9401029412603f",
       "size": 7566
@@ -4487,6 +4497,11 @@
       "path": ".cursor/skills/mk-verify/SKILL.md",
       "sha256": "a006ed99d4d3516970bf7abbe41dc43d8eba7896c4db5b21f68802e8aff1deed",
       "size": 8129
+    },
+    {
+      "path": ".cursor/skills/mk-verify/references/heavy-commands.md",
+      "sha256": "ba840fbba23489f5e63cadd1d28931695faab408dc24028d257cf9364409f557",
+      "size": 2683
     },
     {
       "path": ".cursor/skills/mk-verify/references/project-detection.md",

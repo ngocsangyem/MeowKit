@@ -79,7 +79,7 @@ pytest --cov=src --cov-report=term -q 2>/dev/null | grep TOTAL | awk '{print $NF
 go test ./... -coverprofile=cover.out 2>/dev/null && go tool cover -func=cover.out \
   | grep total | awk '{print $3}' | tr -d '%'
 ```
-Guard idea: the project test suite (`npm test` / `pytest` / `go test ./...`).
+Guard idea: the project test suite (`npm test` / `pytest` / `go test ./...`). On a shared machine run it through `mewkit host run` per `.claude/skills/verify/references/heavy-commands.md` (beta); its exit 75 is not a pass.
 
 ### Lint / type errors (Direction: lower · Noise: low)
 

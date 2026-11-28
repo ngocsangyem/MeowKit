@@ -1,0 +1,47 @@
+[
+  {
+    "input": "/Users/dev/Projects/app",
+    "normalized": "/Users/dev/Projects/app",
+    "key": "5d20cc2f3cddccb2"
+  },
+  {
+    "input": "/Users/dev/Projects/app/",
+    "normalized": "/Users/dev/Projects/app",
+    "key": "5d20cc2f3cddccb2"
+  },
+  {
+    "input": "/Users/dev/./Projects/x/../app",
+    "normalized": "/Users/dev/Projects/app",
+    "key": "5d20cc2f3cddccb2"
+  },
+  {
+    "input": "C:\\Users\\Dev\\app",
+    "normalized": "c:/Users/Dev/app",
+    "key": "013c07a12e335890"
+  },
+  {
+    "input": "c:/Users/Dev/app/",
+    "normalized": "c:/Users/Dev/app",
+    "key": "013c07a12e335890"
+  },
+  {
+    "input": "D:\\work\\repo\\..\\other",
+    "normalized": "d:/work/other",
+    "key": "a4eb4302fd8b250f"
+  },
+  {
+    "input": "/home/u/my repo",
+    "normalized": "/home/u/my repo",
+    "key": "bcda291edcc16271"
+  },
+  {
+    "input": "/",
+    "normalized": "/",
+    "key": "8a5edab282632443"
+  },
+  {
+    "input": "relative/dir",
+    "normalized": "relative/dir",
+    "key": "393de91d95fd83c9"
+  }
+]

@@ -12,7 +12,7 @@
 use serde::Serialize;
 use serde_json::{Map, Value, json, ser::PrettyFormatter};
 
-use super::key_surface::{KeySpec, ValueKind, known_keys};
+use super::key_surface::{KeySpec, ValueKind, is_user_only_key, known_keys};
 use super::schema::SCHEMA_URL;
 
 /// The JSON Schema draft the document declares itself against.
@@ -39,7 +39,12 @@ pub fn config_json_schema(observer_names: &[String]) -> Value {
     let mut groups: Map<String, Value> = Map::new();
     let mut properties = Map::new();
     properties.insert("$schema".into(), json!({ "type": "string" }));
-    for (key, spec) in known_keys(observer_names) {
+    // Machine-wide keys (`host.*`) are refused in a project file, so the
+    // project schema must not offer them.
+    for (key, spec) in known_keys(observer_names)
+        .into_iter()
+        .filter(|(key, _)| !is_user_only_key(key))
+    {
         match key.split_once('.') {
             None => {
                 properties.insert(key, leaf(&spec));

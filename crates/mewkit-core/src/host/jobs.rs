@@ -1,0 +1,221 @@
+//! A heavy job on disk: `jobs/<id>/` holds `meta.json` (who and what, never
+//! the full command line), `alive.lock` (held by the supervisor for its whole
+//! life), `admitted` once the command starts, `exit` when it ends, `cancel`
+//! when someone asks it to stop and `cancelled` when it did, plus the log.
+//! A job whose supervisor is gone without an `exit` file is `lost`: never a
+//! pass.
+use std::path::PathBuf;
+
+use serde::{Deserialize, Serialize};
+
+use super::locks;
+use super::paths::{HostPaths, read_json, read_parsed};
+
+/// Finished and lost job directories older than this are swept.
+pub const RETENTION_MS: i64 = 7 * 24 * 3600 * 1000;
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Meta {
+    pub id: String,
+    pub worktree: Option<String>,
+    /// The tree when the job was enqueued: the attach key, not evidence.
+    pub tree_digest: Option<String>,
+    /// The tree the command ran on, recorded only when it was the same at
+    /// start and at exit: the one digest a pass may be credited to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ran_tree_digest: Option<String>,
+    pub cmd_class: Option<String>,
+    pub cmd_hash: String,
+    pub exe_base: String,
+    pub priority: super::queue::Priority,
+    pub enqueued_at_ms: i64,
+    pub child_pid: Option<u32>,
+    pub child_start_ms: Option<i64>,
+    pub session_hint: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum JobState {
+    Queued,
+    Running,
+    Done(i32),
+    Cancelled,
+    Lost,
+}
+
+impl JobState {
+    pub fn label(self) -> String {
+        match self {
+            Self::Queued => "queued".into(),
+            Self::Running => "running".into(),
+            Self::Done(code) => format!("done({code})"),
+            Self::Cancelled => "cancelled".into(),
+            Self::Lost => "lost".into(),
+        }
+    }
+    pub fn is_live(self) -> bool {
+        matches!(self, Self::Queued | Self::Running)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct JobDir {
+    pub id: String,
+    pub dir: PathBuf,
+}
+
+impl JobDir {
+    pub fn new(paths: &HostPaths, id: &str) -> Self {
+        Self {
+            id: id.to_string(),
+            dir: paths.dir("jobs").join(id),
+        }
+    }
+    pub fn alive(&self) -> PathBuf {
+        self.dir.join("alive.lock")
+    }
+    pub fn meta(&self) -> PathBuf {
+        self.dir.join("meta.json")
+    }
+    pub fn admitted(&self) -> PathBuf {
+        self.dir.join("admitted")
+    }
+    pub fn exit(&self) -> PathBuf {
+        self.dir.join("exit")
+    }
+    pub fn cancel(&self) -> PathBuf {
+        self.dir.join("cancel")
+    }
+    pub fn claim(&self) -> PathBuf {
+        self.dir.join("claim")
+    }
+    pub fn cancelled(&self) -> PathBuf {
+        self.dir.join("cancelled")
+    }
+    pub fn log(&self) -> PathBuf {
+        self.dir.join("log")
+    }
+
+    pub fn read_meta(&self) -> Option<Meta> {
+        read_json(&self.meta())
+    }
+    pub fn write_meta(&self, meta: &Meta) -> std::io::Result<()> {
+        let bytes = serde_json::to_vec_pretty(meta).map_err(std::io::Error::other)?;
+        crate::fsx::atomic_write(&self.meta(), &bytes, Some(0o600))
+    }
+
+    fn finished(&self) -> Option<JobState> {
+        let code: i32 = read_parsed(&self.exit())?;
+        Some(if self.cancelled().exists() {
+            JobState::Cancelled
+        } else {
+            JobState::Done(code)
+        })
+    }
+
+    /// Exit file first, then the liveness lock, then the exit file again: a
+    /// supervisor that writes `exit` and dies between the two reads is still
+    /// seen as finished, never as lost.
+    pub fn state(&self) -> JobState {
+        if let Some(done) = self.finished() {
+            return done;
+        }
+        if locks::is_held(&self.alive()) {
+            return if self.admitted().exists() {
+                JobState::Running
+            } else {
+                JobState::Queued
+            };
+        }
+        self.finished().unwrap_or(JobState::Lost)
+    }
+
+    /// Take the right to run the command: true for exactly one caller. The
+    /// supervisor claims before it queues; a client that gave up waiting for
+    /// the supervisor claims before running the command itself, and runs it
+    /// only when the claim is its own.
+    pub fn claim_run(&self) -> bool {
+        std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(self.claim())
+            .is_ok()
+    }
+
+    /// When the command started, for elapsed-time display.
+    pub fn admitted_at_ms(&self) -> Option<i64> {
+        read_parsed(&self.admitted())
+    }
+}
+
+/// True for a name `new_id` could have made: ASCII letters, digits and
+/// dashes, at most 64. Checked before any path is built from an id.
+pub fn valid_id(id: &str) -> bool {
+    !id.is_empty() && id.len() <= 64 && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+}
+
+/// A fresh id: UTC stamp plus a short hash of pid and clock, unique enough
+/// for one machine and readable in a listing.
+pub fn new_id(now_ms: i64) -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or_default();
+    let seed = format!("{}:{nanos}:{now_ms}", std::process::id());
+    let stamp = crate::time_utc::iso_seconds(now_ms).replace(['-', ':'], "");
+    let stamp = stamp.trim_end_matches('Z').replace('T', "-");
+    format!(
+        "{}-{}",
+        stamp.get(2..).unwrap_or(&stamp),
+        &crate::fsx::sha256_hex(seed.as_bytes())[..6]
+    )
+}
+
+/// Every job directory, newest id first.
+pub fn all(paths: &HostPaths) -> Vec<JobDir> {
+    let root = paths.dir("jobs");
+    let Ok(entries) = std::fs::read_dir(&root) else {
+        return Vec::new();
+    };
+    let mut ids: Vec<String> = entries
+        .flatten()
+        .filter(|e| e.file_type().is_ok_and(|t| t.is_dir()))
+        .filter_map(|e| e.file_name().into_string().ok())
+        .collect();
+    ids.sort_unstable_by(|a, b| b.cmp(a));
+    ids.into_iter()
+        .map(|id| JobDir {
+            dir: root.join(&id),
+            id,
+        })
+        .collect()
+}
+
+/// A live job running the same command on the same tree, to attach to
+/// instead of starting a second copy.
+pub fn find_duplicate(paths: &HostPaths, meta: &Meta) -> Option<JobDir> {
+    meta.tree_digest.as_ref()?;
+    all(paths).into_iter().find(|job| {
+        job.read_meta().is_some_and(|m| {
+            m.worktree == meta.worktree
+                && m.cmd_hash == meta.cmd_hash
+                && m.tree_digest == meta.tree_digest
+        }) && job.state().is_live()
+    })
+}
+
+/// Remove ended job directories older than the retention or beyond the
+/// newest [`super::clean::MAX_ENDED_JOBS`], and unused key locks (every
+/// `host run` and the watcher do this, whatever the verdict), through the
+/// same no-follow deletion as the cleanup tier.
+pub fn sweep(paths: &HostPaths, now_ms: i64) -> usize {
+    use super::clean;
+    let mut items = clean::ended_jobs(paths, now_ms, RETENTION_MS);
+    for extra in clean::excess_jobs(paths, clean::MAX_ENDED_JOBS) {
+        if !items.contains(&extra) {
+            items.push(extra);
+        }
+    }
+    items.extend(clean::stale_keys(paths, now_ms, clean::KEY_AGE_MS));
+    clean::execute(paths, &items)
+}

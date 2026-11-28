@@ -76,9 +76,11 @@ fn every_surface_key_has_a_stub_and_nothing_else_does() {
         });
     }
     stubbed.sort();
+    // A project stub never offers a machine-wide key: the rules refuse it there.
     let mut expected: Vec<String> = known_keys(&names())
         .into_iter()
         .map(|(key, _)| key)
+        .filter(|key| !crate::config::is_user_only_key(key))
         .collect();
     expected.sort();
     assert_eq!(stubbed, expected);

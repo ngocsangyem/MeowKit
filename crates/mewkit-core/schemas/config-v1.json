@@ -99,6 +99,9 @@
 				"delegation-brief-check": {
 					"type": "boolean"
 				},
+				"host-pressure": {
+					"type": "boolean"
+				},
 				"jira-env-loader": {
 					"type": "boolean"
 				},

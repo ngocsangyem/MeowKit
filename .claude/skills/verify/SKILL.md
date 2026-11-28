@@ -45,6 +45,8 @@ Detect the project type from its marker files and choose commands per `reference
 
 By default the skill checks what changed, so a post-change run stays fast: lint and tests run on the changed files (tests only those related to them); build and type-check stay whole-program, because a partial build or type-check misses cross-file breakage; coverage is skipped and reported `SCOPED`. `--full` runs every step across the whole project, for releases and CI. With no git, or no changed files, run the whole project.
 
+On a machine where `mewkit host status` works (beta), run build and test steps through `mewkit host run -- <command>` and read exit 75 as not verified, per `references/heavy-commands.md`; elsewhere run them directly.
+
 The ship check mirrors this at commit, push and merge time: lint on changed files, related tests and a type-check. It is not a whole-project gate; use `--full` for one.
 
 ## Process (Fail Fast)

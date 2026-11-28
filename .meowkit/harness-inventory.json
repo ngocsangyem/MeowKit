@@ -232,6 +232,13 @@
       "runtime": "claude-code",
       "responsibility": "verification"
     },
+    "hooks/handlers/host-pressure.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "observability"
+    },
     "hooks/handlers/delegation-brief-check.cjs": {
       "owner": "utility",
       "criticality": "medium",
